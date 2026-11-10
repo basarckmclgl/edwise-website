@@ -2,157 +2,252 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>EDWISE | Yönetim Paneli</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: #11101d;
-      color: #fff;
-      font-family: Arial, sans-serif;
-    }
-    header {
-      height: 75px;
-      padding: 0 5%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #1c1a2c;
-      border-bottom: 1px solid #37334e;
-    }
-    .logo { color: #a18aff; font-size: 24px; font-weight: bold; letter-spacing: 3px; }
-    button {
-      padding: 11px 18px;
-      border: 0;
-      border-radius: 7px;
-      background: #6848d8;
-      color: white;
-      cursor: pointer;
-    }
-    main { max-width: 1100px; margin: 45px auto; padding: 0 20px; }
-    h1 { font-size: 28px; }
-    .welcome, .card {
-      background: #1c1a2c;
-      border: 1px solid #37334e;
-      border-radius: 12px;
-      padding: 24px;
-    }
-    .welcome { margin-bottom: 25px; }
-    .muted { color: #aaa7bd; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 18px;
-    }
-    .card h2 { font-size: 18px; }
-    .card p { color: #aaa7bd; line-height: 1.5; }
-    #status { color: #aaa7bd; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDWISE | Yönetim Merkezi</title>
+<style>
+:root {
+  --bg:#0d0d18;
+  --panel:#171727;
+  --panel2:#1d1d31;
+  --border:#30304b;
+  --purple:#8055ed;
+  --purple2:#a78bfa;
+  --text:#f5f3ff;
+  --muted:#a5a3bd;
+  --green:#42c99a;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Inter,Arial,sans-serif;display:flex;min-height:100vh
+}
+.sidebar{
+  width:255px;background:#131322;border-right:1px solid var(--border);
+  padding:25px 17px;position:fixed;inset:0 auto 0 0;
+  display:flex;flex-direction:column;z-index:5
+}
+.logo{font-size:25px;font-weight:900;letter-spacing:3px;
+  color:var(--purple2);padding:5px 12px 30px}
+.logo span{display:block;font-size:10px;letter-spacing:2px;
+  color:var(--muted);font-weight:500;margin-top:5px}
+.menu-label{font-size:10px;color:#77758f;letter-spacing:1.5px;
+  padding:15px 12px 9px}
+.nav{
+  display:flex;align-items:center;gap:12px;padding:12px;
+  color:var(--muted);text-decoration:none;border-radius:9px;
+  margin:3px 0;font-size:13px;cursor:pointer;border:0;
+  background:transparent;width:100%;text-align:left
+}
+.nav:hover,.nav.active{background:#29213f;color:white}
+.nav.active{border-left:3px solid var(--purple2)}
+.nav .ico{width:22px;text-align:center;font-size:17px}
+.sidebar-bottom{margin-top:auto;border-top:1px solid var(--border);padding-top:15px}
+.main{margin-left:255px;width:calc(100% - 255px);min-height:100vh}
+.topbar{
+  height:70px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 35px;background:#131322
+}
+.top-title{font-size:13px;color:var(--muted)}
+.top-actions{display:flex;align-items:center;gap:15px}
+.user-chip{font-size:12px;color:var(--muted)}
+button{font-family:inherit;cursor:pointer}
+.logout{
+  background:var(--purple);color:white;border:0;padding:10px 16px;
+  border-radius:8px;font-size:12px;font-weight:600
+}
+.content{padding:35px;max-width:1450px;margin:auto}
+.welcome{
+  background:linear-gradient(120deg,#282044,#19192c 70%);
+  border:1px solid #42345f;border-radius:16px;padding:28px;
+  margin-bottom:25px;position:relative;overflow:hidden
+}
+.welcome:after{
+  content:"✦";position:absolute;right:45px;top:12px;
+  font-size:100px;color:#8e69ed;opacity:.12
+}
+.welcome small{color:var(--purple2);font-size:11px;letter-spacing:2px}
+.welcome h1{font-size:25px;margin:12px 0 8px}
+.welcome p{font-size:13px;color:#b9b5ce;margin:0}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin:30px 0 16px}
+.section-head h2{font-size:17px;margin:0}
+.section-head p{font-size:12px;color:var(--muted);margin:6px 0 0}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.stat,.module,.content-panel{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:13px;padding:20px
+}
+.stat-top{display:flex;justify-content:space-between;align-items:center}
+.stat-icon,.module-icon{
+  width:42px;height:42px;border-radius:11px;
+  display:grid;place-items:center;background:#29213f;font-size:20px
+}
+.stat h3{font-size:25px;margin:17px 0 5px}
+.stat p{font-size:12px;color:var(--muted);margin:0}
+.module{cursor:pointer;transition:.2s;min-height:165px}
+.module:hover{transform:translateY(-3px);border-color:var(--purple)}
+.module h3{font-size:14px;margin:16px 0 7px}
+.module p{font-size:12px;line-height:1.6;color:var(--muted);margin:0}
+.module .arrow{float:right;color:var(--purple2)}
+.content-panel{min-height:230px}
+.content-panel h2{font-size:18px;margin:0 0 10px}
+.content-panel p{font-size:13px;color:var(--muted);line-height:1.7}
+.notice{
+  margin-top:18px;padding:13px 15px;border-radius:9px;
+  background:#242039;border:1px solid #40345e;
+  color:#c9bafa;font-size:12px;line-height:1.6
+}
+.quick{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.quick button{
+  background:#29213f;color:#ddd2ff;border:1px solid #443665;
+  border-radius:8px;padding:11px 14px;font-size:12px
+}
+.quick button:hover{background:var(--purple);color:white}
+.hidden{display:none}
+.footer{font-size:11px;color:#77758f;margin-top:35px}
+@media(max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){
+  .sidebar{width:70px;padding:18px 9px}
+  .logo{font-size:15px;padding:5px 7px 25px}
+  .logo span,.menu-label,.nav .nav-text{display:none}
+  .nav{justify-content:center;padding:13px 5px}
+  .nav .ico{font-size:20px}
+  .main{margin-left:70px;width:calc(100% - 70px)}
+  .topbar{padding:0 15px}
+  .content{padding:18px 13px}
+  .grid{grid-template-columns:1fr}
+  .welcome h1{font-size:20px}
+}
+</style>
 </head>
 <body>
-  <header>
-    <div class="logo">EDWISE</div>
-    <button id="logoutButton">Güvenli Çıkış</button>
+
+<aside class="sidebar">
+  <div class="logo">EDWISE<span>CONTENT MANAGEMENT SYSTEM</span></div>
+
+  <div class="menu-label">ANA MENÜ</div>
+  <button class="nav active" data-page="overview"><span class="ico">▦</span><span class="nav-text">Genel Bakış</span></button>
+
+  <div class="menu-label">İÇERİK YÖNETİMİ</div>
+  <button class="nav" data-page="pages"><span class="ico">▤</span><span class="nav-text">Sayfa Yönetimi</span></button>
+  <button class="nav" data-page="services"><span class="ico">✧</span><span class="nav-text">Hizmet Yönetimi</span></button>
+  <button class="nav" data-page="posts"><span class="ico">▧</span><span class="nav-text">Blog Yönetimi</span></button>
+
+  <div class="menu-label">İŞLETME YÖNETİMİ</div>
+  <button class="nav" data-page="applications"><span class="ico">▣</span><span class="nav-text">Başvurular</span></button>
+  <button class="nav" data-page="media"><span class="ico">▧</span><span class="nav-text">Medya Kütüphanesi</span></button>
+  <button class="nav" data-page="settings"><span class="ico">⚙</span><span class="nav-text">Site Ayarları</span></button>
+
+  <div class="menu-label">SİSTEM</div>
+  <button class="nav" data-page="users"><span class="ico">♙</span><span class="nav-text">Kullanıcı ve Yetkiler</span></button>
+
+  <div class="sidebar-bottom">
+    <button class="nav" data-page="profile"><span class="ico">◉</span><span class="nav-text">Hesabım</span></button>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div class="top-title">EDWISE / <strong id="breadcrumb">Genel Bakış</strong></div>
+    <div class="top-actions">
+      <span class="user-chip" id="username">Yönetici</span>
+      <button class="logout" id="logout">Güvenli Çıkış ↗</button>
+    </div>
   </header>
 
-  <main>
-    <section class="welcome">
-      <h1>Yönetim Paneli</h1>
-      <p id="welcomeText" class="muted">Yönetici oturumu kontrol ediliyor...</p>
-      <p id="status"></p>
+  <div class="content">
+    <section id="overview" class="page">
+      <div class="welcome">
+        <small>EDWISE YÖNETİM MERKEZİ</small>
+        <h1>Hoş geldiniz, <span id="welcomeName">Yönetici</span> 👋</h1>
+        <p>İçeriklerinizi, hizmetlerinizi ve web sitenizi tek merkezden yönetin.</p>
+      </div>
+
+      <div class="section-head">
+        <div><h2>Genel Durum</h2><p>İçerik ve işletme yönetimi özeti</p></div>
+      </div>
+      <div class="grid">
+        <div class="stat"><div class="stat-top"><span>Toplam Sayfa</span><span class="stat-icon">▤</span></div><h3>—</h3><p>Veritabanı bağlantısı bekleniyor</p></div>
+        <div class="stat"><div class="stat-top"><span>Hizmetler</span><span class="stat-icon">✧</span></div><h3>—</h3><p>Veritabanı bağlantısı bekleniyor</p></div>
+        <div class="stat"><div class="stat-top"><span>Blog Yazıları</span><span class="stat-icon">▧</span></div><h3>—</h3><p>Veritabanı bağlantısı bekleniyor</p></div>
+        <div class="stat"><div class="stat-top"><span>Başvurular</span><span class="stat-icon">▣</span></div><h3>—</h3><p>Başvuru modülü kurulacak</p></div>
+      </div>
+
+      <div class="section-head"><div><h2>Yönetim Modülleri</h2><p>İşlem yapmak istediğiniz alanı seçin.</p></div></div>
+      <div class="grid">
+        <div class="module" data-open="pages"><div class="module-icon">▤</div><h3>Sayfa Yönetimi <span class="arrow">↗</span></h3><p>Web sitesi sayfalarını oluşturun, düzenleyin ve yayınlayın.</p></div>
+        <div class="module" data-open="services"><div class="module-icon">✧</div><h3>Hizmet Yönetimi <span class="arrow">↗</span></h3><p>Eğitim ve danışmanlık hizmetlerinizi yönetin.</p></div>
+        <div class="module" data-open="posts"><div class="module-icon">▧</div><h3>Blog Yönetimi <span class="arrow">↗</span></h3><p>Blog yazıları oluşturun, düzenleyin ve yayımlayın.</p></div>
+        <div class="module" data-open="applications"><div class="module-icon">▣</div><h3>Başvurular <span class="arrow">↗</span></h3><p>Web sitesi üzerinden gelen başvuruları takip edin.</p></div>
+        <div class="module" data-open="media"><div class="module-icon">▧</div><h3>Medya Kütüphanesi <span class="arrow">↗</span></h3><p>Fotoğraf ve dosyalarınızı tek yerden yönetin.</p></div>
+        <div class="module" data-open="settings"><div class="module-icon">⚙</div><h3>Site Ayarları <span class="arrow">↗</span></h3><p>Logo, iletişim bilgileri, menüler ve sosyal medya ayarları.</p></div>
+        <div class="module" data-open="users"><div class="module-icon">♙</div><h3>Kullanıcı ve Yetkiler <span class="arrow">↗</span></h3><p>Yönetici hesapları ve erişim izinlerini yönetin.</p></div>
+        <div class="module" data-open="profile"><div class="module-icon">◉</div><h3>Hesabım <span class="arrow">↗</span></h3><p>Yönetici hesabınızı ve oturum bilgilerinizi görüntüleyin.</p></div>
+      </div>
     </section>
 
-    <section class="grid">
-      <article class="card">
-        <h2>Sayfa Yönetimi</h2>
-        <p>İnternet sitesindeki sayfaları düzenleme alanı.</p>
-        <span class="muted">Hazırlanıyor</span>
-      </article>
-
-      <article class="card">
-        <h2>Hizmet Yönetimi</h2>
-        <p>Eğitim ve danışmanlık hizmetlerini yönetme alanı.</p>
-        <span class="muted">Hazırlanıyor</span>
-      </article>
-
-      <article class="card">
-        <h2>Blog Yönetimi</h2>
-        <p>Blog yazılarını oluşturma ve yayımlama alanı.</p>
-        <span class="muted">Hazırlanıyor</span>
-      </article>
-
-      <article class="card">
-        <h2>Başvurular</h2>
-        <p>Site üzerinden gelen başvuruları yönetme alanı.</p>
-        <span class="muted">Hazırlanıyor</span>
-      </article>
-
-      <article class="card">
-        <h2>Medya Kütüphanesi</h2>
-        <p>Görselleri ve medya dosyalarını yönetme alanı.</p>
-        <span class="muted">Hazırlanıyor</span>
-      </article>
-
-      <article class="card">
-        <h2>Site Ayarları</h2>
-        <p>Genel site ayarlarını düzenleme alanı.</p>
-        <span class="muted">Hazırlanıyor</span>
-      </article>
+    <section id="modulePage" class="page hidden">
+      <div class="content-panel">
+        <h2 id="moduleTitle">Modül</h2>
+        <p id="moduleDescription"></p>
+        <div class="notice" id="moduleNotice">
+          Bu modülün veritabanı işlemleri ve güvenli sunucu bağlantısı henüz kurulmadı. Bağlantı tamamlanmadan içerik ekleme veya silme işlemi yapılmayacaktır.
+        </div>
+        <div class="quick">
+          <button id="backHome">← Genel Bakışa Dön</button>
+        </div>
+      </div>
     </section>
-  </main>
 
-  <script>
-    async function checkSession() {
-      try {
-        const response = await fetch("/api/me", {
-          credentials: "same-origin",
-          cache: "no-store"
-        });
+    <div class="footer">EDWISE CMS · Yönetim Merkezi · Güvenli yönetim alanı</div>
+  </div>
+</main>
 
-        const data = await response.json();
+<script>
+const descriptions = {
+  pages:["Sayfa Yönetimi","Ana sayfa, Hakkımızda, İletişim ve diğer web sayfalarınızı oluşturup düzenleyebileceğiniz alan."],
+  services:["Hizmet Yönetimi","Eğitim programları ve danışmanlık hizmetlerini ekleyip düzenleyebileceğiniz alan."],
+  posts:["Blog Yönetimi","Yeni blog yazıları oluşturabileceğiniz, taslak kaydedebileceğiniz ve yayınlayabileceğiniz alan."],
+  applications:["Başvuru Yönetimi","Web sitesi ziyaretçilerinden gelen başvuruları inceleyip takip edebileceğiniz alan."],
+  media:["Medya Kütüphanesi","Görsellerinizi ve dosyalarınızı yükleyip yönetebileceğiniz alan."],
+  settings:["Site Ayarları","Logo, site adı, telefon, e-posta, WhatsApp, menü ve sosyal medya bilgilerini yönetebileceğiniz alan."],
+  users:["Kullanıcı ve Yetkiler","Yönetici hesapları oluşturup rollerini ve erişim izinlerini düzenleyebileceğiniz alan."],
+  profile:["Hesabım","Yönetici hesabınızın bilgilerini görüntüleyebileceğiniz alan."]
+};
 
-        if (!response.ok || !data.authenticated) {
-          window.location.replace("/admin/");
-          return;
-        }
+function showPage(page) {
+  document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===page));
+  document.getElementById("overview").classList.toggle("hidden",page!=="overview");
+  document.getElementById("modulePage").classList.toggle("hidden",page==="overview");
+  if(page!=="overview"){
+    document.getElementById("moduleTitle").textContent=descriptions[page][0];
+    document.getElementById("moduleDescription").textContent=descriptions[page][1];
+  }
+  document.getElementById("breadcrumb").textContent=page==="overview"?"Genel Bakış":descriptions[page][0];
+}
+document.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",()=>showPage(el.dataset.page)));
+document.querySelectorAll("[data-open]").forEach(el=>el.addEventListener("click",()=>showPage(el.dataset.open)));
+document.getElementById("backHome").addEventListener("click",()=>showPage("overview"));
 
-        document.getElementById("welcomeText").textContent =
-          "Hoş geldiniz, " + data.admin.username;
-
-        document.getElementById("status").textContent =
-          "Yetki: " + data.admin.role;
-
-      } catch {
-        document.getElementById("welcomeText").textContent =
-          "Oturum doğrulanamadı. Giriş sayfasına yönlendiriliyorsunuz.";
-        window.location.replace("/admin/");
-      }
-    }
-
-    document.getElementById("logoutButton").addEventListener("click", async () => {
-      const button = document.getElementById("logoutButton");
-      button.disabled = true;
-
-      try {
-        const response = await fetch("/api/logout", {
-          method: "POST",
-          credentials: "same-origin"
-        });
-
-        if (!response.ok) {
-          throw new Error("Çıkış yapılamadı.");
-        }
-
-        window.location.replace("/admin/");
-      } catch {
-        button.disabled = false;
-        alert("Çıkış yapılamadı. Lütfen tekrar deneyin.");
-      }
-    });
-
-    checkSession();
-  </script>
+async function checkSession(){
+  try{
+    const response=await fetch("/api/me",{credentials:"same-origin"});
+    if(!response.ok){location.replace("/admin/");return;}
+    const data=await response.json();
+    if(!data.success||!data.admin){location.replace("/admin/");return;}
+    const name=data.admin.username||"Yönetici";
+    document.getElementById("username").textContent=name;
+    document.getElementById("welcomeName").textContent=name;
+  }catch(error){
+    location.replace("/admin/");
+  }
+}
+document.getElementById("logout").addEventListener("click",async()=>{
+  try{await fetch("/api/logout",{method:"POST",credentials:"same-origin"});}
+  finally{location.replace("/admin/");}
+});
+checkSession();
+</script>
 </body>
 </html>
