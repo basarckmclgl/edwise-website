@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDWISE Görsel Yükleme Testi</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #111827;
+  color: white;
+  padding: 40px;
+  max-width: 650px;
+  margin: auto;
+}
+button, input {
+  margin-top: 15px;
+  padding: 12px;
+}
+button {
+  background: #7655e8;
+  color: white;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+#result { margin-top: 20px; overflow-wrap: anywhere; }
+img { max-width: 100%; margin-top: 20px; border-radius: 12px; }
+</style>
+</head>
+<body>
+
+<h1>EDWISE Görsel Yükleme</h1>
+<p>Bilgisayarından bir görsel seç ve yüklemeyi dene.</p>
+
+<input type="file" id="file" accept="image/jpeg,image/png,image/webp,image/gif">
+<br>
+<button id="upload">Görseli Yükle</button>
+
+<div id="result"></div>
+<img id="preview" hidden>
+
+<script>
+const fileInput = document.getElementById("file");
+const button = document.getElementById("upload");
+const result = document.getElementById("result");
+const preview = document.getElementById("preview");
+
+button.addEventListener("click", async () => {
+  const file = fileInput.files[0];
+
+  if (!file) {
+    result.textContent = "Önce bir görsel seçmelisin.";
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  button.disabled = true;
+  result.textContent = "Görsel yükleniyor...";
+
+  try {
+    const response = await fetch("/api/media-upload", {
+      method: "POST",
+      credentials: "same-origin",
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Yükleme başarısız.");
+    }
+
+    result.textContent = "Yükleme başarılı! Görsel adresi: " + data.url;
+    preview.src = data.url;
+    preview.hidden = false;
+
+  } catch (error) {
+    result.textContent = "Hata: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>
