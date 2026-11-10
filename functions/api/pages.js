@@ -1,5 +1,5 @@
 
-import { requireAdmin } from "./_auth.js";
+import { requireEditor } from "./_auth.js";
 
 function json(data, status = 200) {
   return Response.json(data, { status });
@@ -23,7 +23,7 @@ function validStatus(status) {
 }
 
 async function authorized(context) {
-  const result = await requireAdmin(context);
+  const result = await requireEditor(context);
   if (result.response) return { response: result.response };
   return { admin: result.admin };
 }
