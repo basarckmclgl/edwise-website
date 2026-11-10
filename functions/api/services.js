@@ -25,6 +25,98 @@ function validSlug(value) {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value);
 }
 
+function errorResponse(message, fallback, status = 500) {
+  return json({
+    success: false,
+    message: `${fallback}: ${String(message || "Bilinmeyen hata")}`
+  }, status);
+}
+
+async function getServiceSchema(context) {
+  const result = await context.env.DB
+    .prepare("PRAGMA table_info('services')")
+    .all();
+
+  const columns = result.results || [];
+
+  if (!columns.length) {
+    throw new Error("services tablosu bulunamadı.");
+  }
+
+  const names = new Set(columns.map(column => column.name));
+
+  const required = [
+    "id",
+    "title",
+    "slug",
+    "description",
+    "image_url",
+    "content",
+    "status",
+    "sort_order",
+    "created_at",
+    "updated_at"
+  ];
+
+  const missing = required.filter(name => !names.has(name));
+
+  if (missing.length) {
+    throw new Error(
+      "Eksik veritabanı sütunları: " + missing.join(", ")
+    );
+  }
+
+  return columns;
+}
+
+function isIntegerPrimaryKey(column) {
+  return (
+    column &&
+    Number(column.pk) > 0 &&
+    String(column.type || "").toUpperCase() === "INTEGER"
+  );
+}
+
+function prepareServiceValues(body) {
+  const title = clean(body.title, 200);
+  const slug = clean(body.slug, 200).toLowerCase();
+  const description = clean(body.description, 2000);
+  const image_url = clean(body.image_url, 2000);
+  const content = clean(body.content, 30000);
+
+  const status =
+    body.status === "published" ? "published" : "draft";
+
+  const sort_order =
+    body.sort_order === "" || body.sort_order == null
+      ? 0
+      : Number(body.sort_order);
+
+  if (!title || !slug) {
+    throw new Error("Hizmet başlığı ve bağlantı adı zorunludur.");
+  }
+
+  if (!validSlug(slug)) {
+    throw new Error(
+      "Bağlantı adı yalnızca küçük harf, rakam ve tire içerebilir."
+    );
+  }
+
+  if (!Number.isFinite(sort_order)) {
+    throw new Error("Sıralama değeri geçerli bir sayı olmalıdır.");
+  }
+
+  return {
+    title,
+    slug,
+    description,
+    image_url,
+    content,
+    status,
+    sort_order
+  };
+}
+
 export async function onRequestGet(context) {
   const denied = await authorize(context);
   if (denied) return denied;
@@ -37,12 +129,15 @@ export async function onRequestGet(context) {
        ORDER BY sort_order ASC, created_at DESC`
     ).all();
 
-    return json({ success: true, services: results || [] });
-  } catch (error) {
     return json({
-      success: false,
-      message: "Hizmetler alınamadı."
-    }, 500);
+      success: true,
+      services: results || []
+    });
+  } catch (error) {
+    return errorResponse(
+      error?.message,
+      "Hizmetler alınamadı"
+    );
   }
 }
 
@@ -52,65 +147,74 @@ export async function onRequestPost(context) {
 
   try {
     const body = await context.request.json();
+    const values = prepareServiceValues(body);
 
-    const title = clean(body.title, 200);
-    const slug = clean(body.slug, 200).toLowerCase();
-    const description = clean(body.description, 2000);
-    const image_url = clean(body.image_url, 2000);
-    const content = clean(body.content, 30000);
-    const status = body.status === "published" ? "published" : "draft";
-    const sort_order = Number.isFinite(Number(body.sort_order))
-      ? Number(body.sort_order)
-      : 0;
+    const columns = await getServiceSchema(context);
+    const idColumn = columns.find(column => column.name === "id");
 
-    if (!title || !slug) {
-      return json({
-        success: false,
-        message: "Hizmet başlığı ve bağlantı adı zorunludur."
-      }, 400);
-    }
-
-    if (!validSlug(slug)) {
-      return json({
-        success: false,
-        message: "Bağlantı adı yalnızca küçük harf, rakam ve tire içerebilir."
-      }, 400);
-    }
-
-    const id = crypto.randomUUID();
     const now = new Date().toISOString();
 
-    await context.env.DB.prepare(
-      `INSERT INTO services
-       (id, title, slug, description, image_url, content,
-        status, sort_order, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).bind(
-      id, title, slug, description, image_url, content,
-      status, sort_order, now, now
-    ).run();
+    const integerId = isIntegerPrimaryKey(idColumn);
+
+    const id = integerId ? null : crypto.randomUUID();
+
+    const insertColumns = [
+      ...(integerId ? [] : ["id"]),
+      "title",
+      "slug",
+      "description",
+      "image_url",
+      "content",
+      "status",
+      "sort_order",
+      "created_at",
+      "updated_at"
+    ];
+
+    const insertValues = [
+      ...(integerId ? [] : [id]),
+      values.title,
+      values.slug,
+      values.description,
+      values.image_url,
+      values.content,
+      values.status,
+      values.sort_order,
+      now,
+      now
+    ];
+
+    const placeholders = insertColumns.map(() => "?").join(", ");
+
+    const result = await context.env.DB.prepare(
+      `INSERT INTO services (${insertColumns.join(", ")})
+       VALUES (${placeholders})`
+    ).bind(...insertValues).run();
 
     return json({
       success: true,
       message: "Hizmet oluşturuldu.",
-      id
+      id: integerId
+        ? result.meta?.last_row_id
+        : id
     }, 201);
 
   } catch (error) {
-    const message = String(error?.message || "");
+    const message = String(error?.message || error);
 
     if (message.includes("UNIQUE")) {
-      return json({
-        success: false,
-        message: "Bu bağlantı adı zaten kullanılıyor."
-      }, 409);
+      return errorResponse(
+        "Bu bağlantı adı zaten kullanılıyor.",
+        "Hizmet oluşturulamadı",
+        409
+      );
     }
 
-      return json({
-        success: false,
-        message: "Hizmet oluşturulamadı: " + String(error?.message || error)
-      }, 500);
-    }
+    return errorResponse(
+      message,
+      "Hizmet oluşturulamadı"
+    );
+  }
 }
 
 export async function onRequestPut(context) {
@@ -121,40 +225,38 @@ export async function onRequestPut(context) {
     const body = await context.request.json();
 
     const id = clean(body.id, 100);
-    const title = clean(body.title, 200);
-    const slug = clean(body.slug, 200).toLowerCase();
-    const description = clean(body.description, 2000);
-    const image_url = clean(body.image_url, 2000);
-    const content = clean(body.content, 30000);
-    const status = body.status === "published" ? "published" : "draft";
-    const sort_order = Number.isFinite(Number(body.sort_order))
-      ? Number(body.sort_order)
-      : 0;
 
-    if (!id || !title || !slug) {
+    if (!id) {
       return json({
         success: false,
-        message: "ID, başlık ve bağlantı adı zorunludur."
+        message: "Hizmet ID bilgisi zorunludur."
       }, 400);
     }
 
-    if (!validSlug(slug)) {
-      return json({
-        success: false,
-        message: "Bağlantı adı geçersiz."
-      }, 400);
-    }
-
+    const values = prepareServiceValues(body);
     const now = new Date().toISOString();
 
     const result = await context.env.DB.prepare(
       `UPDATE services
-       SET title = ?, slug = ?, description = ?, image_url = ?,
-           content = ?, status = ?, sort_order = ?, updated_at = ?
+       SET title = ?,
+           slug = ?,
+           description = ?,
+           image_url = ?,
+           content = ?,
+           status = ?,
+           sort_order = ?,
+           updated_at = ?
        WHERE id = ?`
     ).bind(
-      title, slug, description, image_url, content,
-      status, sort_order, now, id
+      values.title,
+      values.slug,
+      values.description,
+      values.image_url,
+      values.content,
+      values.status,
+      values.sort_order,
+      now,
+      id
     ).run();
 
     if (!result.meta?.changes) {
@@ -170,19 +272,20 @@ export async function onRequestPut(context) {
     });
 
   } catch (error) {
-    const message = String(error?.message || "");
+    const message = String(error?.message || error);
 
     if (message.includes("UNIQUE")) {
-      return json({
-        success: false,
-        message: "Bu bağlantı adı başka bir hizmette kullanılıyor."
-      }, 409);
+      return errorResponse(
+        "Bu bağlantı adı başka bir hizmette kullanılıyor.",
+        "Hizmet güncellenemedi",
+        409
+      );
     }
 
-    return json({
-      success: false,
-      message: "Hizmet güncellenemedi."
-    }, 500);
+    return errorResponse(
+      message,
+      "Hizmet güncellenemedi"
+    );
   }
 }
 
@@ -218,9 +321,9 @@ export async function onRequestDelete(context) {
     });
 
   } catch (error) {
-    return json({
-      success: false,
-      message: "Hizmet silinemedi."
-    }, 500);
+    return errorResponse(
+      error?.message,
+      "Hizmet silinemedi"
+    );
   }
 }
