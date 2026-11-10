@@ -41,39 +41,60 @@ function safeCompare(a, b) {
   return difference === 0;
 }
 
-export async function onRequestPost({ request, env }) {
-  const headers = {
-    "Cache-Control": "no-store"
-  };
+function json(data, status = 200) {
+  return Response.json(data, {
+    status,
+    headers: {
+      "Cache-Control": "no-store"
+    }
+  });
+}
 
+export async function onRequestPost({ request, env }) {
   try {
-    if (!env.DB || !env.CMS_SETUP_SECRET) {
-      return Response.json(
-        { success: false, message: "Sunucu yapılandırması eksik." },
-        { status: 500, headers }
-      );
+    if (!env.DB) {
+      return json({
+        success: false,
+        message: "DB veritabanı bağlantısı bulunamadı."
+      }, 500);
+    }
+
+    if (!env.CMS_SETUP_SECRET) {
+      return json({
+        success: false,
+        message: "CMS_SETUP_SECRET sunucu değişkeni bulunamadı."
+      }, 500);
     }
 
     const origin = request.headers.get("Origin");
 
     if (origin && origin !== new URL(request.url).origin) {
-      return Response.json(
-        { success: false, message: "İstek reddedildi." },
-        { status: 403, headers }
-      );
+      return json({
+        success: false,
+        message: "İstek kaynağı doğrulanamadı."
+      }, 403);
     }
 
     const suppliedSecret =
       request.headers.get("X-CMS-Setup-Secret") || "";
 
     if (!safeCompare(suppliedSecret, env.CMS_SETUP_SECRET)) {
-      return Response.json(
-        { success: false, message: "Kurulum anahtarı geçersiz." },
-        { status: 403, headers }
-      );
+      return json({
+        success: false,
+        message: "Kurulum gizli anahtarı hatalı."
+      }, 403);
     }
 
-    const data = await request.json();
+    let data;
+
+    try {
+      data = await request.json();
+    } catch {
+      return json({
+        success: false,
+        message: "Gönderilen veriler okunamadı."
+      }, 400);
+    }
 
     const username = String(data.username || "").trim();
     const email = String(data.email || "").trim().toLowerCase();
@@ -85,36 +106,51 @@ export async function onRequestPost({ request, env }) {
       password.length < 12 ||
       password.length > 128
     ) {
-      return Response.json(
-        { success: false, message: "Yönetici bilgileri geçersiz." },
-        { status: 400, headers }
-      );
+      return json({
+        success: false,
+        message: "Kullanıcı bilgileri veya parola koşulları hatalı."
+      }, 400);
+    }
+
+    const existing = await env.DB
+      .prepare("SELECT COUNT(*) AS total FROM admins")
+      .first();
+
+    if (Number(existing.total) > 0) {
+      return json({
+        success: false,
+        message: "Yönetici hesabı zaten mevcut. Kurulum kapatıldı."
+      }, 409);
     }
 
     const passwordHash = await hashPassword(password);
 
     const result = await env.DB.prepare(`
-      INSERT INTO admins (username, email, password_hash, role)
+      INSERT INTO admins
+        (username, email, password_hash, role)
       SELECT ?, ?, ?, 'superadmin'
       WHERE NOT EXISTS (SELECT 1 FROM admins)
     `).bind(username, email, passwordHash).run();
 
     if (!result.meta || result.meta.changes !== 1) {
-      return Response.json(
-        { success: false, message: "Yönetici zaten oluşturulmuş." },
-        { status: 409, headers }
-      );
+      return json({
+        success: false,
+        message: "Yönetici oluşturulamadı veya başka bir kurulum tamamlandı."
+      }, 409);
     }
 
-    return Response.json(
-      { success: true, message: "Süper yönetici oluşturuldu." },
-      { headers }
-    );
+    return json({
+      success: true,
+      message: "Süper yönetici hesabı başarıyla oluşturuldu."
+    });
 
   } catch (error) {
-    return Response.json(
-      { success: false, message: "Kurulum sırasında hata oluştu." },
-      { status: 500, headers }
-    );
+    console.error("EDWISE SETUP ERROR:", error);
+
+    return json({
+      success: false,
+      message: "Kurulum hatası: " +
+        (error && error.message ? error.message : "Bilinmeyen hata")
+    }, 500);
   }
 }
