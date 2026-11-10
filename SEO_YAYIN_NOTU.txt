@@ -1,0 +1,10 @@
+
+
+SEO VE YAYIN NOTU
+- sitemap.xml, robots.txt, _redirects ve _headers proje kök dizinine eklenmiştir.
+- Sayfalara ayrı başlık, açıklama, canonical ve sosyal paylaşım meta etiketleri eklenmiştir.
+- Ana sayfaya EducationalOrganization yapılandırılmış verisi eklenmiştir.
+- Tercih edilen adres https://edwisedanismanlik.com/ (www olmayan) olarak canonical seçilmiştir. www adresinin 301 yönlendirmesi Cloudflare panelindeki Redirect Rules bölümünden ayrıca tanımlanmalıdır.
+- Cloudflare Pages'te bu ZIP içindeki edwise klasörünün içeriğini yayın dizinine yükleyin. Yayın dizini edwise klasörü olmalıdır; sitemap.xml kök seviyede görünmelidir.
+- Bir kez yayınlandıktan sonra sitemap dosyası doğrudan https://edwisedanismanlik.com/sitemap.xml adresinden açılmalıdır. Google Search Console'da sitemap.xml bir kez gönderilir.
+- Google'da üst sıralarda görünme garantisi yoktur; indeksleme ve sıralama Google'ın tarama/değerlendirme sürecine bağlıdır.

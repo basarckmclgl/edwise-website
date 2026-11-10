@@ -1,0 +1,63 @@
+EDWISE WEB SİTESİ
+ÖZEL KULLANIM VE TİCARİ LİSANS (PROPRIETARY LICENSE)
+
+Telif hakkı sahibi: Çilem Atasoy / EDWISE
+Telif hakkı bildirimi: © 2026 Çilem Atasoy. Tüm hakları saklıdır.
+
+1. KAPSAM
+Bu lisans; EDWISE web sitesi projesi kapsamında özel olarak hazırlanmış kaynak kodunu,
+sayfa düzenlerini, özgün tasarım çalışmalarını, grafik öğelerini, metinleri ve proje
+dokümantasyonunu kapsar. Bu lisans yalnızca hak sahibinin sahip olduğu veya devraldığı
+haklar bakımından geçerlidir.
+
+2. İZİN VERİLEN KULLANIM
+EDWISE işletmesi, bu projeyi kendi faaliyetleri için kullanabilir, barındırabilir,
+yayımlayabilir, yedekleyebilir, güncelleyebilir ve geliştirebilir. EDWISE adına
+yetkilendirilen hizmet sağlayıcılar, yalnızca EDWISE'e hizmet vermek amacıyla ve
+gerekli ölçüde projeye erişebilir.
+
+3. İZİNSİZ KULLANIM YASAĞI
+Hak sahibinin önceden verilmiş yazılı izni olmadan:
+- Projenin tamamı veya önemli bir bölümü kopyalanamaz ya da yeniden yayımlanamaz.
+- Kaynak kodu, tasarım veya özgün içerikler üçüncü kişilere satılamaz, kiralanamaz,
+  lisanslanamaz veya dağıtılamaz.
+- Proje, başka bir marka veya müşteri için yeniden paketlenemez ya da türev bir ürün
+  olarak sunulamaz.
+- Marka, logo ve ayırt edici görsel unsurlar EDWISE'in izni olmadan kullanılamaz.
+
+4. ÜÇÜNCÜ TARAF BİLEŞENLER
+Projede kullanılan açık kaynak yazılımlar, kütüphaneler, yazı tipleri, görseller,
+ikonlar ve diğer üçüncü taraf materyaller bu lisansla EDWISE'e devredilmiş sayılmaz.
+Bunlar kendi lisans ve kullanım koşullarına tabidir. İlgili bileşenlerin lisanslarına
+uyulması ve gerekli bildirimlerin korunması gerekir.
+
+5. HAK SAHİPLİĞİ VE DEVİR
+Bu dosya tek başına telif hakkı devri, eser sahipliği tespiti veya mali hakların devri
+anlamına gelmez. Geliştirici ile Çilem Atasoy/EDWISE arasındaki hak sahipliği,
+çoğaltma, yayma, işleme, umuma iletim ve diğer mali haklara ilişkin devir veya lisans
+koşulları ayrıca yazılı bir sözleşmeyle açıkça düzenlenmelidir. Geliştiricinin daha
+önceden sahip olduğu araçlar, genel amaçlı kodlar ve üçüncü taraf bileşenler ayrıca
+belirtilmelidir.
+
+6. GARANTİ VE SORUMLULUK
+Bu proje, ayrıca yazılı olarak kararlaştırılmadıkça, mevcut hâliyle sunulur. Bu lisans,
+web sitesinin mevzuata uygunluğu, kesintisiz çalışması, güvenliği veya belirli bir
+amaca uygunluğu hakkında tek başına garanti oluşturmaz. Güvenlik, kişisel verilerin
+korunması, tüketici mevzuatı, eğitim faaliyet izinleri ve diğer yasal yükümlülükler
+ayrıca değerlendirilmelidir.
+
+7. İZİN VE İLETİŞİM
+Bu lisans kapsamındaki izin talepleri, hak sahibinin yazılı onayıyla değerlendirilir.
+İletişim: edwisedanismanlik@gmail.com
+
+8. YÜRÜRLÜK
+Bu metin, proje deposunda lisans bildirimi olarak kullanılmak üzere hazırlanmıştır.
+Taraflar arasındaki hak devri ve kullanım ilişkisi, imzalanacak ayrı sözleşme ile
+kesinleştirilmelidir.
+
+ÖNEMLİ NOT
+Bu dosya bir lisans taslağıdır. Projenin geliştiricisi ile EDWISE işletme sahibi
+arasında imzalı bir fikrî mülkiyet ve yazılım geliştirme sözleşmesi yapılmadan,
+kaynak kodu ve tasarım üzerindeki bütün hakların EDWISE'e geçtiği varsayılmamalıdır.
+Yayımdan önce Türkiye'de fikrî mülkiyet ve bilişim hukuku alanında çalışan bir avukata
+inceletilmesi önerilir.

@@ -1,0 +1,105 @@
+EDWISE EĞİTİM VE DANIŞMALIK
+YAZILIM GELİŞTİRME VE ÜCRETSİZ KULLANIM LİSANSI SÖZLEŞMESİ
+08/11/2026
+
+## MADDE 1 – TARAFLAR
+1.1. GELİŞTİRİCİ
+Adı Soyadı: **Başar Çekmecelioğlu**
+T.C. Kimlik No: 10658355834
+Adres: Çekmece Mahallesi 75. Sokak No:2/3 DEFNE/HATAY
+E-posta: basarcekmecelioglu6@gmail.com
+### 1.2. İŞLETME SAHİBİ VE LİSANS ALAN
+Adı Soyadı: **Çilem Atasoy**
+İşletme / Marka: **EDWISE – Education & Consultancy**
+T.C. Kimlik No / Vergi No: …………………………………
+Adres: Zülüflühan, Yeni 7 Sokak No: 13A, 31060 Antakya / Hatay
+E-posta: edwisedanismanlik@gmail.com
+## MADDE 2 – SÖZLEŞMENİN KONUSU
+2.1. İşbu sözleşmenin konusu, Geliştirici tarafından EDWISE için hazırlanan internet sitesinin yazılım, tasarım, kaynak kod ve özgün dijital bileşenlerine ilişkin kullanım koşullarının belirlenmesidir.
+2.2. Sözleşme, EDWISE'in internet sitesini kendi ticari ve kurumsal faaliyetlerinde kullanabilmesini sağlarken Geliştiricinin eser sahipliği ve fikrî mülkiyet haklarını korumayı amaçlamaktadır.
+2.3. İşbu sözleşme bir hak devri sözleşmesi değil, kullanım lisansı sözleşmesidir.
+## MADDE 3 – ÜCRETSİZ KULLANIM LİSANSI
+3.1. Geliştirici, EDWISE'e hazırlanan web sitesini kendi faaliyetlerinde kullanabilmesi için ücretsiz, süresiz, dünya genelinde geçerli ve münhasır olmayan bir kullanım lisansı verir.
+3.2. Lisans kapsamında EDWISE aşağıdaki haklara sahip olacaktır:
+- Web sitesini internet ortamında yayımlamak ve barındırmak.
+- Web sitesini kendi ticari ve kurumsal faaliyetlerinde kullanmak.
+- Kaynak kodları yedeklemek ve işletim amacıyla çoğaltmak.
+- Web sitesini ihtiyaçları doğrultusunda güncellemek ve geliştirmek.
+- Mevcut sayfalarda değişiklik yaptırmak ve yeni sayfalar ekletmek.
+- Web sitesinin bakım ve teknik işlemleri için başka yazılım geliştiricilerinden hizmet almak.
+- Web sitesini kendi markası altında kullanmak ve tanıtmak.
+- Web sitesinin internet üzerinden ziyaretçilere sunulmasını sağlamak.
+3.3. Bu kullanım izni, 5846 sayılı Fikir ve Sanat Eserleri Kanunu kapsamında Geliştiricinin sahip olduğu ve lisans verme yetkisine sahip bulunduğu mali haklar bakımından geçerlidir. Bu kapsamda işleme, çoğaltma, yayma, temsil ve umuma iletim hakları, yukarıda belirtilen kullanım amaçlarıyla sınırlı olarak lisanslanmıştır.
+3.4. İşbu lisans münhasır değildir. Geliştirici, kendisine ait genel amaçlı kodları, yazılım araçlarını, yöntemlerini, teknik bilgi birikimini ve önceden geliştirdiği altyapıları başka projelerde kullanma hakkını saklı tutar.
+3.5. İşbu sözleşme, Geliştiricinin eser sahipliğini veya lisanslanan mali hakların mülkiyetini EDWISE'e devretmez.
+## MADDE 4 – GELİŞTİRİCİNİN HAKLARI
+4.1. Geliştirici, kendi oluşturduğu ve hak sahibi olduğu özgün yazılım ve tasarım çalışmaları üzerindeki eser sahipliği haklarını korur.
+4.2. Geliştiricinin proje dışında geliştirdiği genel amaçlı yazılım altyapıları, kod parçaları, yöntemler, araçlar ve teknik bilgi birikimi bu sözleşmenin kapsamı dışındadır.
+4.3. Geliştirici, EDWISE'e özel hazırlanan çalışmaları, EDWISE'in gizli bilgilerini ve kişisel verilerini açıklamamak kaydıyla portföyünde referans proje olarak gösterebilir.
+4.4. Geliştiricinin kanundan doğan manevi hakları saklıdır.
+## MADDE 5 – KAYNAK KOD VE PROJE DOSYALARI
+5.1. Geliştirici, taraflarca kararlaştırılan proje dosyalarını EDWISE'e teslim eder.
+5.2. EDWISE, teslim edilen dosyaları kendi web sitesinin işletilmesi, bakımı ve geliştirilmesi amacıyla kullanabilir.
+5.3. EDWISE, teknik bakım ve geliştirme işlemleri için başka yazılım geliştiricilerine veya hizmet sağlayıcılara proje dosyalarına erişim izni verebilir.
+5.4. Bu erişim yalnızca EDWISE'in internet sitesinin işletilmesi ve geliştirilmesi amacıyla kullanılabilir. Üçüncü kişilere bağımsız ticari kullanım hakkı verilmiş sayılmaz.
+5.5. Teslim edilen dosyaların kapsamı, tarafların onaylayacağı proje teslim listesinde belirtilir.
+## MADDE 6 – ÜÇÜNCÜ TARAF BİLEŞENLER
+6.1. Web sitesinde kullanılan açık kaynak yazılımlar, kütüphaneler, yazı tipleri, ikonlar, görseller, eklentiler ve diğer üçüncü taraf materyaller kendi lisans ve kullanım koşullarına tabidir.
+6.2. Bu bileşenler üzerindeki haklar işbu sözleşme ile taraflardan birine devredilmiş sayılmaz.
+6.3. Taraflar, üçüncü taraf lisanslarının gerektirdiği bildirim ve kullanım koşullarına uymayı kabul eder.
+6.4. Geliştirici, hak sahibi olmadığı üçüncü taraf bileşenler üzerinde mülkiyet veya lisans devri taahhüdünde bulunmaz.
+## MADDE 7 – ÜCRETSİZ LİSANS VE EK HİZMETLER
+7.1. Taraflar, işbu sözleşmeyle verilen kullanım lisansının ücretsiz olduğunu kabul eder.
+7.2. EDWISE, bu lisans kapsamında web sitesini kullanmak için Geliştiriciye lisans bedeli veya dönemsel kullanım ücreti ödemez.
+7.3. Ücretsiz kullanım lisansı; gelecekte yapılacak yeni yazılım geliştirme, bakım, teknik destek, barındırma, alan adı, sunucu veya üçüncü taraf hizmetlerinin ücretsiz olduğu anlamına gelmez.
+7.4. Gelecekte yapılacak ek çalışmalar ve hizmetler tarafların ayrıca yazılı anlaşmasıyla belirlenir.
+## MADDE 8 – GİZLİLİK VE KİŞİSEL VERİLER
+8.1. Taraflar, sözleşme kapsamında öğrendikleri gizli bilgileri ve ticari sırları diğer tarafın izni olmadan üçüncü kişilerle paylaşamaz.
+8.2. EDWISE, internet sitesi aracılığıyla topladığı kişisel veriler bakımından veri sorumlusu sıfatıyla yürürlükteki kişisel verilerin korunması mevzuatından doğan yükümlülüklerini yerine getirir.
+8.3. Geliştirici, kendisine erişim sağlanan kişisel verileri yalnızca yetkilendirildiği amaç ve talimatlar doğrultusunda işler.
+8.4. Gerektiğinde taraflar kişisel verilerin işlenmesine ilişkin ayrıca bir veri işleme ve gizlilik protokolü düzenler.
+
+## MADDE 9 – SORUMLULUK VE GARANTİ
+9.1. Geliştirici, yalnızca kendisine ait ve lisans verme yetkisine sahip olduğu bileşenler bakımından işbu sözleşmedeki kullanım iznini verebilir.
+9.2. EDWISE'in eğitim faaliyetleri, ticari faaliyetleri, tüketici mevzuatı, vergi yükümlülükleri, kişisel verilerin korunması ve diğer yasal yükümlülükleri kendi sorumluluğundadır.
+9.3. Alan adı, sunucu, barındırma, internet altyapısı ve üçüncü taraf servislerden kaynaklanan kesintiler, ayrıca yazılı bir hizmet taahhüdü bulunmadıkça Geliştiricinin sorumluluğunda değildir.
+9.4. Tarafların kanundan doğan emredici sorumlulukları saklıdır.
+
+## MADDE 10 – SÜRE VE SONA ERME
+10.1. İşbu lisans, tarafların imzaladığı tarihte yürürlüğe girer ve süresiz olarak verilir.
+10.2. Taraflardan biri sözleşmenin esaslı hükümlerinin ihlal edildiğini düşünürse diğer tarafa yazılı bildirimde bulunarak ihlalin giderilmesi için makul süre tanır.
+10.3. İhlalin giderilmemesi hâlinde ilgili taraf, kanundan ve sözleşmeden doğan haklarını kullanabilir.
+10.4. Lisansın sona ermesi veya feshi durumunda mevcut kullanım izinlerinin ve tarafların yükümlülüklerinin durumu, fesih sebebi ve yürürlükteki mevzuat çerçevesinde değerlendirilir.
+
+## MADDE 11 – UYGULANACAK HUKUK VE UYUŞMAZLIKLAR
+11.1. İşbu sözleşmeye Türkiye Cumhuriyeti hukuku uygulanır.
+11.2. Taraflar, sözleşmeden doğabilecek uyuşmazlıkları öncelikle karşılıklı görüşme yoluyla çözmeye çalışır.
+11.3. Çözülemeyen uyuşmazlıklarda görevli ve yetkili mahkemeler ile icra daireleri yürürlükteki mevzuata göre belirlenir.
+
+## MADDE 12 – YÜRÜRLÜK VE İMZA
+12.1. İşbu sözleşme 12 maddeden oluşmakta olup taraflarca okunarak, anlaşılarak ve … / … / 2026 tarihinde iki nüsha olarak imzalanmıştır.
+12.2. Taraflar, sözleşme hükümlerini kabul ettiklerini beyan eder.
+### GELİŞTİRİCİ
+**Başar Çekmecelioğlu**
+T.C. Kimlik No: 
+Adres:
+Tarih: 
+İmza:
+
+### LİSANS ALAN – EDWISE
+**Çilem Atasoy**
+EDWISE – Education & Consultancy
+T.C. Kimlik No / Vergi No: 
+Adres: Zülüflühan, Yeni 7 Sokak No: 13A, 31060 Antakya / Hatay
+Tarih: … / … / 2026
+İmza:
+PROJE TESLİM KAPSAMI
+Sözleşme kapsamında lisans verilen ve teslim edilecek proje bileşenleri:
+1. EDWISE internet sitesi ana sayfası.
+2. Projeye ait HTML sayfaları.
+3. CSS ve JavaScript dosyaları.
+4. Özgün tasarım ve arayüz çalışmaları.
+5. Projeye özel grafik ve görsel çalışmalar.
+6. Kaynak kod ve proje dokümantasyonu.
+7. Tarafların teslim listesinde ayrıca belirleyeceği diğer proje dosyaları.
+Üçüncü taraf bileşenler ve Geliştiricinin önceden sahip olduğu genel amaçlı araçlar bu kapsamdan ayrı değerlendirilir.
