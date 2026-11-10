@@ -17,17 +17,28 @@ function getCookie(request, name) {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+function authError(message, status) {
+  return {
+    admin: null,
+    response: Response.json(
+      { success: false, message },
+      { status }
+    )
+  };
+}
+
+// Oturum kontrolü: Mevcut giriş sistemi korunur.
 export async function requireAdmin(context) {
-  const token = getCookie(context.request, "edwise_session");
+  const token = getCookie(
+    context.request,
+    "edwise_session"
+  );
 
   if (!token) {
-    return {
-      admin: null,
-      response: Response.json(
-        { success: false, message: "Oturum açmanız gerekiyor." },
-        { status: 401 }
-      )
-    };
+    return authError(
+      "Oturum açmanız gerekiyor.",
+      401
+    );
   }
 
   const tokenHash = await hashToken(token);
@@ -47,17 +58,55 @@ export async function requireAdmin(context) {
   `).bind(tokenHash).first();
 
   if (!result) {
-    return {
-      admin: null,
-      response: Response.json(
-        { success: false, message: "Oturum geçersiz veya süresi dolmuş." },
-        { status: 401 }
-      )
-    };
+    return authError(
+      "Oturum geçersiz veya süresi dolmuş.",
+      401
+    );
   }
 
   return {
     admin: result,
     response: null
   };
+}
+
+// Yalnızca ana yöneticiye izin verir.
+export async function requireSuperAdmin(context) {
+  const auth = await requireAdmin(context);
+
+  if (auth.response) {
+    return auth;
+  }
+
+  if (auth.admin.role !== "superadmin") {
+    return authError(
+      "Bu işlem için ana yönetici yetkisi gerekiyor.",
+      403
+    );
+  }
+
+  return auth;
+}
+
+// Ana yönetici ve içerik editörüne izin verir.
+export async function requireEditor(context) {
+  const auth = await requireAdmin(context);
+
+  if (auth.response) {
+    return auth;
+  }
+
+  const allowedRoles = [
+    "superadmin",
+    "content_admin"
+  ];
+
+  if (!allowedRoles.includes(auth.admin.role)) {
+    return authError(
+      "Bu işlem için yetkiniz bulunmuyor.",
+      403
+    );
+  }
+
+  return auth;
 }
