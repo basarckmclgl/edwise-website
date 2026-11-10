@@ -1,0 +1,259 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EDWISE | Medya Kütüphanesi</title>
+<style>
+:root{--bg:#0d0d18;--panel:#171727;--border:#30304b;--purple:#8055ed;--light:#a78bfa;--text:#f5f3ff;--muted:#aaa7c0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+header{padding:20px 5%;background:#131322;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:23px;font-weight:900;color:var(--light);letter-spacing:3px}
+a{color:var(--light);text-decoration:none;font-size:13px}
+main{max-width:1200px;margin:35px auto;padding:0 20px}
+h1{font-size:25px;margin-bottom:8px}
+p{color:var(--muted);font-size:13px;line-height:1.6}
+.upload{border:2px dashed #514078;background:#171727;border-radius:15px;padding:35px;text-align:center;margin:25px 0}
+.upload.drag{border-color:var(--light);background:#25203a}
+button{background:var(--purple);color:white;border:0;padding:11px 16px;border-radius:8px;cursor:pointer}
+button:disabled{opacity:.5;cursor:wait}
+input{display:none}
+#message{margin:15px 0;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:17px;margin-top:20px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.card img{width:100%;height:170px;object-fit:cover;background:#10101c}
+.info{padding:12px}
+.name{font-size:12px;overflow-wrap:anywhere;color:#eee}
+.actions{display:flex;gap:7px;margin-top:12px}
+.actions button{font-size:11px;padding:8px}
+.secondary{background:#29213f}
+.empty{padding:35px;text-align:center;color:var(--muted);grid-column:1/-1}
+</style>
+</head>
+<body>
+<header>
+ <div class="logo">EDWISE</div>
+ <a href="/admin/dashboard.html">← Yönetim Paneline Dön</a>
+</header>
+<main>
+ <h1>Medya Kütüphanesi</h1>
+ <p>Fotoğraflarınızı yükleyin, görüntüleyin ve sayfalarınızda kullanmak üzere bağlantılarını kopyalayın.</p>
+
+ <div class="upload" id="dropArea">
+  <h2>Görsellerinizi buraya bırakın</h2>
+  <p>Veya bilgisayarınızdan dosya seçin.</p>
+  <p>JPG, PNG, WEBP ve GIF · En fazla 5 MB</p>
+  <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+  <button id="chooseButton">Dosya Seç</button>
+  <button id="uploadButton" disabled>Seçilenleri Yükle</button>
+ </div>
+
+ <div id="message"></div>
+
+ <h2>Yüklenen Görseller</h2>
+ <div class="grid" id="mediaGrid">
+  <div class="empty">Medya kütüphanesi yükleniyor...</div>
+ </div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+let selectedFiles = [];
+
+function showMessage(text, success = false) {
+ $("message").textContent = text;
+ $("message").style.color = success ? "#71dbb3" : "#ffadb5";
+}
+
+function selectFiles(files) {
+ selectedFiles = Array.from(files || []);
+ $("uploadButton").disabled = selectedFiles.length === 0;
+ $("chooseButton").textContent = selectedFiles.length
+  ? selectedFiles.length + " dosya seçildi"
+  : "Dosya Seç";
+}
+
+$("chooseButton").addEventListener("click", () => $("fileInput").click());
+
+$("fileInput").addEventListener("change", event => {
+ selectFiles(event.target.files);
+});
+
+const dropArea = $("dropArea");
+
+["dragenter","dragover"].forEach(type => {
+ dropArea.addEventListener(type, event => {
+  event.preventDefault();
+  dropArea.classList.add("drag");
+ });
+});
+
+["dragleave","drop"].forEach(type => {
+ dropArea.addEventListener(type, event => {
+  event.preventDefault();
+  dropArea.classList.remove("drag");
+ });
+});
+
+dropArea.addEventListener("drop", event => {
+ selectFiles(event.dataTransfer.files);
+});
+
+async function loadMedia() {
+ $("mediaGrid").innerHTML = '<div class="empty">Görseller yükleniyor...</div>';
+
+ try {
+  const response = await fetch("/api/media", {
+   credentials:"same-origin"
+  });
+
+  if (response.status === 401) {
+   location.replace("/admin/");
+   return;
+  }
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+   throw new Error(data.error || "Medya listesi alınamadı.");
+  }
+
+  const items = data.media || [];
+
+  if (!items.length) {
+   $("mediaGrid").innerHTML =
+    '<div class="empty">Henüz görsel yüklenmemiş.</div>';
+   return;
+  }
+
+  $("mediaGrid").replaceChildren();
+
+  items.forEach(item => {
+   const card = document.createElement("article");
+   card.className = "card";
+
+   const img = document.createElement("img");
+   img.src = item.file_url;
+   img.alt = item.file_name;
+   img.loading = "lazy";
+
+   const info = document.createElement("div");
+   info.className = "info";
+
+   const name = document.createElement("div");
+   name.className = "name";
+   name.textContent = item.file_name;
+
+   const actions = document.createElement("div");
+   actions.className = "actions";
+
+   const copy = document.createElement("button");
+   copy.className = "secondary";
+   copy.textContent = "Adresi Kopyala";
+   copy.addEventListener("click", async () => {
+    try {
+     await navigator.clipboard.writeText(item.file_url);
+     showMessage("Görsel adresi kopyalandı.", true);
+    } catch {
+     showMessage("Kopyalama başarısız. Görsel adresini açıp kopyalayabilirsin.");
+    }
+   });
+
+   const open = document.createElement("button");
+   open.textContent = "Görseli Aç";
+   open.addEventListener("click", () => {
+    window.open(item.file_url, "_blank", "noopener");
+   });
+
+   actions.append(copy, open);
+   info.append(name, actions);
+   card.append(img, info);
+   $("mediaGrid").append(card);
+  });
+
+ } catch (error) {
+  $("mediaGrid").innerHTML = "";
+  showMessage(error.message);
+ }
+}
+
+$("uploadButton").addEventListener("click", async () => {
+ if (!selectedFiles.length) return;
+
+ $("uploadButton").disabled = true;
+ let uploaded = 0;
+
+ for (const file of selectedFiles) {
+  const form = new FormData();
+  form.append("file", file);
+
+  try {
+   const response = await fetch("/api/media-upload", {
+    method:"POST",
+    credentials:"same-origin",
+    body:form
+   });
+
+   const data = await response.json();
+
+   if (!response.ok || !data.success) {
+    throw new Error(data.error || "Yükleme başarısız.");
+   }
+
+   uploaded++;
+
+   if (data.warning) {
+    showMessage(data.warning);
+   }
+
+  } catch (error) {
+   showMessage(file.name + ": " + error.message);
+  }
+ }
+
+ selectFiles([]);
+ $("fileInput").value = "";
+ $("chooseButton").textContent = "Dosya Seç";
+
+ if (uploaded) {
+  showMessage(uploaded + " görsel başarıyla yüklendi.", true);
+ }
+
+ await loadMedia();
+});
+
+async function checkSession() {
+ try {
+  const response = await fetch("/api/me", {
+   credentials:"same-origin"
+  });
+
+  if (!response.ok) {
+   location.replace("/admin/");
+   return false;
+  }
+
+  const data = await response.json();
+
+  if (!data.success || !data.admin) {
+   location.replace("/admin/");
+   return false;
+  }
+
+  return true;
+ } catch {
+  location.replace("/admin/");
+  return false;
+ }
+}
+
+(async () => {
+ if (await checkSession()) {
+  await loadMedia();
+ }
+})();
+</script>
+</body>
+</html>
