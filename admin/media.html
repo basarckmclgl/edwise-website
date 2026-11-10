@@ -29,6 +29,7 @@ input{display:none}
 .actions{display:flex;gap:7px;margin-top:12px}
 .actions button{font-size:11px;padding:8px}
 .secondary{background:#29213f}
+ .danger{background:#a83248}
 .empty{padding:35px;text-align:center;color:var(--muted);grid-column:1/-1}
 </style>
 </head>
@@ -167,7 +168,52 @@ async function loadMedia() {
     window.open(item.file_url, "_blank", "noopener");
    });
 
-   actions.append(copy, open);
+   
+const del = document.createElement("button");
+del.className = "danger";
+del.textContent = "Sil";
+
+del.addEventListener("click", async () => {
+  if (!confirm("Bu görseli kalıcı olarak silmek istiyor musun?")) {
+    return;
+  }
+
+  del.disabled = true;
+  del.textContent = "Siliniyor...";
+
+  try {
+    const response = await fetch("/api/media-delete", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        file_url: item.file_url
+      })
+    });
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.error || "Silme başarısız.");
+    }
+
+    showMessage(
+      data.warning || "Görsel başarıyla silindi.",
+      !data.warning
+    );
+
+    await loadMedia();
+
+  } catch (error) {
+    showMessage(error.message);
+    del.disabled = false;
+    del.textContent = "Sil";
+  }
+});
+
+   actions.append(copy, open, del);
    info.append(name, actions);
    card.append(img, info);
    $("mediaGrid").append(card);
