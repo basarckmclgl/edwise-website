@@ -62,31 +62,41 @@ td{color:#e8e5f3}
 .error{background:#3b2029;color:#ffadb5}
 .success{background:#15372f;color:#8ae2bf}
 .empty{padding:25px;text-align:center;color:var(--muted);font-size:13px}
+.role-label{display:inline-block;margin-left:8px;padding:5px 8px;border-radius:20px;background:#29213f;color:var(--light);font-size:10px}
 @media(max-width:950px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:650px){.sidebar{width:65px;padding:15px 7px}.logo{font-size:14px;padding:5px}.logo small,.menu-label,.nav span:last-child{display:none}.nav{justify-content:center;padding:13px 4px}.main{margin-left:65px;width:calc(100% - 65px)}.content{padding:16px 12px}.topbar{padding:0 12px}.grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
 </style>
 </head>
 <body>
+
 <aside class="sidebar">
  <div class="logo">EDWISE<small>CONTENT MANAGEMENT SYSTEM</small></div>
  <div class="menu-label">ANA MENÜ</div>
  <button class="nav active" data-page="overview"><span class="ico">▦</span><span>Genel Bakış</span></button>
+
  <div class="menu-label">İÇERİK YÖNETİMİ</div>
  <button class="nav" data-page="pages"><span class="ico">▤</span><span>Sayfa Yönetimi</span></button>
  <button class="nav" data-page="services"><span class="ico">✧</span><span>Hizmet Yönetimi</span></button>
  <button class="nav" data-page="posts"><span class="ico">▧</span><span>Blog Yönetimi</span></button>
+
  <div class="menu-label">İŞLETME YÖNETİMİ</div>
- <button class="nav" data-page="applications"><span class="ico">▣</span><span>Başvurular</span></button>
+ <button class="nav" data-page="applications" data-superadmin><span class="ico">▣</span><span>Başvurular</span></button>
  <button class="nav" data-page="media"><span class="ico">▧</span><span>Medya Kütüphanesi</span></button>
- <button class="nav" data-page="settings"><span class="ico">⚙</span><span>Site Ayarları</span></button>
- <div class="menu-label">SİSTEM</div>
- <button class="nav" data-page="users"><span class="ico">♙</span><span>Kullanıcı ve Yetkiler</span></button>
+ <button class="nav" data-page="settings" data-superadmin><span class="ico">⚙</span><span>Site Ayarları</span></button>
+
+ <div class="menu-label" data-superadmin>SİSTEM</div>
+ <button class="nav" data-page="users" data-superadmin><span class="ico">♙</span><span>Kullanıcı ve Yetkiler</span></button>
 </aside>
 
 <main class="main">
  <header class="topbar">
   <span>EDWISE / <strong id="breadcrumb">Genel Bakış</strong></span>
-  <div><span id="username">Yönetici</span> &nbsp; <button class="logout" id="logout">Güvenli Çıkış ↗</button></div>
+  <div>
+   <span id="username">Yönetici</span>
+   <span id="roleLabel" class="role-label"></span>
+   &nbsp;
+   <button class="logout" id="logout">Güvenli Çıkış ↗</button>
+  </div>
  </header>
 
  <div class="content">
@@ -96,21 +106,26 @@ td{color:#e8e5f3}
     <h1>Hoş geldiniz, <span id="welcomeName">Yönetici</span> 👋</h1>
     <p>İçeriklerinizi ve web sitenizi tek merkezden yönetin.</p>
    </div>
+
    <div class="grid">
     <div class="stat"><span>Toplam Sayfa</span><h2 id="countPages">—</h2><p>Veritabanındaki sayfalar</p></div>
     <div class="stat"><span>Hizmetler</span><h2>—</h2><p>Sonraki modülde bağlanacak</p></div>
     <div class="stat"><span>Blog Yazıları</span><h2>—</h2><p>Sonraki modülde bağlanacak</p></div>
-    <div class="stat"><span>Başvurular</span><h2>—</h2><p>Başvuru modülü kurulacak</p></div>
+    <div class="stat" data-superadmin><span>Başvurular</span><h2>—</h2><p>Başvuru modülü kurulacak</p></div>
    </div>
-   <div class="section-head"><div><h2>Yönetim Modülleri</h2><p>İşlem yapmak istediğiniz alanı seçin.</p></div></div>
+
+   <div class="section-head">
+    <div><h2>Yönetim Modülleri</h2><p>İşlem yapmak istediğiniz alanı seçin.</p></div>
+   </div>
+
    <div class="grid">
     <div class="module" data-open="pages"><div class="module-icon">▤</div><h3>Sayfa Yönetimi ↗</h3><p>Web sayfalarını oluşturun ve düzenleyin.</p></div>
     <div class="module" data-open="services"><div class="module-icon">✧</div><h3>Hizmet Yönetimi ↗</h3><p>Eğitim ve danışmanlık hizmetlerinizi yönetin.</p></div>
     <div class="module" data-open="posts"><div class="module-icon">▧</div><h3>Blog Yönetimi ↗</h3><p>Blog yazıları oluşturun ve yayımlayın.</p></div>
-    <div class="module" data-open="applications"><div class="module-icon">▣</div><h3>Başvurular ↗</h3><p>Gelen başvuruları takip edin.</p></div>
+    <div class="module" data-open="applications" data-superadmin><div class="module-icon">▣</div><h3>Başvurular ↗</h3><p>Gelen başvuruları takip edin.</p></div>
     <div class="module" data-open="media"><div class="module-icon">▧</div><h3>Medya Kütüphanesi ↗</h3><p>Fotoğraf ve dosyalarınızı yönetin.</p></div>
-    <div class="module" data-open="settings"><div class="module-icon">⚙</div><h3>Site Ayarları ↗</h3><p>Logo, iletişim ve menü ayarları.</p></div>
-    <div class="module" data-open="users"><div class="module-icon">♙</div><h3>Kullanıcı ve Yetkiler ↗</h3><p>Yönetici hesaplarını yönetin.</p></div>
+    <div class="module" data-open="settings" data-superadmin><div class="module-icon">⚙</div><h3>Site Ayarları ↗</h3><p>Logo, iletişim ve menü ayarları.</p></div>
+    <div class="module" data-open="users" data-superadmin><div class="module-icon">♙</div><h3>Kullanıcı ve Yetkiler ↗</h3><p>Yönetici hesaplarını yönetin.</p></div>
    </div>
   </section>
 
@@ -119,7 +134,9 @@ td{color:#e8e5f3}
     <div><h2>Sayfa Yönetimi</h2><p>Web sitenizin sayfalarını buradan yönetin.</p></div>
     <button class="primary" id="newPage">+ Yeni Sayfa Oluştur</button>
    </div>
+
    <div id="pageMessage"></div>
+
    <div id="editor" class="panel hidden">
     <h2 id="editorTitle">Yeni Sayfa</h2>
     <form id="pageForm">
@@ -138,6 +155,7 @@ td{color:#e8e5f3}
      </div>
     </form>
    </div>
+
    <div class="panel">
     <h2>Mevcut Sayfalar</h2>
     <p class="muted">Kayıtlı sayfaları görüntüleyin, düzenleyin veya silin.</p>
@@ -155,10 +173,8 @@ td{color:#e8e5f3}
     <h2 id="otherTitle"></h2>
     <p class="muted" id="otherDescription"></p>
     <div id="mediaLink" class="hidden" style="margin-top:20px">
-  <a href="/admin/media.html" class="primary" style="display:inline-block;text-decoration:none">
-    Medya Kütüphanesini Aç →
-  </a>
-</div>
+     <a href="/admin/media.html" class="primary" style="display:inline-block;text-decoration:none">Medya Kütüphanesini Aç →</a>
+    </div>
     <div class="message">Bu modül henüz geliştirme aşamasında. Gerçek işlemler, güvenli API bağlantıları tamamlandığında açılacak.</div>
    </div>
   </section>
@@ -174,49 +190,120 @@ const otherModules={
  settings:["Site Ayarları","Logo, iletişim bilgileri, menüler ve sosyal medya bağlantıları."],
  users:["Kullanıcı ve Yetkiler","Yönetici hesapları ve rol izinlerini yönetme."]
 };
+
 const $=id=>document.getElementById(id);
 let pages=[];
+let currentRole=null;
+
+const superAdminOnly=["applications","settings","users"];
+const editorAllowed=["overview","pages","services","posts","media"];
+
+function canAccess(page){
+ if(currentRole==="superadmin") return true;
+ if(currentRole==="content_admin") return editorAllowed.includes(page);
+ return false;
+}
+
+function applyRolePermissions(){
+ const isSuperAdmin=currentRole==="superadmin";
+
+ document.querySelectorAll("[data-superadmin]").forEach(element=>{
+  element.classList.toggle("hidden",!isSuperAdmin);
+ });
+
+ document.querySelectorAll("[data-page]").forEach(element=>{
+  const page=element.dataset.page;
+  element.classList.toggle("hidden",!canAccess(page));
+ });
+
+ document.querySelectorAll("[data-open]").forEach(element=>{
+  const page=element.dataset.open;
+  element.classList.toggle("hidden",!canAccess(page));
+ });
+
+ $("roleLabel").textContent=isSuperAdmin?"Super Admin":"İçerik Editörü";
+}
 
 function escapeHtml(value){
  return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
+
 function showPage(name){
+ if(!canAccess(name)){
+  name="overview";
+ }
+
  $("overview").classList.toggle("hidden",name!=="overview");
  $("pages").classList.toggle("hidden",name!=="pages");
  $("other").classList.toggle("hidden",!otherModules[name]);
- document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===name));
+
+ document.querySelectorAll(".nav").forEach(n=>{
+  n.classList.toggle("active",n.dataset.page===name);
+ });
+
  $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="pages"?"Sayfa Yönetimi":otherModules[name]?.[0]||"";
+
  if(name==="pages")loadPages();
- $("mediaLink").classList.toggle("hidden", name !== "media");
+
+ $("mediaLink").classList.toggle("hidden",name!=="media");
+
  if(otherModules[name]){
   $("otherTitle").textContent=otherModules[name][0];
   $("otherDescription").textContent=otherModules[name][1];
  }
 }
-document.querySelectorAll("[data-page]").forEach(n=>n.addEventListener("click",()=>showPage(n.dataset.page)));
-document.querySelectorAll("[data-open]").forEach(n=>n.addEventListener("click",()=>showPage(n.dataset.open)));
+
+document.querySelectorAll("[data-page]").forEach(n=>{
+ n.addEventListener("click",()=>showPage(n.dataset.page));
+});
+
+document.querySelectorAll("[data-open]").forEach(n=>{
+ n.addEventListener("click",()=>showPage(n.dataset.open));
+});
 
 function message(text,type="error"){
  $("pageMessage").innerHTML='<div class="message '+type+'">'+escapeHtml(text)+'</div>';
 }
+
 async function api(url,options={}){
  const response=await fetch(url,{credentials:"same-origin",...options});
  let data;
- try{data=await response.json()}catch{throw new Error("Sunucudan geçerli yanıt alınamadı.")}
- if(response.status===401){location.replace("/admin/");throw new Error("Oturumunuz sona erdi.")}
- if(!response.ok||!data.success)throw new Error(data.message||"İşlem başarısız.");
+
+ try{
+  data=await response.json();
+ }catch{
+  throw new Error("Sunucudan geçerli yanıt alınamadı.");
+ }
+
+ if(response.status===401){
+  location.replace("/admin/");
+  throw new Error("Oturumunuz sona erdi.");
+ }
+
+ if(response.status===403){
+  throw new Error("Bu işlem için yetkiniz bulunmuyor.");
+ }
+
+ if(!response.ok||!data.success){
+  throw new Error(data.message||"İşlem başarısız.");
+ }
+
  return data;
 }
+
 async function loadPages(){
  $("pagesTable").innerHTML='<tr><td colspan="4">Sayfalar yükleniyor...</td></tr>';
+
  try{
   const data=await api("/api/pages");
   pages=data.pages||[];
   $("countPages").textContent=pages.length;
+
   if(!pages.length){
    $("pagesTable").innerHTML='<tr><td colspan="4" class="empty">Henüz sayfa oluşturulmamış.</td></tr>';
    return;
   }
+
   $("pagesTable").innerHTML=pages.map(p=>`
    <tr>
     <td>${escapeHtml(p.title)}</td>
@@ -226,30 +313,48 @@ async function loadPages(){
      <button class="btn" data-edit="${Number(p.id)}">Düzenle</button>
      <button class="btn btn-danger" data-delete="${Number(p.id)}">Sil</button>
     </td>
-   </tr>`).join("");
-  document.querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",()=>editPage(Number(b.dataset.edit))));
-  document.querySelectorAll("[data-delete]").forEach(b=>b.addEventListener("click",()=>deletePage(Number(b.dataset.delete))));
+   </tr>
+  `).join("");
+
+  document.querySelectorAll("[data-edit]").forEach(b=>{
+   b.addEventListener("click",()=>editPage(Number(b.dataset.edit)));
+  });
+
+  document.querySelectorAll("[data-delete]").forEach(b=>{
+   b.addEventListener("click",()=>deletePage(Number(b.dataset.delete)));
+  });
+
  }catch(error){
   $("pagesTable").innerHTML='<tr><td colspan="4" class="empty">Sayfalar yüklenemedi.</td></tr>';
   message(error.message);
  }
 }
+
 function resetEditor(){
- $("pageForm").reset();$("pageId").value="";
+ $("pageForm").reset();
+ $("pageId").value="";
+ $("slug").dataset.edited="";
  $("editorTitle").textContent="Yeni Sayfa";
  $("editor").classList.add("hidden");
 }
+
 $("newPage").addEventListener("click",()=>{
- resetEditor();$("editor").classList.remove("hidden");
+ resetEditor();
+ $("editor").classList.remove("hidden");
  $("editorTitle").textContent="Yeni Sayfa Oluştur";
  $("title").focus();
 });
+
 $("cancelEdit").addEventListener("click",resetEditor);
+
 function editPage(id){
- const p=pages.find(x=>Number(x.id)===id);if(!p)return;
+ const p=pages.find(x=>Number(x.id)===id);
+ if(!p)return;
+
  $("pageId").value=p.id;
  $("title").value=p.title||"";
  $("slug").value=p.slug||"";
+ $("slug").dataset.edited="1";
  $("contentText").value=p.content||"";
  $("metaTitle").value=p.meta_title||"";
  $("metaDescription").value=p.meta_description||"";
@@ -258,6 +363,7 @@ function editPage(id){
  $("editor").classList.remove("hidden");
  $("editor").scrollIntoView({behavior:"smooth"});
 }
+
 $("title").addEventListener("input",()=>{
  if(!$("pageId").value&&!$("slug").dataset.edited){
   $("slug").value=$("title").value.toLocaleLowerCase("tr-TR")
@@ -266,10 +372,16 @@ $("title").addEventListener("input",()=>{
    .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
  }
 });
-$("slug").addEventListener("input",()=>{$("slug").dataset.edited="1"});
+
+$("slug").addEventListener("input",()=>{
+ $("slug").dataset.edited="1";
+});
+
 $("pageForm").addEventListener("submit",async event=>{
  event.preventDefault();
+
  const id=$("pageId").value;
+
  const payload={
   id:id?Number(id):undefined,
   title:$("title").value.trim(),
@@ -279,39 +391,86 @@ $("pageForm").addEventListener("submit",async event=>{
   meta_description:$("metaDescription").value.trim(),
   status:$("status").value
  };
- $("savePage").disabled=true;$("savePage").textContent="Kaydediliyor...";
+
+ $("savePage").disabled=true;
+ $("savePage").textContent="Kaydediliyor...";
+
  try{
   const data=await api("/api/pages",{
    method:id?"PUT":"POST",
    headers:{"Content-Type":"application/json"},
    body:JSON.stringify(payload)
   });
-  resetEditor();message(data.message,"success");await loadPages();
- }catch(error){message(error.message)}
- finally{$("savePage").disabled=false;$("savePage").textContent="Sayfayı Kaydet";}
+
+  resetEditor();
+  message(data.message,"success");
+  await loadPages();
+
+ }catch(error){
+  message(error.message);
+ }finally{
+  $("savePage").disabled=false;
+  $("savePage").textContent="Sayfayı Kaydet";
+ }
 });
+
 async function deletePage(id){
  const p=pages.find(x=>Number(x.id)===id);
+
  if(!p||!confirm('"'+p.title+'" sayfasını silmek istediğinizden emin misiniz?'))return;
+
  try{
   const data=await api("/api/pages?id="+encodeURIComponent(id),{method:"DELETE"});
-  message(data.message,"success");await loadPages();
- }catch(error){message(error.message)}
+  message(data.message,"success");
+  await loadPages();
+ }catch(error){
+  message(error.message);
+ }
 }
+
 async function checkSession(){
  try{
   const response=await fetch("/api/me",{credentials:"same-origin"});
-  if(!response.ok){location.replace("/admin/");return;}
+
+  if(!response.ok){
+   location.replace("/admin/");
+   return;
+  }
+
   const data=await response.json();
-  if(!data.success||!data.admin){location.replace("/admin/");return;}
+
+  if(!data.success||!data.admin){
+   location.replace("/admin/");
+   return;
+  }
+
   const name=data.admin.username||"Yönetici";
-  $("username").textContent=name;$("welcomeName").textContent=name;
- }catch{location.replace("/admin/")}
+  currentRole=data.admin.role;
+
+  if(!["superadmin","content_admin"].includes(currentRole)){
+   location.replace("/admin/");
+   return;
+  }
+
+  $("username").textContent=name;
+  $("welcomeName").textContent=name;
+
+  applyRolePermissions();
+  showPage("overview");
+
+ }catch{
+  location.replace("/admin/");
+ }
 }
+
 $("logout").addEventListener("click",async()=>{
- try{await fetch("/api/logout",{method:"POST",credentials:"same-origin"})}
- finally{location.replace("/admin/")}
+ try{
+  await fetch("/api/logout",{method:"POST",credentials:"same-origin"});
+ }finally{
+  location.replace("/admin/");
+ }
 });
+
 checkSession();
 </script>
 </body>
