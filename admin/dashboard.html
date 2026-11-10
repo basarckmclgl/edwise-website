@@ -154,6 +154,11 @@ td{color:#e8e5f3}
    <div class="panel">
     <h2 id="otherTitle"></h2>
     <p class="muted" id="otherDescription"></p>
+    <div id="mediaLink" class="hidden" style="margin-top:20px">
+  <a href="/admin/media.html" class="primary" style="display:inline-block;text-decoration:none">
+    Medya Kütüphanesini Aç →
+  </a>
+</div>
     <div class="message">Bu modül henüz geliştirme aşamasında. Gerçek işlemler, güvenli API bağlantıları tamamlandığında açılacak.</div>
    </div>
   </section>
@@ -182,6 +187,7 @@ function showPage(name){
  document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===name));
  $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="pages"?"Sayfa Yönetimi":otherModules[name]?.[0]||"";
  if(name==="pages")loadPages();
+ $("mediaLink").classList.toggle("hidden", name !== "media");
  if(otherModules[name]){
   $("otherTitle").textContent=otherModules[name][0];
   $("otherDescription").textContent=otherModules[name][1];
