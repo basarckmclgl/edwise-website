@@ -3,249 +3,308 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>EDWISE | Yönetim Merkezi</title>
 <style>
-:root {
-  --bg:#0d0d18;
-  --panel:#171727;
-  --panel2:#1d1d31;
-  --border:#30304b;
-  --purple:#8055ed;
-  --purple2:#a78bfa;
-  --text:#f5f3ff;
-  --muted:#a5a3bd;
-  --green:#42c99a;
-}
+:root{--bg:#0d0d18;--panel:#171727;--border:#30304b;--purple:#8055ed;--light:#a78bfa;--text:#f5f3ff;--muted:#aaa7c0;--green:#42c99a;--red:#f07887}
 *{box-sizing:border-box}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font-family:Inter,Arial,sans-serif;display:flex;min-height:100vh
-}
-.sidebar{
-  width:255px;background:#131322;border-right:1px solid var(--border);
-  padding:25px 17px;position:fixed;inset:0 auto 0 0;
-  display:flex;flex-direction:column;z-index:5
-}
-.logo{font-size:25px;font-weight:900;letter-spacing:3px;
-  color:var(--purple2);padding:5px 12px 30px}
-.logo span{display:block;font-size:10px;letter-spacing:2px;
-  color:var(--muted);font-weight:500;margin-top:5px}
-.menu-label{font-size:10px;color:#77758f;letter-spacing:1.5px;
-  padding:15px 12px 9px}
-.nav{
-  display:flex;align-items:center;gap:12px;padding:12px;
-  color:var(--muted);text-decoration:none;border-radius:9px;
-  margin:3px 0;font-size:13px;cursor:pointer;border:0;
-  background:transparent;width:100%;text-align:left
-}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif;display:flex;min-height:100vh}
+.sidebar{width:245px;background:#131322;border-right:1px solid var(--border);padding:23px 15px;position:fixed;inset:0 auto 0 0;z-index:5}
+.logo{font-size:24px;font-weight:900;letter-spacing:3px;color:var(--light);padding:5px 12px 30px}
+.logo small{display:block;font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:6px;font-weight:400}
+.menu-label{font-size:10px;color:#77758f;letter-spacing:1.5px;padding:15px 12px 8px}
+.nav{display:flex;gap:12px;align-items:center;padding:12px;color:var(--muted);text-decoration:none;border:0;background:none;width:100%;text-align:left;border-radius:8px;cursor:pointer;font-size:13px;margin:3px 0}
 .nav:hover,.nav.active{background:#29213f;color:white}
-.nav.active{border-left:3px solid var(--purple2)}
-.nav .ico{width:22px;text-align:center;font-size:17px}
-.sidebar-bottom{margin-top:auto;border-top:1px solid var(--border);padding-top:15px}
-.main{margin-left:255px;width:calc(100% - 255px);min-height:100vh}
-.topbar{
-  height:70px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 35px;background:#131322
-}
-.top-title{font-size:13px;color:var(--muted)}
-.top-actions{display:flex;align-items:center;gap:15px}
-.user-chip{font-size:12px;color:var(--muted)}
-button{font-family:inherit;cursor:pointer}
-.logout{
-  background:var(--purple);color:white;border:0;padding:10px 16px;
-  border-radius:8px;font-size:12px;font-weight:600
-}
-.content{padding:35px;max-width:1450px;margin:auto}
-.welcome{
-  background:linear-gradient(120deg,#282044,#19192c 70%);
-  border:1px solid #42345f;border-radius:16px;padding:28px;
-  margin-bottom:25px;position:relative;overflow:hidden
-}
-.welcome:after{
-  content:"✦";position:absolute;right:45px;top:12px;
-  font-size:100px;color:#8e69ed;opacity:.12
-}
-.welcome small{color:var(--purple2);font-size:11px;letter-spacing:2px}
-.welcome h1{font-size:25px;margin:12px 0 8px}
-.welcome p{font-size:13px;color:#b9b5ce;margin:0}
-.section-head{display:flex;justify-content:space-between;align-items:center;margin:30px 0 16px}
-.section-head h2{font-size:17px;margin:0}
-.section-head p{font-size:12px;color:var(--muted);margin:6px 0 0}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
-.stat,.module,.content-panel{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:13px;padding:20px
-}
-.stat-top{display:flex;justify-content:space-between;align-items:center}
-.stat-icon,.module-icon{
-  width:42px;height:42px;border-radius:11px;
-  display:grid;place-items:center;background:#29213f;font-size:20px
-}
-.stat h3{font-size:25px;margin:17px 0 5px}
-.stat p{font-size:12px;color:var(--muted);margin:0}
-.module{cursor:pointer;transition:.2s;min-height:165px}
-.module:hover{transform:translateY(-3px);border-color:var(--purple)}
-.module h3{font-size:14px;margin:16px 0 7px}
-.module p{font-size:12px;line-height:1.6;color:var(--muted);margin:0}
-.module .arrow{float:right;color:var(--purple2)}
-.content-panel{min-height:230px}
-.content-panel h2{font-size:18px;margin:0 0 10px}
-.content-panel p{font-size:13px;color:var(--muted);line-height:1.7}
-.notice{
-  margin-top:18px;padding:13px 15px;border-radius:9px;
-  background:#242039;border:1px solid #40345e;
-  color:#c9bafa;font-size:12px;line-height:1.6
-}
-.quick{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-.quick button{
-  background:#29213f;color:#ddd2ff;border:1px solid #443665;
-  border-radius:8px;padding:11px 14px;font-size:12px
-}
-.quick button:hover{background:var(--purple);color:white}
-.hidden{display:none}
-.footer{font-size:11px;color:#77758f;margin-top:35px}
-@media(max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:700px){
-  .sidebar{width:70px;padding:18px 9px}
-  .logo{font-size:15px;padding:5px 7px 25px}
-  .logo span,.menu-label,.nav .nav-text{display:none}
-  .nav{justify-content:center;padding:13px 5px}
-  .nav .ico{font-size:20px}
-  .main{margin-left:70px;width:calc(100% - 70px)}
-  .topbar{padding:0 15px}
-  .content{padding:18px 13px}
-  .grid{grid-template-columns:1fr}
-  .welcome h1{font-size:20px}
-}
+.nav.active{border-left:3px solid var(--light)}
+.ico{width:20px;text-align:center;font-size:17px}
+.main{margin-left:245px;width:calc(100% - 245px);min-height:100vh}
+.topbar{height:68px;background:#131322;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 30px}
+.topbar span{font-size:12px;color:var(--muted)}
+.logout,.primary{background:var(--purple);color:white;border:0;padding:11px 16px;border-radius:8px;cursor:pointer;font-weight:600}
+.content{padding:30px;max-width:1450px;margin:auto}
+.welcome{background:linear-gradient(120deg,#292044,#19192c);border:1px solid #42345f;border-radius:14px;padding:25px;margin-bottom:25px}
+.welcome small{color:var(--light);letter-spacing:2px;font-size:10px}
+.welcome h1{font-size:24px;margin:12px 0 8px}
+.welcome p,.muted{font-size:13px;color:var(--muted);line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.stat,.module,.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:19px}
+.stat h2{font-size:25px;margin:15px 0 5px}
+.stat p,.module p{font-size:12px;color:var(--muted)}
+.module{cursor:pointer;min-height:145px}
+.module:hover{border-color:var(--purple);transform:translateY(-2px)}
+.module h3{font-size:14px;margin:14px 0 7px}
+.module-icon{font-size:22px;color:var(--light)}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:27px 0 15px}
+.section-head h2{font-size:18px;margin:0}
+.section-head p{font-size:12px;color:var(--muted);margin:6px 0}
+.panel{margin-top:20px}
+.panel h2{font-size:18px;margin:0 0 8px}
+.hidden{display:none!important}
+.btn{border:1px solid var(--border);background:#242039;color:#e5dcff;padding:9px 13px;border-radius:7px;cursor:pointer;font-size:12px}
+.btn:hover{border-color:var(--light)}
+.btn-danger{color:#ff9da8;border-color:#64333f}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.field{display:flex;flex-direction:column;gap:7px;margin:12px 0}
+.field.full{grid-column:1/-1}
+label{font-size:12px;color:#c9c4dc}
+input,textarea,select{width:100%;background:#10101c;border:1px solid var(--border);border-radius:7px;padding:12px;color:white;font:13px Arial}
+textarea{min-height:160px;resize:vertical;line-height:1.6}
+input:focus,textarea:focus,select:focus{outline:1px solid var(--light);border-color:var(--light)}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+table{width:100%;border-collapse:collapse;min-width:650px}
+th,td{text-align:left;padding:14px 12px;border-bottom:1px solid var(--border);font-size:12px}
+th{color:var(--muted);font-weight:500}
+td{color:#e8e5f3}
+.table-wrap{overflow-x:auto}
+.status{padding:5px 8px;border-radius:20px;font-size:10px;background:#29213f;color:#c8b7ff}
+.status.published{background:#15372f;color:#71dbb3}
+.message{padding:12px;border-radius:8px;margin:12px 0;font-size:12px;line-height:1.5}
+.error{background:#3b2029;color:#ffadb5}
+.success{background:#15372f;color:#8ae2bf}
+.empty{padding:25px;text-align:center;color:var(--muted);font-size:13px}
+@media(max-width:950px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.sidebar{width:65px;padding:15px 7px}.logo{font-size:14px;padding:5px}.logo small,.menu-label,.nav span:last-child{display:none}.nav{justify-content:center;padding:13px 4px}.main{margin-left:65px;width:calc(100% - 65px)}.content{padding:16px 12px}.topbar{padding:0 12px}.grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
 </style>
 </head>
 <body>
-
 <aside class="sidebar">
-  <div class="logo">EDWISE<span>CONTENT MANAGEMENT SYSTEM</span></div>
-
-  <div class="menu-label">ANA MENÜ</div>
-  <button class="nav active" data-page="overview"><span class="ico">▦</span><span class="nav-text">Genel Bakış</span></button>
-
-  <div class="menu-label">İÇERİK YÖNETİMİ</div>
-  <button class="nav" data-page="pages"><span class="ico">▤</span><span class="nav-text">Sayfa Yönetimi</span></button>
-  <button class="nav" data-page="services"><span class="ico">✧</span><span class="nav-text">Hizmet Yönetimi</span></button>
-  <button class="nav" data-page="posts"><span class="ico">▧</span><span class="nav-text">Blog Yönetimi</span></button>
-
-  <div class="menu-label">İŞLETME YÖNETİMİ</div>
-  <button class="nav" data-page="applications"><span class="ico">▣</span><span class="nav-text">Başvurular</span></button>
-  <button class="nav" data-page="media"><span class="ico">▧</span><span class="nav-text">Medya Kütüphanesi</span></button>
-  <button class="nav" data-page="settings"><span class="ico">⚙</span><span class="nav-text">Site Ayarları</span></button>
-
-  <div class="menu-label">SİSTEM</div>
-  <button class="nav" data-page="users"><span class="ico">♙</span><span class="nav-text">Kullanıcı ve Yetkiler</span></button>
-
-  <div class="sidebar-bottom">
-    <button class="nav" data-page="profile"><span class="ico">◉</span><span class="nav-text">Hesabım</span></button>
-  </div>
+ <div class="logo">EDWISE<small>CONTENT MANAGEMENT SYSTEM</small></div>
+ <div class="menu-label">ANA MENÜ</div>
+ <button class="nav active" data-page="overview"><span class="ico">▦</span><span>Genel Bakış</span></button>
+ <div class="menu-label">İÇERİK YÖNETİMİ</div>
+ <button class="nav" data-page="pages"><span class="ico">▤</span><span>Sayfa Yönetimi</span></button>
+ <button class="nav" data-page="services"><span class="ico">✧</span><span>Hizmet Yönetimi</span></button>
+ <button class="nav" data-page="posts"><span class="ico">▧</span><span>Blog Yönetimi</span></button>
+ <div class="menu-label">İŞLETME YÖNETİMİ</div>
+ <button class="nav" data-page="applications"><span class="ico">▣</span><span>Başvurular</span></button>
+ <button class="nav" data-page="media"><span class="ico">▧</span><span>Medya Kütüphanesi</span></button>
+ <button class="nav" data-page="settings"><span class="ico">⚙</span><span>Site Ayarları</span></button>
+ <div class="menu-label">SİSTEM</div>
+ <button class="nav" data-page="users"><span class="ico">♙</span><span>Kullanıcı ve Yetkiler</span></button>
 </aside>
 
 <main class="main">
-  <header class="topbar">
-    <div class="top-title">EDWISE / <strong id="breadcrumb">Genel Bakış</strong></div>
-    <div class="top-actions">
-      <span class="user-chip" id="username">Yönetici</span>
-      <button class="logout" id="logout">Güvenli Çıkış ↗</button>
+ <header class="topbar">
+  <span>EDWISE / <strong id="breadcrumb">Genel Bakış</strong></span>
+  <div><span id="username">Yönetici</span> &nbsp; <button class="logout" id="logout">Güvenli Çıkış ↗</button></div>
+ </header>
+
+ <div class="content">
+  <section id="overview">
+   <div class="welcome">
+    <small>EDWISE YÖNETİM MERKEZİ</small>
+    <h1>Hoş geldiniz, <span id="welcomeName">Yönetici</span> 👋</h1>
+    <p>İçeriklerinizi ve web sitenizi tek merkezden yönetin.</p>
+   </div>
+   <div class="grid">
+    <div class="stat"><span>Toplam Sayfa</span><h2 id="countPages">—</h2><p>Veritabanındaki sayfalar</p></div>
+    <div class="stat"><span>Hizmetler</span><h2>—</h2><p>Sonraki modülde bağlanacak</p></div>
+    <div class="stat"><span>Blog Yazıları</span><h2>—</h2><p>Sonraki modülde bağlanacak</p></div>
+    <div class="stat"><span>Başvurular</span><h2>—</h2><p>Başvuru modülü kurulacak</p></div>
+   </div>
+   <div class="section-head"><div><h2>Yönetim Modülleri</h2><p>İşlem yapmak istediğiniz alanı seçin.</p></div></div>
+   <div class="grid">
+    <div class="module" data-open="pages"><div class="module-icon">▤</div><h3>Sayfa Yönetimi ↗</h3><p>Web sayfalarını oluşturun ve düzenleyin.</p></div>
+    <div class="module" data-open="services"><div class="module-icon">✧</div><h3>Hizmet Yönetimi ↗</h3><p>Eğitim ve danışmanlık hizmetlerinizi yönetin.</p></div>
+    <div class="module" data-open="posts"><div class="module-icon">▧</div><h3>Blog Yönetimi ↗</h3><p>Blog yazıları oluşturun ve yayımlayın.</p></div>
+    <div class="module" data-open="applications"><div class="module-icon">▣</div><h3>Başvurular ↗</h3><p>Gelen başvuruları takip edin.</p></div>
+    <div class="module" data-open="media"><div class="module-icon">▧</div><h3>Medya Kütüphanesi ↗</h3><p>Fotoğraf ve dosyalarınızı yönetin.</p></div>
+    <div class="module" data-open="settings"><div class="module-icon">⚙</div><h3>Site Ayarları ↗</h3><p>Logo, iletişim ve menü ayarları.</p></div>
+    <div class="module" data-open="users"><div class="module-icon">♙</div><h3>Kullanıcı ve Yetkiler ↗</h3><p>Yönetici hesaplarını yönetin.</p></div>
+   </div>
+  </section>
+
+  <section id="pages" class="hidden">
+   <div class="section-head">
+    <div><h2>Sayfa Yönetimi</h2><p>Web sitenizin sayfalarını buradan yönetin.</p></div>
+    <button class="primary" id="newPage">+ Yeni Sayfa Oluştur</button>
+   </div>
+   <div id="pageMessage"></div>
+   <div id="editor" class="panel hidden">
+    <h2 id="editorTitle">Yeni Sayfa</h2>
+    <form id="pageForm">
+     <input type="hidden" id="pageId">
+     <div class="form-grid">
+      <div class="field"><label for="title">Sayfa başlığı *</label><input id="title" required maxlength="200" placeholder="Örn. Hakkımızda"></div>
+      <div class="field"><label for="slug">Sayfa URL adresi</label><input id="slug" placeholder="hakkimizda"></div>
+      <div class="field full"><label for="contentText">Sayfa içeriği</label><textarea id="contentText" placeholder="Sayfa metnini buraya yazın..."></textarea></div>
+      <div class="field"><label for="metaTitle">SEO başlığı</label><input id="metaTitle" maxlength="250"></div>
+      <div class="field"><label for="metaDescription">SEO açıklaması</label><input id="metaDescription" maxlength="500"></div>
+      <div class="field"><label for="status">Yayın durumu</label><select id="status"><option value="draft">Taslak</option><option value="published">Yayında</option></select></div>
+     </div>
+     <div class="actions">
+      <button class="primary" type="submit" id="savePage">Sayfayı Kaydet</button>
+      <button class="btn" type="button" id="cancelEdit">Vazgeç</button>
+     </div>
+    </form>
+   </div>
+   <div class="panel">
+    <h2>Mevcut Sayfalar</h2>
+    <p class="muted">Kayıtlı sayfaları görüntüleyin, düzenleyin veya silin.</p>
+    <div class="table-wrap">
+     <table>
+      <thead><tr><th>Sayfa Başlığı</th><th>URL</th><th>Durum</th><th>İşlemler</th></tr></thead>
+      <tbody id="pagesTable"><tr><td colspan="4">Sayfalar yükleniyor...</td></tr></tbody>
+     </table>
     </div>
-  </header>
+   </div>
+  </section>
 
-  <div class="content">
-    <section id="overview" class="page">
-      <div class="welcome">
-        <small>EDWISE YÖNETİM MERKEZİ</small>
-        <h1>Hoş geldiniz, <span id="welcomeName">Yönetici</span> 👋</h1>
-        <p>İçeriklerinizi, hizmetlerinizi ve web sitenizi tek merkezden yönetin.</p>
-      </div>
-
-      <div class="section-head">
-        <div><h2>Genel Durum</h2><p>İçerik ve işletme yönetimi özeti</p></div>
-      </div>
-      <div class="grid">
-        <div class="stat"><div class="stat-top"><span>Toplam Sayfa</span><span class="stat-icon">▤</span></div><h3>—</h3><p>Veritabanı bağlantısı bekleniyor</p></div>
-        <div class="stat"><div class="stat-top"><span>Hizmetler</span><span class="stat-icon">✧</span></div><h3>—</h3><p>Veritabanı bağlantısı bekleniyor</p></div>
-        <div class="stat"><div class="stat-top"><span>Blog Yazıları</span><span class="stat-icon">▧</span></div><h3>—</h3><p>Veritabanı bağlantısı bekleniyor</p></div>
-        <div class="stat"><div class="stat-top"><span>Başvurular</span><span class="stat-icon">▣</span></div><h3>—</h3><p>Başvuru modülü kurulacak</p></div>
-      </div>
-
-      <div class="section-head"><div><h2>Yönetim Modülleri</h2><p>İşlem yapmak istediğiniz alanı seçin.</p></div></div>
-      <div class="grid">
-        <div class="module" data-open="pages"><div class="module-icon">▤</div><h3>Sayfa Yönetimi <span class="arrow">↗</span></h3><p>Web sitesi sayfalarını oluşturun, düzenleyin ve yayınlayın.</p></div>
-        <div class="module" data-open="services"><div class="module-icon">✧</div><h3>Hizmet Yönetimi <span class="arrow">↗</span></h3><p>Eğitim ve danışmanlık hizmetlerinizi yönetin.</p></div>
-        <div class="module" data-open="posts"><div class="module-icon">▧</div><h3>Blog Yönetimi <span class="arrow">↗</span></h3><p>Blog yazıları oluşturun, düzenleyin ve yayımlayın.</p></div>
-        <div class="module" data-open="applications"><div class="module-icon">▣</div><h3>Başvurular <span class="arrow">↗</span></h3><p>Web sitesi üzerinden gelen başvuruları takip edin.</p></div>
-        <div class="module" data-open="media"><div class="module-icon">▧</div><h3>Medya Kütüphanesi <span class="arrow">↗</span></h3><p>Fotoğraf ve dosyalarınızı tek yerden yönetin.</p></div>
-        <div class="module" data-open="settings"><div class="module-icon">⚙</div><h3>Site Ayarları <span class="arrow">↗</span></h3><p>Logo, iletişim bilgileri, menüler ve sosyal medya ayarları.</p></div>
-        <div class="module" data-open="users"><div class="module-icon">♙</div><h3>Kullanıcı ve Yetkiler <span class="arrow">↗</span></h3><p>Yönetici hesapları ve erişim izinlerini yönetin.</p></div>
-        <div class="module" data-open="profile"><div class="module-icon">◉</div><h3>Hesabım <span class="arrow">↗</span></h3><p>Yönetici hesabınızı ve oturum bilgilerinizi görüntüleyin.</p></div>
-      </div>
-    </section>
-
-    <section id="modulePage" class="page hidden">
-      <div class="content-panel">
-        <h2 id="moduleTitle">Modül</h2>
-        <p id="moduleDescription"></p>
-        <div class="notice" id="moduleNotice">
-          Bu modülün veritabanı işlemleri ve güvenli sunucu bağlantısı henüz kurulmadı. Bağlantı tamamlanmadan içerik ekleme veya silme işlemi yapılmayacaktır.
-        </div>
-        <div class="quick">
-          <button id="backHome">← Genel Bakışa Dön</button>
-        </div>
-      </div>
-    </section>
-
-    <div class="footer">EDWISE CMS · Yönetim Merkezi · Güvenli yönetim alanı</div>
-  </div>
+  <section id="other" class="hidden">
+   <div class="panel">
+    <h2 id="otherTitle"></h2>
+    <p class="muted" id="otherDescription"></p>
+    <div class="message">Bu modül henüz geliştirme aşamasında. Gerçek işlemler, güvenli API bağlantıları tamamlandığında açılacak.</div>
+   </div>
+  </section>
+ </div>
 </main>
 
 <script>
-const descriptions = {
-  pages:["Sayfa Yönetimi","Ana sayfa, Hakkımızda, İletişim ve diğer web sayfalarınızı oluşturup düzenleyebileceğiniz alan."],
-  services:["Hizmet Yönetimi","Eğitim programları ve danışmanlık hizmetlerini ekleyip düzenleyebileceğiniz alan."],
-  posts:["Blog Yönetimi","Yeni blog yazıları oluşturabileceğiniz, taslak kaydedebileceğiniz ve yayınlayabileceğiniz alan."],
-  applications:["Başvuru Yönetimi","Web sitesi ziyaretçilerinden gelen başvuruları inceleyip takip edebileceğiniz alan."],
-  media:["Medya Kütüphanesi","Görsellerinizi ve dosyalarınızı yükleyip yönetebileceğiniz alan."],
-  settings:["Site Ayarları","Logo, site adı, telefon, e-posta, WhatsApp, menü ve sosyal medya bilgilerini yönetebileceğiniz alan."],
-  users:["Kullanıcı ve Yetkiler","Yönetici hesapları oluşturup rollerini ve erişim izinlerini düzenleyebileceğiniz alan."],
-  profile:["Hesabım","Yönetici hesabınızın bilgilerini görüntüleyebileceğiniz alan."]
+const otherModules={
+ services:["Hizmet Yönetimi","Eğitim ve danışmanlık hizmetleri ekleme ve düzenleme."],
+ posts:["Blog Yönetimi","Blog yazısı oluşturma, taslak kaydetme ve yayınlama."],
+ applications:["Başvuru Yönetimi","Ziyaretçi başvurularını görüntüleme ve takip etme."],
+ media:["Medya Kütüphanesi","Görsel ve dosyaları yükleme ve yönetme."],
+ settings:["Site Ayarları","Logo, iletişim bilgileri, menüler ve sosyal medya bağlantıları."],
+ users:["Kullanıcı ve Yetkiler","Yönetici hesapları ve rol izinlerini yönetme."]
 };
+const $=id=>document.getElementById(id);
+let pages=[];
 
-function showPage(page) {
-  document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===page));
-  document.getElementById("overview").classList.toggle("hidden",page!=="overview");
-  document.getElementById("modulePage").classList.toggle("hidden",page==="overview");
-  if(page!=="overview"){
-    document.getElementById("moduleTitle").textContent=descriptions[page][0];
-    document.getElementById("moduleDescription").textContent=descriptions[page][1];
-  }
-  document.getElementById("breadcrumb").textContent=page==="overview"?"Genel Bakış":descriptions[page][0];
+function escapeHtml(value){
+ return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
-document.querySelectorAll("[data-page]").forEach(el=>el.addEventListener("click",()=>showPage(el.dataset.page)));
-document.querySelectorAll("[data-open]").forEach(el=>el.addEventListener("click",()=>showPage(el.dataset.open)));
-document.getElementById("backHome").addEventListener("click",()=>showPage("overview"));
+function showPage(name){
+ $("overview").classList.toggle("hidden",name!=="overview");
+ $("pages").classList.toggle("hidden",name!=="pages");
+ $("other").classList.toggle("hidden",!otherModules[name]);
+ document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===name));
+ $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="pages"?"Sayfa Yönetimi":otherModules[name]?.[0]||"";
+ if(name==="pages")loadPages();
+ if(otherModules[name]){
+  $("otherTitle").textContent=otherModules[name][0];
+  $("otherDescription").textContent=otherModules[name][1];
+ }
+}
+document.querySelectorAll("[data-page]").forEach(n=>n.addEventListener("click",()=>showPage(n.dataset.page)));
+document.querySelectorAll("[data-open]").forEach(n=>n.addEventListener("click",()=>showPage(n.dataset.open)));
 
+function message(text,type="error"){
+ $("pageMessage").innerHTML='<div class="message '+type+'">'+escapeHtml(text)+'</div>';
+}
+async function api(url,options={}){
+ const response=await fetch(url,{credentials:"same-origin",...options});
+ let data;
+ try{data=await response.json()}catch{throw new Error("Sunucudan geçerli yanıt alınamadı.")}
+ if(response.status===401){location.replace("/admin/");throw new Error("Oturumunuz sona erdi.")}
+ if(!response.ok||!data.success)throw new Error(data.message||"İşlem başarısız.");
+ return data;
+}
+async function loadPages(){
+ $("pagesTable").innerHTML='<tr><td colspan="4">Sayfalar yükleniyor...</td></tr>';
+ try{
+  const data=await api("/api/pages");
+  pages=data.pages||[];
+  $("countPages").textContent=pages.length;
+  if(!pages.length){
+   $("pagesTable").innerHTML='<tr><td colspan="4" class="empty">Henüz sayfa oluşturulmamış.</td></tr>';
+   return;
+  }
+  $("pagesTable").innerHTML=pages.map(p=>`
+   <tr>
+    <td>${escapeHtml(p.title)}</td>
+    <td>/${escapeHtml(p.slug)}</td>
+    <td><span class="status ${p.status==="published"?"published":""}">${p.status==="published"?"Yayında":"Taslak"}</span></td>
+    <td>
+     <button class="btn" data-edit="${Number(p.id)}">Düzenle</button>
+     <button class="btn btn-danger" data-delete="${Number(p.id)}">Sil</button>
+    </td>
+   </tr>`).join("");
+  document.querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",()=>editPage(Number(b.dataset.edit))));
+  document.querySelectorAll("[data-delete]").forEach(b=>b.addEventListener("click",()=>deletePage(Number(b.dataset.delete))));
+ }catch(error){
+  $("pagesTable").innerHTML='<tr><td colspan="4" class="empty">Sayfalar yüklenemedi.</td></tr>';
+  message(error.message);
+ }
+}
+function resetEditor(){
+ $("pageForm").reset();$("pageId").value="";
+ $("editorTitle").textContent="Yeni Sayfa";
+ $("editor").classList.add("hidden");
+}
+$("newPage").addEventListener("click",()=>{
+ resetEditor();$("editor").classList.remove("hidden");
+ $("editorTitle").textContent="Yeni Sayfa Oluştur";
+ $("title").focus();
+});
+$("cancelEdit").addEventListener("click",resetEditor);
+function editPage(id){
+ const p=pages.find(x=>Number(x.id)===id);if(!p)return;
+ $("pageId").value=p.id;
+ $("title").value=p.title||"";
+ $("slug").value=p.slug||"";
+ $("contentText").value=p.content||"";
+ $("metaTitle").value=p.meta_title||"";
+ $("metaDescription").value=p.meta_description||"";
+ $("status").value=p.status||"draft";
+ $("editorTitle").textContent="Sayfayı Düzenle";
+ $("editor").classList.remove("hidden");
+ $("editor").scrollIntoView({behavior:"smooth"});
+}
+$("title").addEventListener("input",()=>{
+ if(!$("pageId").value&&!$("slug").dataset.edited){
+  $("slug").value=$("title").value.toLocaleLowerCase("tr-TR")
+   .replace(/ı/g,"i").replace(/ğ/g,"g").replace(/ü/g,"u")
+   .replace(/ş/g,"s").replace(/ö/g,"o").replace(/ç/g,"c")
+   .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+ }
+});
+$("slug").addEventListener("input",()=>{$("slug").dataset.edited="1"});
+$("pageForm").addEventListener("submit",async event=>{
+ event.preventDefault();
+ const id=$("pageId").value;
+ const payload={
+  id:id?Number(id):undefined,
+  title:$("title").value.trim(),
+  slug:$("slug").value.trim(),
+  content:$("contentText").value,
+  meta_title:$("metaTitle").value.trim(),
+  meta_description:$("metaDescription").value.trim(),
+  status:$("status").value
+ };
+ $("savePage").disabled=true;$("savePage").textContent="Kaydediliyor...";
+ try{
+  const data=await api("/api/pages",{
+   method:id?"PUT":"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify(payload)
+  });
+  resetEditor();message(data.message,"success");await loadPages();
+ }catch(error){message(error.message)}
+ finally{$("savePage").disabled=false;$("savePage").textContent="Sayfayı Kaydet";}
+});
+async function deletePage(id){
+ const p=pages.find(x=>Number(x.id)===id);
+ if(!p||!confirm('"'+p.title+'" sayfasını silmek istediğinizden emin misiniz?'))return;
+ try{
+  const data=await api("/api/pages?id="+encodeURIComponent(id),{method:"DELETE"});
+  message(data.message,"success");await loadPages();
+ }catch(error){message(error.message)}
+}
 async function checkSession(){
-  try{
-    const response=await fetch("/api/me",{credentials:"same-origin"});
-    if(!response.ok){location.replace("/admin/");return;}
-    const data=await response.json();
-    if(!data.success||!data.admin){location.replace("/admin/");return;}
-    const name=data.admin.username||"Yönetici";
-    document.getElementById("username").textContent=name;
-    document.getElementById("welcomeName").textContent=name;
-  }catch(error){
-    location.replace("/admin/");
-  }
+ try{
+  const response=await fetch("/api/me",{credentials:"same-origin"});
+  if(!response.ok){location.replace("/admin/");return;}
+  const data=await response.json();
+  if(!data.success||!data.admin){location.replace("/admin/");return;}
+  const name=data.admin.username||"Yönetici";
+  $("username").textContent=name;$("welcomeName").textContent=name;
+ }catch{location.replace("/admin/")}
 }
-document.getElementById("logout").addEventListener("click",async()=>{
-  try{await fetch("/api/logout",{method:"POST",credentials:"same-origin"});}
-  finally{location.replace("/admin/");}
+$("logout").addEventListener("click",async()=>{
+ try{await fetch("/api/logout",{method:"POST",credentials:"same-origin"})}
+ finally{location.replace("/admin/")}
 });
 checkSession();
 </script>
