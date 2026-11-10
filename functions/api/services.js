@@ -106,11 +106,11 @@ export async function onRequestPost(context) {
       }, 409);
     }
 
-    return json({
-      success: false,
-      message: "Hizmet oluşturulamadı."
-    }, 500);
-  }
+      return json({
+        success: false,
+        message: "Hizmet oluşturulamadı: " + String(error?.message || error)
+      }, 500);
+    }
 }
 
 export async function onRequestPut(context) {
