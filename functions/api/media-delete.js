@@ -1,9 +1,9 @@
 
-import { requireAdmin } from "./_auth.js";
+import { requireEditor } from "./_auth.js";
 
 export async function onRequestPost(context) {
-  const auth = await requireAdmin(context);
-  if (auth instanceof Response) return auth;
+  const auth = await requireEditor(context);
+  if (auth.response) return auth.response;
 
   const { request, env } = context;
 
