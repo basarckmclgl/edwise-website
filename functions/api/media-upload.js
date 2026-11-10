@@ -1,5 +1,5 @@
 
-import { requireAdmin } from "./_auth.js";
+import { requireEditor } from "./_auth.js";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
@@ -35,15 +35,15 @@ function toBase64(bytes) {
 
 export async function onRequestPost(context) {
   try {
-    const auth = await requireAdmin(context);
+    const auth = await requireEditor(context);
 
-    if (auth instanceof Response) return auth;
+    if (auth.response) return auth.response;
 
     const token = context.env.GITHUB_TOKEN;
-    const repo = context.env.GITHUB_REPO || "basarckmclgl/edwise-website";
+    const repo = context.env.GITHUB_REPO;
     const db = context.env.DB;
 
-    if (!token || !db) {
+    if (!token || !repo || !db) {
       return json({
         error: "GitHub veya veritabanı bağlantısı bulunamadı."
       }, 500);
