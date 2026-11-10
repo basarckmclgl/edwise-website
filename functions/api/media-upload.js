@@ -25,8 +25,9 @@ function toBase64(bytes) {
   const chunkSize = 8192;
 
   for (let i = 0; i < bytes.length; i += chunkSize) {
-    const chunk = bytes.subarray(i, i + chunkSize);
-    binary += String.fromCharCode(...chunk);
+    binary += String.fromCharCode(
+      ...bytes.subarray(i, i + chunkSize)
+    );
   }
 
   return btoa(binary);
@@ -36,61 +37,43 @@ export async function onRequestPost(context) {
   try {
     const auth = await requireAdmin(context);
 
-    if (auth instanceof Response) {
-      return auth;
-    }
+    if (auth instanceof Response) return auth;
 
     const token = context.env.GITHUB_TOKEN;
     const repo = context.env.GITHUB_REPO || "basarckmclgl/edwise-website";
+    const db = context.env.DB;
 
-    if (!token) {
+    if (!token || !db) {
       return json({
-        error: "GITHUB_TOKEN bulunamadı. Cloudflare gizli değişkenini kontrol et."
+        error: "GitHub veya veritabanı bağlantısı bulunamadı."
       }, 500);
     }
 
-    if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo)) {
-      return json({
-        error: "GITHUB_REPO ayarı hatalı."
-      }, 500);
-    }
-
-    let form;
-
-    try {
-      form = await context.request.formData();
-    } catch {
-      return json({
-        error: "Form verisi okunamadı. Sayfayı yenileyip tekrar dene."
-      }, 400);
-    }
-
+    const form = await context.request.formData();
     const file = form.get("file");
 
     if (!file || typeof file.arrayBuffer !== "function" || !file.size) {
-      return json({
-        error: "Lütfen önce bir görsel dosyası seç."
-      }, 400);
+      return json({ error: "Lütfen bir görsel seç." }, 400);
     }
 
     if (!ALLOWED_TYPES[file.type]) {
       return json({
-        error: "Desteklenmeyen dosya türü. JPG, PNG, WEBP veya GIF kullan."
+        error: "JPG, PNG, WEBP veya GIF dosyası seçmelisin."
       }, 400);
     }
 
     if (file.size > MAX_FILE_SIZE) {
       return json({
-        error: "Dosya boyutu 5 MB sınırını aşıyor."
+        error: "Dosya boyutu en fazla 5 MB olabilir."
       }, 400);
     }
 
     const extension = ALLOWED_TYPES[file.type];
     const filename = `${crypto.randomUUID()}.${extension}`;
     const path = `media/${filename}`;
+    const url = `https://raw.githubusercontent.com/${repo}/main/${path}`;
 
     const bytes = new Uint8Array(await file.arrayBuffer());
-    const content = toBase64(bytes);
 
     const githubResponse = await fetch(
       `https://api.github.com/repos/${repo}/contents/${path}`,
@@ -104,36 +87,42 @@ export async function onRequestPost(context) {
           "User-Agent": "EDWISE-CMS"
         },
         body: JSON.stringify({
-          message: `EDWISE CMS görsel yükleme: ${filename}`,
-          content,
+          message: `EDWISE CMS görseli: ${filename}`,
+          content: toBase64(bytes),
           branch: "main"
         })
       }
     );
 
-    const responseText = await githubResponse.text();
-
-    let githubData = {};
-
-    try {
-      githubData = JSON.parse(responseText);
-    } catch {
-      githubData = {};
-    }
+    const githubData = await githubResponse.json();
 
     if (!githubResponse.ok) {
       return json({
-        error: `GitHub yükleme hatası (${githubResponse.status}): ${
-          githubData.message || "GitHub isteği başarısız oldu."
-        }`
+        error: githubData.message || "GitHub yüklemesi başarısız."
       }, 502);
+    }
+
+    try {
+      await db.prepare(`
+        INSERT INTO media
+          (file_name, file_url, file_type, created_at)
+        VALUES (?, ?, ?, datetime('now'))
+      `).bind(filename, url, file.type).run();
+
+    } catch (dbError) {
+      return json({
+        success: true,
+        warning: "Görsel GitHub'a yüklendi ancak veritabanı kaydı başarısız.",
+        filename,
+        url
+      }, 207);
     }
 
     return json({
       success: true,
       filename,
-      url: `https://raw.githubusercontent.com/${repo}/main/${path}`,
-      message: "Görsel başarıyla yüklendi."
+      url,
+      message: "Görsel yüklendi ve medya kütüphanesine kaydedildi."
     });
 
   } catch (error) {
