@@ -167,6 +167,94 @@ td{color:#e8e5f3}
     </div>
    </div>
   </section>
+  
+<section id="services" class="hidden">
+  <div class="section-head">
+    <div>
+      <h2>Hizmet Yönetimi</h2>
+      <p>Eğitim ve danışmanlık hizmetlerinizi oluşturun ve yönetin.</p>
+    </div>
+    <button class="primary" id="newService">+ Yeni Hizmet Ekle</button>
+  </div>
+
+  <div id="serviceMessage"></div>
+
+  <div id="serviceEditor" class="panel hidden">
+    <h2 id="serviceEditorTitle">Yeni Hizmet</h2>
+
+    <form id="serviceForm">
+      <input type="hidden" id="serviceId">
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="serviceTitle">Hizmet başlığı *</label>
+          <input id="serviceTitle" required maxlength="200" placeholder="Örn. Eğitim Danışmanlığı">
+        </div>
+
+        <div class="field">
+          <label for="serviceSlug">URL adresi *</label>
+          <input id="serviceSlug" required placeholder="egitim-danismanligi">
+        </div>
+
+        <div class="field full">
+          <label for="serviceDescription">Kısa açıklama</label>
+          <textarea id="serviceDescription" placeholder="Hizmet hakkında kısa bilgi..."></textarea>
+        </div>
+
+        <div class="field full">
+          <label for="serviceImage">Görsel URL adresi</label>
+          <input id="serviceImage" placeholder="https://...">
+        </div>
+
+        <div class="field full">
+          <label for="serviceContent">Detaylı hizmet içeriği</label>
+          <textarea id="serviceContent" placeholder="Hizmetin ayrıntılarını yazın..."></textarea>
+        </div>
+
+        <div class="field">
+          <label for="serviceStatus">Yayın durumu</label>
+          <select id="serviceStatus">
+            <option value="draft">Taslak</option>
+            <option value="published">Yayında</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="serviceOrder">Gösterim sırası</label>
+          <input id="serviceOrder" type="number" value="0">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" type="submit" id="saveService">Hizmeti Kaydet</button>
+        <button class="btn" type="button" id="cancelService">Vazgeç</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Kayıtlı Hizmetler</h2>
+    <p class="muted">Hizmetleri düzenleyebilir, yayına alabilir veya silebilirsiniz.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Hizmet</th>
+            <th>URL</th>
+            <th>Durum</th>
+            <th>Sıra</th>
+            <th>İşlemler</th>
+          </tr>
+        </thead>
+        <tbody id="servicesTable">
+          <tr><td colspan="5">Hizmetler yükleniyor...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
 
   <section id="other" class="hidden">
    <div class="panel">
