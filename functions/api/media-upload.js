@@ -1,69 +1,98 @@
 
 import { requireAdmin } from "./_auth.js";
 
-export async function onRequestPost(context) {
-  const auth = await requireAdmin(context);
-  if (auth instanceof Response) return auth;
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-  const token = context.env.GITHUB_TOKEN;
-  const repo = context.env.GITHUB_REPO || "basarckmclgl/edwise-website";
+const ALLOWED_TYPES = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif"
+};
 
-  if (!token) {
-    return Response.json(
-      { error: "GitHub bağlantısı henüz yapılandırılmadı." },
-      { status: 500 }
-    );
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store"
+    }
+  });
+}
+
+function toBase64(bytes) {
+  let binary = "";
+  const chunkSize = 8192;
+
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode(...chunk);
   }
 
+  return btoa(binary);
+}
+
+export async function onRequestPost(context) {
   try {
-    const form = await context.request.formData();
+    const auth = await requireAdmin(context);
+
+    if (auth instanceof Response) {
+      return auth;
+    }
+
+    const token = context.env.GITHUB_TOKEN;
+    const repo = context.env.GITHUB_REPO || "basarckmclgl/edwise-website";
+
+    if (!token) {
+      return json({
+        error: "GITHUB_TOKEN bulunamadı. Cloudflare gizli değişkenini kontrol et."
+      }, 500);
+    }
+
+    if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo)) {
+      return json({
+        error: "GITHUB_REPO ayarı hatalı."
+      }, 500);
+    }
+
+    let form;
+
+    try {
+      form = await context.request.formData();
+    } catch {
+      return json({
+        error: "Form verisi okunamadı. Sayfayı yenileyip tekrar dene."
+      }, 400);
+    }
+
     const file = form.get("file");
 
-    if (!(file instanceof File) || !file.size) {
-      return Response.json(
-        { error: "Yüklenecek dosya bulunamadı." },
-        { status: 400 }
-      );
+    if (!file || typeof file.arrayBuffer !== "function" || !file.size) {
+      return json({
+        error: "Lütfen önce bir görsel dosyası seç."
+      }, 400);
     }
 
-    const allowed = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/gif"
-    ];
-
-    if (!allowed.includes(file.type)) {
-      return Response.json(
-        { error: "Sadece JPG, PNG, WEBP ve GIF yüklenebilir." },
-        { status: 400 }
-      );
+    if (!ALLOWED_TYPES[file.type]) {
+      return json({
+        error: "Desteklenmeyen dosya türü. JPG, PNG, WEBP veya GIF kullan."
+      }, 400);
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      return Response.json(
-        { error: "Dosya boyutu en fazla 5 MB olabilir." },
-        { status: 400 }
-      );
+    if (file.size > MAX_FILE_SIZE) {
+      return json({
+        error: "Dosya boyutu 5 MB sınırını aşıyor."
+      }, 400);
     }
 
-    const extension = {
-      "image/jpeg": "jpg",
-      "image/png": "png",
-      "image/webp": "webp",
-      "image/gif": "gif"
-    }[file.type];
-
+    const extension = ALLOWED_TYPES[file.type];
     const filename = `${crypto.randomUUID()}.${extension}`;
     const path = `media/${filename}`;
 
     const bytes = new Uint8Array(await file.arrayBuffer());
-    let binary = "";
-    for (let i = 0; i < bytes.length; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
+    const content = toBase64(bytes);
 
-    const response = await fetch(
+    const githubResponse = await fetch(
       `https://api.github.com/repos/${repo}/contents/${path}`,
       {
         method: "PUT",
@@ -71,35 +100,45 @@ export async function onRequestPost(context) {
           "Authorization": `Bearer ${token}`,
           "Accept": "application/vnd.github+json",
           "X-GitHub-Api-Version": "2022-11-28",
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "User-Agent": "EDWISE-CMS"
         },
         body: JSON.stringify({
-          message: `CMS görseli eklendi: ${filename}`,
-          content: btoa(binary),
+          message: `EDWISE CMS görsel yükleme: ${filename}`,
+          content,
           branch: "main"
         })
       }
     );
 
-    const result = await response.json();
+    const responseText = await githubResponse.text();
 
-    if (!response.ok) {
-      return Response.json(
-        { error: result.message || "GitHub yükleme işlemi başarısız." },
-        { status: response.status }
-      );
+    let githubData = {};
+
+    try {
+      githubData = JSON.parse(responseText);
+    } catch {
+      githubData = {};
     }
 
-    return Response.json({
+    if (!githubResponse.ok) {
+      return json({
+        error: `GitHub yükleme hatası (${githubResponse.status}): ${
+          githubData.message || "GitHub isteği başarısız oldu."
+        }`
+      }, 502);
+    }
+
+    return json({
       success: true,
       filename,
-      url: `https://raw.githubusercontent.com/${repo}/main/${path}`
+      url: `https://raw.githubusercontent.com/${repo}/main/${path}`,
+      message: "Görsel başarıyla yüklendi."
     });
 
   } catch (error) {
-    return Response.json(
-      { error: "Yükleme sırasında bir hata oluştu." },
-      { status: 500 }
-    );
+    return json({
+      error: `Sunucu hatası: ${error?.message || "Bilinmeyen hata"}`
+    }, 500);
   }
 }
