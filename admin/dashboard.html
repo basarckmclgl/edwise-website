@@ -109,7 +109,7 @@ td{color:#e8e5f3}
 
    <div class="grid">
     <div class="stat"><span>Toplam Sayfa</span><h2 id="countPages">—</h2><p>Veritabanındaki sayfalar</p></div>
-    <div class="stat"><span>Hizmetler</span><h2>—</h2><p>Sonraki modülde bağlanacak</p></div>
+    <div class="stat"><span>Hizmetler</span><h2 id="countServices">—</h2><p>Toplam kayıtlı hizmet</p></div>
     <div class="stat"><span>Blog Yazıları</span><h2>—</h2><p>Sonraki modülde bağlanacak</p></div>
     <div class="stat" data-superadmin><span>Başvurular</span><h2>—</h2><p>Başvuru modülü kurulacak</p></div>
    </div>
@@ -323,6 +323,7 @@ function showPage(name){
 
  $("overview").classList.toggle("hidden",name!=="overview");
  $("pages").classList.toggle("hidden",name!=="pages");
+ $("services").classList.toggle("hidden",name!=="services");
  $("other").classList.toggle("hidden",!otherModules[name]);
 
  document.querySelectorAll(".nav").forEach(n=>{
@@ -332,6 +333,7 @@ function showPage(name){
  $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="pages"?"Sayfa Yönetimi":otherModules[name]?.[0]||"";
 
  if(name==="pages")loadPages();
+ if(name==="services")loadServices();
 
  $("mediaLink").classList.toggle("hidden",name!=="media");
 
@@ -558,6 +560,178 @@ $("logout").addEventListener("click",async()=>{
   location.replace("/admin/");
  }
 });
+
+ 
+let services = [];
+
+function serviceMessage(text, type = "error") {
+  $("serviceMessage").innerHTML =
+    '<div class="message ' + type + '">' + escapeHtml(text) + '</div>';
+}
+
+async function loadServices() {
+  $("servicesTable").innerHTML =
+    '<tr><td colspan="5">Hizmetler yükleniyor...</td></tr>';
+
+  try {
+    const data = await api("/api/services");
+    services = data.services || [];
+
+    const count = document.getElementById("countServices");
+    if (count) count.textContent = services.length;
+
+    if (!services.length) {
+      $("servicesTable").innerHTML =
+        '<tr><td colspan="5" class="empty">Henüz hizmet eklenmemiş.</td></tr>';
+      return;
+    }
+
+    $("servicesTable").innerHTML = services.map(service => `
+      <tr>
+        <td>${escapeHtml(service.title)}</td>
+        <td>/${escapeHtml(service.slug)}</td>
+        <td>
+          <span class="status ${service.status === "published" ? "published" : ""}">
+            ${service.status === "published" ? "Yayında" : "Taslak"}
+          </span>
+        </td>
+        <td>${Number(service.sort_order) || 0}</td>
+        <td>
+          <button class="btn" data-service-edit="${escapeHtml(service.id)}">Düzenle</button>
+          <button class="btn btn-danger" data-service-delete="${escapeHtml(service.id)}">Sil</button>
+        </td>
+      </tr>
+    `).join("");
+
+    document.querySelectorAll("[data-service-edit]").forEach(button => {
+      button.addEventListener("click", () => {
+        editService(button.dataset.serviceEdit);
+      });
+    });
+
+    document.querySelectorAll("[data-service-delete]").forEach(button => {
+      button.addEventListener("click", () => {
+        deleteService(button.dataset.serviceDelete);
+      });
+    });
+
+  } catch (error) {
+    $("servicesTable").innerHTML =
+      '<tr><td colspan="5" class="empty">Hizmetler yüklenemedi.</td></tr>';
+    serviceMessage(error.message);
+  }
+}
+
+function resetServiceEditor() {
+  $("serviceForm").reset();
+  $("serviceId").value = "";
+  $("serviceOrder").value = "0";
+  $("serviceEditorTitle").textContent = "Yeni Hizmet";
+  $("serviceEditor").classList.add("hidden");
+}
+
+$("newService").addEventListener("click", () => {
+  resetServiceEditor();
+  $("serviceEditor").classList.remove("hidden");
+  $("serviceEditorTitle").textContent = "Yeni Hizmet Oluştur";
+  $("serviceTitle").focus();
+});
+
+$("cancelService").addEventListener("click", resetServiceEditor);
+
+$("serviceTitle").addEventListener("input", () => {
+  if (!$("serviceId").value) {
+    $("serviceSlug").value = $("serviceTitle").value
+      .toLocaleLowerCase("tr-TR")
+      .replace(/ı/g, "i")
+      .replace(/ğ/g, "g")
+      .replace(/ü/g, "u")
+      .replace(/ş/g, "s")
+      .replace(/ö/g, "o")
+      .replace(/ç/g, "c")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
+});
+
+function editService(id) {
+  const service = services.find(item => String(item.id) === String(id));
+  if (!service) return;
+
+  $("serviceId").value = service.id;
+  $("serviceTitle").value = service.title || "";
+  $("serviceSlug").value = service.slug || "";
+  $("serviceDescription").value = service.description || "";
+  $("serviceImage").value = service.image_url || "";
+  $("serviceContent").value = service.content || "";
+  $("serviceStatus").value = service.status || "draft";
+  $("serviceOrder").value = service.sort_order ?? 0;
+
+  $("serviceEditorTitle").textContent = "Hizmeti Düzenle";
+  $("serviceEditor").classList.remove("hidden");
+  $("serviceEditor").scrollIntoView({ behavior: "smooth" });
+}
+
+$("serviceForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const id = $("serviceId").value;
+
+  const payload = {
+    id: id || undefined,
+    title: $("serviceTitle").value.trim(),
+    slug: $("serviceSlug").value.trim().toLowerCase(),
+    description: $("serviceDescription").value.trim(),
+    image_url: $("serviceImage").value.trim(),
+    content: $("serviceContent").value.trim(),
+    status: $("serviceStatus").value,
+    sort_order: Number($("serviceOrder").value) || 0
+  };
+
+  $("saveService").disabled = true;
+  $("saveService").textContent = "Kaydediliyor...";
+
+  try {
+    const result = await api("/api/services", {
+      method: id ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    resetServiceEditor();
+    serviceMessage(result.message, "success");
+    await loadServices();
+
+  } catch (error) {
+    serviceMessage(error.message);
+  } finally {
+    $("saveService").disabled = false;
+    $("saveService").textContent = "Hizmeti Kaydet";
+  }
+});
+
+async function deleteService(id) {
+  const service = services.find(item => String(item.id) === String(id));
+  if (!service) return;
+
+  if (!confirm('"' + service.title + '" hizmetini silmek istediğinizden emin misiniz?')) {
+    return;
+  }
+
+  try {
+    const result = await api("/api/services", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id })
+    });
+
+    serviceMessage(result.message, "success");
+    await loadServices();
+
+  } catch (error) {
+    serviceMessage(error.message);
+  }
+}
 
 checkSession();
 </script>
