@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EDWISE | Yönetici Girişi</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: #11101d;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    .login {
+      width: 100%;
+      max-width: 410px;
+      padding: 36px;
+      background: #1c1a2c;
+      border: 1px solid #37334e;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px #0005;
+    }
+
+    .logo {
+      color: #a18aff;
+      font-size: 27px;
+      font-weight: bold;
+      letter-spacing: 3px;
+    }
+
+    h1 { font-size: 23px; margin: 25px 0 8px; }
+
+    p { color: #aaa7bd; line-height: 1.5; }
+
+    label {
+      display: block;
+      margin: 20px 0 8px;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      color: white;
+      background: #11101d;
+      border: 1px solid #49445f;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    input:focus {
+      outline: 2px solid #8064e8;
+      border-color: transparent;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 14px;
+      border: 0;
+      border-radius: 8px;
+      background: #6848d8;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled { opacity: .6; cursor: wait; }
+
+    #message {
+      margin-top: 18px;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .back {
+      display: block;
+      margin-top: 24px;
+      color: #aaa7bd;
+      text-align: center;
+      text-decoration: none;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <main class="login">
+    <div class="logo">EDWISE</div>
+    <h1>Yönetici Paneli</h1>
+    <p>Devam etmek için yönetici hesabınızla giriş yapın.</p>
+
+    <form id="loginForm">
+      <label for="username">Kullanıcı adı</label>
+      <input id="username" name="username"
+        type="text" autocomplete="username" required>
+
+      <label for="password">Parola</label>
+      <input id="password" name="password"
+        type="password" autocomplete="current-password" required>
+
+      <button id="loginButton" type="submit">Giriş Yap</button>
+    </form>
+
+    <div id="message" role="status"></div>
+    <a class="back" href="/">← Ana sayfaya dön</a>
+  </main>
+
+  <script>
+    const form = document.getElementById("loginForm");
+    const button = document.getElementById("loginButton");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      button.disabled = true;
+      message.textContent = "Giriş kontrol ediliyor...";
+
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({
+            username: document.getElementById("username").value.trim(),
+            password: document.getElementById("password").value
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          message.textContent = "Giriş başarılı. Yönlendiriliyorsunuz...";
+          window.location.href = "/admin/dashboard.html";
+          return;
+        }
+
+        message.textContent = data.message || "Giriş başarısız.";
+      } catch {
+        message.textContent = "Sunucuya ulaşılamadı. Tekrar deneyin.";
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
