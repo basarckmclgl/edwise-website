@@ -134,7 +134,6 @@ td{color:#e8e5f3}
  <div class="menu-label">İŞLETME YÖNETİMİ</div>
  <button class="nav" data-page="applications" data-superadmin><span class="ico">▣</span><span>Başvurular</span></button>
  <button class="nav" data-page="media"><span class="ico">▧</span><span>Medya Kütüphanesi</span></button>
- <button class="nav" data-page="settings" data-superadmin><span class="ico">⚙</span><span>Site Ayarları</span></button>
 
  <div class="menu-label" data-superadmin>SİSTEM</div>
  <button class="nav" data-page="users" data-superadmin><span class="ico">♙</span><span>Kullanıcı ve Yetkiler</span></button>
@@ -176,7 +175,7 @@ td{color:#e8e5f3}
     <div class="module" data-open="posts"><div class="module-icon">▧</div><h3>Blog Yönetimi ↗</h3><p>Blog yazıları oluşturun ve yayımlayın.</p></div>
     <div class="module" data-open="applications" data-superadmin><div class="module-icon">▣</div><h3>Başvurular ↗</h3><p>Gelen başvuruları takip edin.</p></div>
     <div class="module" data-open="media"><div class="module-icon">▧</div><h3>Medya Kütüphanesi ↗</h3><p>Fotoğraf ve dosyalarınızı yönetin.</p></div>
-    <div class="module" data-open="settings" data-superadmin><div class="module-icon">⚙</div><h3>Site Ayarları ↗</h3><p>Logo, iletişim ve menü ayarları.</p></div>
+    <div class="module" data-open="designcenter"><div class="module-icon">⚙</div><h3>Site Tasarımı ve Menü ↗</h3><p>Genel görünümü, renkleri ve menü yapısını yönetin.</p></div>
     <div class="module" data-open="users" data-superadmin><div class="module-icon">♙</div><h3>Kullanıcı ve Yetkiler ↗</h3><p>Yönetici hesaplarını ve rol izinlerini yönetin.</p></div>
    </div>
   </section>
@@ -199,6 +198,52 @@ td{color:#e8e5f3}
    </div>
    <div class="panel" style="padding:10px">
     <iframe id="designPreviewFrame" title="EDWISE sayfa önizlemesi" src="/" loading="lazy" style="display:block;width:100%;height:760px;border:1px solid #d8d5df;border-radius:8px;background:#fff"></iframe>
+   </div>
+  
+   <div id="siteDesignSettings" data-superadmin>
+<div class="section-head"><div><h2>Site Genel Tasarımı ve Menü Yapısı</h2><p>Bu ayarlar sitenin genel görünümünü ve ziyaretçi menüsünü yönetir. Sayfa içeriklerinden bağımsızdır.</p></div></div>
+   <div id="themeMessage"></div>
+   <div class="actions" style="margin-bottom:16px"><button class="primary" type="button" id="designTabButton">Genel Görünüm</button><button class="btn" type="button" id="menuTabButton">Menü ve Navigasyon</button></div>
+   <div id="designTab">
+   <div class="panel">
+    <h2>Marka renkleri ve görünüm</h2>
+    <div class="form-grid">
+     <div class="field"><label for="themePrimary">Ana marka rengi</label><input id="themePrimary" type="color" value="#291447"></div>
+     <div class="field"><label for="themeAccent">Vurgu / buton rengi</label><input id="themeAccent" type="color" value="#c5a0f2"></div>
+     <div class="field"><label for="themeSurface">Açık bölüm arka planı</label><input id="themeSurface" type="color" value="#f7f3fb"></div>
+     <div class="field"><label for="themeText">Ana yazı rengi</label><input id="themeText" type="color" value="#261a35"></div>
+     <div class="field"><label for="themeHeader">Üst menü arka planı</label><input id="themeHeader" type="color" value="#ffffff"></div>
+     <div class="field"><label for="themeHero">Ana karşılama alanı rengi</label><input id="themeHero" type="color" value="#291447"></div>
+     <div class="field"><label for="themeFooter">Alt bilgi (footer) arka planı</label><input id="themeFooter" type="color" value="#1b0d2d"></div>
+     <div class="field"><label for="themeFont">Site yazı tipi</label><select id="themeFont"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="'Times New Roman'">Times New Roman</option><option value="Verdana">Verdana</option></select></div>
+     <div class="field"><label for="themeRadius">Buton köşe yuvarlaklığı</label><select id="themeRadius"><option value="0px">Keskin (0 px)</option><option value="4px">4 px</option><option value="6px" selected>6 px</option><option value="8px">8 px</option><option value="12px">12 px</option><option value="16px">16 px</option><option value="18px">18 px</option></select></div>
+    </div>
+    <div class="actions">
+     <button class="btn" type="button" id="previewTheme">Önizlemeyi Uygula</button>
+     <button class="btn" type="button" id="saveThemeDraft">Taslak Kaydet</button>
+     <button class="primary" type="button" id="publishTheme">Siteye Yayımla</button>
+     <button class="btn" type="button" id="resetTheme">Varsayılan Tasarıma Dön</button>
+    </div>
+    <p class="muted">Önemli: Önizleme yalnızca bu yönetim ekranında görünür. “Siteye Yayımla” dediğinizde ziyaretçiler yeni tasarımı görür. Mevcut sayfa düzeni ve içerikler silinmez.</p>
+   </div>
+   <div class="panel">
+    <h2>Canlı önizleme</h2>
+    <div id="themePreview" style="background:#fff;border-radius:12px;overflow:hidden;border:1px solid #ddd;color:#261a35">
+     <div id="previewHeader" style="padding:18px 22px;font-weight:800">EDWISE　　Ana Sayfa　 Hizmetlerimiz　 Hakkımızda　 İletişim</div>
+     <div id="previewHero" style="padding:42px 24px;color:#fff"><small id="previewEyebrow" contenteditable="true" title="Metni doğrudan burada değiştirebilirsiniz">EDUCATION & CONSULTANCY</small><h2 id="previewHeroTitle" contenteditable="true" style="color:inherit;margin:12px 0">Geleceğine doğru adımla başla.</h2><p id="previewHeroDescription" contenteditable="true">Doğru rehberlik, parlak gelecek.</p><button id="previewButton" type="button" contenteditable="true" style="border:0;padding:10px 18px;margin-top:15px">Bize Ulaşın</button></div>
+     <div id="previewSurface" style="padding:24px"><strong id="previewSurfaceTitle" contenteditable="true">Hedeflerine uygun eğitim desteği</strong><p id="previewSurfaceDescription" contenteditable="true" style="margin-top:8px">Bu alan, açık bölüm rengini ve yazı tipini gösterir.</p></div>
+     <div id="previewFooter" style="padding:18px 22px;color:#fff"><span id="previewFooterText" contenteditable="true">EDWISE · Education & Consultancy</span></div>
+    </div>
+   </div>
+   <div id="menuTab" class="hidden">
+    <div class="panel">
+     <h2>Site menüsünde görünecek bağlantılar</h2>
+     <p class="muted">Burada yayımlanmış sayfaları menüye ekleyip çıkarabilir, bağlantıların sırasını değiştirebilirsiniz. Taslak sayfalar ziyaretçi menüsünde görünmez.</p>
+     <div id="menuItems"><p class="muted">Sayfalar yükleniyor...</p></div>
+     <div class="actions"><button class="primary" type="button" id="saveMenu">Menüyü Kaydet</button></div>
+     <div id="menuMessage"></div>
+    </div>
+   </div>
    </div>
   </section>
 
@@ -493,54 +538,6 @@ td{color:#e8e5f3}
   </div>
  </div>
 </section>
-
-  <section id="settings" class="hidden">
-   <div class="section-head">
-    <div><h2>Tasarım Yönetimi</h2><p>Renkleri, yazı tipini ve ana bölümlerin görünümünü değiştirin. Önce önizleyin; yayımlamadan ziyaretçiler görmez.</p></div>
-   </div>
-   <div id="themeMessage"></div>
-   <div class="actions" style="margin-bottom:16px"><button class="primary" type="button" id="designTabButton">Tasarım ve Metinler</button><button class="btn" type="button" id="menuTabButton">Menü Yönetimi</button></div>
-   <div id="designTab">
-   <div class="panel">
-    <h2>Marka renkleri ve görünüm</h2>
-    <div class="form-grid">
-     <div class="field"><label for="themePrimary">Ana marka rengi</label><input id="themePrimary" type="color" value="#291447"></div>
-     <div class="field"><label for="themeAccent">Vurgu / buton rengi</label><input id="themeAccent" type="color" value="#c5a0f2"></div>
-     <div class="field"><label for="themeSurface">Açık bölüm arka planı</label><input id="themeSurface" type="color" value="#f7f3fb"></div>
-     <div class="field"><label for="themeText">Ana yazı rengi</label><input id="themeText" type="color" value="#261a35"></div>
-     <div class="field"><label for="themeHeader">Üst menü arka planı</label><input id="themeHeader" type="color" value="#ffffff"></div>
-     <div class="field"><label for="themeHero">Ana karşılama alanı rengi</label><input id="themeHero" type="color" value="#291447"></div>
-     <div class="field"><label for="themeFooter">Alt bilgi (footer) arka planı</label><input id="themeFooter" type="color" value="#1b0d2d"></div>
-     <div class="field"><label for="themeFont">Site yazı tipi</label><select id="themeFont"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="'Times New Roman'">Times New Roman</option><option value="Verdana">Verdana</option></select></div>
-     <div class="field"><label for="themeRadius">Buton köşe yuvarlaklığı</label><select id="themeRadius"><option value="0px">Keskin (0 px)</option><option value="4px">4 px</option><option value="6px" selected>6 px</option><option value="8px">8 px</option><option value="12px">12 px</option><option value="16px">16 px</option><option value="18px">18 px</option></select></div>
-    </div>
-    <div class="actions">
-     <button class="btn" type="button" id="previewTheme">Önizlemeyi Uygula</button>
-     <button class="btn" type="button" id="saveThemeDraft">Taslak Kaydet</button>
-     <button class="primary" type="button" id="publishTheme">Siteye Yayımla</button>
-     <button class="btn" type="button" id="resetTheme">Varsayılan Tasarıma Dön</button>
-    </div>
-    <p class="muted">Önemli: Önizleme yalnızca bu yönetim ekranında görünür. “Siteye Yayımla” dediğinizde ziyaretçiler yeni tasarımı görür. Mevcut sayfa düzeni ve içerikler silinmez.</p>
-   </div>
-   <div class="panel">
-    <h2>Canlı önizleme</h2>
-    <div id="themePreview" style="background:#fff;border-radius:12px;overflow:hidden;border:1px solid #ddd;color:#261a35">
-     <div id="previewHeader" style="padding:18px 22px;font-weight:800">EDWISE　　Ana Sayfa　 Hizmetlerimiz　 Hakkımızda　 İletişim</div>
-     <div id="previewHero" style="padding:42px 24px;color:#fff"><small id="previewEyebrow" contenteditable="true" title="Metni doğrudan burada değiştirebilirsiniz">EDUCATION & CONSULTANCY</small><h2 id="previewHeroTitle" contenteditable="true" style="color:inherit;margin:12px 0">Geleceğine doğru adımla başla.</h2><p id="previewHeroDescription" contenteditable="true">Doğru rehberlik, parlak gelecek.</p><button id="previewButton" type="button" contenteditable="true" style="border:0;padding:10px 18px;margin-top:15px">Bize Ulaşın</button></div>
-     <div id="previewSurface" style="padding:24px"><strong id="previewSurfaceTitle" contenteditable="true">Hedeflerine uygun eğitim desteği</strong><p id="previewSurfaceDescription" contenteditable="true" style="margin-top:8px">Bu alan, açık bölüm rengini ve yazı tipini gösterir.</p></div>
-     <div id="previewFooter" style="padding:18px 22px;color:#fff"><span id="previewFooterText" contenteditable="true">EDWISE · Education & Consultancy</span></div>
-    </div>
-   </div>
-   <div id="menuTab" class="hidden">
-    <div class="panel">
-     <h2>Site menüsünde görünecek bağlantılar</h2>
-     <p class="muted">Burada yayımlanmış sayfaları menüye ekleyip çıkarabilir, bağlantıların sırasını değiştirebilirsiniz. Taslak sayfalar ziyaretçi menüsünde görünmez.</p>
-     <div id="menuItems"><p class="muted">Sayfalar yükleniyor...</p></div>
-     <div class="actions"><button class="primary" type="button" id="saveMenu">Menüyü Kaydet</button></div>
-     <div id="menuMessage"></div>
-    </div>
-   </div>
-  </section>
 
   <section id="other" class="hidden">
    <div class="panel">
