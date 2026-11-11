@@ -92,37 +92,6 @@
 </div>
 </div>
 
-<script>
-(async function () {
-  try {
-    const response = await fetch("/api/public-pages?slug=hakkimizda");
-    if (!response.ok) return;
-
-    const data = await response.json();
-    if (!data.success || !data.page || !data.page.content) return;
-
-    const container = document.getElementById("cms-page-content");
-    if (!container) return;
-
-    const content = document.createElement("div");
-    content.className = "cms-content";
-    content.textContent = data.page.content;
-    container.replaceChildren(content);
-
-    if (data.page.meta_title) {
-      document.title = data.page.meta_title;
-    }
-
-    if (data.page.meta_description) {
-      const description = document.querySelector('meta[name="description"]');
-      if (description) description.content = data.page.meta_description;
-    }
-  } catch (error) {
-    console.error("CMS içeriği yüklenemedi:", error);
-  }
-})();
-</script>
-
 <script defer src="../assets/js/site.js?v=menu-cleanup-20261111"></script>
 <script defer src="../assets/js/consent-and-forms.js"></script>
 <script defer src="../assets/js/cms-page-sync.js?v=cms-pages-20261111"></script>
