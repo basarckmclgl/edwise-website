@@ -29,7 +29,7 @@ window.EDWISEContent={
    }
    node.childNodes.forEach(child=>el.append(clean(child)));return el;
   };
-  const safe=value=>{try{const u=new URL(value,location.origin);return ["http:","https:"].includes(u.protocol)?u.href:""}catch{return ""}};
+  const safe=value=>{try{const u=new URL(value,location.origin);if(u.hostname==="raw.githubusercontent.com"&&u.pathname.startsWith("/basarckmclgl/edwise-website/main/media/")){const name=u.pathname.split("/").pop();if(/^[a-f0-9-]{36}\\.(jpg|png|webp|gif)$/i.test(name))return "/api/media/"+name}return ["http:","https:"].includes(u.protocol)?u.href:""}catch{return ""}};
   const fragment=document.createDocumentFragment();parsed.body.childNodes.forEach(node=>fragment.append(clean(node)));root.replaceChildren(fragment);
  }
 };
