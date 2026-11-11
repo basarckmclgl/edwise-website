@@ -6,7 +6,7 @@ async function originOk(request){
  try{return !!origin && origin===new URL(request.url).origin;}catch{return false;}
 }
 async function readSettings(DB){
- const result=await DB.prepare("SELECT setting_key, setting_value FROM site_settings WHERE setting_key IN ('draft_theme','live_theme')").all();
+ const result=await DB.prepare("SELECT setting_key, setting_value FROM site_settings WHERE setting_key IN ('draft_theme','live_theme','menu_theme')").all();
  const values={};
  for(const row of result.results||[]){
   try{values[row.setting_key]=JSON.parse(row.setting_value);}catch{values[row.setting_key]={};}
@@ -18,7 +18,7 @@ export async function onRequestGet(context){
   const auth=await requireSuperAdmin(context);
   if(auth.response)return auth.response;
   const values=await readSettings(context.env.DB);
-  return json({success:true,draft:values.draft_theme||{},live:values.live_theme||{}});
+  return json({success:true,draft:values.draft_theme||{},live:values.live_theme||{},menu:values.menu_theme||{}});
  }catch(error){return json({success:false,message:"Tasarım ayarları alınamadı."},500);}
 }
 export async function onRequestPost(context){
@@ -27,7 +27,18 @@ export async function onRequestPost(context){
   const auth=await requireSuperAdmin(context);
   if(auth.response)return auth.response;
   const body=await context.request.json();
-  const allowed=["primary","accent","surface","text","header","hero","footer","font","buttonRadius"];
+  if(body.action==="save_menu"){
+   const items=Array.isArray(body.items)?body.items:[];
+   if(items.length>100)return json({success:false,message:"Menüde en fazla 100 bağlantı olabilir."},400);
+   const clean=items.map((item,index)=>({key:String(item.key||"").slice(0,100),label:String(item.label||"").trim().slice(0,80),url:String(item.url||"").slice(0,300),visible:item.visible!==false,order:index}));
+   if(clean.some(item=>!item.key||!item.label||!item.url||!item.url.startsWith("/")||item.url.startsWith("//")))return json({success:false,message:"Menü bağlantılarından biri geçersiz."},400);
+   const serialized=JSON.stringify(clean);
+   const existing=await context.env.DB.prepare("SELECT id FROM site_settings WHERE setting_key=? LIMIT 1").bind("menu_theme").first();
+   if(existing)await context.env.DB.prepare("UPDATE site_settings SET setting_value=?, updated_at=datetime('now') WHERE setting_key=?").bind(serialized,"menu_theme").run();
+   else await context.env.DB.prepare("INSERT INTO site_settings (setting_key, setting_value, updated_at) VALUES (?, ?, datetime('now'))").bind("menu_theme",serialized).run();
+   return json({success:true,message:"Menü ayarları kaydedildi."});
+  }
+  const allowed=["primary","accent","surface","text","header","hero","footer","font","buttonRadius","heroEyebrow","heroTitle","heroDescription","heroButton","surfaceTitle","surfaceDescription","footerText"];
   const theme={};
   for(const key of allowed){
    if(typeof body.theme?.[key]!=="string")continue;
@@ -37,6 +48,9 @@ export async function onRequestPost(context){
     theme[key]=value;
    }else if(key==="buttonRadius"){
     if(!/^(0|[2-9]|1[0-8])px$/.test(value))return json({success:false,message:"Buton köşe değeri 0–18 px olmalıdır."},400);
+    theme[key]=value;
+   }else if(["heroEyebrow","heroTitle","heroDescription","heroButton","surfaceTitle","surfaceDescription","footerText"].includes(key)){
+    if(value.length>500)return json({success:false,message:"Önizleme metni 500 karakteri aşamaz."},400);
     theme[key]=value;
    }else{
     if(!/^#[0-9a-fA-F]{6}$/.test(value))return json({success:false,message:"Renk değerleri 6 haneli HEX formatında olmalıdır."},400);
