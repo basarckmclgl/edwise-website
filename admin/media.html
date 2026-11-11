@@ -49,6 +49,7 @@ input{display:none}
   <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
   <button id="chooseButton">Dosya Seç</button>
   <button id="uploadButton" disabled>Seçilenleri Yükle</button>
+  <button id="importSiteImagesButton" class="secondary" type="button">Sitedeki Görselleri Aktar</button>
  </div>
 
  <div id="message"></div>
@@ -83,6 +84,21 @@ function selectFiles(files) {
   : "Dosya Seç";
 }
 
+$("importSiteImagesButton").addEventListener("click", async () => {
+ const button=$("importSiteImagesButton");
+ if(!confirm("Sitede kullanılan mevcut görseller medya kütüphanesine aktarılsın mı? Zaten kayıtlı görseller atlanır."))return;
+ button.disabled=true;button.textContent="Aktarılıyor...";
+ try{
+  const response=await fetch("/api/media-import",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"}});
+  const data=await response.json();
+  if(!response.ok||!data.success)throw new Error(data.error||"Görseller aktarılamadı.");
+  const imported=(data.imported||[]).length;
+  const skipped=(data.skipped||[]).length;
+  showMessage(imported+" görsel aktarıldı. "+skipped+" görsel zaten kayıtlı veya aktarılamadı.",true);
+  await loadMedia();
+ }catch(error){showMessage(error.message);}
+ finally{button.disabled=false;button.textContent="Sitedeki Görselleri Aktar";}
+});
 $("chooseButton").addEventListener("click", () => $("fileInput").click());
 
 $("fileInput").addEventListener("change", event => {
