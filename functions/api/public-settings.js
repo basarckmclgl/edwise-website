@@ -9,6 +9,9 @@ export async function onRequestGet(context){
   if(row?.setting_value){
    try{theme={...DEFAULT_THEME,...JSON.parse(row.setting_value)};}catch{}
   }
-  return Response.json({success:true,theme},{headers:{"Cache-Control":"public, max-age=60"}});
+  const menuRow=await context.env.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key='menu_theme' LIMIT 1").first();
+  let menu=[];
+  if(menuRow?.setting_value){try{menu=JSON.parse(menuRow.setting_value);}catch{}}
+  return Response.json({success:true,theme,menu},{headers:{"Cache-Control":"public, max-age=60"}});
  }catch(error){return Response.json({success:false,message:"Tasarım ayarları alınamadı."},{status:500});}
 }
