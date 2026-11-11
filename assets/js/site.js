@@ -348,6 +348,24 @@
       const data=await response.json();
       if(!data.success||!data.theme)return;
       const t=data.theme,root=document.documentElement;
+      const pref=data.preferences||{};
+      if(pref.siteName)document.title=pref.siteName;
+      if(pref.seoTitle)document.title=pref.seoTitle;
+      const meta=(name,content)=>{if(!content)return;let el=document.querySelector('meta[name="'+name+'"]');if(!el){el=document.createElement("meta");el.name=name;document.head.appendChild(el);}el.content=content;};
+      const property=(name,content)=>{if(!content)return;let el=document.querySelector('meta[property="'+name+'"]');if(!el){el=document.createElement("meta");el.setAttribute("property",name);document.head.appendChild(el);}el.content=content;};
+      meta("description",pref.seoDescription);
+      meta("robots",pref.robots);
+      property("og:site_name",pref.siteName);
+      property("og:title",pref.seoTitle||pref.siteName);
+      property("og:description",pref.seoDescription);
+      if(pref.canonical){let link=document.querySelector('link[rel="canonical"]');if(link)link.href=pref.canonical;}
+      if(pref.faviconUrl){let icon=document.querySelector('link[rel~="icon"]');if(!icon){icon=document.createElement("link");icon.rel="icon";document.head.appendChild(icon);}icon.href=pref.faviconUrl;}
+      if(pref.logoUrl)document.querySelectorAll("header .brand img.logo").forEach(img=>img.src=pref.logoUrl);
+      if(pref.phone){const digits=pref.phone.replace(/[^0-9+]/g,"");document.querySelectorAll('.topbar a[href^="tel:"],.hero-actions a[href^="tel:"]').forEach(link=>{link.href="tel:"+digits;link.textContent=pref.phone;});}
+      if(pref.whatsapp){const wa=pref.whatsapp.replace(/[^0-9]/g,"");document.querySelectorAll(".whatsapp-float").forEach(link=>link.href="https://wa.me/"+wa);}
+      if(pref.address)document.querySelectorAll("[data-site-address]").forEach(el=>el.textContent=pref.address);
+      if(pref.email)document.querySelectorAll('a[data-site-email]').forEach(el=>{el.href="mailto:"+pref.email;el.textContent=pref.email;});
+
       const setText=(selector,value)=>{if(typeof value==="string"&&value.trim())document.querySelectorAll(selector).forEach(el=>el.textContent=value);};
       setText(".hero .eyebrow",t.heroEyebrow);
       setText(".hero .hero-content h1",t.heroTitle);
