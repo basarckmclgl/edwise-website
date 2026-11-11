@@ -117,7 +117,7 @@ td{color:#e8e5f3}
     pointer-events: none;
 }
 
-/* Chrome benzeri Site Ayarları düzeni */
+/* Chrome benzeri Panel Ayarları düzeni */
 .settings-search-wrap{max-width:720px;margin:18px auto 22px;position:relative}
 .settings-search-wrap>span{position:absolute;left:16px;top:10px;font-size:23px;color:var(--muted)}
 .settings-search-wrap input{height:46px;border-radius:24px;padding:0 18px 0 48px;background:#202033;border:1px solid #4b4765;font-size:14px}
@@ -496,86 +496,41 @@ td{color:#e8e5f3}
     
 
 <section id="sitesettings" class="hidden" data-superadmin>
- <div class="section-head"><div><h2>Site Ayarları</h2><p>Site kimliği, iletişim, SEO, sosyal medya ve ölçümleme bilgilerini yönetin.</p></div></div>
+ <div class="section-head"><div><h2>Panel Ayarları</h2><p>Yalnızca yönetim panelinin görünümünü ve kullanım tercihlerini düzenleyin. Ziyaretçilerin gördüğü site etkilenmez.</p></div></div>
  <div id="siteSettingsMessage"></div>
  <div class="settings-search-wrap">
   <span>⌕</span><input id="settingsSearch" type="search" placeholder="Ayarlarda arayın" autocomplete="off">
  </div>
  <div id="siteSettingsMessage"></div>
  <div class="settings-layout">
-  <nav class="settings-nav" aria-label="Site ayarları kategorileri">
-   <div class="settings-nav-label">KİŞİSELLEŞTİRME</div>
-   <button type="button" class="settings-nav-item" data-settings-tab="appearance"><span>◐</span><b>Görünüm</b></button>
+  <nav class="settings-nav" aria-label="Panel ayarları kategorileri">
+   <div class="settings-nav-label">PANEL TERCİHLERİ</div>
+   <button type="button" class="settings-nav-item active" data-settings-tab="appearance"><span>◐</span><b>Görünüm</b></button>
    <button type="button" class="settings-nav-item" data-settings-tab="accessibility"><span>♿</span><b>Erişilebilirlik</b></button>
    <button type="button" class="settings-nav-item" data-settings-tab="language"><span>文</span><b>Dil ve bölge</b></button>
-   <button type="button" class="settings-nav-item" data-settings-tab="privacy"><span>◆</span><b>Gizlilik ve güvenlik</b></button>
-   <div class="settings-nav-label">SİTE YÖNETİMİ</div>
-   <button type="button" class="settings-nav-item active" data-settings-tab="general"><span>◎</span><b>Genel</b></button>
-   <button type="button" class="settings-nav-item" data-settings-tab="contact"><span>♧</span><b>İletişim</b></button>
-   <div class="settings-nav-label">GÖRÜNÜRLÜK</div>
-   <button type="button" class="settings-nav-item" data-settings-tab="seo"><span>⌕</span><b>Arama motoru</b></button>
-   <button type="button" class="settings-nav-item" data-settings-tab="social"><span>↗</span><b>Sosyal medya</b></button>
-   <div class="settings-nav-label">ÖLÇÜMLEME</div>
-   <button type="button" class="settings-nav-item" data-settings-tab="tracking"><span>▥</span><b>Analitik ve doğrulama</b></button>
+   <button type="button" class="settings-nav-item" data-settings-tab="security"><span>♢</span><b>Oturum ve güvenlik</b></button>
   </nav>
   <div class="settings-main">
    <form id="siteSettingsForm">
-  <div class="panel hidden" data-settings-panel="appearance"><h2>Görünüm</h2><p class="muted">Ziyaretçilerin göreceği varsayılan site görünümünü seçin.</p><div class="form-grid">
-   <div class="field"><label for="ssColorMode">Renk teması</label><select id="ssColorMode"><option value="light">Açık tema</option><option value="dark">Koyu tema</option><option value="system">Cihaz ayarını kullan</option></select></div>
-   <div class="field"><label for="ssAccentPreset">Vurgu rengi</label><select id="ssAccentPreset"><option value="purple">EDWISE Moru</option><option value="blue">Mavi</option><option value="green">Yeşil</option><option value="orange">Turuncu</option></select></div>
-   <div class="field"><label for="ssDensity">Görünüm yoğunluğu</label><select id="ssDensity"><option value="comfortable">Rahat</option><option value="compact">Kompakt</option></select></div>
+  <div class="panel" data-settings-panel="appearance"><h2>Görünüm</h2><p class="muted">Yönetim panelinin renk ve yerleşim seçenekleri.</p><div class="form-grid">
+   <div class="field"><label for="panelTheme">Tema</label><select id="panelTheme"><option value="dark">Koyu tema</option><option value="light">Açık tema</option><option value="system">Cihaz tercihini kullan</option></select></div>
+   <div class="field"><label for="panelAccent">Vurgu rengi</label><select id="panelAccent"><option value="purple">Mor</option><option value="blue">Mavi</option><option value="green">Yeşil</option><option value="orange">Turuncu</option></select></div>
+   <div class="field"><label for="panelDensity">Menü ve içerik yoğunluğu</label><select id="panelDensity"><option value="comfortable">Rahat</option><option value="compact">Kompakt</option></select></div>
   </div></div>
-  <div class="panel hidden" data-settings-panel="accessibility"><h2>Erişilebilirlik</h2><p class="muted">Okunabilirliği ve klavye kullanımını kolaylaştıran hazır seçenekler.</p><div class="form-grid">
-   <div class="field"><label for="ssFontScale">Yazı boyutu</label><select id="ssFontScale"><option value="normal">Normal</option><option value="large">Büyük</option><option value="larger">Çok büyük</option></select></div>
-   <div class="field"><label for="ssContrast">Kontrast</label><select id="ssContrast"><option value="normal">Normal</option><option value="high">Yüksek kontrast</option></select></div>
-   <div class="field"><label for="ssMotion">Hareket efektleri</label><select id="ssMotion"><option value="full">Normal animasyonlar</option><option value="reduced">Hareketi azalt</option></select></div>
-   <div class="field"><label for="ssLinks">Bağlantı görünümü</label><select id="ssLinks"><option value="normal">Normal</option><option value="underlined">Bağlantıların altını çiz</option></select></div>
+  <div class="panel hidden" data-settings-panel="accessibility"><h2>Erişilebilirlik</h2><p class="muted">Panel kullanımını daha okunabilir ve rahat hale getirin.</p><div class="form-grid">
+   <div class="field"><label for="panelFontScale">Yazı boyutu</label><select id="panelFontScale"><option value="normal">Normal</option><option value="large">Büyük</option><option value="larger">Çok büyük</option></select></div>
+   <div class="field"><label for="panelContrast">Kontrast</label><select id="panelContrast"><option value="normal">Normal</option><option value="high">Yüksek kontrast</option></select></div>
+   <div class="field"><label for="panelMotion">Hareket efektleri</label><select id="panelMotion"><option value="full">Normal</option><option value="reduced">Hareketi azalt</option></select></div>
+   <div class="field"><label for="panelLinks">Bağlantılar</label><select id="panelLinks"><option value="normal">Normal</option><option value="underlined">Altı çizili</option></select></div>
   </div></div>
   <div class="panel hidden" data-settings-panel="language"><h2>Dil ve bölge</h2><div class="form-grid">
-   <div class="field"><label for="ssLanguage">Site dili</label><select id="ssLanguage"><option value="tr">Türkçe</option><option value="en">English</option><option value="ar">العربية</option></select></div>
-   <div class="field"><label for="ssTimezone">Saat dilimi</label><select id="ssTimezone"><option value="Europe/Istanbul">Türkiye (GMT+3)</option><option value="UTC">UTC</option></select></div>
-   <div class="field"><label for="ssDateFormat">Tarih biçimi</label><select id="ssDateFormat"><option value="dd.mm.yyyy">11.11.2026</option><option value="yyyy-mm-dd">2026-11-11</option><option value="mm/dd/yyyy">11/11/2026</option></select></div>
+   <div class="field"><label>Panel arayüz dili</label><input value="Türkçe" disabled><small class="muted">Şu anda yönetim paneli Türkçe. Diğer diller, tüm panel metinleri çevrildiğinde etkinleştirilecek.</small></div>
+   <div class="field"><label for="panelTimezone">Saat dilimi</label><select id="panelTimezone"><option value="Europe/Istanbul">Türkiye (GMT+3)</option><option value="UTC">UTC</option></select></div>
+   <div class="field"><label for="panelDateFormat">Tarih biçimi</label><select id="panelDateFormat"><option value="dd.mm.yyyy">11.11.2026</option><option value="yyyy-mm-dd">2026-11-11</option><option value="mm/dd/yyyy">11/11/2026</option></select></div>
   </div></div>
-  <div class="panel hidden" data-settings-panel="privacy"><h2>Gizlilik ve güvenlik</h2><div class="form-grid">
-   <div class="field"><label for="ssCookieBanner">Çerez bilgilendirmesi</label><select id="ssCookieBanner"><option value="enabled">Göster</option><option value="disabled">Gösterme</option></select></div>
-   <div class="field"><label for="ssAnalyticsConsent">Analitik çerezleri</label><select id="ssAnalyticsConsent"><option value="consent">Kullanıcı izni al</option><option value="essential">Yalnızca zorunlu çerezler</option></select></div>
-   <div class="field"><label for="ssExternalLinks">Dış bağlantılar</label><select id="ssExternalLinks"><option value="newtab">Yeni sekmede aç</option><option value="sametab">Aynı sekmede aç</option></select></div>
-  </div><p class="muted">Çerez seçenekleri burada tercih olarak saklanır. Gerçek çerez izin yönetimi, çerez banner'ı ve analitik kodu ayrıca bağlanmalıdır.</p></div>
-  <div class="panel" data-settings-panel="general"><h2>Genel bilgiler</h2><div class="form-grid">
-   <div class="field"><label>Site adı</label><input id="ssSiteName" maxlength="100"></div>
-   <div class="field"><label>Kısa slogan</label><input id="ssTagline" maxlength="180"></div>
-   <div class="field"><label>Logo URL</label><input id="ssLogoUrl" type="url" maxlength="500" placeholder="https://..."></div>
-   <div class="field"><label>Favicon URL</label><input id="ssFaviconUrl" type="url" maxlength="500" placeholder="https://..."></div>
-  </div></div>
-  <div class="panel hidden" data-settings-panel="contact"><h2>İletişim bilgileri</h2><div class="form-grid">
-   <div class="field"><label>Telefon</label><input id="ssPhone" maxlength="40"></div>
-   <div class="field"><label>WhatsApp (ülke koduyla)</label><input id="ssWhatsapp" maxlength="30"></div>
-   <div class="field"><label>E-posta</label><input id="ssEmail" type="email" maxlength="254"></div>
-   <div class="field"><label>Adres</label><input id="ssAddress" maxlength="300"></div>
-   <div class="field"><label>Çalışma saatleri</label><input id="ssHours" maxlength="180"></div>
-   <div class="field"><label>Harita bağlantısı</label><input id="ssMapUrl" type="url" maxlength="500"></div>
-  </div></div>
-  <div class="panel hidden" data-settings-panel="seo"><h2>SEO varsayılanları</h2><p class="muted">Sayfaya özel SEO bilgileri varsa onlar önceliklidir.</p><div class="form-grid">
-   <div class="field full"><label>Varsayılan SEO başlığı</label><input id="ssSeoTitle" maxlength="250"></div>
-   <div class="field full"><label>Varsayılan SEO açıklaması</label><textarea id="ssSeoDescription" maxlength="500"></textarea></div>
-   <div class="field full"><label>Anahtar kelimeler</label><input id="ssSeoKeywords" maxlength="500"></div>
-   <div class="field"><label>Canonical site adresi</label><input id="ssCanonical" type="url" maxlength="300"></div>
-   <div class="field"><label>Arama motoru indeksleme</label><select id="ssRobots"><option value="index,follow">İzin ver</option><option value="noindex,nofollow">Engelle</option></select></div>
-  </div></div>
-  <div class="panel hidden" data-settings-panel="social"><h2>Sosyal medya bağlantıları</h2><div class="form-grid">
-   <div class="field"><label>Instagram</label><input id="ssInstagram" type="url" maxlength="500"></div>
-   <div class="field"><label>Facebook</label><input id="ssFacebook" type="url" maxlength="500"></div>
-   <div class="field"><label>YouTube</label><input id="ssYoutube" type="url" maxlength="500"></div>
-   <div class="field"><label>LinkedIn</label><input id="ssLinkedin" type="url" maxlength="500"></div>
-   <div class="field"><label>TikTok</label><input id="ssTiktok" type="url" maxlength="500"></div>
-  </div></div>
-  <div class="panel hidden" data-settings-panel="tracking"><h2>Analitik ve doğrulama</h2><p class="muted">Kimlikleri kaydetmek entegrasyonu tek başına çalıştırmaz; site koduna bağlanmaları ayrıca gerekir. Gizli API anahtarı veya şifre girmeyin.</p><div class="form-grid">
-   <div class="field"><label>Google Analytics ID</label><input id="ssGaId" maxlength="40" placeholder="G-XXXXXXXXXX"></div>
-   <div class="field"><label>Google Search Console doğrulama kodu</label><input id="ssGsc" maxlength="200"></div>
-   <div class="field"><label>Meta Pixel ID</label><input id="ssMetaPixel" maxlength="30"></div>
-  </div></div>
-  <div class="actions"><button class="primary" type="submit" id="saveSiteSettings">Ayarları Kaydet</button><button class="btn" type="button" id="reloadSiteSettings">Son Kaydedileni Yükle</button></div>
-   </form>
+  <div class="panel hidden" data-settings-panel="security"><h2>Oturum ve güvenlik</h2><p>Yönetim paneli hesabınız ve oturumunuzla ilgili temel bilgiler.</p><div class="form-grid"><div class="field"><label>Giriş güvenliği</label><input value="Yetkili yönetici oturumu" disabled></div><div class="field"><label>Şifre yönetimi</label><p class="muted">Şifre ve kullanıcı yetkileri, Kullanıcı Yönetimi bölümünden yönetilir.</p></div></div></div>
+  <div class="actions"><button class="primary" type="submit" id="saveSiteSettings">Panel Tercihlerini Kaydet</button><button class="btn" type="button" id="reloadSiteSettings">Varsayılanları Geri Yükle</button></div>
+ </form>
   </div>
  </div>
 </section>
@@ -1779,15 +1734,16 @@ $("editDesignRecord").addEventListener("click",()=>{
 });
 
 
-const siteSettingFields={colorMode:"ssColorMode",accentPreset:"ssAccentPreset",density:"ssDensity",fontScale:"ssFontScale",contrast:"ssContrast",motion:"ssMotion",links:"ssLinks",dateFormat:"ssDateFormat",cookieBanner:"ssCookieBanner",analyticsConsent:"ssAnalyticsConsent",externalLinks:"ssExternalLinks",siteName:"ssSiteName",tagline:"ssTagline",logoUrl:"ssLogoUrl",faviconUrl:"ssFaviconUrl",language:"ssLanguage",timezone:"ssTimezone",phone:"ssPhone",whatsapp:"ssWhatsapp",email:"ssEmail",address:"ssAddress",hours:"ssHours",mapUrl:"ssMapUrl",seoTitle:"ssSeoTitle",seoDescription:"ssSeoDescription",seoKeywords:"ssSeoKeywords",canonical:"ssCanonical",robots:"ssRobots",instagram:"ssInstagram",facebook:"ssFacebook",youtube:"ssYoutube",linkedin:"ssLinkedin",tiktok:"ssTiktok",gaId:"ssGaId",gsc:"ssGsc",metaPixel:"ssMetaPixel"};
-let activeSettingsTab="general";
+const panelSettingFields={theme:"panelTheme",accent:"panelAccent",density:"panelDensity",fontScale:"panelFontScale",contrast:"panelContrast",motion:"panelMotion",links:"panelLinks",timezone:"panelTimezone",dateFormat:"panelDateFormat"};
+let activeSettingsTab="appearance";
 function showSettingsTab(tab){activeSettingsTab=tab;document.querySelectorAll("[data-settings-panel]").forEach(p=>p.classList.toggle("hidden",p.dataset.settingsPanel!==tab));document.querySelectorAll("[data-settings-tab]").forEach(b=>b.classList.toggle("active",b.dataset.settingsTab===tab));const search=$("settingsSearch");if(search)search.value="";}
 document.querySelectorAll("[data-settings-tab]").forEach(b=>b.addEventListener("click",()=>showSettingsTab(b.dataset.settingsTab)));
-$("settingsSearch").addEventListener("input",event=>{const query=event.target.value.trim().toLocaleLowerCase("tr-TR");const panels=[...document.querySelectorAll("[data-settings-panel]")];if(!query){showSettingsTab(activeSettingsTab);return;}let first=null;panels.forEach(panel=>{let matched=0;panel.querySelectorAll(".field").forEach(field=>{const label=field.querySelector("label")?.textContent||"";const input=field.querySelector("input,select,textarea");const hay=(label+" "+(input?.placeholder||"")+" "+(input?.id||"")).toLocaleLowerCase("tr-TR");const hit=hay.includes(query);field.classList.toggle("hidden",!hit);if(hit)matched++;});const hit=matched>0||panel.querySelector("h2")?.textContent.toLocaleLowerCase("tr-TR").includes(query);panel.classList.toggle("hidden",!hit);if(hit&&!first)first=panel.dataset.settingsPanel;});document.querySelectorAll("[data-settings-tab]").forEach(b=>b.classList.toggle("active",!!first&&b.dataset.settingsTab===first));if(!first){let empty=$("settingsSearchEmpty");if(!empty){empty=document.createElement("div");empty.id="settingsSearchEmpty";empty.className="settings-empty";$("siteSettingsForm").prepend(empty);}empty.textContent="Aramanızla eşleşen bir ayar bulunamadı.";}else $("settingsSearchEmpty")?.remove();});
+$("settingsSearch").addEventListener("input",event=>{const query=event.target.value.trim().toLocaleLowerCase("tr-TR");const panels=[...document.querySelectorAll("[data-settings-panel]")];if(!query){showSettingsTab(activeSettingsTab);return;}let first=null;panels.forEach(panel=>{let matched=0;panel.querySelectorAll(".field").forEach(field=>{const label=field.querySelector("label")?.textContent||"";const input=field.querySelector("input,select,textarea");const hay=(label+" "+(input?.placeholder||"")+" "+(input?.id||"")).toLocaleLowerCase("tr-TR");const hit=hay.includes(query);field.classList.toggle("hidden",!hit);if(hit)matched++;});const hit=matched>0;panel.classList.toggle("hidden",!hit);if(hit&&!first)first=panel.dataset.settingsPanel;});if(first){activeSettingsTab=first;document.querySelectorAll("[data-settings-tab]").forEach(b=>b.classList.toggle("active",b.dataset.settingsTab===first));}let empty=$("settingsSearchEmpty");if(!first){if(!empty){empty=document.createElement("div");empty.id="settingsSearchEmpty";empty.className="settings-empty";$("siteSettingsForm").prepend(empty);}empty.textContent="Aramanızla eşleşen bir panel tercihi bulunamadı.";}else $("settingsSearchEmpty")?.remove();});
+async function loadSiteSettings(){try{const data=await api("/api/settings");const values=data.panelPreferences||{};Object.entries(panelSettingFields).forEach(([key,id])=>{if($(id))$(id).value=values[key]||({theme:"dark",accent:"purple",density:"comfortable",fontScale:"normal",contrast:"normal",motion:"full",links:"normal",timezone:"Europe/Istanbul",dateFormat:"dd.mm.yyyy"}[key]);});applyPanelPreferences(values);showSettingsTab(activeSettingsTab);$("siteSettingsMessage").innerHTML="";}catch(error){$("siteSettingsMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}}
+function applyPanelPreferences(values){const root=document.documentElement;root.classList.toggle("panel-light",values.theme==="light"||(values.theme==="system"&&window.matchMedia("(prefers-color-scheme: light)").matches));root.style.fontSize=values.fontScale==="large"?"112.5%":values.fontScale==="larger"?"125%":"";root.classList.toggle("panel-compact",values.density==="compact");root.classList.toggle("panel-high-contrast",values.contrast==="high");root.classList.toggle("panel-reduced-motion",values.motion==="reduced");root.classList.toggle("panel-underlined-links",values.links==="underlined");const accents={purple:"#8055ed",blue:"#2878db",green:"#15966b",orange:"#d97706"};root.style.setProperty("--purple",accents[values.accent]||accents.purple);root.style.setProperty("--light",accents[values.accent]||"#a78bfa");}
+$("reloadSiteSettings").addEventListener("click",()=>{document.querySelectorAll("[data-settings-panel] select").forEach(el=>el.selectedIndex=0);$("panelTimezone").value="Europe/Istanbul";$("panelDateFormat").value="dd.mm.yyyy";});
+$("siteSettingsForm").addEventListener("submit",async event=>{event.preventDefault();const preferences={};Object.entries(panelSettingFields).forEach(([key,id])=>preferences[key]=$(id).value);const button=$("saveSiteSettings");button.disabled=true;button.textContent="Kaydediliyor...";try{const result=await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"save_panel_preferences",preferences})});applyPanelPreferences(preferences);$("siteSettingsMessage").innerHTML='<div class="message success">'+escapeHtml(result.message||"Panel tercihleri kaydedildi.")+'</div>';}catch(error){$("siteSettingsMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}finally{button.disabled=false;button.textContent="Panel Tercihlerini Kaydet";}});
 
-async function loadSiteSettings(){try{const data=await api("/api/settings");const values=data.preferences||{};Object.entries(siteSettingFields).forEach(([key,id])=>{if($(id))$(id).value=values[key]||"";});showSettingsTab(activeSettingsTab);$("siteSettingsMessage").innerHTML="";}catch(error){$("siteSettingsMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}}
-$("reloadSiteSettings").addEventListener("click",loadSiteSettings);
-$("siteSettingsForm").addEventListener("submit",async event=>{event.preventDefault();const preferences={};Object.entries(siteSettingFields).forEach(([key,id])=>preferences[key]=$(id).value.trim());const button=$("saveSiteSettings");button.disabled=true;button.textContent="Kaydediliyor...";try{const result=await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"save_preferences",preferences})});$("siteSettingsMessage").innerHTML='<div class="message success">'+escapeHtml(result.message||"Site ayarları kaydedildi.")+'</div>';}catch(error){$("siteSettingsMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}finally{button.disabled=false;button.textContent="Ayarları Kaydet";}});
 
 checkSession();
 </script>
