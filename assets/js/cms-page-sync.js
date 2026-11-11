@@ -15,6 +15,8 @@
   "/pages/yasal-bilgilendirme.html":"yasal-bilgilendirme"
  };
  const path=location.pathname;
+ // Ana sayfanın özgün HTML tasarımını koru; CMS ana sayfayı değiştirmesin.
+ if(path==="/"||path==="/index.html")return;
  const params=new URLSearchParams(location.search);
  if(path==="/pages/sayfa.html"&&params.has("slug"))return;
  const slug=routes[path];
