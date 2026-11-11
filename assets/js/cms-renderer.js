@@ -20,7 +20,6 @@ window.EDWISEContent={
    const color=style.match(/(?:^|;)\s*color\s*:\s*(#[0-9a-f]{3,8}|[a-z]{3,20})/i);if(color)el.style.color=color[1];
    const bg=style.match(/background-color\s*:\s*(#[0-9a-f]{3,8}|[a-z]{3,20})/i);if(bg)el.style.backgroundColor=bg[1];
    const size=style.match(/font-size\s*:\s*(\d{1,2}(?:\.\d+)?)(px|pt)/i);if(size)el.style.fontSize=size[1]+size[2];
-   const family=style.match(/font-family\s*:\s*([^;]+)/i);if(family){const first=family[1].replace(/["\']/g,"").split(",")[0].trim();if(["Arial","Helvetica","Times New Roman","Times","Calibri","Georgia","Verdana","Tahoma"].some(x=>x.toLowerCase()===first.toLowerCase()))el.style.fontFamily=family[1]}
    const family=style.match(/font-family\s*:\s*([^;]+)/i);if(family){const cleanFamily=family[1].replace(/["']/g,"").split(",")[0].trim();if(fonts.some(font=>font.toLowerCase()===cleanFamily.toLowerCase()))el.style.fontFamily=family[1]}
    if(node.tagName==="IMG"){
     const width=style.match(/width\s*:\s*(\d{1,3}%|\d{1,3}px)/i);if(width)el.style.width=width[1];
