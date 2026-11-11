@@ -30,9 +30,14 @@ async function authorized(context) {
 
 async function checkOrigin(request) {
   const origin = request.headers.get("Origin");
-  if (!origin) return true;
 
-  return origin === new URL(request.url).origin;
+  if (!origin) return false;
+
+  try {
+    return origin === new URL(request.url).origin;
+  } catch {
+    return false;
+  }
 }
 
 export async function onRequestGet(context) {
