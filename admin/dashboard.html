@@ -209,10 +209,10 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
     <div class="stat"><span>Toplam Sayfa</span><h2 id="countPages">—</h2><p>Veritabanındaki sayfalar</p></div>
     <div class="stat"><span>Hizmetler</span><h2 id="countServices">—</h2><p>Toplam kayıtlı hizmet</p></div>
     <div class="stat"><span>Blog Yazıları</span><h2 id="countPosts">—</h2><p>Toplam kayıtlı blog yazısı</p></div>
-    <div class="stat" data-superadmin><span>Başvurular</span><h2>—</h2><p>Başvuru modülü kurulacak</p></div>
+    <div class="stat" data-superadmin><span>Başvurular</span><h2 id="countApplications">—</h2><p>Kayıtlı başvurular</p></div>
    </div>
 
-   <section class="analytics-wrap" id="analyticsOverview" data-superadmin>
+   <section class="analytics-wrap hidden" id="analyticsOverview" data-superadmin>
     <div class="section-head">
      <div><h2>Google &amp; Cloudflare Analizleri</h2><p>Son 30 günlük ziyaretçi davranışları ve site trafiği</p></div>
      <div class="actions" style="margin:0"><button class="btn" id="refreshAnalytics">↻ Verileri Yenile</button><span id="analyticsUpdated" class="muted">Henüz yüklenmedi</span></div>
@@ -684,7 +684,11 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
     <div id="mediaLink" class="hidden" style="margin-top:20px">
      <a href="/admin/media.html" class="primary" style="display:inline-block;text-decoration:none">Medya Kütüphanesini Aç →</a>
     </div>
-    <div class="message">Bu modül henüz geliştirme aşamasında. Gerçek işlemler, güvenli API bağlantıları tamamlandığında açılacak.</div>
+    <div id="applicationsModule" class="hidden">
+  <div class="actions"><button class="btn" id="refreshApplications">↻ Yenile</button><span id="applicationsMessage" class="muted"></span></div>
+  <div class="table-wrap"><table><thead><tr><th>Tarih</th><th>Ad Soyad</th><th>Telefon</th><th>E-posta</th><th>Program</th><th>Tercih</th><th>Durum</th><th>İşlem</th></tr></thead><tbody id="applicationsTable"><tr><td colspan="8">Başvurular yükleniyor...</td></tr></tbody></table></div>
+ </div>
+ <div class="message" id="otherModuleMessage">Bu modül henüz geliştirme aşamasında. Gerçek işlemler, güvenli API bağlantıları tamamlandığında açılacak.</div>
    </div>
   </section>
  </div>
@@ -757,7 +761,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
  if(name==="services")loadServices();
  if(name==="posts")loadPosts();
     if(name==="users")loadUsers();
- if(name==="audit")loadAudit();
+ if(name==="audit")loadAudit();\n if(name==="applications")loadApplications();
  if(name==="designcenter")loadThemeSettings();
  if(name==="sitesettings")loadSiteSettings();
 
@@ -778,6 +782,24 @@ document.querySelectorAll("[data-open]").forEach(n=>{
  n.addEventListener("click",()=>showPage(n.dataset.open));
 });
 
+
+async function loadApplications(){
+ const body=$("applicationsTable");
+ body.innerHTML='<tr><td colspan="8">Başvurular yükleniyor...</td></tr>';
+ try{
+  const data=await api("/api/applications");
+  const rows=data.applications||[];
+  $("countApplications").textContent=rows.length;
+  $("applicationsMessage").textContent=rows.length+" başvuru";
+  body.innerHTML=rows.map(x=>'<tr><td>'+escapeHtml(x.created_at)+'</td><td>'+escapeHtml(x.name)+'</td><td><a href="tel:'+escapeHtml(x.phone)+'">'+escapeHtml(x.phone)+'</a></td><td>'+escapeHtml(x.email||"-")+'</td><td>'+escapeHtml(x.program)+'</td><td>'+escapeHtml(x.format)+'</td><td><select data-app-status="'+x.id+'"><option value="new" '+(x.status==="new"?"selected":"")+'>Yeni</option><option value="contacted" '+(x.status==="contacted"?"selected":"")+'>İletişime geçildi</option><option value="completed" '+(x.status==="completed"?"selected":"")+'>Tamamlandı</option></select></td><td><button class="btn" data-app-detail="'+x.id+'">Detay</button></td></tr><tr class="hidden" id="app-detail-'+x.id+'"><td colspan="8"><strong>Uygun zaman:</strong> '+escapeHtml(x.availability||"-")+'<br><strong>Not:</strong> '+escapeHtml(x.note||"-")+'</td></tr>').join("")||'<tr><td colspan="8">Henüz başvuru yok.</td></tr>';
+  body.querySelectorAll("[data-app-status]").forEach(select=>select.addEventListener("change",async()=>{
+   try{await api("/api/applications",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:select.dataset.appStatus,status:select.value})});}
+   catch(e){alert("Durum kaydedilemedi.");}
+  }));
+  body.querySelectorAll("[data-app-detail]").forEach(button=>button.addEventListener("click",()=> $("app-detail-"+button.dataset.appDetail).classList.toggle("hidden")));
+ }catch(error){body.innerHTML='<tr><td colspan="8">Başvurular yüklenemedi.</td></tr>';$("applicationsMessage").textContent=error.message;}
+}
+$("refreshApplications")?.addEventListener("click",loadApplications);
 
 async function loadAudit(){
  $("auditTable").innerHTML='<tr><td colspan="6">İşlem geçmişi yükleniyor...</td></tr>';
@@ -1060,7 +1082,7 @@ async function checkSession(){
   applyRolePermissions();
   if(currentRole==="superadmin")await loadSiteSettings();
   showPage("overview");
-  if(currentRole==="superadmin")loadAnalytics();
+  // Analiz entegrasyonu şimdilik gizli; yapılandırma tamamlandığında yeniden açılacak.
 
  }catch{
   location.replace("/admin/");
