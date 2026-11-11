@@ -53,6 +53,15 @@ export async function onRequestPost(context){
     }else{return json({success:false,message:"Sayfa yedeği eksik."},409)}
    }else if(event.entity_type==="post"){
     await db.prepare(`INSERT INTO posts(id,title,slug,excerpt,content,image_url,meta_title,meta_description,status,published_at,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,datetime('now'),datetime('now')) ON CONFLICT(id) DO UPDATE SET title=excluded.title,slug=excluded.slug,excerpt=excluded.excerpt,content=excluded.content,image_url=excluded.image_url,meta_title=excluded.meta_title,meta_description=excluded.meta_description,status=excluded.status,published_at=excluded.published_at,updated_at=datetime('now')`).bind(snapshot.id,snapshot.title,snapshot.slug,snapshot.excerpt||"",snapshot.content||"",snapshot.image_url||"",snapshot.meta_title||"",snapshot.meta_description||"",snapshot.status||"draft",snapshot.published_at||null).run();
+   }else if(event.entity_type==="media"){
+    if(!snapshot.file_name||!snapshot.github_sha||!context.env.GITHUB_TOKEN||!context.env.GITHUB_REPO)return json({success:false,message:"Görselin geri yüklenebilir GitHub sürüm bilgisi bulunamadı."},409);
+    const headers={"Authorization":"Bearer "+context.env.GITHUB_TOKEN,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"EDWISE-CMS"};
+    const blobResponse=await fetch("https://api.github.com/repos/"+context.env.GITHUB_REPO+"/git/blobs/"+snapshot.github_sha,{headers});
+    if(!blobResponse.ok)return json({success:false,message:"Görsel yedeği GitHub deposundan alınamadı."},502);
+    const blob=await blobResponse.json();
+    const putResponse=await fetch("https://api.github.com/repos/"+context.env.GITHUB_REPO+"/contents/media/"+encodeURIComponent(snapshot.file_name),{method:"PUT",headers:{...headers,"Content-Type":"application/json"},body:JSON.stringify({message:"EDWISE CMS: görsel geri yüklendi - "+snapshot.file_name,content:blob.content,branch:"main"})});
+    if(!putResponse.ok)return json({success:false,message:"Görsel dosyası depoya geri yüklenemedi."},502);
+    await db.prepare("INSERT INTO media(file_name,file_url,file_type,created_at) VALUES(?,?,?,datetime('now')) ON CONFLICT(file_name) DO UPDATE SET file_url=excluded.file_url,file_type=excluded.file_type").bind(snapshot.file_name,snapshot.file_url||("/api/media/"+snapshot.file_name),snapshot.file_type||"image/jpeg").run();
    }else{return json({success:false,message:"Bu kayıt türü için geri yükleme desteklenmiyor."},409)}
    await logAudit(db,context.request,auth.admin,{action:"version_restored",entity_type:event.entity_type,entity_id:event.entity_id,entity_title:event.entity_title,details:{restored_from_event:eventId}});
    return json({success:true,message:"Önceki sürüm geri yüklendi."});
