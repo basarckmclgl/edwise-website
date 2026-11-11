@@ -107,6 +107,27 @@ function makeEditor(textareaId, label) {
     label.appendChild(select);
     groupElement.appendChild(label);
   }
+  function applyInlineStyle(property, value) {
+    restoreSelection();
+    const selection = window.getSelection();
+    if (!selection || !selection.rangeCount) return;
+    const range = selection.getRangeAt(0);
+    if (range.collapsed) {
+      const block = currentBlock();
+      if (block) block.style[property] = value;
+    } else {
+      const span = document.createElement("span");
+      span.style[property] = value;
+      span.appendChild(range.extractContents());
+      range.insertNode(span);
+      const next = document.createRange();
+      next.selectNodeContents(span);
+      selection.removeAllRanges();
+      selection.addRange(next);
+    }
+    saveSelection();
+    sync();
+  }
   function runCommand(command, value) {
     restoreSelection();
     document.execCommand(command, false, value || null);
@@ -122,22 +143,11 @@ function makeEditor(textareaId, label) {
 
   g = group();
   selectControl(g, "Yazı tipi", [["Yazı tipi seç", ""], ...FONT_OPTIONS], function (font) {
-    if (font) runCommand("fontName", font);
+    if (font) applyInlineStyle("fontFamily", font);
   });
   selectControl(g, "Boyut", [["Boyut", ""], ...[12,14,16,18,20,22,24,28,32,36,42,48].map(function (n) { return [n + " px", n + "px"]; })], function (size) {
     if (!size) return;
-    restoreSelection();
-    const selection = window.getSelection();
-    if (!selection || !selection.rangeCount || selection.isCollapsed) {
-      const block = currentBlock();
-      if (block) block.style.fontSize = size;
-    } else {
-      const span = document.createElement("span");
-      span.style.fontSize = size;
-      try { selection.getRangeAt(0).surroundContents(span); }
-      catch (_) { document.execCommand("fontSize", false, "4"); }
-    }
-    saveSelection(); sync();
+    applyInlineStyle("fontSize", size);
   });
   const colorLabel = document.createElement("label");
   colorLabel.className = "pb-color-label";
@@ -145,7 +155,7 @@ function makeEditor(textareaId, label) {
   const colorInput = document.createElement("input");
   colorInput.type = "color"; colorInput.value = "#24212b"; colorInput.title = "Metin rengi";
   colorInput.addEventListener("mousedown", saveSelection);
-  colorInput.addEventListener("input", function () { runCommand("foreColor", colorInput.value); });
+  colorInput.addEventListener("input", function () { applyInlineStyle("color", colorInput.value); });
   colorLabel.appendChild(colorInput); g.appendChild(colorLabel);
   const markLabel = document.createElement("label");
   markLabel.className = "pb-color-label";
@@ -153,7 +163,7 @@ function makeEditor(textareaId, label) {
   const markInput = document.createElement("input");
   markInput.type = "color"; markInput.value = "#fff2a8"; markInput.title = "Metin vurgusu";
   markInput.addEventListener("mousedown", saveSelection);
-  markInput.addEventListener("input", function () { runCommand("hiliteColor", markInput.value); });
+  markInput.addEventListener("input", function () { applyInlineStyle("backgroundColor", markInput.value); });
   markLabel.appendChild(markInput); g.appendChild(markLabel);
 
   g = group();
