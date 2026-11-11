@@ -1,4 +1,5 @@
 import { requireEditor } from "./_auth.js";
+import { logAudit } from "./_audit.js";
 
 export async function onRequestPost(context) {
   const auth = await requireEditor(context);
@@ -29,6 +30,7 @@ export async function onRequestPost(context) {
       return Response.json({ success: false, error: "Geçersiz görsel adresi veya dosya adı." }, { status: 400 });
     }
 
+    const before = await env.DB.prepare("SELECT * FROM media WHERE file_name = ?").bind(fileName).first();
     const apiUrl = "https://api.github.com/repos/" + env.GITHUB_REPO +
       "/contents/media/" + encodeURIComponent(fileName) + "?ref=main";
     const headers = {
@@ -68,7 +70,7 @@ export async function onRequestPost(context) {
     }
 
     await env.DB.prepare("DELETE FROM media WHERE file_name = ?").bind(fileName).run();
-
+    await logAudit(env.DB,request,auth.admin,{action:"media_deleted",entity_type:"media",entity_id:fileName,entity_title:fileName,details:{before:before||{file_name:fileName},after:null}});
     return Response.json({ success: true, message: "Görsel başarıyla silindi." });
   } catch (error) {
     return Response.json({
