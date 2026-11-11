@@ -196,17 +196,13 @@ td{color:#e8e5f3}
     </div>
     <p id="designCenterMessage" class="muted">Önizleme, sitenin mevcut görünümünü gösterir. İçeriği düzenle düğmesi ilgili yönetim ekranını açar; tasarım değişiklikleri henüz bu ekrandan doğrudan yayımlanmaz.</p>
    </div>
-   <div class="panel" style="padding:10px">
-    <iframe id="designPreviewFrame" title="EDWISE sayfa önizlemesi" src="/" loading="lazy" style="display:block;width:100%;height:760px;border:1px solid #d8d5df;border-radius:8px;background:#fff"></iframe>
-   </div>
-  
    <div id="siteDesignSettings" data-superadmin>
-<div class="section-head"><div><h2>Site Genel Tasarımı ve Menü Yapısı</h2><p>Bu ayarlar sitenin genel görünümünü ve ziyaretçi menüsünü yönetir. Sayfa içeriklerinden bağımsızdır.</p></div></div>
+<div class="section-head"><div><h2>Site Genel Tasarımı ve Menü Yapısı</h2><p>Aşağıdaki ayarlar seçili sayfanın gerçek önizlemesine uygulanır. Taslak değişiklikler ziyaretçilere yayımlanmaz.</p></div></div>
    <div id="themeMessage"></div>
    <div class="actions" style="margin-bottom:16px"><button class="primary" type="button" id="designTabButton">Genel Görünüm</button><button class="btn" type="button" id="menuTabButton">Menü ve Navigasyon</button></div>
    <div id="designTab">
    <div class="panel">
-    <h2>Marka renkleri ve görünüm</h2>
+    <h2>Görünüm ve içerik ayarları</h2>
     <div class="form-grid">
      <div class="field"><label for="themePrimary">Ana marka rengi</label><input id="themePrimary" type="color" value="#291447"></div>
      <div class="field"><label for="themeAccent">Vurgu / buton rengi</label><input id="themeAccent" type="color" value="#c5a0f2"></div>
@@ -224,26 +220,31 @@ td{color:#e8e5f3}
      <button class="primary" type="button" id="publishTheme">Siteye Yayımla</button>
      <button class="btn" type="button" id="resetTheme">Varsayılan Tasarıma Dön</button>
     </div>
-    <p class="muted">Önemli: Önizleme yalnızca bu yönetim ekranında görünür. “Siteye Yayımla” dediğinizde ziyaretçiler yeni tasarımı görür. Mevcut sayfa düzeni ve içerikler silinmez.</p>
+    <p class="muted">Değişiklikler aşağıdaki gerçek site önizlemesine uygulanır. Taslak Kaydet ile saklanır; Siteye Yayımla ile ziyaretçilere açılır.</p>
    </div>
-   <div class="panel">
-    <h2>Canlı önizleme</h2>
-    <div id="themePreview" style="background:#fff;border-radius:12px;overflow:hidden;border:1px solid #ddd;color:#261a35">
-     <div id="previewHeader" style="padding:18px 22px;font-weight:800">EDWISE　　Ana Sayfa　 Hizmetlerimiz　 Hakkımızda　 İletişim</div>
-     <div id="previewHero" style="padding:42px 24px;color:#fff"><small id="previewEyebrow" contenteditable="true" title="Metni doğrudan burada değiştirebilirsiniz">EDUCATION & CONSULTANCY</small><h2 id="previewHeroTitle" contenteditable="true" style="color:inherit;margin:12px 0">Geleceğine doğru adımla başla.</h2><p id="previewHeroDescription" contenteditable="true">Doğru rehberlik, parlak gelecek.</p><button id="previewButton" type="button" contenteditable="true" style="border:0;padding:10px 18px;margin-top:15px">Bize Ulaşın</button></div>
-     <div id="previewSurface" style="padding:24px"><strong id="previewSurfaceTitle" contenteditable="true">Hedeflerine uygun eğitim desteği</strong><p id="previewSurfaceDescription" contenteditable="true" style="margin-top:8px">Bu alan, açık bölüm rengini ve yazı tipini gösterir.</p></div>
-     <div id="previewFooter" style="padding:18px 22px;color:#fff"><span id="previewFooterText" contenteditable="true">EDWISE · Education & Consultancy</span></div>
-    </div>
-   </div>
+   >
    <div id="menuTab" class="hidden">
     <div class="panel">
      <h2>Site menüsünde görünecek bağlantılar</h2>
      <p class="muted">Burada yayımlanmış sayfaları menüye ekleyip çıkarabilir, bağlantıların sırasını değiştirebilirsiniz. Taslak sayfalar ziyaretçi menüsünde görünmez.</p>
-     <div id="menuItems"><p class="muted">Sayfalar yükleniyor...</p></div>
+     <div id="menuItems"><p class="muted">Sayfalar yükleniyor...</p>
+<div class="field"><label for="themeHeroEyebrow">Ana sayfa üst küçük başlık</label><input id="themeHeroEyebrow" type="text"></div>
+<div class="field"><label for="themeHeroTitle">Ana sayfa ana başlık</label><input id="themeHeroTitle" type="text"></div>
+<div class="field"><label for="themeHeroDescription">Ana sayfa açıklaması</label><input id="themeHeroDescription" type="text"></div>
+<div class="field"><label for="themeHeroButton">Ana sayfa buton yazısı</label><input id="themeHeroButton" type="text"></div>
+<div class="field"><label for="themeSurfaceTitle">Tanıtım alanı başlığı</label><input id="themeSurfaceTitle" type="text"></div>
+<div class="field"><label for="themeSurfaceDescription">Tanıtım alanı açıklaması</label><input id="themeSurfaceDescription" type="text"></div>
+<div class="field"><label for="themeFooterText">Alt bilgi metni</label><input id="themeFooterText" type="text"></div>
+</div>
      <div class="actions"><button class="primary" type="button" id="saveMenu">Menüyü Kaydet</button></div>
      <div id="menuMessage"></div>
     </div>
    </div>
+<div class="panel" style="padding:10px">
+    <iframe id="designPreviewFrame" title="EDWISE sayfa önizlemesi" src="/" loading="lazy" style="display:block;width:100%;height:760px;border:1px solid #d8d5df;border-radius:8px;background:#fff"></iframe>
+   </div>
+  
+   
    </div>
   </section>
 
@@ -805,45 +806,18 @@ async function deletePage(id){
 
 
 const themeDefaults={primary:"#291447",accent:"#c5a0f2",surface:"#f7f3fb",text:"#261a35",header:"#ffffff",hero:"#291447",footer:"#1b0d2d",font:"Inter",buttonRadius:"6px",heroEyebrow:"EDUCATION & CONSULTANCY",heroTitle:"Geleceğine doğru adımla başla.",heroDescription:"Doğru rehberlik, parlak gelecek.",heroButton:"Bize Ulaşın",surfaceTitle:"Hedeflerine uygun eğitim desteği",surfaceDescription:"Bu alan, açık bölüm rengini ve yazı tipini gösterir.",footerText:"EDWISE · Education & Consultancy"};
-const themeFields={primary:"themePrimary",accent:"themeAccent",surface:"themeSurface",text:"themeText",header:"themeHeader",hero:"themeHero",footer:"themeFooter",font:"themeFont",buttonRadius:"themeRadius"};
-function currentTheme(){const value={};Object.keys(themeFields).forEach(key=>value[key]=$(themeFields[key]).value);value.heroEyebrow=$("previewEyebrow").textContent.trim();value.heroTitle=$("previewHeroTitle").textContent.trim();value.heroDescription=$("previewHeroDescription").textContent.trim();value.heroButton=$("previewButton").textContent.trim();value.surfaceTitle=$("previewSurfaceTitle").textContent.trim();value.surfaceDescription=$("previewSurfaceDescription").textContent.trim();value.footerText=$("previewFooterText").textContent.trim();return value;}
-function fillTheme(theme){Object.keys(themeFields).forEach(key=>{if(theme&&theme[key])$(themeFields[key]).value=theme[key];});const t={...themeDefaults,...theme};$("previewEyebrow").textContent=t.heroEyebrow;$("previewHeroTitle").textContent=t.heroTitle;$("previewHeroDescription").textContent=t.heroDescription;$("previewButton").textContent=t.heroButton;$("previewSurfaceTitle").textContent=t.surfaceTitle;$("previewSurfaceDescription").textContent=t.surfaceDescription;$("previewFooterText").textContent=t.footerText;applyThemePreview(currentTheme());}
-function applyThemePreview(t){
- $("previewHeader").style.background=t.header;
- $("previewHeader").style.color=t.primary;
- $("previewHero").style.background="linear-gradient(115deg,"+t.hero+","+t.primary+")";
- $("previewSurface").style.background=t.surface;
- $("previewSurface").style.color=t.text;
- $("previewFooter").style.background=t.footer;
- $("previewButton").style.background=t.accent;
- $("previewButton").style.color=t.primary;
- $("previewButton").style.borderRadius=t.buttonRadius;
- $("themePreview").style.fontFamily=t.font+",Arial,sans-serif";
-}
-function themeMessage(message,type="success"){$("themeMessage").innerHTML='<div class="message '+type+'">'+escapeHtml(message)+'</div>';}
-async function loadThemeSettings(){
- try{
-  const data=await api("/api/settings");
-  fillTheme(data.draft&&Object.keys(data.draft).length?data.draft:(data.live&&Object.keys(data.live).length?data.live:themeDefaults));
- }catch(error){themeMessage(error.message,"error");}
-}
-$("previewTheme").addEventListener("click",()=>{applyThemePreview(currentTheme());themeMessage("Önizleme uygulandı. Henüz ziyaretçilere yayımlanmadı.");});
-$("resetTheme").addEventListener("click",()=>{fillTheme(themeDefaults);themeMessage("Varsayılan renkler önizlemeye yansıtıldı. Kaydetmek veya yayımlamak için ilgili düğmeye basın.");});
-$("saveThemeDraft").addEventListener("click",()=>saveTheme("draft"));
-$("publishTheme").addEventListener("click",()=>saveTheme("publish"));
-async function saveTheme(action){
- const button=action==="publish"?$("publishTheme"):$("saveThemeDraft");
- button.disabled=true;
- try{
-  const data=await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action,theme:currentTheme()})});
-  themeMessage(data.message,"success");
- }catch(error){themeMessage(error.message,"error");}
- finally{button.disabled=false;}
-}
+const themeFields={primary:"themePrimary",accent:"themeAccent",surface:"themeSurface",text:"themeText",header:"themeHeader",hero:"themeHero",footer:"themeFooter",font:"themeFont",buttonRadius:"themeRadius",heroEyebrow:"themeHeroEyebrow",heroTitle:"themeHeroTitle",heroDescription:"themeHeroDescription",heroButton:"themeHeroButton",surfaceTitle:"themeSurfaceTitle",surfaceDescription:"themeSurfaceDescription",footerText:"themeFooterText"};
+function currentTheme(){const v={};Object.keys(themeFields).forEach(k=>v[k]=$(themeFields[k]).value);return v;}
+function fillTheme(theme){const t={...themeDefaults,...theme};Object.keys(themeFields).forEach(k=>{if($(themeFields[k]))$(themeFields[k]).value=t[k]??"";});applyThemePreview(currentTheme());}
+function applyThemePreview(t){try{const d=$("designPreviewFrame").contentDocument;if(!d||!d.documentElement)return;const r=d.documentElement;const txt=(q,v)=>{if(typeof v==="string")d.querySelectorAll(q).forEach(e=>e.textContent=v);};txt(".hero .eyebrow",t.heroEyebrow);txt(".hero .hero-content h1",t.heroTitle);txt(".hero .hero-content > p",t.heroDescription);txt(".hero .hero-actions .btn:first-child",t.heroButton);txt(".home-about .section-head h2",t.surfaceTitle);txt(".home-about .section-head > p",t.surfaceDescription);txt("footer > span:nth-of-type(1)",t.footerText);if(/^#[0-9a-fA-F]{6}$/.test(t.primary||""))r.style.setProperty("--navy",t.primary);if(/^#[0-9a-fA-F]{6}$/.test(t.accent||""))r.style.setProperty("--gold",t.accent);if(/^#[0-9a-fA-F]{6}$/.test(t.surface||""))r.style.setProperty("--cream",t.surface);if(/^#[0-9a-fA-F]{6}$/.test(t.text||""))r.style.setProperty("--ink",t.text);if(/^#[0-9a-fA-F]{6}$/.test(t.header||""))d.querySelectorAll("header,header nav#site-menu").forEach(e=>e.style.backgroundColor=t.header);if(/^#[0-9a-fA-F]{6}$/.test(t.hero||""))d.querySelectorAll(".hero").forEach(e=>e.style.background="linear-gradient(110deg,"+t.hero+"f2 0%,"+t.hero+"e8 55%,"+t.primary+"dd 100%)");if(/^#[0-9a-fA-F]{6}$/.test(t.footer||""))d.querySelectorAll("footer").forEach(e=>e.style.backgroundColor=t.footer);if(["Inter","Arial","Georgia","'Times New Roman'","Verdana"].includes(t.font||""))d.body.style.fontFamily=t.font+",ui-sans-serif,system-ui,sans-serif";if(/^(0|[2-9]|1[0-8])px$/.test(t.buttonRadius||""))d.querySelectorAll(".btn,.nav-cta,.btn-outline").forEach(e=>e.style.borderRadius=t.buttonRadius);}catch(e){console.warn(e);}}
+function themeMessage(m,type="success"){$("themeMessage").innerHTML='<div class="message '+type+'">'+escapeHtml(m)+'</div>';}
+async function loadThemeSettings(){try{const d=await api("/api/settings");fillTheme(d.draft&&Object.keys(d.draft).length?d.draft:(d.live&&Object.keys(d.live).length?d.live:themeDefaults));}catch(e){themeMessage(e.message,"error");}}
+$("previewTheme").addEventListener("click",()=>{applyThemePreview(currentTheme());themeMessage("Değişiklikler seçili sayfanın gerçek önizlemesine uygulandı. Henüz yayımlanmadı.");});
+$("resetTheme").addEventListener("click",()=>{fillTheme(themeDefaults);themeMessage("Varsayılan tasarım önizlemeye uygulandı.");});
+$("saveThemeDraft").addEventListener("click",()=>saveTheme("draft"));$("publishTheme").addEventListener("click",()=>saveTheme("publish"));
+async function saveTheme(action){const btn=action==="publish"?$("publishTheme"):$("saveThemeDraft");btn.disabled=true;try{const d=await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action,theme:currentTheme()})});themeMessage(d.message,"success");}catch(e){themeMessage(e.message,"error");}finally{btn.disabled=false;}}
 Object.values(themeFields).forEach(id=>$(id).addEventListener("input",()=>applyThemePreview(currentTheme())));
-["previewEyebrow","previewHeroTitle","previewHeroDescription","previewButton","previewSurfaceTitle","previewSurfaceDescription","previewFooterText"].forEach(id=>$(id).addEventListener("input",()=>themeMessage("Önizleme metni değişti. Ziyaretçilere yansıtmak için Taslak Kaydet veya Siteye Yayımla düğmesine basın.")));
-$("designTabButton").addEventListener("click",()=>{$("designTab").classList.remove("hidden");$("menuTab").classList.add("hidden");$("designTabButton").classList.add("primary");$("menuTabButton").classList.remove("primary");});
-$("menuTabButton").addEventListener("click",()=>{$("designTab").classList.add("hidden");$("menuTab").classList.remove("hidden");$("menuTabButton").classList.add("primary");$("designTabButton").classList.remove("primary");loadMenuSettings();});
+$("designPreviewFrame").addEventListener("load",()=>applyThemePreview(currentTheme()));
 async function loadMenuSettings(){
  try{
   const [pageData,settingsData]=await Promise.all([api("/api/pages"),api("/api/settings")]);
