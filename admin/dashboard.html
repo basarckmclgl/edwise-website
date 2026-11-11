@@ -477,6 +477,8 @@ td{color:#e8e5f3}
     <div><h2>Tasarım Yönetimi</h2><p>Renkleri, yazı tipini ve ana bölümlerin görünümünü değiştirin. Önce önizleyin; yayımlamadan ziyaretçiler görmez.</p></div>
    </div>
    <div id="themeMessage"></div>
+   <div class="actions" style="margin-bottom:16px"><button class="primary" type="button" id="designTabButton">Tasarım ve Metinler</button><button class="btn" type="button" id="menuTabButton">Menü Yönetimi</button></div>
+   <div id="designTab">
    <div class="panel">
     <h2>Marka renkleri ve görünüm</h2>
     <div class="form-grid">
@@ -502,9 +504,18 @@ td{color:#e8e5f3}
     <h2>Canlı önizleme</h2>
     <div id="themePreview" style="background:#fff;border-radius:12px;overflow:hidden;border:1px solid #ddd;color:#261a35">
      <div id="previewHeader" style="padding:18px 22px;font-weight:800">EDWISE　　Ana Sayfa　 Hizmetlerimiz　 Hakkımızda　 İletişim</div>
-     <div id="previewHero" style="padding:42px 24px;color:#fff"><small>EDUCATION & CONSULTANCY</small><h2 style="color:inherit;margin:12px 0">Geleceğine doğru adımla başla.</h2><p>Doğru rehberlik, parlak gelecek.</p><button id="previewButton" type="button" style="border:0;padding:10px 18px;margin-top:15px">Bize Ulaşın</button></div>
-     <div id="previewSurface" style="padding:24px"><strong>Hedeflerine uygun eğitim desteği</strong><p style="margin-top:8px">Bu alan, açık bölüm rengini ve yazı tipini gösterir.</p></div>
-     <div id="previewFooter" style="padding:18px 22px;color:#fff">EDWISE · Education & Consultancy</div>
+     <div id="previewHero" style="padding:42px 24px;color:#fff"><small id="previewEyebrow" contenteditable="true" title="Metni doğrudan burada değiştirebilirsiniz">EDUCATION & CONSULTANCY</small><h2 id="previewHeroTitle" contenteditable="true" style="color:inherit;margin:12px 0">Geleceğine doğru adımla başla.</h2><p id="previewHeroDescription" contenteditable="true">Doğru rehberlik, parlak gelecek.</p><button id="previewButton" type="button" contenteditable="true" style="border:0;padding:10px 18px;margin-top:15px">Bize Ulaşın</button></div>
+     <div id="previewSurface" style="padding:24px"><strong id="previewSurfaceTitle" contenteditable="true">Hedeflerine uygun eğitim desteği</strong><p id="previewSurfaceDescription" contenteditable="true" style="margin-top:8px">Bu alan, açık bölüm rengini ve yazı tipini gösterir.</p></div>
+     <div id="previewFooter" style="padding:18px 22px;color:#fff"><span id="previewFooterText" contenteditable="true">EDWISE · Education & Consultancy</span></div>
+    </div>
+   </div>
+   <div id="menuTab" class="hidden">
+    <div class="panel">
+     <h2>Site menüsünde görünecek bağlantılar</h2>
+     <p class="muted">Burada yayımlanmış sayfaları menüye ekleyip çıkarabilir, bağlantıların sırasını değiştirebilirsiniz. Taslak sayfalar ziyaretçi menüsünde görünmez.</p>
+     <div id="menuItems"><p class="muted">Sayfalar yükleniyor...</p></div>
+     <div class="actions"><button class="primary" type="button" id="saveMenu">Menüyü Kaydet</button></div>
+     <div id="menuMessage"></div>
     </div>
    </div>
   </section>
@@ -774,10 +785,10 @@ async function deletePage(id){
 }
 
 
-const themeDefaults={primary:"#291447",accent:"#c5a0f2",surface:"#f7f3fb",text:"#261a35",header:"#ffffff",hero:"#291447",footer:"#1b0d2d",font:"Inter",buttonRadius:"6px"};
+const themeDefaults={primary:"#291447",accent:"#c5a0f2",surface:"#f7f3fb",text:"#261a35",header:"#ffffff",hero:"#291447",footer:"#1b0d2d",font:"Inter",buttonRadius:"6px",heroEyebrow:"EDUCATION & CONSULTANCY",heroTitle:"Geleceğine doğru adımla başla.",heroDescription:"Doğru rehberlik, parlak gelecek.",heroButton:"Bize Ulaşın",surfaceTitle:"Hedeflerine uygun eğitim desteği",surfaceDescription:"Bu alan, açık bölüm rengini ve yazı tipini gösterir.",footerText:"EDWISE · Education & Consultancy"};
 const themeFields={primary:"themePrimary",accent:"themeAccent",surface:"themeSurface",text:"themeText",header:"themeHeader",hero:"themeHero",footer:"themeFooter",font:"themeFont",buttonRadius:"themeRadius"};
-function currentTheme(){const value={};Object.keys(themeFields).forEach(key=>value[key]=$(themeFields[key]).value);return value;}
-function fillTheme(theme){Object.keys(themeFields).forEach(key=>{if(theme&&theme[key])$(themeFields[key]).value=theme[key];});applyThemePreview(currentTheme());}
+function currentTheme(){const value={};Object.keys(themeFields).forEach(key=>value[key]=$(themeFields[key]).value);value.heroEyebrow=$("previewEyebrow").textContent.trim();value.heroTitle=$("previewHeroTitle").textContent.trim();value.heroDescription=$("previewHeroDescription").textContent.trim();value.heroButton=$("previewButton").textContent.trim();value.surfaceTitle=$("previewSurfaceTitle").textContent.trim();value.surfaceDescription=$("previewSurfaceDescription").textContent.trim();value.footerText=$("previewFooterText").textContent.trim();return value;}
+function fillTheme(theme){Object.keys(themeFields).forEach(key=>{if(theme&&theme[key])$(themeFields[key]).value=theme[key];});const t={...themeDefaults,...theme};$("previewEyebrow").textContent=t.heroEyebrow;$("previewHeroTitle").textContent=t.heroTitle;$("previewHeroDescription").textContent=t.heroDescription;$("previewButton").textContent=t.heroButton;$("previewSurfaceTitle").textContent=t.surfaceTitle;$("previewSurfaceDescription").textContent=t.surfaceDescription;$("previewFooterText").textContent=t.footerText;applyThemePreview(currentTheme());}
 function applyThemePreview(t){
  $("previewHeader").style.background=t.header;
  $("previewHeader").style.color=t.primary;
@@ -811,6 +822,38 @@ async function saveTheme(action){
  finally{button.disabled=false;}
 }
 Object.values(themeFields).forEach(id=>$(id).addEventListener("input",()=>applyThemePreview(currentTheme())));
+["previewEyebrow","previewHeroTitle","previewHeroDescription","previewButton","previewSurfaceTitle","previewSurfaceDescription","previewFooterText"].forEach(id=>$(id).addEventListener("input",()=>themeMessage("Önizleme metni değişti. Ziyaretçilere yansıtmak için Taslak Kaydet veya Siteye Yayımla düğmesine basın.")));
+$("designTabButton").addEventListener("click",()=>{$("designTab").classList.remove("hidden");$("menuTab").classList.add("hidden");$("designTabButton").classList.add("primary");$("menuTabButton").classList.remove("primary");});
+$("menuTabButton").addEventListener("click",()=>{$("designTab").classList.add("hidden");$("menuTab").classList.remove("hidden");$("menuTabButton").classList.add("primary");$("designTabButton").classList.remove("primary");loadMenuSettings();});
+async function loadMenuSettings(){
+ try{
+  const [pageData,settingsData]=await Promise.all([api("/api/pages"),api("/api/settings")]);
+  const saved=Array.isArray(settingsData.menu)?settingsData.menu:null;
+  const defaults=[
+   {key:"home",label:"Ana Sayfa",url:"/",visible:true},
+   {key:"services",label:"Hizmetlerimiz",url:"/pages/hizmetlerimiz.html",visible:true},
+   {key:"about",label:"Hakkımızda",url:"/pages/hakkimizda.html",visible:true},
+   {key:"contact",label:"İletişim",url:"/#iletisim",visible:true}
+  ];
+  (pageData.pages||[]).filter(p=>p.status==="published"&&!["hakkimizda","iletisim","hizmetlerimiz","anasayfa"].includes(p.slug)).forEach(p=>defaults.push({key:"page-"+p.id,label:p.title,url:"/pages/sayfa.html?slug="+encodeURIComponent(p.slug),visible:true}));
+  let items=saved&&saved.length?saved:defaults;
+  const existing=new Set(items.map(x=>x.key));
+  defaults.forEach(item=>{if(!existing.has(item.key))items.push(item);});
+  window.edwiseMenuItems=items;
+  renderMenuItems();
+ }catch(error){$("menuMessage").textContent=error.message;}
+}
+function renderMenuItems(){
+ const items=window.edwiseMenuItems||[];
+ $("menuItems").innerHTML=items.map((item,index)=>'<div class="menu-setting-row" data-menu-index="'+index+'" style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid #eee"><label style="flex:1"><input type="checkbox" data-menu-visible="'+index+'" '+(item.visible!==false?'checked':'')+'> '+escapeHtml(item.label)+'</label><small style="color:#777;max-width:45%;overflow-wrap:anywhere">'+escapeHtml(item.url)+'</small><button type="button" class="btn" data-menu-up="'+index+'" '+(index===0?'disabled':'')+'>↑</button><button type="button" class="btn" data-menu-down="'+index+'" '+(index===items.length-1?'disabled':'')+'>↓</button></div>').join("");
+ document.querySelectorAll("[data-menu-visible]").forEach(el=>el.addEventListener("change",()=>{items[Number(el.dataset.menuVisible)].visible=el.checked;}));
+ document.querySelectorAll("[data-menu-up]").forEach(el=>el.addEventListener("click",()=>{const i=Number(el.dataset.menuUp);if(i>0){[items[i-1],items[i]]=[items[i],items[i-1]];renderMenuItems();}}));
+ document.querySelectorAll("[data-menu-down]").forEach(el=>el.addEventListener("click",()=>{const i=Number(el.dataset.menuDown);if(i<items.length-1){[items[i+1],items[i]]=[items[i],items[i+1]];renderMenuItems();}}));
+}
+$("saveMenu").addEventListener("click",async()=>{
+ try{const data=await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"save_menu",items:window.edwiseMenuItems||[]})});$("menuMessage").innerHTML='<div class="message success">'+escapeHtml(data.message)+'</div>';}
+ catch(error){$("menuMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}
+});
 
 async function checkSession(){
  try{
