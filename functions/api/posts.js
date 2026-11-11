@@ -46,15 +46,15 @@ function validatePost(data) {
   if (!slug) throw new Error("Geçerli bir URL adresi girilmelidir.");
 
   return {
-  title,
-  slug,
-  excerpt: String(data.excerpt || "").trim(),
-  content: String(data.content || "").trim(),
-  image_url: String(data.image_url || "").trim(),
-  meta_title: String(data.meta_title || "").trim(),
-  meta_description: String(data.meta_description || "").trim(),
-  status
-};
+    title,
+    slug,
+    excerpt: String(data.excerpt || "").trim(),
+    content: String(data.content || "").trim(),
+    image_url: String(data.image_url || "").trim(),
+    meta_title: String(data.meta_title || "").trim(),
+    meta_description: String(data.meta_description || "").trim(),
+    status
+  };
 }
 
 function getRequestId(context, data = {}) {
@@ -71,32 +71,16 @@ function getRequestId(context, data = {}) {
 export async function onRequestGet(context) {
   const auth = await requireEditor(context);
   if (auth.response) return auth.response;
-  
 
   try {
-    const { results } = await context.env.DB.prepare(`
-      SELECT
-        id,
-        title,
-        slug,
-        excerpt,
-        content,
-        image_url,
-        meta_title,
-        meta_description,
-        status,
-        published_at,
-        created_at,
-        updated_at
-      FROM posts
-      ORDER BY created_at DESC
-    `).all();
+    const { results } = await context.env.DB.prepare(
+      "SELECT id, title, slug, excerpt, content, image_url, meta_title, meta_description, status, published_at, created_at, updated_at FROM posts ORDER BY created_at DESC"
+    ).all();
 
     return json({
       success: true,
       posts: results || []
     });
-
   } catch (error) {
     console.error("Posts GET error:", error);
     return json({
@@ -109,12 +93,13 @@ export async function onRequestGet(context) {
 export async function onRequestPost(context) {
   const auth = await requireEditor(context);
   if (auth.response) return auth.response;
+
   if (!(await checkOrigin(context.request))) {
-  return json({
-    success: false,
-    message: "Geçersiz istek kaynağı."
-  }, 403);
-}
+    return json({
+      success: false,
+      message: "Geçersiz istek kaynağı."
+    }, 403);
+  }
 
   try {
     const data = await context.request.json();
@@ -122,28 +107,28 @@ export async function onRequestPost(context) {
     const DB = context.env.DB;
 
     const columns = [
-  "title",
-  "slug",
-  "excerpt",
-  "content",
-  "image_url",
-  "meta_title",
-  "meta_description",
-  "status",
-  "published_at"
-];
+      "title",
+      "slug",
+      "excerpt",
+      "content",
+      "image_url",
+      "meta_title",
+      "meta_description",
+      "status",
+      "published_at"
+    ];
 
     const values = [
-  post.title,
-  post.slug,
-  post.excerpt,
-  post.content,
-  post.image_url,
-  post.meta_title,
-  post.meta_description,
-  post.status,
-  post.status === "published" ? new Date().toISOString() : null
-];
+      post.title,
+      post.slug,
+      post.excerpt,
+      post.content,
+      post.image_url,
+      post.meta_title,
+      post.meta_description,
+      post.status,
+      post.status === "published" ? new Date().toISOString() : null
+    ];
 
     const tableInfo = await DB.prepare(
       "PRAGMA table_info(posts)"
@@ -172,12 +157,11 @@ export async function onRequestPost(context) {
 
     const placeholders = columns.map(() => "?").join(", ");
 
-    const result = await DB.prepare(`
-      INSERT INTO posts (${columns.join(", ")})
-      VALUES (${placeholders})
-    `).bind(...values).run();
+    const result = await DB.prepare(
+      `INSERT INTO posts (${columns.join(", ")}) VALUES (${placeholders})`
+    ).bind(...values).run();
 
-    let newId = isInteger
+    const newId = isInteger
       ? result.meta?.last_row_id
       : values[0];
 
@@ -201,12 +185,13 @@ export async function onRequestPost(context) {
 export async function onRequestPut(context) {
   const auth = await requireEditor(context);
   if (auth.response) return auth.response;
+
   if (!(await checkOrigin(context.request))) {
-  return json({
-    success: false,
-    message: "Geçersiz istek kaynağı."
-  }, 403);
-}
+    return json({
+      success: false,
+      message: "Geçersiz istek kaynağı."
+    }, 403);
+  }
 
   try {
     const data = await context.request.json();
@@ -243,20 +228,9 @@ export async function onRequestPut(context) {
       publishedAt = null;
     }
 
-    await DB.prepare(`
-      UPDATE posts SET
-        title = ?,
-        slug = ?,
-        excerpt = ?,
-        content = ?,
-        image_url = ?,
-        meta_title = ?,
-        meta_description = ?,
-        status = ?,
-        published_at = ?,
-        updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
-      `).bind(
+    await DB.prepare(
+      "UPDATE posts SET title = ?, slug = ?, excerpt = ?, content = ?, image_url = ?, meta_title = ?, meta_description = ?, status = ?, published_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+    ).bind(
       post.title,
       post.slug,
       post.excerpt,
@@ -287,12 +261,13 @@ export async function onRequestPut(context) {
 export async function onRequestDelete(context) {
   const auth = await requireEditor(context);
   if (auth.response) return auth.response;
+
   if (!(await checkOrigin(context.request))) {
-  return json({
-    success: false,
-    message: "Geçersiz istek kaynağı."
-  }, 403);
-}
+    return json({
+      success: false,
+      message: "Geçersiz istek kaynağı."
+    }, 403);
+  }
 
   try {
     const url = new URL(context.request.url);
