@@ -61,7 +61,8 @@ export async function onRequestPost(context){
     const blob=await blobResponse.json();
     const putResponse=await fetch("https://api.github.com/repos/"+context.env.GITHUB_REPO+"/contents/media/"+encodeURIComponent(snapshot.file_name),{method:"PUT",headers:{...headers,"Content-Type":"application/json"},body:JSON.stringify({message:"EDWISE CMS: görsel geri yüklendi - "+snapshot.file_name,content:blob.content,branch:"main"})});
     if(!putResponse.ok)return json({success:false,message:"Görsel dosyası depoya geri yüklenemedi."},502);
-    await db.prepare("INSERT INTO media(file_name,file_url,file_type,created_at) VALUES(?,?,?,datetime('now')) ON CONFLICT(file_name) DO UPDATE SET file_url=excluded.file_url,file_type=excluded.file_type").bind(snapshot.file_name,snapshot.file_url||("/api/media/"+snapshot.file_name),snapshot.file_type||"image/jpeg").run();
+    await db.prepare("DELETE FROM media WHERE file_name=?").bind(snapshot.file_name).run();
+    await db.prepare("INSERT INTO media(file_name,file_url,file_type,created_at) VALUES(?,?,?,datetime('now'))").bind(snapshot.file_name,snapshot.file_url||("/api/media/"+snapshot.file_name),snapshot.file_type||"image/jpeg").run();
    }else{return json({success:false,message:"Bu kayıt türü için geri yükleme desteklenmiyor."},409)}
    await logAudit(db,context.request,auth.admin,{action:"version_restored",entity_type:event.entity_type,entity_id:event.entity_id,entity_title:event.entity_title,details:{restored_from_event:eventId}});
    return json({success:true,message:"Önceki sürüm geri yüklendi."});
