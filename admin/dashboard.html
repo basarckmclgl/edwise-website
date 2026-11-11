@@ -1407,11 +1407,12 @@ $("userForm").addEventListener("submit",async event=>{
  }
 
  const body={
+  id:id?Number(id):undefined,
   username,
   email,
   role:"content_admin",
   is_active:!!editingUserActive
- };
+};
 
  if(password)body.password=password;
 
@@ -1473,11 +1474,12 @@ $("usersTable").addEventListener("click",async event=>{
    method:"PUT",
    headers:{"Content-Type":"application/json"},
    body:JSON.stringify({
+    id:Number(id),
     username:user.username,
     email:user.email,
     role:"content_admin",
     is_active:!currentlyActive
-   })
+})
   });
 
   showUsersMessage(result.message||"Kullanıcı yetkisi güncellendi.","success");
