@@ -738,16 +738,17 @@ function escapeHtml(value){
 }
 
 async function loadPublishedContentCounts(){
- const ids=["countPages","countServices","countPosts"];
+ const ids=["countPages","countServices","countPosts","countApplications"];
  ids.forEach(id=>{const el=$(id);if(el)el.textContent="…";});
  try{
-  const [pageData,serviceData,postData]=await Promise.all([
-   api("/api/pages"),api("/api/services"),api("/api/posts")
+  const [pageData,serviceData,postData,applicationData]=await Promise.all([
+   api("/api/pages"),api("/api/services"),api("/api/posts"),api("/api/applications")
   ]);
   const count=(items)=>(items||[]).filter(item=>item.status==="published").length;
   $("countPages").textContent=count(pageData.pages);
   $("countServices").textContent=count(serviceData.services);
   $("countPosts").textContent=count(postData.posts);
+  $("countApplications").textContent=(applicationData.applications||[]).length;
  }catch(error){
   ids.forEach(id=>{const el=$(id);if(el)el.textContent="—";});
  }
