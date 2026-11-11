@@ -504,6 +504,11 @@ td{color:#e8e5f3}
  <div id="siteSettingsMessage"></div>
  <div class="settings-layout">
   <nav class="settings-nav" aria-label="Site ayarları kategorileri">
+   <div class="settings-nav-label">KİŞİSELLEŞTİRME</div>
+   <button type="button" class="settings-nav-item" data-settings-tab="appearance"><span>◐</span><b>Görünüm</b></button>
+   <button type="button" class="settings-nav-item" data-settings-tab="accessibility"><span>♿</span><b>Erişilebilirlik</b></button>
+   <button type="button" class="settings-nav-item" data-settings-tab="language"><span>文</span><b>Dil ve bölge</b></button>
+   <button type="button" class="settings-nav-item" data-settings-tab="privacy"><span>◆</span><b>Gizlilik ve güvenlik</b></button>
    <div class="settings-nav-label">SİTE YÖNETİMİ</div>
    <button type="button" class="settings-nav-item active" data-settings-tab="general"><span>◎</span><b>Genel</b></button>
    <button type="button" class="settings-nav-item" data-settings-tab="contact"><span>♧</span><b>İletişim</b></button>
@@ -515,6 +520,27 @@ td{color:#e8e5f3}
   </nav>
   <div class="settings-main">
    <form id="siteSettingsForm">
+  <div class="panel hidden" data-settings-panel="appearance"><h2>Görünüm</h2><p class="muted">Ziyaretçilerin göreceği varsayılan site görünümünü seçin.</p><div class="form-grid">
+   <div class="field"><label for="ssColorMode">Renk teması</label><select id="ssColorMode"><option value="light">Açık tema</option><option value="dark">Koyu tema</option><option value="system">Cihaz ayarını kullan</option></select></div>
+   <div class="field"><label for="ssAccentPreset">Vurgu rengi</label><select id="ssAccentPreset"><option value="purple">EDWISE Moru</option><option value="blue">Mavi</option><option value="green">Yeşil</option><option value="orange">Turuncu</option></select></div>
+   <div class="field"><label for="ssDensity">Görünüm yoğunluğu</label><select id="ssDensity"><option value="comfortable">Rahat</option><option value="compact">Kompakt</option></select></div>
+  </div></div>
+  <div class="panel hidden" data-settings-panel="accessibility"><h2>Erişilebilirlik</h2><p class="muted">Okunabilirliği ve klavye kullanımını kolaylaştıran hazır seçenekler.</p><div class="form-grid">
+   <div class="field"><label for="ssFontScale">Yazı boyutu</label><select id="ssFontScale"><option value="normal">Normal</option><option value="large">Büyük</option><option value="larger">Çok büyük</option></select></div>
+   <div class="field"><label for="ssContrast">Kontrast</label><select id="ssContrast"><option value="normal">Normal</option><option value="high">Yüksek kontrast</option></select></div>
+   <div class="field"><label for="ssMotion">Hareket efektleri</label><select id="ssMotion"><option value="full">Normal animasyonlar</option><option value="reduced">Hareketi azalt</option></select></div>
+   <div class="field"><label for="ssLinks">Bağlantı görünümü</label><select id="ssLinks"><option value="normal">Normal</option><option value="underlined">Bağlantıların altını çiz</option></select></div>
+  </div></div>
+  <div class="panel hidden" data-settings-panel="language"><h2>Dil ve bölge</h2><div class="form-grid">
+   <div class="field"><label for="ssLanguage">Site dili</label><select id="ssLanguage"><option value="tr">Türkçe</option><option value="en">English</option><option value="ar">العربية</option></select></div>
+   <div class="field"><label for="ssTimezone">Saat dilimi</label><select id="ssTimezone"><option value="Europe/Istanbul">Türkiye (GMT+3)</option><option value="UTC">UTC</option></select></div>
+   <div class="field"><label for="ssDateFormat">Tarih biçimi</label><select id="ssDateFormat"><option value="dd.mm.yyyy">11.11.2026</option><option value="yyyy-mm-dd">2026-11-11</option><option value="mm/dd/yyyy">11/11/2026</option></select></div>
+  </div></div>
+  <div class="panel hidden" data-settings-panel="privacy"><h2>Gizlilik ve güvenlik</h2><div class="form-grid">
+   <div class="field"><label for="ssCookieBanner">Çerez bilgilendirmesi</label><select id="ssCookieBanner"><option value="enabled">Göster</option><option value="disabled">Gösterme</option></select></div>
+   <div class="field"><label for="ssAnalyticsConsent">Analitik çerezleri</label><select id="ssAnalyticsConsent"><option value="consent">Kullanıcı izni al</option><option value="essential">Yalnızca zorunlu çerezler</option></select></div>
+   <div class="field"><label for="ssExternalLinks">Dış bağlantılar</label><select id="ssExternalLinks"><option value="newtab">Yeni sekmede aç</option><option value="sametab">Aynı sekmede aç</option></select></div>
+  </div><p class="muted">Çerez seçenekleri burada tercih olarak saklanır. Gerçek çerez izin yönetimi, çerez banner'ı ve analitik kodu ayrıca bağlanmalıdır.</p></div>
   <div class="panel" data-settings-panel="general"><h2>Genel bilgiler</h2><div class="form-grid">
    <div class="field"><label>Site adı</label><input id="ssSiteName" maxlength="100"></div>
    <div class="field"><label>Kısa slogan</label><input id="ssTagline" maxlength="180"></div>
@@ -1755,7 +1781,7 @@ $("editDesignRecord").addEventListener("click",()=>{
 });
 
 
-const siteSettingFields={siteName:"ssSiteName",tagline:"ssTagline",logoUrl:"ssLogoUrl",faviconUrl:"ssFaviconUrl",language:"ssLanguage",timezone:"ssTimezone",phone:"ssPhone",whatsapp:"ssWhatsapp",email:"ssEmail",address:"ssAddress",hours:"ssHours",mapUrl:"ssMapUrl",seoTitle:"ssSeoTitle",seoDescription:"ssSeoDescription",seoKeywords:"ssSeoKeywords",canonical:"ssCanonical",robots:"ssRobots",instagram:"ssInstagram",facebook:"ssFacebook",youtube:"ssYoutube",linkedin:"ssLinkedin",tiktok:"ssTiktok",gaId:"ssGaId",gsc:"ssGsc",metaPixel:"ssMetaPixel"};
+const siteSettingFields={colorMode:"ssColorMode",accentPreset:"ssAccentPreset",density:"ssDensity",fontScale:"ssFontScale",contrast:"ssContrast",motion:"ssMotion",links:"ssLinks",dateFormat:"ssDateFormat",cookieBanner:"ssCookieBanner",analyticsConsent:"ssAnalyticsConsent",externalLinks:"ssExternalLinks",siteName:"ssSiteName",tagline:"ssTagline",logoUrl:"ssLogoUrl",faviconUrl:"ssFaviconUrl",language:"ssLanguage",timezone:"ssTimezone",phone:"ssPhone",whatsapp:"ssWhatsapp",email:"ssEmail",address:"ssAddress",hours:"ssHours",mapUrl:"ssMapUrl",seoTitle:"ssSeoTitle",seoDescription:"ssSeoDescription",seoKeywords:"ssSeoKeywords",canonical:"ssCanonical",robots:"ssRobots",instagram:"ssInstagram",facebook:"ssFacebook",youtube:"ssYoutube",linkedin:"ssLinkedin",tiktok:"ssTiktok",gaId:"ssGaId",gsc:"ssGsc",metaPixel:"ssMetaPixel"};
 let activeSettingsTab="general";
 function showSettingsTab(tab){activeSettingsTab=tab;document.querySelectorAll("[data-settings-panel]").forEach(p=>p.classList.toggle("hidden",p.dataset.settingsPanel!==tab));document.querySelectorAll("[data-settings-tab]").forEach(b=>b.classList.toggle("active",b.dataset.settingsTab===tab));const search=$("settingsSearch");if(search)search.value="";}
 document.querySelectorAll("[data-settings-tab]").forEach(b=>b.addEventListener("click",()=>showSettingsTab(b.dataset.settingsTab)));
