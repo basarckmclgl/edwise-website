@@ -14,12 +14,13 @@ function makeEditor(textareaId,label){
  [["Kalın","bold"],["İtalik","italic"],["Altı çizili","underline"]],
  [["Paragraf","format:p"],["Başlık","format:h2"],["Alt başlık","format:h3"],["Alıntı","format:blockquote"]],
  [["• Liste","insert:ul"],["1. Liste","insert:ol"],["Bağlantı","link"],["Düğme","button"]],
- [["Görsel URL","image"],["Harita / Konum","map"],["Video URL","video"],["Yatay çizgi","hr"]],
+ [["Görsel Yükle","upload"],["Görsel URL","image"],["Harita / Konum","map"],["Video URL","video"],["Yatay çizgi","hr"]],
  [["Sola","align:left"],["Ortala","align:center"],["Sağa","align:right"],["Metin rengi","color"],["Yazı boyutu","size"]],
  [["↑ Yukarı","up"],["↓ Aşağı","down"],["Bloğu sil","delete"]]
  ];
  groups.forEach(items=>{const g=document.createElement("div");g.className="pb-group";items.forEach(([label,action])=>{const b=document.createElement("button");b.type="button";b.className="editor-tool";b.textContent=label;b.addEventListener("mousedown",e=>e.preventDefault());b.addEventListener("click",()=>run(action));g.appendChild(b)});bar.appendChild(g)});
  wrap.append(bar,canvas,help);source.parentNode.insertBefore(wrap,source);
+ const picker=document.createElement("input");picker.type="file";picker.accept="image/jpeg,image/png,image/webp,image/gif";picker.hidden=true;wrap.append(picker);picker.addEventListener("change",async()=>{const file=picker.files?.[0];if(!file)return;if(file.size>5*1024*1024){alert("Görsel en fazla 5 MB olabilir.");picker.value="";return}try{const fd=new FormData();fd.append("file",file);const res=await fetch("/api/media-upload",{method:"POST",credentials:"same-origin",body:fd});const data=await res.json();if(!res.ok||!data.success)throw Error(data.message||"Görsel yüklenemedi");const url=data.file_url||data.url;if(!url)throw Error("Görsel adresi alınamadı");const figure=document.createElement("figure"),img=document.createElement("img");img.src=url;img.alt=file.name;figure.append(img);const active=selected();active?active.after(figure):canvas.append(figure);sync()}catch(err){alert(err.message)}finally{picker.value=""}});
  const existing=source.value.trim();canvas.innerHTML=existing&&/<[a-z][\s\S]*>/i.test(existing)?existing:existing?existing.split(/\n+/).filter(Boolean).map(x=>"<p>"+escapeText(x)+"</p>").join(""):"<p><br></p>";
  function escapeText(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
  function selected(){let n=getSelection()?.anchorNode;if(n?.nodeType===3)n=n.parentElement;while(n&&n.parentElement!==canvas)n=n.parentElement;return n&&n.parentElement===canvas?n:null}
@@ -35,6 +36,7 @@ function makeEditor(textareaId,label){
  if(a==="delete"&&active)active.remove();
  if(a==="link"){const url=prompt("Bağlantı adresi (https://)");if(url&&safeUrl(url)){document.execCommand("createLink",false,url);sync()}return}
  if(a==="button"){const url=prompt("Düğmenin gideceği adres (https://)");const label=prompt("Düğme metni","Daha fazla bilgi");if(url&&label&&safeUrl(url))add("p",'<a href="'+safeUrl(url)+'">'+escapeText(label)+'</a>');return}
+ if(a==="upload"){picker.click();return}
  if(a==="image"){const url=prompt("Görsel URL adresi");if(url&&safeUrl(url,true)){const img=document.createElement("img");img.src=safeUrl(url,true);img.alt=prompt("Görsel açıklaması","");img.style.maxWidth="100%";img.style.height="auto";const figure=document.createElement("figure");figure.append(img);const active=selected();active?active.after(figure):canvas.append(figure);sync()}return}
  if(a==="map"){const url=prompt("Harita bağlantısı (Google Maps veya OpenStreetMap)");if(url&&safeUrl(url))add("p",'<a href="'+safeUrl(url)+'" target="_blank" rel="noopener">Konumu haritada aç</a>');return}
  if(a==="video"){const url=prompt("Video bağlantısı (YouTube/Vimeo)");if(url&&safeUrl(url))add("p",'<a href="'+safeUrl(url)+'" target="_blank" rel="noopener">Videoyu izle</a>');return}
