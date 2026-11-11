@@ -6,7 +6,7 @@ async function originOk(request){
  try{return !!origin && origin===new URL(request.url).origin;}catch{return false;}
 }
 async function readSettings(DB){
- const result=await DB.prepare("SELECT setting_key, setting_value FROM site_settings WHERE setting_key IN ('draft_theme','live_theme','menu_theme')").all();
+ const result=await DB.prepare("SELECT setting_key, setting_value FROM site_settings WHERE setting_key IN ('draft_theme','live_theme','menu_theme','site_preferences')").all();
  const values={};
  for(const row of result.results||[]){
   try{values[row.setting_key]=JSON.parse(row.setting_value);}catch{values[row.setting_key]={};}
@@ -18,7 +18,7 @@ export async function onRequestGet(context){
   const auth=await requireSuperAdmin(context);
   if(auth.response)return auth.response;
   const values=await readSettings(context.env.DB);
-  return json({success:true,draft:values.draft_theme||{},live:values.live_theme||{},menu:values.menu_theme||{}});
+  return json({success:true,draft:values.draft_theme||{},live:values.live_theme||{},menu:values.menu_theme||{},preferences:values.site_preferences||{}});
  }catch(error){return json({success:false,message:"Tasarım ayarları alınamadı."},500);}
 }
 export async function onRequestPost(context){
@@ -37,6 +37,29 @@ export async function onRequestPost(context){
    if(existing)await context.env.DB.prepare("UPDATE site_settings SET setting_value=?, updated_at=datetime('now') WHERE setting_key=?").bind(serialized,"menu_theme").run();
    else await context.env.DB.prepare("INSERT INTO site_settings (setting_key, setting_value, updated_at) VALUES (?, ?, datetime('now'))").bind("menu_theme",serialized).run();
    return json({success:true,message:"Menü ayarları kaydedildi."});
+  }
+
+  if(body.action==="save_preferences"){
+   const allowed=["siteName","tagline","logoUrl","faviconUrl","language","timezone","phone","whatsapp","email","address","hours","mapUrl","seoTitle","seoDescription","seoKeywords","canonical","robots","instagram","facebook","youtube","linkedin","tiktok","gaId","gsc","metaPixel"];
+   const preferences={};
+   for(const key of allowed){
+    const value=typeof body.preferences?.[key]==="string"?body.preferences[key].trim():"";
+    if(value.length>600)return json({success:false,message:"Bir ayar alanı izin verilen karakter sınırını aşıyor."},400);
+    const urlFields=["logoUrl","faviconUrl","mapUrl","canonical","instagram","facebook","youtube","linkedin","tiktok"];
+    if(urlFields.includes(key)&&value&&!value.startsWith("https://"))return json({success:false,message:"Bağlantılar https:// ile başlamalıdır."},400);
+    if(key==="email"&&value&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))return json({success:false,message:"E-posta adresi geçersiz."},400);
+    if(key==="language"&&!["tr","en"].includes(value))return json({success:false,message:"Dil seçimi geçersiz."},400);
+    if(key==="timezone"&&!["Europe/Istanbul","UTC"].includes(value))return json({success:false,message:"Saat dilimi geçersiz."},400);
+    if(key==="robots"&&!["index,follow","noindex,nofollow"].includes(value))return json({success:false,message:"İndeksleme seçimi geçersiz."},400);
+    if(key==="gaId"&&value&&!/^G-[A-Z0-9]+$/.test(value))return json({success:false,message:"Google Analytics kimliği G- ile başlamalıdır."},400);
+    if(key==="metaPixel"&&value&&!/^\d{5,30}$/.test(value))return json({success:false,message:"Meta Pixel kimliği yalnızca rakamlardan oluşmalıdır."},400);
+    preferences[key]=value;
+   }
+   const serialized=JSON.stringify(preferences);
+   const existing=await context.env.DB.prepare("SELECT id FROM site_settings WHERE setting_key=? LIMIT 1").bind("site_preferences").first();
+   if(existing)await context.env.DB.prepare("UPDATE site_settings SET setting_value=?, updated_at=datetime('now') WHERE setting_key=?").bind(serialized,"site_preferences").run();
+   else await context.env.DB.prepare("INSERT INTO site_settings (setting_key, setting_value, updated_at) VALUES (?, ?, datetime('now'))").bind(serialized,"site_preferences").run();
+   return json({success:true,message:"Site ayarları kaydedildi."});
   }
   const allowed=["primary","accent","surface","text","header","hero","footer","font","buttonRadius","heroEyebrow","heroTitle","heroDescription","heroButton","surfaceTitle","surfaceDescription","footerText"];
   const theme={};
