@@ -1,14 +1,13 @@
 
-document.addEventListener('DOMContentLoaded',function(){
- const button=document.getElementById('load-map');
+document.addEventListener('click',function(event){
+ const button=event.target.closest('#load-map');
  if(!button)return;
- button.addEventListener('click',function(){
-  const box=document.getElementById('map-consent-box');
-  const frame=document.createElement('iframe');
-  frame.src='https://www.google.com/maps?q=EDWISE+Education+%26+Consultancy,+Zülüflühan,+Yeni+7+Sokak+No+13A,+Antakya,+Hatay&output=embed';
-  frame.title='EDWISE konum haritası'; frame.loading='lazy'; frame.referrerPolicy='no-referrer-when-downgrade'; frame.allowFullscreen=true;
-  box.replaceChildren(frame);
- });
+ const box=document.getElementById('map-consent-box');
+ if(!box)return;
+ const frame=document.createElement('iframe');
+ frame.src='https://www.google.com/maps?q=EDWISE+Education+%26+Consultancy,+Zülüflühan,+Yeni+7+Sokak+No+13A,+Antakya,+Hatay&output=embed';
+ frame.title='EDWISE konum haritası';frame.loading='lazy';frame.referrerPolicy='no-referrer-when-downgrade';frame.allowFullscreen=true;
+ box.replaceChildren(frame);
 });
 
 // Çerez tercihleri: her yeni sayfa girişinde görünür; seçiminiz kaydedilir.
@@ -21,8 +20,10 @@ document.addEventListener('DOMContentLoaded',function(){
  document.getElementById('open-cookie-settings')?.addEventListener('click',()=>{if(cookie)cookie.hidden=false;});
 })();
 // Başvuru formu: veriler sunucuda saklanmaz; kullanıcı WhatsApp üzerinden kendisi gönderir.
-document.getElementById('application-form')?.addEventListener('submit',function(e){
- e.preventDefault();const f=new FormData(this);
+document.addEventListener('submit',function(e){
+ const form=e.target;
+ if(!form||form.id!=='application-form')return;
+ e.preventDefault();const f=new FormData(form);
  const lines=['EDWISE EĞİTİM BAŞVURUSU','Ad Soyad: '+f.get('name'),'Telefon: '+f.get('phone'),'E-posta: '+(f.get('email')||'-'),'Program: '+f.get('program'),'Eğitim tercihi: '+f.get('format'),'Uygun zaman: '+(f.get('availability')||'-'),'Not: '+(f.get('note')||'-')];
  const url='https://wa.me/905512501701?text='+encodeURIComponent(lines.join('\n'));
  window.open(url,'_blank','noopener');
