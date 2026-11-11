@@ -48,7 +48,7 @@ export async function onRequestPost(context){
     const urlFields=["logoUrl","faviconUrl","mapUrl","canonical","instagram","facebook","youtube","linkedin","tiktok"];
     if(urlFields.includes(key)&&value&&!value.startsWith("https://"))return json({success:false,message:"Bağlantılar https:// ile başlamalıdır."},400);
     if(key==="email"&&value&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))return json({success:false,message:"E-posta adresi geçersiz."},400);
-    if(key==="language"&&!["tr","en"].includes(value))return json({success:false,message:"Dil seçimi geçersiz."},400);
+    if(key==="language"&&!["tr","en","ar"].includes(value))return json({success:false,message:"Dil seçimi geçersiz."},400);
     if(key==="timezone"&&!["Europe/Istanbul","UTC"].includes(value))return json({success:false,message:"Saat dilimi geçersiz."},400);
     if(key==="robots"&&!["index,follow","noindex,nofollow"].includes(value))return json({success:false,message:"İndeksleme seçimi geçersiz."},400);
     if(key==="gaId"&&value&&!/^G-[A-Z0-9]+$/.test(value))return json({success:false,message:"Google Analytics kimliği G- ile başlamalıdır."},400);
