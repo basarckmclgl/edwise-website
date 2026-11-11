@@ -13,7 +13,11 @@ function json(data, status = 200) {
 
 async function authorize(context) {
   const auth = await requireEditor(context);
-  if (auth.response) return auth.response;
+
+  if (auth.response) {
+    return auth.response;
+  }
+
   return null;
 }
 
@@ -25,10 +29,10 @@ function validSlug(value) {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value);
 }
 
-function errorResponse(message, fallback, status = 500) {
+function errorResponse(error, fallback, status = 500) {
   return json({
     success: false,
-    message: `${fallback}: ${String(message || "Bilinmeyen hata")}`
+    message: `${fallback}: ${String(error?.message || error || "Bilinmeyen hata")}`
   }, status);
 }
 
@@ -43,9 +47,7 @@ async function getServiceSchema(context) {
     throw new Error("services tablosu bulunamadı.");
   }
 
-  const names = new Set(columns.map(column => column.name));
-
-  const required = [
+  const requiredColumns = [
     "id",
     "title",
     "slug",
@@ -58,11 +60,18 @@ async function getServiceSchema(context) {
     "updated_at"
   ];
 
-  const missing = required.filter(name => !names.has(name));
+  const existingColumns = new Set(
+    columns.map(column => column.name)
+  );
 
-  if (missing.length) {
+  const missingColumns = requiredColumns.filter(
+    column => !existingColumns.has(column)
+  );
+
+  if (missingColumns.length) {
     throw new Error(
-      "Eksik veritabanı sütunları: " + missing.join(", ")
+      "Eksik veritabanı sütunları: " +
+      missingColumns.join(", ")
     );
   }
 
@@ -70,14 +79,18 @@ async function getServiceSchema(context) {
 }
 
 function isIntegerPrimaryKey(column) {
-  return (
+  return Boolean(
     column &&
     Number(column.pk) > 0 &&
-    String(column.type || "").toUpperCase() === "INTEGER"
+    String(column.type || "").trim().toUpperCase() === "INTEGER"
   );
 }
 
 function prepareServiceValues(body) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    throw new Error("Geçersiz hizmet verisi.");
+  }
+
   const title = clean(body.title, 200);
   const slug = clean(body.slug, 200).toLowerCase();
   const description = clean(body.description, 2000);
@@ -92,8 +105,12 @@ function prepareServiceValues(body) {
       ? 0
       : Number(body.sort_order);
 
-  if (!title || !slug) {
-    throw new Error("Hizmet başlığı ve bağlantı adı zorunludur.");
+  if (!title) {
+    throw new Error("Hizmet başlığı zorunludur.");
+  }
+
+  if (!slug) {
+    throw new Error("Hizmet bağlantı adı zorunludur.");
   }
 
   if (!validSlug(slug)) {
@@ -103,7 +120,9 @@ function prepareServiceValues(body) {
   }
 
   if (!Number.isFinite(sort_order)) {
-    throw new Error("Sıralama değeri geçerli bir sayı olmalıdır.");
+    throw new Error(
+      "Sıralama değeri geçerli bir sayı olmalıdır."
+    );
   }
 
   return {
@@ -117,14 +136,24 @@ function prepareServiceValues(body) {
   };
 }
 
+// HİZMETLERİ LİSTELE
 export async function onRequestGet(context) {
   const denied = await authorize(context);
   if (denied) return denied;
 
   try {
     const { results } = await context.env.DB.prepare(
-      `SELECT id, title, slug, description, image_url,
-              content, status, sort_order, created_at, updated_at
+      `SELECT
+        id,
+        title,
+        slug,
+        description,
+        image_url,
+        content,
+        status,
+        sort_order,
+        created_at,
+        updated_at
        FROM services
        ORDER BY sort_order ASC, created_at DESC`
     ).all();
@@ -133,14 +162,16 @@ export async function onRequestGet(context) {
       success: true,
       services: results || []
     });
+
   } catch (error) {
     return errorResponse(
-      error?.message,
+      error,
       "Hizmetler alınamadı"
     );
   }
 }
 
+// YENİ HİZMET OLUŞTUR
 export async function onRequestPost(context) {
   const denied = await authorize(context);
   if (denied) return denied;
@@ -150,13 +181,18 @@ export async function onRequestPost(context) {
     const values = prepareServiceValues(body);
 
     const columns = await getServiceSchema(context);
-    const idColumn = columns.find(column => column.name === "id");
 
-    const now = new Date().toISOString();
+    const idColumn = columns.find(
+      column => column.name === "id"
+    );
 
     const integerId = isIntegerPrimaryKey(idColumn);
 
-    const id = integerId ? null : crypto.randomUUID();
+    const now = new Date().toISOString();
+
+    const id = integerId
+      ? null
+      : crypto.randomUUID();
 
     const insertColumns = [
       ...(integerId ? [] : ["id"]),
@@ -184,11 +220,14 @@ export async function onRequestPost(context) {
       now
     ];
 
-    const placeholders = insertColumns.map(() => "?").join(", ");
+    const placeholders = insertColumns
+      .map(() => "?")
+      .join(", ");
 
     const result = await context.env.DB.prepare(
-      `INSERT INTO services (${insertColumns.join(", ")})
-       VALUES (${placeholders})`
+      `INSERT INTO services (
+        ${insertColumns.join(", ")}
+      ) VALUES (${placeholders})`
     ).bind(...insertValues).run();
 
     return json({
@@ -211,12 +250,13 @@ export async function onRequestPost(context) {
     }
 
     return errorResponse(
-      message,
+      error,
       "Hizmet oluşturulamadı"
     );
   }
 }
 
+// HİZMET DÜZENLE
 export async function onRequestPut(context) {
   const denied = await authorize(context);
   if (denied) return denied;
@@ -238,14 +278,15 @@ export async function onRequestPut(context) {
 
     const result = await context.env.DB.prepare(
       `UPDATE services
-       SET title = ?,
-           slug = ?,
-           description = ?,
-           image_url = ?,
-           content = ?,
-           status = ?,
-           sort_order = ?,
-           updated_at = ?
+       SET
+         title = ?,
+         slug = ?,
+         description = ?,
+         image_url = ?,
+         content = ?,
+         status = ?,
+         sort_order = ?,
+         updated_at = ?
        WHERE id = ?`
     ).bind(
       values.title,
@@ -283,12 +324,13 @@ export async function onRequestPut(context) {
     }
 
     return errorResponse(
-      message,
+      error,
       "Hizmet güncellenemedi"
     );
   }
 }
 
+// HİZMET SİL
 export async function onRequestDelete(context) {
   const denied = await authorize(context);
   if (denied) return denied;
@@ -322,7 +364,7 @@ export async function onRequestDelete(context) {
 
   } catch (error) {
     return errorResponse(
-      error?.message,
+      error,
       "Hizmet silinemedi"
     );
   }
