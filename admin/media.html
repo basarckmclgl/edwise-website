@@ -189,6 +189,7 @@ del.addEventListener("click", async () => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
+        file_name: item.file_name,
         file_url: item.file_url
       })
     });
