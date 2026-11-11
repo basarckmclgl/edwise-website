@@ -1,25 +1,275 @@
+
 <!doctype html>
-<html lang="tr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta name="description" content="IELTS, TOEFL, YDS, YÖKDİL, Speaking Club ve eğitim danışmanlığı hizmetlerini EDWISE ile keşfedin."/><title>Eğitim ve Yabancı Dil Hizmetleri | EDWISE</title><link rel="canonical" href="https://edwisedanismanlik.com/pages/hizmetlerimiz.html"/><meta name="robots" content="index, follow, max-image-preview:large"/><meta property="og:type" content="website"/><meta property="og:site_name" content="EDWISE Education &amp; Consultancy"/><meta property="og:title" content="Eğitim ve Yabancı Dil Hizmetleri | EDWISE"/><meta property="og:description" content="IELTS, TOEFL, YDS, YÖKDİL, Speaking Club ve eğitim danışmanlığı hizmetlerini EDWISE ile keşfedin."/><meta property="og:url" content="https://edwisedanismanlik.com/pages/hizmetlerimiz.html"/><meta property="og:image" content="https://edwisedanismanlik.com/assets/images/logo.png"/><meta name="twitter:card" content="summary"/><link href="../assets/css/style.css" rel="stylesheet"/></head><body><div class="topbar">
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta name="description" content="IELTS, TOEFL, YDS, YÖKDİL, Speaking Club ve eğitim danışmanlığı hizmetlerini EDWISE ile keşfedin."/>
+<title>Eğitim ve Yabancı Dil Hizmetleri | EDWISE</title>
+<link rel="canonical" href="https://edwisedanismanlik.com/pages/hizmetlerimiz.html"/>
+<meta name="robots" content="index, follow, max-image-preview:large"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="EDWISE Education &amp; Consultancy"/>
+<meta property="og:title" content="Eğitim ve Yabancı Dil Hizmetleri | EDWISE"/>
+<meta property="og:description" content="IELTS, TOEFL, YDS, YÖKDİL, Speaking Club ve eğitim danışmanlığı hizmetlerini EDWISE ile keşfedin."/>
+<meta property="og:url" content="https://edwisedanismanlik.com/pages/hizmetlerimiz.html"/>
+<meta property="og:image" content="https://edwisedanismanlik.com/assets/images/logo.png"/>
+<meta name="twitter:card" content="summary"/>
+<link href="../assets/css/style.css" rel="stylesheet"/>
+
+<style>
+.service-card-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  display: block;
+}
+.services-loading,
+.services-empty,
+.services-error {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 35px 20px;
+}
+.service-card .service-description {
+  line-height: 1.7;
+}
+.service-card .service-button {
+  display: inline-block;
+  margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
 <span>Hatay · Antakya</span>
 <span>Bilgi ve kayıt: <a href="tel:+905512501701">0551 250 17 01</a></span>
-</div><header>
+</div>
+
+<header>
 <a aria-label="EDWISE ana sayfa" class="brand" href="../index.html">
 <img alt="EDWISE Education &amp; Consultancy" class="logo" src="../assets/images/logo.png"/>
 </a>
+
 <button aria-controls="site-menu" aria-expanded="false" aria-label="Menüyü aç" class="menu" type="button">☰ <span>Menü</span></button>
+
 <nav aria-label="Ana menü" id="site-menu">
-<div aria-label="Dil seçimi" class="dropdown-languages"><span aria-hidden="true" class="language-icon">🌐</span><button aria-label="Türkçe" aria-pressed="true" class="lang-btn active" data-lang="tr" type="button">TR</button><button aria-label="English" aria-pressed="false" class="lang-btn" data-lang="en" type="button">EN</button><button aria-label="العربية" aria-pressed="false" class="lang-btn" data-lang="ar" type="button">AR</button></div><div class="dropdown-divider"></div><a aria-current="page" href="../index.html"><span aria-hidden="true" class="menu-item-icon">🏠</span><span>Ana Sayfa</span></a><a href="hizmetlerimiz.html"><span aria-hidden="true" class="menu-item-icon">🎓</span><span>Hizmetlerimiz</span></a><a href="hakkimizda.html"><span aria-hidden="true" class="menu-item-icon">ℹ️</span><span>Hakkımızda</span></a><a class="menu-apply" href="basvuru.html"><span aria-hidden="true" class="menu-item-icon">📝</span><span>Başvur</span></a><a href="iletisim.html"><span aria-hidden="true" class="menu-item-icon">📍</span><span>İletişim ve Konum</span></a><div class="dropdown-divider"></div><a class="menu-contact" href="iletisim.html"><span aria-hidden="true" class="menu-item-icon">📞</span><span>Bize Ulaşın · WhatsApp</span></a></nav>
-</header><section class="section services single-page-content" data-page="hizmetler" id="hizmetler">
+<div aria-label="Dil seçimi" class="dropdown-languages">
+<span aria-hidden="true" class="language-icon">🌐</span>
+<button aria-label="Türkçe" aria-pressed="true" class="lang-btn active" data-lang="tr" type="button">TR</button>
+<button aria-label="English" aria-pressed="false" class="lang-btn" data-lang="en" type="button">EN</button>
+<button aria-label="العربية" aria-pressed="false" class="lang-btn" data-lang="ar" type="button">AR</button>
+</div>
+
+<div class="dropdown-divider"></div>
+
+<a href="../index.html"><span aria-hidden="true" class="menu-item-icon">🏠</span><span>Ana Sayfa</span></a>
+<a aria-current="page" href="hizmetlerimiz.html"><span aria-hidden="true" class="menu-item-icon">🎓</span><span>Hizmetlerimiz</span></a>
+<a href="hakkimizda.html"><span aria-hidden="true" class="menu-item-icon">ℹ️</span><span>Hakkımızda</span></a>
+<a class="menu-apply" href="basvuru.html"><span aria-hidden="true" class="menu-item-icon">📝</span><span>Başvur</span></a>
+<a href="iletisim.html"><span aria-hidden="true" class="menu-item-icon">📍</span><span>İletişim ve Konum</span></a>
+
+<div class="dropdown-divider"></div>
+
+<a class="menu-contact" href="iletisim.html"><span aria-hidden="true" class="menu-item-icon">📞</span><span>Bize Ulaşın · WhatsApp</span></a>
+</nav>
+</header>
+
+<main>
+<section class="section services single-page-content" data-page="hizmetler" id="hizmetler">
+
 <div class="section-head">
 <div class="eyebrow">Neler sunuyoruz?</div>
 <h2>Hedeflerine uygun eğitim desteği</h2>
 <p>Akademik ve kişisel hedeflerini planlı, sürdürülebilir ve sana uygun bir yol haritasıyla destekliyoruz.</p>
 </div>
-<div class="cards">
-<article class="card"><div class="card-icon">✍</div><h3>IELTS · TOEFL</h3><p>Uluslararası İngilizce yeterlilik sınavlarına yönelik hedef odaklı hazırlık desteği.</p><a href="ielts.html">IELTS ayrıntıları</a> · <a href="toefl.html">TOEFL ayrıntıları</a></article>
-<article class="card"><div class="card-icon">📚</div><h3>YDS · YÖKDİL</h3><p>Akademik ve mesleki hedeflerin için sınav hazırlık sürecine yönelik eğitim.</p><a href="yds.html">YDS ayrıntıları</a> · <a href="yokdil.html">YÖKDİL ayrıntıları</a></article>
-<article class="card"><div class="card-icon">🌍</div><h3>Education Consultancy</h3><p>Eğitim hedeflerini belirleme, seçenekleri değerlendirme ve süreç planlama desteği.</p><a href="egitim-danismanligi.html">Ayrıntıları incele</a></article>
-<article class="card"><div class="card-icon">💬</div><h3>Speaking Club</h3><p>İngilizce konuşma pratiğini geliştirebileceğin, iletişim odaklı pratik ortamı.</p><a href="speaking-club.html">Ayrıntıları incele</a></article>
-<article class="card"><div class="card-icon">🎯</div><h3>Coaching &amp; Mentoring</h3><p>Hedef belirleme, motivasyon ve kişisel gelişim yolculuğunda rehberlik.</p><a href="coaching-mentoring.html">Ayrıntıları incele</a></article>
+
+<div class="cards" id="services-list" aria-live="polite" aria-busy="true">
+<p class="services-loading">Hizmetler yükleniyor...</p>
 </div>
-</section><footer><strong>EDWISE</strong><span>Education &amp; Consultancy · Hatay, Türkiye</span><span>© 2026 EDWISE. Tüm hakları saklıdır.</span><nav aria-label="Yasal bilgilendirme bağlantıları" class="legal-links"><a href="yasal-bilgilendirme.html">KVKK Aydınlatma Metni</a><a href="yasal-bilgilendirme.html">Gizlilik</a><a href="yasal-bilgilendirme.html">Çerez Politikası</a><a href="yasal-bilgilendirme.html">Hizmet Koşulları</a><a href="yasal-bilgilendirme.html">Marka Bilgilendirmesi</a><button class="footer-cookie-settings" id="open-cookie-settings" type="button">Çerez Tercihleri</button></nav></footer><a class="whatsapp-float" href="https://wa.me/905512501701" target="_blank" rel="noopener" aria-label="WhatsApp üzerinden EDWISE ile iletişime geç">WhatsApp ↗</a><div aria-label="Çerez tercihleri" class="cookie-banner" hidden="" id="cookie-banner" role="region"><p><strong>Çerez tercihleri</strong><br/>Sitede gerekli teknik depolama kullanılabilir. İsteğe bağlı analiz ve reklam çerezleri yalnızca izin vermeniz hâlinde etkinleştirilir. Tercihinizi seçebilirsiniz.</p><div class="cookie-actions"><button id="cookie-essential" type="button">Yalnızca gerekli</button><button class="cookie-accept" id="cookie-accept" type="button">Tüm çerezlere izin ver</button></div></div><script defer="True" src="../assets/js/site.js"></script><script defer="True" src="../assets/js/consent-and-forms.js"></script></body></html>
+
+</section>
+</main>
+
+<footer>
+<strong>EDWISE</strong>
+<span>Education &amp; Consultancy · Hatay, Türkiye</span>
+<span>© 2026 EDWISE. Tüm hakları saklıdır.</span>
+
+<nav aria-label="Yasal bilgilendirme bağlantıları" class="legal-links">
+<a href="yasal-bilgilendirme.html">KVKK Aydınlatma Metni</a>
+<a href="yasal-bilgilendirme.html">Gizlilik</a>
+<a href="yasal-bilgilendirme.html">Çerez Politikası</a>
+<a href="yasal-bilgilendirme.html">Hizmet Koşulları</a>
+<a href="yasal-bilgilendirme.html">Marka Bilgilendirmesi</a>
+<button class="footer-cookie-settings" id="open-cookie-settings" type="button">Çerez Tercihleri</button>
+</nav>
+</footer>
+
+<a class="whatsapp-float" href="https://wa.me/905512501701" target="_blank" rel="noopener" aria-label="WhatsApp üzerinden EDWISE ile iletişime geç">WhatsApp ↗</a>
+
+<div aria-label="Çerez tercihleri" class="cookie-banner" hidden="" id="cookie-banner" role="region">
+<p><strong>Çerez tercihleri</strong><br/>Sitede gerekli teknik depolama kullanılabilir. İsteğe bağlı analiz ve reklam çerezleri yalnızca izin vermeniz hâlinde etkinleştirilir. Tercihinizi seçebilirsiniz.</p>
+<div class="cookie-actions">
+<button id="cookie-essential" type="button">Yalnızca gerekli</button>
+<button class="cookie-accept" id="cookie-accept" type="button">Tüm çerezlere izin ver</button>
+</div>
+</div>
+
+<script defer src="../assets/js/site.js"></script>
+<script defer src="../assets/js/consent-and-forms.js"></script>
+
+<script>
+(function () {
+  "use strict";
+
+  const container = document.getElementById("services-list");
+
+  function createElement(tag, className, text) {
+    const element = document.createElement(tag);
+
+    if (className) {
+      element.className = className;
+    }
+
+    if (text !== undefined) {
+      element.textContent = text;
+    }
+
+    return element;
+  }
+
+  function safeImageUrl(value) {
+    if (!value) return "";
+
+    try {
+      const url = new URL(value, window.location.origin);
+
+      if (url.protocol !== "https:" && url.protocol !== "http:") {
+        return "";
+      }
+
+      return url.href;
+    } catch {
+      return "";
+    }
+  }
+
+  function renderServices(services) {
+    container.replaceChildren();
+
+    if (!services.length) {
+      const message = createElement(
+        "p",
+        "services-empty",
+        "Şu anda yayımlanmış hizmet bulunmuyor. Yeni hizmetlerimiz yakında burada olacak."
+      );
+
+      container.appendChild(message);
+      return;
+    }
+
+    services.forEach(function (service) {
+      const card = createElement("article", "card service-card");
+
+      const imageUrl = safeImageUrl(service.image_url);
+
+      if (imageUrl) {
+        const image = createElement("img", "service-card-image");
+        image.src = imageUrl;
+        image.alt = service.title || "EDWISE hizmet görseli";
+        image.loading = "lazy";
+        image.onerror = function () {
+          image.remove();
+        };
+
+        card.appendChild(image);
+      } else {
+        card.appendChild(
+          createElement("div", "card-icon", "🎓")
+        );
+      }
+
+      card.appendChild(
+        createElement("h3", "", service.title || "EDWISE Hizmeti")
+      );
+
+      const description =
+        service.description ||
+        service.content ||
+        "Bu hizmet hakkında ayrıntılı bilgi almak için bizimle iletişime geçebilirsiniz.";
+
+      card.appendChild(
+        createElement("p", "service-description", description)
+      );
+
+      const button = createElement(
+        "a",
+        "btn service-button",
+        "Bilgi Al"
+      );
+
+      const message = "Merhaba, " +
+        (service.title || "EDWISE hizmeti") +
+        " hakkında bilgi almak istiyorum.";
+
+      button.href =
+        "https://wa.me/905512501701?text=" +
+        encodeURIComponent(message);
+
+      button.target = "_blank";
+      button.rel = "noopener noreferrer";
+
+      card.appendChild(button);
+      container.appendChild(card);
+    });
+  }
+
+  async function loadServices() {
+    try {
+      const response = await fetch("/api/public-services", {
+        method: "GET",
+        headers: {
+          "Accept": "application/json"
+        },
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        throw new Error("Hizmetler sunucudan alınamadı.");
+      }
+
+      const data = await response.json();
+
+      if (!data.success || !Array.isArray(data.services)) {
+        throw new Error("Hizmet verileri beklenen biçimde değil.");
+      }
+
+      renderServices(data.services);
+
+    } catch (error) {
+      console.error("EDWISE hizmet yükleme hatası:", error);
+
+      container.replaceChildren(
+        createElement(
+          "p",
+          "services-error",
+          "Hizmetler şu anda yüklenemiyor. Lütfen daha sonra tekrar deneyin."
+        )
+      );
+
+    } finally {
+      container.setAttribute("aria-busy", "false");
+    }
+  }
+
+  loadServices();
+})();
+</script>
+
+</body>
+</html>
