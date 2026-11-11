@@ -194,7 +194,7 @@ td{color:#e8e5f3}
      <button class="primary" type="button" id="editDesignRecord">Seçili İçeriği Düzenle</button>
      <a class="btn" id="openDesignPage" href="/" target="_blank" rel="noopener" style="text-decoration:none">Sayfayı Yeni Sekmede Aç ↗</a>
     </div>
-    <p id="designCenterMessage" class="muted">Seçtiğiniz sayfanın gerçek görünümü aşağıda açılır. Yukarıdaki tasarım ayarları bu önizlemeye uygulanır.</p>
+    <p id="designCenterMessage" class="muted">Önizlemede metinlerin üzerine tıklayıp doğrudan yazabilirsiniz. Renk ve görünüm ayarları anında uygulanır; metin değişiklikleri taslak olarak kaydedilir.</p>
    </div>
    <div id="siteDesignSettings" data-superadmin>
     <div class="section-head"><div><h2>Site Genel Tasarımı ve Menü Yapısı</h2><p>Değişiklikleri seçili sayfanın gerçek önizlemesinde gör. Taslaklar ziyaretçilere yansımaz.</p></div></div>
@@ -244,7 +244,7 @@ td{color:#e8e5f3}
     </div>
    </div>
    <div class="panel" style="padding:10px">
-    <iframe id="designPreviewFrame" title="EDWISE gerçek sayfa önizlemesi" src="/" loading="lazy" style="display:block;width:100%;height:980px;min-height:80vh;border:1px solid #d8d5df;border-radius:8px;background:#fff"></iframe>
+    <iframe id="designPreviewFrame" title="EDWISE gerçek sayfa önizlemesi — metinleri düzenlemek için tıklayın" src="/" loading="lazy" style="display:block;width:100%;height:980px;min-height:80vh;border:1px solid #d8d5df;border-radius:8px;background:#fff"></iframe>
    </div>
   </section>
 
@@ -1657,6 +1657,7 @@ async function loadDesignRecords(){
  }catch(e){designRecordSelect.innerHTML='<option value="">İçerikler yüklenemedi</option>';$("designCenterMessage").textContent=e.message}
 }
 designPageSelect.addEventListener("change",()=>{refreshDesignFrame();loadDesignRecords()});
+ designRecordSelect.addEventListener("change",()=>enablePreviewTextEditing());
 $("refreshDesignPreview").addEventListener("click",refreshDesignFrame);
 $("editDesignRecord").addEventListener("click",()=>{
  const value=designRecordSelect.value;
