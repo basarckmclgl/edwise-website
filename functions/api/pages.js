@@ -75,6 +75,37 @@ export async function onRequestPost(context) {
 
     const data = await context.request.json();
 
+    if (data.action === "import_static_pages") {
+      const marker = await context.env.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key = ? LIMIT 1").bind("static_pages_migrated_v1").first();
+      if (marker?.setting_value === "done") {
+        return json({ success: true, message: "Sabit sayfalar daha önce CMS'ye aktarılmış.", imported: 0, alreadyImported: true });
+      }
+      const records = Array.isArray(data.pages) ? data.pages : [];
+      if (!records.length || records.length > 30) {
+        return json({ success: false, message: "Aktarılacak sayfa listesi geçersiz." }, 400);
+      }
+      let imported = 0;
+      for (const page of records) {
+        const title = String(page.title || "").trim();
+        const slug = makeSlug(page.slug);
+        const content = String(page.content || "");
+        const status = page.status === "published" ? "published" : "draft";
+        if (!title || !slug || !content) continue;
+        const existing = await context.env.DB.prepare("SELECT id FROM pages WHERE slug = ? LIMIT 1").bind(slug).first();
+        if (existing) {
+          await context.env.DB.prepare(`UPDATE pages SET title=?, content=?, meta_title=?, meta_description=?, status=?, updated_at=datetime('now') WHERE id=?`)
+            .bind(title, content, String(page.meta_title || "").slice(0, 200), String(page.meta_description || "").slice(0, 500), status, existing.id).run();
+        } else {
+          await context.env.DB.prepare(`INSERT INTO pages (title,slug,content,meta_title,meta_description,status,created_at,updated_at) VALUES (?,?,?,?,?,?,datetime('now'),datetime('now'))`)
+            .bind(title, slug, content, String(page.meta_title || "").slice(0, 200), String(page.meta_description || "").slice(0, 500), status).run();
+        }
+        imported++;
+      }
+      await context.env.DB.prepare(`INSERT INTO site_settings (setting_key,setting_value,updated_at) VALUES (?,?,datetime('now')) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value,updated_at=datetime('now')`)
+        .bind("static_pages_migrated_v1", "done").run();
+      return json({ success: true, message: imported + " sabit sayfa CMS'ye aktarıldı.", imported });
+    }
+
     const title = String(data.title || "").trim();
     const slug = makeSlug(data.slug || title);
     const content = String(data.content || "");
