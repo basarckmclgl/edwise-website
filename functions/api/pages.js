@@ -1,5 +1,6 @@
 
 import { requireEditor } from "./_auth.js";
+import { logAudit } from "./_audit.js";
 
 function json(data, status = 200) {
   return Response.json(data, { status });
@@ -96,7 +97,7 @@ export async function onRequestPost(context) {
         const content = String(page.content || "");
         const status = page.status === "published" ? "published" : "draft";
         if (!title || !slug || !content) continue;
-        const existing = await context.env.DB.prepare("SELECT id FROM pages WHERE slug = ? LIMIT 1").bind(slug).first();
+        const existing = await context.env.DB.prepare("SELECT * FROM pages WHERE slug = ? LIMIT 1").bind(slug).first();
         if (existing) {
           await context.env.DB.prepare(`UPDATE pages SET title=?, content=?, meta_title=?, meta_description=?, status=?, updated_at=datetime('now') WHERE id=?`)
             .bind(title, content, String(page.meta_title || "").slice(0, 200), String(page.meta_description || "").slice(0, 500), status, existing.id).run();
@@ -104,6 +105,8 @@ export async function onRequestPost(context) {
           await context.env.DB.prepare(`INSERT INTO pages (title,slug,content,meta_title,meta_description,status,created_at,updated_at) VALUES (?,?,?,?,?,?,datetime('now'),datetime('now'))`)
             .bind(title, slug, content, String(page.meta_title || "").slice(0, 200), String(page.meta_description || "").slice(0, 500), status).run();
         }
+        const after = await context.env.DB.prepare("SELECT * FROM pages WHERE slug = ? LIMIT 1").bind(slug).first();
+        await logAudit(context.env.DB,context.request,auth.admin,{action:existing?"page_import_updated":"page_imported",entity_type:"page",entity_id:after?.id,entity_title:title,details:{before:existing,after}});
         imported++;
       }
       await context.env.DB.prepare(`INSERT INTO site_settings (setting_key,setting_value,updated_at) VALUES (?,?,datetime('now')) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value,updated_at=datetime('now')`)
@@ -142,6 +145,8 @@ export async function onRequestPost(context) {
       title, slug, content, metaTitle, metaDescription, status
     ).run();
 
+    const created = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(result.meta.last_row_id).first();
+    await logAudit(context.env.DB,context.request,auth.admin,{action:status==="published"?"page_created_published":"page_created",entity_type:"page",entity_id:result.meta.last_row_id,entity_title:title,details:{before:null,after:created}});
     return json({
       success: true,
       message: "Sayfa oluşturuldu.",
@@ -179,6 +184,9 @@ export async function onRequestPut(context) {
       return json({ success: false, message: "Geçersiz yayın durumu." }, 400);
     }
 
+    const before = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(id).first();
+    if (!before) return json({ success: false, message: "Sayfa bulunamadı." }, 404);
+
     const duplicate = await context.env.DB.prepare(
       "SELECT id FROM pages WHERE slug = ? AND id != ? LIMIT 1"
     ).bind(slug, id).first();
@@ -200,6 +208,9 @@ export async function onRequestPut(context) {
       return json({ success: false, message: "Sayfa bulunamadı." }, 404);
     }
 
+    const after = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(id).first();
+    const action = before.status !== status ? (status==="published"?"page_published":"page_unpublished") : "page_updated";
+    await logAudit(context.env.DB,context.request,auth.admin,{action,entity_type:"page",entity_id:id,entity_title:title,details:{before,after}});
     return json({ success: true, message: "Sayfa güncellendi." });
 
   } catch (error) {
@@ -222,6 +233,8 @@ export async function onRequestDelete(context) {
       return json({ success: false, message: "Geçerli bir sayfa numarası belirtilmedi." }, 400);
     }
 
+    const before = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(id).first();
+    if (!before) return json({ success: false, message: "Sayfa bulunamadı." }, 404);
     const result = await context.env.DB.prepare(
       "DELETE FROM pages WHERE id = ?"
     ).bind(id).run();
@@ -230,6 +243,7 @@ export async function onRequestDelete(context) {
       return json({ success: false, message: "Sayfa bulunamadı." }, 404);
     }
 
+    await logAudit(context.env.DB,context.request,auth.admin,{action:"page_deleted",entity_type:"page",entity_id:id,entity_title:before.title,details:{before,after:null}});
     return json({ success: true, message: "Sayfa silindi." });
 
   } catch (error) {
