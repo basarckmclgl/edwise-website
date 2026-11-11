@@ -141,8 +141,8 @@ async function getGoogleAnalytics(env, startDate, endDate) {
 }
 
 async function getCloudflare(env, startDate, endDate) {
-  if (!env.CF_ACCOUNT_ID || !env.CF_ZONE_TAG || !env.CF_ANALYTICS_API_TOKEN) {
-    return { configured: false, error: "Cloudflare bağlantısı için CF_ACCOUNT_ID, CF_ZONE_TAG ve CF_ANALYTICS_API_TOKEN ayarlanmalı." };
+  if (!env.CF_ZONE_TAG || !env.CF_ANALYTICS_API_TOKEN) {
+    return { configured: false, error: "Cloudflare bağlantısı için CF_ZONE_TAG ve CF_ANALYTICS_API_TOKEN ayarlanmalı." };
   }
   const query = `query ZoneTraffic($zone: String!, $from: Date!, $to: Date!) {
     viewer {
