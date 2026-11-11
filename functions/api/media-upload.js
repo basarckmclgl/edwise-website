@@ -71,7 +71,7 @@ export async function onRequestPost(context) {
     const extension = ALLOWED_TYPES[file.type];
     const filename = `${crypto.randomUUID()}.${extension}`;
     const path = `media/${filename}`;
-    const url = `https://raw.githubusercontent.com/${repo}/main/${path}`;
+    const url = `/api/media/${filename}`;
 
     const bytes = new Uint8Array(await file.arrayBuffer());
 
