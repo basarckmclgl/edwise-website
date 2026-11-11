@@ -256,8 +256,7 @@ export async function onRequestPut(context) {
         published_at = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
-    `      WHERE id = ?
-    `).bind(
+      `).bind(
       post.title,
       post.slug,
       post.excerpt,
