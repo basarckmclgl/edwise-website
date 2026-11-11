@@ -111,6 +111,7 @@ export async function onRequestPost(context) {
       `).bind(filename, url, file.type).run();
 
     } catch (dbError) {
+      await logAudit(db,context.request,auth.admin,{action:"media_uploaded",entity_type:"media",entity_id:filename,entity_title:filename,details:{before:null,after:{file_name:filename,file_url:url,file_type:file.type},database_record_warning:true}});
       return json({
         success: true,
         warning: "Görsel GitHub'a yüklendi ancak veritabanı kaydı başarısız.",
