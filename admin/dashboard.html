@@ -124,7 +124,7 @@ td{color:#e8e5f3}
  <div class="logo">EDWISE<small>CONTENT MANAGEMENT SYSTEM</small></div>
  <div class="menu-label">ANA MENÜ</div>
  <button class="nav active" data-page="overview"><span class="ico">▦</span><span>Genel Bakış</span></button>
- <button class="nav" data-page="designcenter"><span class="ico">▣</span><span>Sayfa Tasarım Merkezi</span></button>
+ <button class="nav" data-page="designcenter"><span class="ico">▣</span><span>Site Tasarım Merkezi</span></button>
 
  <div class="menu-label">İÇERİK YÖNETİMİ</div>
  <button class="nav" data-page="pages"><span class="ico">▤</span><span>Sayfa Yönetimi</span></button>
@@ -182,7 +182,7 @@ td{color:#e8e5f3}
 
   <section id="designcenter" class="hidden">
    <div class="section-head">
-    <div><h2>Sayfa Tasarım Merkezi</h2><p>Önizlemek istediğiniz site sayfasını seçin. Gerçek site görünümü aşağıda açılır.</p></div>
+    <div><h2>Site Tasarım Merkezi</h2><p>Önizlemek istediğiniz site sayfasını seçin. Gerçek site görünümü aşağıda açılır.</p></div>
    </div>
    <div class="panel">
     <div class="form-grid">
@@ -610,7 +610,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
   n.classList.toggle("active",n.dataset.page===name);
  });
 
- $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="designcenter"?"Sayfa Tasarım Merkezi":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":otherModules[name]?.[0]||"";
+ $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="designcenter"?"Site Tasarım Merkezi":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":otherModules[name]?.[0]||"";
 
  if(name==="designcenter")loadDesignRecords();
  if(name==="pages")loadPages();
