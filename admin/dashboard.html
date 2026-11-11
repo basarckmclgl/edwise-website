@@ -212,31 +212,26 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
     <div class="stat" data-superadmin><span>Başvurular</span><h2 id="countApplications">—</h2><p>Kayıtlı başvurular</p></div>
    </div>
 
-   <section class="analytics-wrap hidden" id="analyticsOverview" data-superadmin>
+   <section class="analytics-wrap" id="analyticsOverview" data-superadmin>
     <div class="section-head">
-     <div><h2>Google &amp; Cloudflare Analizleri</h2><p>Son 30 günlük ziyaretçi davranışları ve site trafiği</p></div>
+     <div><h2>Cloudflare Site Analizleri</h2><p>Son 30 günlük trafik ve ziyaretçi verileri</p></div>
      <div class="actions" style="margin:0"><button class="btn" id="refreshAnalytics">↻ Verileri Yenile</button><span id="analyticsUpdated" class="muted">Henüz yüklenmedi</span></div>
     </div>
-    <div id="analyticsMessage" class="message">Analiz verileri yükleniyor...</div>
+    <div id="analyticsMessage" class="message">Cloudflare verileri yükleniyor...</div>
     <div class="grid analytics-stats">
-     <div class="stat"><span>Tekil Ziyaretçi</span><h2 id="anUsers">—</h2><p>Google Analytics</p></div>
-     <div class="stat"><span>Oturum</span><h2 id="anSessions">—</h2><p>Google Analytics</p></div>
-     <div class="stat"><span>Sayfa Görüntüleme</span><h2 id="anViews">—</h2><p>Google Analytics</p></div>
-    </div>
-    <div class="grid analytics-stats" style="margin-top:14px">
-     <div class="stat"><span>Etkileşim Etkinlikleri</span><h2 id="anEvents">—</h2><p>Google Analytics eventCount</p></div>
-     <div class="stat"><span>Tıklama / Form Etkinlikleri</span><h2 id="anClicks">—</h2><p>GA4 etkinlik adlarına göre</p></div>
-     <div class="stat"><span>Kaydırma Etkinlikleri</span><h2 id="anScrolls">—</h2><p>GA4 scroll etkinliği</p></div>
+     <div class="stat"><span>Günlük Tekil IP Toplamı</span><h2 id="cfUnique">—</h2><p>Günlük tekil IP değerleri toplamı; 30 günlük tekil kişi değildir</p></div>
+     <div class="stat"><span>Toplam İstek</span><h2 id="cfRequests">—</h2><p>Cloudflare üzerinden geçen HTTP istekleri</p></div>
+     <div class="stat"><span>Sayfa Görüntüleme</span><h2 id="cfPageViews">—</h2><p>Cloudflare HTML sayfa görüntüleme sayısı</p></div>
+     <div class="stat"><span>Ülke Sayısı</span><h2 id="cfCountryCount">—</h2><p>Trafik alınan ülke ve bölgeler</p></div>
     </div>
     <div class="grid analytics-charts" style="grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);margin-top:16px">
-     <div class="panel"><h3>Günlük trafik ve görüntüleme</h3><p class="muted">Google Analytics oturum ve sayfa görüntüleme</p><canvas id="analyticsDailyChart" height="260" style="width:100%;height:260px"></canvas></div>
-     <div class="panel"><h3>Ziyaretçilerin ülkelere dağılımı</h3><p class="muted">Oturum bazında ilk 7 ülke</p><div id="analyticsDonut" class="analytics-donut"><div class="analytics-donut-center"><strong id="analyticsCountryTotal">—</strong><small>Oturum</small></div></div><div id="analyticsLegend" class="analytics-legend"></div></div>
+     <div class="panel"><h3>Günlük trafik ve sayfa görüntüleme</h3><p class="muted">Cloudflare günlük istek ve HTML sayfa görüntüleme sayıları</p><canvas id="analyticsDailyChart" height="260" style="width:100%;height:260px"></canvas></div>
+     <div class="panel"><h3>Trafiğin ülkelere dağılımı</h3><p class="muted">İstek sayısına göre ilk 7 ülke</p><div id="analyticsDonut" class="analytics-donut"><div class="analytics-donut-center"><strong id="analyticsCountryTotal">—</strong><small>İstek</small></div></div><div id="analyticsLegend" class="analytics-legend"></div></div>
     </div>
     <div class="grid analytics-charts" style="grid-template-columns:minmax(0,1.2fr) minmax(280px,1fr);margin-top:16px">
-     <div class="panel"><h3>Ülkelere göre trafik</h3><p class="muted">Google Analytics oturum ve görüntüleme / Cloudflare istek sayısı ayrı sütunlarda</p><div class="table-wrap"><table style="min-width:500px"><thead><tr><th>Ülke</th><th>Oturum</th><th>Görüntüleme</th><th>Tıklama</th><th>Kaydırma</th><th>CF İstek</th></tr></thead><tbody id="analyticsCountryTable"><tr><td colspan="6">Veriler bekleniyor...</td></tr></tbody></table></div></div>
-     <div class="panel"><h3>En çok görüntülenen sayfalar</h3><p class="muted">Google Analytics pagePath raporu</p><div class="table-wrap"><table style="min-width:280px"><thead><tr><th>Sayfa</th><th>Görüntüleme</th></tr></thead><tbody id="analyticsPagesTable"><tr><td colspan="2">Veriler bekleniyor...</td></tr></tbody></table></div></div>
+     <div class="panel"><h3>Ülkelere göre trafik</h3><p class="muted">Cloudflare istek ve HTML sayfa görüntüleme sayıları</p><div class="table-wrap"><table style="min-width:360px"><thead><tr><th>Ülke</th><th>İstek</th><th>Sayfa Görüntüleme</th></tr></thead><tbody id="analyticsCountryTable"><tr><td colspan="3">Veriler bekleniyor...</td></tr></tbody></table></div></div>
+     <div class="panel"><h3>En çok istek alan sayfalar</h3><p class="muted">Cloudflare sayfa yolu raporu</p><div class="table-wrap"><table style="min-width:280px"><thead><tr><th>Sayfa</th><th>İstek</th></tr></thead><tbody id="analyticsPagesTable"><tr><td colspan="2">Veriler bekleniyor...</td></tr></tbody></table></div></div>
     </div>
-    <p class="muted" style="margin-top:14px">Not: Tıklama ve kaydırma sayıları, GA4 üzerinde ilgili etkinlikler kurulmuşsa görünür. Cloudflare istek sayısı sayfa görüntüleme veya gerçek kişi sayısı ile aynı değildir.</p>
    </section>
 
    <div class="section-head">
@@ -1121,58 +1116,44 @@ async function checkSession(){
 }
 
 
-// Google Analytics + Cloudflare overview dashboard
+// Cloudflare analytics dashboard
 const analyticsColors=["#8055ed","#e79a43","#39b995","#4f9de8","#d86f9d","#9a8bcb","#a6b45b"];
-function analyticsNumber(value){return Number(value||0).toLocaleString("tr-TR");}
+function analyticsNumber(v){return Number(v||0).toLocaleString("tr-TR");}
 function drawAnalyticsBars(rows){
  const canvas=$("analyticsDailyChart");if(!canvas)return;
- const width=Math.max(320,canvas.clientWidth||600),height=260,dpr=window.devicePixelRatio||1;
- canvas.width=width*dpr;canvas.height=height*dpr;
+ const width=Math.max(320,canvas.clientWidth||600),height=260,dpr=window.devicePixelRatio||1;canvas.width=width*dpr;canvas.height=height*dpr;
  const ctx=canvas.getContext("2d");ctx.scale(dpr,dpr);ctx.clearRect(0,0,width,height);
- const left=42,right=12,top=12,bottom=36,plotW=width-left-right,plotH=height-top-bottom;
- const max=Math.max(1,...rows.map(r=>Math.max(r.sessions||0,r.pageViews||0)));
- ctx.font="10px Arial";ctx.fillStyle="#aaa7c0";ctx.strokeStyle="#39364c";ctx.lineWidth=1;
+ const left=42,right=12,top=12,bottom=36,plotW=width-left-right,plotH=height-top-bottom,max=Math.max(1,...rows.map(r=>Math.max(r.requests||0,r.pageViews||0)));
+ ctx.font="10px Arial";ctx.fillStyle="#aaa7c0";ctx.strokeStyle="#39364c";
  for(let i=0;i<5;i++){const y=top+plotH*i/4;ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(width-right,y);ctx.stroke();ctx.fillText(Math.round(max*(1-i/4)).toLocaleString("tr-TR"),3,y+3);}
  const step=plotW/Math.max(rows.length,1),barW=Math.max(2,Math.min(12,step*.32));
- rows.forEach((r,i)=>{const x=left+i*step+step/2;const a=(r.sessions||0)/max*plotH,b=(r.pageViews||0)/max*plotH;ctx.fillStyle="#8055ed";ctx.fillRect(x-barW-1,top+plotH-a,barW,a);ctx.fillStyle="#39b995";ctx.fillRect(x+1,top+plotH-b,barW,b);if(i%Math.max(1,Math.ceil(rows.length/7))===0){ctx.fillStyle="#aaa7c0";ctx.fillText(String(r.date||"").slice(5).replace("-","/"),x-15,height-12);}});
+ rows.forEach((r,i)=>{const x=left+i*step+step/2,a=(r.requests||0)/max*plotH,b=(r.pageViews||0)/max*plotH;ctx.fillStyle="#8055ed";ctx.fillRect(x-barW-1,top+plotH-a,barW,a);ctx.fillStyle="#39b995";ctx.fillRect(x+1,top+plotH-b,barW,b);if(i%Math.max(1,Math.ceil(rows.length/7))===0){ctx.fillStyle="#aaa7c0";ctx.fillText(String(r.date||"").slice(5).replace("-","/"),x-15,height-12);}});
 }
 function renderAnalytics(data){
- window._edwiseAnalyticsData=data;
- const g=data.google||{},cf=data.cloudflare||{},t=g.totals||{},ct=cf.totals||{};
- $("anUsers").textContent=g.configured?analyticsNumber(t.users):"—";
- $("anSessions").textContent=g.configured?analyticsNumber(t.sessions):"—";
- $("anViews").textContent=g.configured?analyticsNumber(t.pageViews):"—";
- $("anEvents").textContent=g.configured?analyticsNumber(t.events):"—";
- $("anClicks").textContent=g.configured?analyticsNumber(t.clicks):"—";
- $("anScrolls").textContent=g.configured?analyticsNumber(t.scrolls):"—";
- $("anRequests").textContent=cf.configured?analyticsNumber(ct.requests):"—";
- $("anUniqueCF").textContent=cf.configured?analyticsNumber(ct.uniqueVisitors):"—";
- const errors=[];if(g.error)errors.push("Google Analytics: "+g.error);if(cf.error)errors.push("Cloudflare: "+cf.error);
- $("analyticsMessage").className="message "+(errors.length?"error":"success");
- $("analyticsMessage").textContent=errors.length?errors.join(" | "):"Google Analytics ve Cloudflare verileri başarıyla alındı. Dönem: "+data.period.startDate+" – "+data.period.endDate;
+ window._edwiseAnalyticsData=data;const cf=data.cloudflare||{},t=cf.totals||{};
+ $("cfUnique").textContent=cf.configured?analyticsNumber(t.dailyUniqueIpTotal):"—";
+ $("cfRequests").textContent=cf.configured?analyticsNumber(t.requests):"—";
+ $("cfPageViews").textContent=cf.configured?analyticsNumber(t.pageViews):"—";
+ $("cfCountryCount").textContent=cf.configured?analyticsNumber((cf.countries||[]).length):"—";
+ $("analyticsMessage").className="message "+(cf.error?"error":"success");
+ $("analyticsMessage").textContent=cf.error?cf.error:"Cloudflare verileri alındı. Dönem: "+data.period.startDate+" – "+data.period.endDate;
+ if(cf.pathWarning)$("analyticsMessage").textContent+=" Sayfa yolu raporu: "+cf.pathWarning;
  $("analyticsUpdated").textContent="Son güncelleme: "+new Date().toLocaleTimeString("tr-TR");
- const countries=(g.countries||[]).slice(0,7),total=countries.reduce((s,x)=>s+x.sessions,0);
- $("analyticsCountryTotal").textContent=analyticsNumber(total);
- let cursor=0;const slices=countries.map((x,i)=>{const start=cursor;cursor+=total?x.sessions/total*100:0;return analyticsColors[i%analyticsColors.length]+" "+start+"% "+cursor+"%";});
+ const countries=(cf.countries||[]).slice(0,7),total=countries.reduce((s,x)=>s+x.requests,0);$("analyticsCountryTotal").textContent=analyticsNumber(total);
+ let cursor=0;const slices=countries.map((x,i)=>{const from=cursor;cursor+=total?x.requests/total*100:0;return analyticsColors[i%analyticsColors.length]+" "+from+"% "+cursor+"%";});
  $("analyticsDonut").style.background=countries.length?"conic-gradient("+slices.join(",")+")":"#39364c";
- $("analyticsLegend").innerHTML=countries.map((x,i)=>'<span><i style="background:'+analyticsColors[i%analyticsColors.length]+'"></i>'+escapeHtml(x.country)+' · '+analyticsNumber(x.sessions)+'</span>').join("")||"Ülke verisi bulunamadı.";
- drawAnalyticsBars(g.daily||[]);
- const cfCountries=new Map((cf.countries||[]).map(x=>[x.country,x.requests]));
- const merged=new Map();
- (g.countries||[]).forEach(x=>merged.set(x.country,{...x}));
- (cf.countries||[]).forEach(x=>{const old=merged.get(x.country)||{country:x.country,sessions:0,pageViews:0};old.requests=x.requests;merged.set(x.country,old);});
- const list=[...merged.values()].sort((a,b)=>(b.sessions||b.requests||0)-(a.sessions||a.requests||0));
- $("analyticsCountryTable").innerHTML=list.map(x=>'<tr><td>'+escapeHtml(x.country)+'</td><td>'+analyticsNumber(x.sessions)+'</td><td>'+analyticsNumber(x.pageViews)+'</td><td>'+analyticsNumber(x.clicks)+'</td><td>'+analyticsNumber(x.scrolls)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="6">Henüz ülke verisi yok.</td></tr>';
- $("analyticsPagesTable").innerHTML=(g.pages||[]).map(x=>'<tr><td>'+escapeHtml(x.path)+'</td><td>'+analyticsNumber(x.pageViews)+'</td></tr>').join("")||'<tr><td colspan="2">Sayfa verisi bulunamadı.</td></tr>';
+ $("analyticsLegend").innerHTML=countries.map((x,i)=>'<span><i style="background:'+analyticsColors[i%analyticsColors.length]+'"></i>'+escapeHtml(x.country)+' · '+analyticsNumber(x.requests)+'</span>').join("")||"Ülke verisi bulunamadı.";
+ drawAnalyticsBars(cf.daily||[]);
+ $("analyticsCountryTable").innerHTML=countries.map(x=>'<tr><td>'+escapeHtml(x.country)+'</td><td>'+analyticsNumber(x.requests)+'</td><td>'+analyticsNumber(x.pageViews)+'</td></tr>').join("")||'<tr><td colspan="3">Henüz ülke verisi yok.</td></tr>';
+ $("analyticsPagesTable").innerHTML=(cf.pages||[]).map(x=>'<tr><td>'+escapeHtml(x.path)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="2">'+(cf.pathWarning?escapeHtml(cf.pathWarning):"Sayfa verisi bulunamadı.")+'</td></tr>';
 }
 async function loadAnalytics(){
- if(!$("analyticsMessage"))return;
- $("analyticsMessage").className="message";$("analyticsMessage").textContent="Google Analytics ve Cloudflare verileri getiriliyor...";
- try{const response=await fetch("/api/analytics",{credentials:"same-origin",cache:"no-store"});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||"Analiz verileri alınamadı.");renderAnalytics(data);}
+ if(!$("analyticsMessage"))return;$("analyticsMessage").className="message";$("analyticsMessage").textContent="Cloudflare verileri getiriliyor...";
+ try{const response=await fetch("/api/analytics",{credentials:"same-origin",cache:"no-store"});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||"Cloudflare analiz verileri alınamadı.");renderAnalytics(data);}
  catch(error){$("analyticsMessage").className="message error";$("analyticsMessage").textContent=error.message;}
 }
 $("refreshAnalytics")?.addEventListener("click",loadAnalytics);
-window.addEventListener("resize",()=>{if(window._edwiseAnalyticsData?.google?.daily)drawAnalyticsBars(window._edwiseAnalyticsData.google.daily);});
+window.addEventListener("resize",()=>{if(window._edwiseAnalyticsData?.cloudflare?.daily)drawAnalyticsBars(window._edwiseAnalyticsData.cloudflare.daily);});
 
 $("logout").addEventListener("click",async()=>{
  try{
