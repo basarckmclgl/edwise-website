@@ -1242,6 +1242,8 @@ function editPost(id){
  $("postSlug").value=post.slug||"";
  $("postSlug").dataset.edited="1";
  $("postExcerpt").value=post.excerpt||"";
+$("postMetaTitle").value=post.meta_title||"";
+$("postMetaDescription").value=post.meta_description||"";
  $("postCanvas").innerHTML=normalizePostContent(post.content||"");
  $("postContent").value=$("postCanvas").innerHTML;
  activePostBlock=null;
