@@ -225,11 +225,11 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
      <div class="stat"><span>Ülke Sayısı</span><h2 id="cfCountryCount">—</h2><p>Trafik alınan ülke ve bölgeler</p></div>
     </div>
     <div class="grid analytics-charts" style="grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);margin-top:16px">
-     <div class="panel"><h3>Günlük trafik ve sayfa görüntüleme</h3><p class="muted">Cloudflare günlük istek ve HTML sayfa görüntüleme sayıları</p><canvas id="analyticsDailyChart" height="260" style="width:100%;height:260px"></canvas></div>
+     <div class="panel"><h3>Günlük trafik</h3><p class="muted">Cloudflare üzerinden geçen günlük HTTP istekleri</p><canvas id="analyticsDailyChart" height="260" style="width:100%;height:260px"></canvas></div>
      <div class="panel"><h3>Trafiğin ülkelere dağılımı</h3><p class="muted">İstek sayısına göre ilk 7 ülke</p><div id="analyticsDonut" class="analytics-donut"><div class="analytics-donut-center"><strong id="analyticsCountryTotal">—</strong><small>İstek</small></div></div><div id="analyticsLegend" class="analytics-legend"></div></div>
     </div>
     <div class="grid analytics-charts" style="grid-template-columns:minmax(0,1.2fr) minmax(280px,1fr);margin-top:16px">
-     <div class="panel"><h3>Ülkelere göre trafik</h3><p class="muted">Cloudflare istek ve HTML sayfa görüntüleme sayıları</p><div class="table-wrap"><table style="min-width:360px"><thead><tr><th>Ülke</th><th>İstek</th><th>Sayfa Görüntüleme</th></tr></thead><tbody id="analyticsCountryTable"><tr><td colspan="3">Veriler bekleniyor...</td></tr></tbody></table></div></div>
+     <div class="panel"><h3>Ülkelere göre trafik</h3><p class="muted">Cloudflare istek sayıları</p><div class="table-wrap"><table style="min-width:360px"><thead><tr><th>Ülke</th><th>İstek</th></tr></thead><tbody id="analyticsCountryTable"><tr><td colspan="2">Veriler bekleniyor...</td></tr></tbody></table></div></div>
      <div class="panel"><h3>En çok istek alan sayfalar</h3><p class="muted">Cloudflare sayfa yolu raporu</p><div class="table-wrap"><table style="min-width:280px"><thead><tr><th>Sayfa</th><th>İstek</th></tr></thead><tbody id="analyticsPagesTable"><tr><td colspan="2">Veriler bekleniyor...</td></tr></tbody></table></div></div>
     </div>
    </section>
@@ -1123,11 +1123,11 @@ function drawAnalyticsBars(rows){
  const canvas=$("analyticsDailyChart");if(!canvas)return;
  const width=Math.max(320,canvas.clientWidth||600),height=260,dpr=window.devicePixelRatio||1;canvas.width=width*dpr;canvas.height=height*dpr;
  const ctx=canvas.getContext("2d");ctx.scale(dpr,dpr);ctx.clearRect(0,0,width,height);
- const left=42,right=12,top=12,bottom=36,plotW=width-left-right,plotH=height-top-bottom,max=Math.max(1,...rows.map(r=>Math.max(r.requests||0,r.pageViews||0)));
+ const left=42,right=12,top=12,bottom=36,plotW=width-left-right,plotH=height-top-bottom,max=Math.max(1,...rows.map(r=>(r.requests||0)));
  ctx.font="10px Arial";ctx.fillStyle="#aaa7c0";ctx.strokeStyle="#39364c";
  for(let i=0;i<5;i++){const y=top+plotH*i/4;ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(width-right,y);ctx.stroke();ctx.fillText(Math.round(max*(1-i/4)).toLocaleString("tr-TR"),3,y+3);}
  const step=plotW/Math.max(rows.length,1),barW=Math.max(2,Math.min(12,step*.32));
- rows.forEach((r,i)=>{const x=left+i*step+step/2,a=(r.requests||0)/max*plotH,b=(r.pageViews||0)/max*plotH;ctx.fillStyle="#8055ed";ctx.fillRect(x-barW-1,top+plotH-a,barW,a);ctx.fillStyle="#39b995";ctx.fillRect(x+1,top+plotH-b,barW,b);if(i%Math.max(1,Math.ceil(rows.length/7))===0){ctx.fillStyle="#aaa7c0";ctx.fillText(String(r.date||"").slice(5).replace("-","/"),x-15,height-12);}});
+ rows.forEach((r,i)=>{const x=left+i*step+step/2,a=(r.requests||0)/max*plotH;ctx.fillStyle="#8055ed";ctx.fillRect(x-barW/2,top+plotH-a,barW,a);if(i%Math.max(1,Math.ceil(rows.length/7))===0){ctx.fillStyle="#aaa7c0";ctx.fillText(String(r.date||"").slice(5).replace("-","/"),x-15,height-12);}});
 }
 function renderAnalytics(data){
  window._edwiseAnalyticsData=data;const cf=data.cloudflare||{},t=cf.totals||{};
@@ -1144,7 +1144,7 @@ function renderAnalytics(data){
  $("analyticsDonut").style.background=countries.length?"conic-gradient("+slices.join(",")+")":"#39364c";
  $("analyticsLegend").innerHTML=countries.map((x,i)=>'<span><i style="background:'+analyticsColors[i%analyticsColors.length]+'"></i>'+escapeHtml(x.country)+' · '+analyticsNumber(x.requests)+'</span>').join("")||"Ülke verisi bulunamadı.";
  drawAnalyticsBars(cf.daily||[]);
- $("analyticsCountryTable").innerHTML=countries.map(x=>'<tr><td>'+escapeHtml(x.country)+'</td><td>'+analyticsNumber(x.requests)+'</td><td>'+analyticsNumber(x.pageViews)+'</td></tr>').join("")||'<tr><td colspan="3">Henüz ülke verisi yok.</td></tr>';
+ $("analyticsCountryTable").innerHTML=countries.map(x=>'<tr><td>'+escapeHtml(x.country)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="2">Henüz ülke verisi yok.</td></tr>';
  $("analyticsPagesTable").innerHTML=(cf.pages||[]).map(x=>'<tr><td>'+escapeHtml(x.path)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="2">'+(cf.pathWarning?escapeHtml(cf.pathWarning):"Sayfa verisi bulunamadı.")+'</td></tr>';
 }
 async function loadAnalytics(){
