@@ -2,6 +2,8 @@ import { requireEditor } from "./_auth.js";
 import { logAudit } from "./_audit.js";
 
 export async function onRequestPost(context) {
+  const origin = context.request.headers.get("Origin");
+  try { if(!origin || origin !== new URL(context.request.url).origin) return Response.json({success:false,error:"İstek kaynağı geçersiz."},{status:403}); } catch { return Response.json({success:false,error:"İstek kaynağı geçersiz."},{status:403}); }
   const auth = await requireEditor(context);
   if (auth.response) return auth.response;
 
