@@ -40,7 +40,7 @@ export async function onRequestPost(context){
   }
 
   if(body.action==="save_preferences"){
-   const allowed=["siteName","tagline","logoUrl","faviconUrl","language","timezone","phone","whatsapp","email","address","hours","mapUrl","seoTitle","seoDescription","seoKeywords","canonical","robots","instagram","facebook","youtube","linkedin","tiktok","gaId","gsc","metaPixel"];
+   const allowed=["siteName","tagline","logoUrl","faviconUrl","language","timezone","phone","whatsapp","email","address","hours","mapUrl","seoTitle","seoDescription","seoKeywords","canonical","robots","instagram","facebook","youtube","linkedin","tiktok","gaId","gsc","metaPixel","colorMode","accentPreset","density","fontScale","contrast","motion","links","dateFormat","cookieBanner","analyticsConsent","externalLinks"];
    const preferences={};
    for(const key of allowed){
     const value=typeof body.preferences?.[key]==="string"?body.preferences[key].trim():"";
@@ -53,6 +53,17 @@ export async function onRequestPost(context){
     if(key==="robots"&&!["index,follow","noindex,nofollow"].includes(value))return json({success:false,message:"İndeksleme seçimi geçersiz."},400);
     if(key==="gaId"&&value&&!/^G-[A-Z0-9]+$/.test(value))return json({success:false,message:"Google Analytics kimliği G- ile başlamalıdır."},400);
     if(key==="metaPixel"&&value&&!/^\d{5,30}$/.test(value))return json({success:false,message:"Meta Pixel kimliği yalnızca rakamlardan oluşmalıdır."},400);
+    if(key==="colorMode"&&!["light","dark","system"].includes(value))return json({success:false,message:"Tema seçimi geçersiz."},400);
+    if(key==="accentPreset"&&!["purple","blue","green","orange"].includes(value))return json({success:false,message:"Vurgu rengi geçersiz."},400);
+    if(key==="density"&&!["comfortable","compact"].includes(value))return json({success:false,message:"Görünüm yoğunluğu geçersiz."},400);
+    if(key==="fontScale"&&!["normal","large","larger"].includes(value))return json({success:false,message:"Yazı boyutu seçimi geçersiz."},400);
+    if(key==="contrast"&&!["normal","high"].includes(value))return json({success:false,message:"Kontrast seçimi geçersiz."},400);
+    if(key==="motion"&&!["full","reduced"].includes(value))return json({success:false,message:"Hareket tercihi geçersiz."},400);
+    if(key==="links"&&!["normal","underlined"].includes(value))return json({success:false,message:"Bağlantı görünümü geçersiz."},400);
+    if(key==="dateFormat"&&!["dd.mm.yyyy","yyyy-mm-dd","mm/dd/yyyy"].includes(value))return json({success:false,message:"Tarih biçimi geçersiz."},400);
+    if(key==="cookieBanner"&&!["enabled","disabled"].includes(value))return json({success:false,message:"Çerez bilgilendirme tercihi geçersiz."},400);
+    if(key==="analyticsConsent"&&!["consent","essential"].includes(value))return json({success:false,message:"Analitik çerez tercihi geçersiz."},400);
+    if(key==="externalLinks"&&!["newtab","sametab"].includes(value))return json({success:false,message:"Dış bağlantı tercihi geçersiz."},400);
     preferences[key]=value;
    }
    const serialized=JSON.stringify(preferences);
