@@ -19,12 +19,44 @@ document.addEventListener('click',function(event){
  document.getElementById('cookie-essential')?.addEventListener('click',()=>chooseCookie('essential'));
  document.getElementById('open-cookie-settings')?.addEventListener('click',()=>{if(cookie)cookie.hidden=false;});
 })();
-// Başvuru formu: veriler sunucuda saklanmaz; kullanıcı WhatsApp üzerinden kendisi gönderir.
-document.addEventListener('submit',function(e){
+// Başvuru: önce veritabanına kaydet, ardından WhatsApp mesajını hazırla.
+document.addEventListener('submit', async function(e){
  const form=e.target;
- if(!form||form.id!=='application-form')return;
- e.preventDefault();const f=new FormData(form);
- const lines=['EDWISE EĞİTİM BAŞVURUSU','Ad Soyad: '+f.get('name'),'Telefon: '+f.get('phone'),'E-posta: '+(f.get('email')||'-'),'Program: '+f.get('program'),'Eğitim tercihi: '+f.get('format'),'Uygun zaman: '+(f.get('availability')||'-'),'Not: '+(f.get('note')||'-')];
- const url='https://wa.me/905512501701?text='+encodeURIComponent(lines.join('\n'));
- window.open(url,'_blank','noopener');
+ if(!form || form.id!=='application-form') return;
+ e.preventDefault();
+ const button=form.querySelector('[type="submit"]');
+ if(button.disabled) return;
+ const f=new FormData(form);
+ const payload={
+  name:f.get('name'), phone:f.get('phone'), email:f.get('email')||'',
+  program:f.get('program'), format:f.get('format'),
+  availability:f.get('availability')||'', note:f.get('note')||'',
+  privacy:f.get('privacy')==='on'
+ };
+ button.disabled=true;
+ const original=button.textContent;
+ button.textContent='Başvurunuz kaydediliyor...';
+ try{
+  const response=await fetch('/api/applications',{
+   method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'},
+   body:JSON.stringify(payload)
+  });
+  const result=await response.json();
+  if(!response.ok || !result.success) throw new Error(result.message||'Başvuru gönderilemedi.');
+  const lines=['EDWISE EĞİTİM BAŞVURUSU','Ad Soyad: '+payload.name,'Telefon: '+payload.phone,'E-posta: '+(payload.email||'-'),'Program: '+payload.program,'Eğitim tercihi: '+payload.format,'Uygun zaman: '+(payload.availability||'-'),'Not: '+(payload.note||'-'),'Başvuru No: '+result.applicationId];
+  const url='https://wa.me/905512501701?text='+encodeURIComponent(lines.join('\\n'));
+  const status=document.createElement('p');
+  status.className='form-note';
+  status.textContent=result.emailSent
+   ? 'Başvurunuz kaydedildi ve e-posta bildirimi gönderildi. WhatsApp mesajı da açılıyor.'
+   : 'Başvurunuz panele kaydedildi. E-posta bildirimi için gönderim servisi henüz etkinleştirilmedi. WhatsApp mesajı açılıyor.';
+  form.appendChild(status);
+  window.open(url,'_blank','noopener');
+  form.reset();
+ }catch(error){
+  alert(error.message||'Başvuru sırasında hata oluştu.');
+ }finally{
+  button.disabled=false;
+  button.textContent=original;
+ }
 });
