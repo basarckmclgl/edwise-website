@@ -1,5 +1,6 @@
 
 import { requireEditor } from "./_auth.js";
+import { logAudit } from "./_audit.js";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -172,6 +173,8 @@ export async function onRequestPost(context) {
       ? result.meta?.last_row_id
       : values[0];
 
+    const created = await DB.prepare("SELECT * FROM posts WHERE id = ?").bind(newId).first();
+    await logAudit(DB,context.request,auth.admin,{action:post.status==="published"?"post_published":"post_created",entity_type:"post",entity_id:newId,entity_title:post.title,details:{before:null,after:created}});
     return json({
       success: true,
       id: newId,
@@ -215,7 +218,7 @@ export async function onRequestPut(context) {
     const DB = context.env.DB;
 
     const existing = await DB.prepare(
-      "SELECT id, published_at FROM posts WHERE id = ?"
+      "SELECT * FROM posts WHERE id = ?"
     ).bind(id).first();
 
     if (!existing) {
@@ -262,6 +265,9 @@ export async function onRequestPut(context) {
       id
     ).run();
 
+    const after = await DB.prepare("SELECT * FROM posts WHERE id = ?").bind(id).first();
+    const action = existing.status !== post.status ? (post.status==="published"?"post_published":"post_unpublished") : "post_updated";
+    await logAudit(DB,context.request,auth.admin,{action,entity_type:"post",entity_id:id,entity_title:post.title,details:{before:existing,after}});
     return json({
       success: true,
       id,
@@ -304,6 +310,8 @@ export async function onRequestDelete(context) {
       }, 400);
     }
 
+    const before = await context.env.DB.prepare("SELECT * FROM posts WHERE id = ?").bind(id).first();
+    if (!before) return json({ success: false, message: "Blog yazısı bulunamadı." }, 404);
     const result = await context.env.DB.prepare(
       "DELETE FROM posts WHERE id = ?"
     ).bind(id).run();
@@ -315,6 +323,7 @@ export async function onRequestDelete(context) {
       }, 404);
     }
 
+    await logAudit(context.env.DB,context.request,auth.admin,{action:"post_deleted",entity_type:"post",entity_id:id,entity_title:before.title,details:{before,after:null}});
     return json({
       success: true,
       id,
