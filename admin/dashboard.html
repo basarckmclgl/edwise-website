@@ -755,35 +755,44 @@ async function api(url,options={}){
 }
 
 const fixedSitePages=[
- {title:"Ana Sayfa",url:"/",kind:"Ana sayfa",status:"Sabit",file:"index.html"},
- {title:"Hizmetlerimiz",url:"/pages/hizmetlerimiz.html",kind:"Kurumsal sayfa",status:"Sabit",file:"pages/hizmetlerimiz.html"},
- {title:"Hakkımızda",url:"/pages/hakkimizda.html",kind:"Kurumsal sayfa",status:"Sabit",file:"pages/hakkimizda.html"},
- {title:"Başvuru",url:"/pages/basvuru.html",kind:"Form sayfası",status:"Sabit",file:"pages/basvuru.html"},
- {title:"İletişim ve Konum",url:"/pages/iletisim.html",kind:"İletişim sayfası",status:"Sabit",file:"pages/iletisim.html"},
- {title:"EDWISE Rehber",url:"/edwise-rehber.html",kind:"Blog liste sayfası",status:"Sabit",file:"edwise-rehber.html"},
- {title:"Eğitim Danışmanlığı",url:"/pages/egitim-danismanligi.html",kind:"Hizmet detay sayfası",status:"Sabit",file:"pages/egitim-danismanligi.html"},
- {title:"Coaching & Mentoring",url:"/pages/coaching-mentoring.html",kind:"Hizmet detay sayfası",status:"Sabit",file:"pages/coaching-mentoring.html"},
- {title:"IELTS",url:"/pages/ielts.html",kind:"Eğitim sayfası",status:"Sabit",file:"pages/ielts.html"},
- {title:"TOEFL",url:"/pages/toefl.html",kind:"Eğitim sayfası",status:"Sabit",file:"pages/toefl.html"},
- {title:"YDS",url:"/pages/yds.html",kind:"Eğitim sayfası",status:"Sabit",file:"pages/yds.html"},
- {title:"YÖKDİL",url:"/pages/yokdil.html",kind:"Eğitim sayfası",status:"Sabit",file:"pages/yokdil.html"},
- {title:"Speaking Club",url:"/pages/speaking-club.html",kind:"Eğitim sayfası",status:"Sabit",file:"pages/speaking-club.html"},
- {title:"Yasal Bilgilendirme",url:"/pages/yasal-bilgilendirme.html",kind:"Yasal sayfa",status:"Sabit",file:"pages/yasal-bilgilendirme.html"}
+ {slug:"anasayfa",title:"Ana Sayfa",url:"/",kind:"Ana sayfa"},
+ {slug:"hizmetlerimiz",title:"Hizmetlerimiz",url:"/pages/hizmetlerimiz.html",kind:"Kurumsal sayfa"},
+ {slug:"hakkimizda",title:"Hakkımızda",url:"/pages/hakkimizda.html",kind:"Kurumsal sayfa"},
+ {slug:"basvuru",title:"Başvuru",url:"/pages/basvuru.html",kind:"Form sayfası"},
+ {slug:"iletisim",title:"İletişim ve Konum",url:"/pages/iletisim.html",kind:"İletişim sayfası"},
+ {slug:"edwise-rehber",title:"EDWISE Rehber",url:"/edwise-rehber.html",kind:"Blog liste sayfası"},
+ {slug:"egitim-danismanligi",title:"Eğitim Danışmanlığı",url:"/pages/egitim-danismanligi.html",kind:"Hizmet detay sayfası"},
+ {slug:"coaching-mentoring",title:"Coaching & Mentoring",url:"/pages/coaching-mentoring.html",kind:"Hizmet detay sayfası"},
+ {slug:"ielts",title:"IELTS",url:"/pages/ielts.html",kind:"Eğitim sayfası"},
+ {slug:"toefl",title:"TOEFL",url:"/pages/toefl.html",kind:"Eğitim sayfası"},
+ {slug:"yds",title:"YDS",url:"/pages/yds.html",kind:"Eğitim sayfası"},
+ {slug:"yokdil",title:"YÖKDİL",url:"/pages/yokdil.html",kind:"Eğitim sayfası"},
+ {slug:"speaking-club",title:"Speaking Club",url:"/pages/speaking-club.html",kind:"Eğitim sayfası"},
+ {slug:"yasal-bilgilendirme",title:"Yasal Bilgilendirme",url:"/pages/yasal-bilgilendirme.html",kind:"Yasal sayfa"}
 ];
 async function loadPages(){
  $("pagesTable").innerHTML='<tr><td colspan="5">Sayfalar yükleniyor...</td></tr>';
  try{
-  const data=await api("/api/pages");
+  let data=await api("/api/pages");
+  if(!data.staticPagesMigrated&&Array.isArray(window.EDWISE_STATIC_PAGE_IMPORTS)&&window.EDWISE_STATIC_PAGE_IMPORTS.length){
+   $("pageInventorySummary").textContent="Mevcut site sayfaları CMS'ye aktarılıyor...";
+   await api("/api/pages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"import_static_pages",pages:window.EDWISE_STATIC_PAGE_IMPORTS})});
+   data=await api("/api/pages");
+  }
   pages=data.pages||[];
-  $("countPages").textContent=fixedSitePages.length+pages.length;
-  $("pageInventorySummary").textContent=fixedSitePages.length+" sabit sayfa · "+pages.length+" CMS sayfası";
-  const fixedRows=fixedSitePages.map(p=>'<tr><td>'+escapeHtml(p.title)+'</td><td>'+escapeHtml(p.kind)+'</td><td>'+escapeHtml(p.url)+'</td><td><span class="status">Sabit dosya</span></td><td><button class="btn" data-static-preview="'+escapeHtml(p.url)+'">Önizle</button><button class="btn" data-static-design="'+escapeHtml(p.url)+'">Tasarım Merkezinde Aç</button></td></tr>').join("");
-  const cmsRows=pages.map(p=>'<tr><td>'+escapeHtml(p.title)+'</td><td>CMS sayfası</td><td>/pages/sayfa.html?slug='+escapeHtml(p.slug)+'</td><td><span class="status '+(p.status==="published"?"published":"")+'">'+(p.status==="published"?"Yayında":"Taslak")+'</span></td><td><button class="btn" data-edit="'+Number(p.id)+'">Düzenle</button><button class="btn btn-danger" data-delete="'+Number(p.id)+'">Sil</button></td></tr>').join("");
-  $("pagesTable").innerHTML=fixedRows+cmsRows;
+  $("countPages").textContent=pages.length;
+  $("pageInventorySummary").textContent=pages.length+" yönetilebilir sayfa · "+fixedSitePages.filter(x=>pages.some(p=>p.slug===x.slug)).length+" mevcut site sayfası CMS'ye bağlı";
+  const rows=pages.map(p=>{
+   const fixed=fixedSitePages.find(x=>x.slug===p.slug);
+   const url=fixed?fixed.url:"/pages/sayfa.html?slug="+encodeURIComponent(p.slug);
+   const kind=fixed?fixed.kind:"Yeni CMS sayfası";
+   const status=p.status==="published"?"Yayında":"Taslak / Yayından kaldırıldı";
+   return '<tr><td>'+escapeHtml(p.title)+'</td><td>'+escapeHtml(kind)+'</td><td><a href="'+escapeHtml(url)+'" target="_blank" rel="noopener">'+escapeHtml(url)+'</a></td><td><span class="status '+(p.status==="published"?"published":"")+'">'+status+'</span></td><td><button class="btn" data-edit="'+Number(p.id)+'">Düzenle</button><button class="btn" data-preview="'+escapeHtml(url)+'">Önizle</button><button class="btn btn-danger" data-delete="'+Number(p.id)+'">Sil</button></td></tr>';
+  }).join("");
+  $("pagesTable").innerHTML=rows||'<tr><td colspan="5" class="empty">Henüz yönetilebilir sayfa bulunmuyor.</td></tr>';
   document.querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",()=>editPage(Number(b.dataset.edit))));
   document.querySelectorAll("[data-delete]").forEach(b=>b.addEventListener("click",()=>deletePage(Number(b.dataset.delete))));
-  document.querySelectorAll("[data-static-preview]").forEach(b=>b.addEventListener("click",()=>window.open(b.dataset.staticPreview,"_blank","noopener")));
-  document.querySelectorAll("[data-static-design]").forEach(b=>b.addEventListener("click",()=>{showPage("designcenter");const select=$("designPageSelect");select.value=b.dataset.staticDesign;if(select.value){refreshDesignFrame();loadDesignRecords();}}));
+  document.querySelectorAll("[data-preview]").forEach(b=>b.addEventListener("click",()=>window.open(b.dataset.preview,"_blank","noopener")));
  }catch(error){
   $("pagesTable").innerHTML='<tr><td colspan="5" class="empty">Sayfalar yüklenemedi.</td></tr>';
   message(error.message);
@@ -794,6 +803,7 @@ $("refreshAllPages").addEventListener("click",loadPages);
 function resetEditor(){
  $("pageForm").reset();
  $("pageId").value="";
+ $("slug").readOnly=false;
  $("slug").dataset.edited="";
  $("editorTitle").textContent="Yeni Sayfa";
  $("editor").classList.add("hidden");
@@ -815,12 +825,13 @@ function editPage(id){
  $("pageId").value=p.id;
  $("title").value=p.title||"";
  $("slug").value=p.slug||"";
+ $("slug").readOnly=fixedSitePages.some(x=>x.slug===p.slug);
  $("slug").dataset.edited="1";
  $("contentText").value=p.content||"";
  $("metaTitle").value=p.meta_title||"";
  $("metaDescription").value=p.meta_description||"";
  $("status").value=p.status||"draft";
- $("editorTitle").textContent="Sayfayı Düzenle";
+ $("editorTitle").textContent=fixedSitePages.some(x=>x.slug===p.slug)?"Mevcut Site Sayfasını Düzenle":"Sayfayı Düzenle";
  $("editor").classList.remove("hidden");
  $("editor").scrollIntoView({behavior:"smooth"});
 }
@@ -1768,6 +1779,7 @@ $("siteSettingsForm").addEventListener("submit",async event=>{event.preventDefau
 
 checkSession();
 </script>
+<script src="/admin/assets/js/static-page-imports.js"></script>
 <script src="/admin/assets/js/page-builder.js?v=wps-ribbon-20261111"></script>
 </body>
 </html>
