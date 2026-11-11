@@ -161,43 +161,6 @@
 </div>
 </div>
 
-<script>
-(async function () {
-  try {
-    const response = await fetch("/api/public-pages?slug=anasayfa", {
-      headers: { "Accept": "application/json" },
-      cache: "no-store"
-    });
-    if (!response.ok) return;
-
-    const data = await response.json();
-    if (!data.success || !data.page) return;
-
-    const page = data.page;
-    const heading = document.querySelector(".hero h1");
-    const description = document.querySelector(".hero-content > p");
-
-    if (heading && page.title) {
-      heading.textContent = page.title;
-    }
-
-    if (description && page.content) {
-      description.textContent = page.content;
-    }
-
-    if (page.meta_title) {
-      document.title = page.meta_title;
-    }
-
-    if (page.meta_description) {
-      const meta = document.querySelector('meta[name="description"]');
-      if (meta) meta.content = page.meta_description;
-    }
-  } catch (error) {
-    console.error("Ana sayfa CMS içeriği yüklenemedi:", error);
-  }
-})();
-</script>
 
 <script defer="True" src="assets/js/site.js"></script>
 <script defer="True" src="assets/js/consent-and-forms.js"></script>
