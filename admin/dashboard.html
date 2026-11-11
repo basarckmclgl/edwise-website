@@ -802,6 +802,169 @@ async function deleteService(id){
  }
 }
 
+ 
+let posts = [];
+
+async function loadPosts() {
+  const table = document.getElementById("postsTableBody");
+  if (!table) return;
+
+  table.innerHTML = `<tr><td colspan="5">Yazılar yükleniyor...</td></tr>`;
+
+  try {
+    const response = await fetch("/api/posts");
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Yazılar alınamadı.");
+    }
+
+    posts = data.posts || [];
+
+    const count = document.getElementById("countPosts");
+    if (count) count.textContent = posts.length;
+
+    if (!posts.length) {
+      table.innerHTML = `<tr><td colspan="5">Henüz blog yazısı yok.</td></tr>`;
+      return;
+    }
+
+    table.innerHTML = posts.map(post => `
+      <tr>
+        <td>${escapePostHTML(post.title)}</td>
+        <td>${escapePostHTML(post.slug)}</td>
+        <td>${post.status === "published" ? "Yayında" : "Taslak"}</td>
+        <td>${post.published_at ? new Date(post.published_at).toLocaleDateString("tr-TR") : "-"}</td>
+        <td>
+          <button onclick="editPost('${post.id}')">Düzenle</button>
+          <button onclick="deletePost('${post.id}')">Sil</button>
+        </td>
+      </tr>
+    `).join("");
+
+  } catch (error) {
+    table.innerHTML = `<tr><td colspan="5">${escapePostHTML(error.message)}</td></tr>`;
+  }
+}
+
+function escapePostHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function resetPostEditor() {
+  document.getElementById("postForm").reset();
+  document.getElementById("postId").value = "";
+  document.getElementById("postEditorTitle").textContent = "Yeni Blog Yazısı";
+}
+
+function editPost(id) {
+  const post = posts.find(item => String(item.id) === String(id));
+  if (!post) return;
+
+  document.getElementById("postId").value = post.id;
+  document.getElementById("postTitle").value = post.title || "";
+  document.getElementById("postSlug").value = post.slug || "";
+  document.getElementById("postExcerpt").value = post.excerpt || "";
+  document.getElementById("postContent").value = post.content || "";
+  document.getElementById("postImage").value = post.image_url || "";
+  document.getElementById("postStatus").value = post.status || "draft";
+
+  document.getElementById("postEditorTitle").textContent = "Blog Yazısını Düzenle";
+  document.getElementById("postEditor").scrollIntoView({ behavior: "smooth" });
+}
+
+document.getElementById("postTitle")?.addEventListener("input", function () {
+  const slug = document.getElementById("postSlug");
+  if (!slug.dataset.edited) {
+    slug.value = this.value
+      .toLocaleLowerCase("tr-TR")
+      .replace(/ı/g, "i")
+      .replace(/ğ/g, "g")
+      .replace(/ü/g, "u")
+      .replace(/ş/g, "s")
+      .replace(/ö/g, "o")
+      .replace(/ç/g, "c")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
+});
+
+document.getElementById("postSlug")?.addEventListener("input", function () {
+  this.dataset.edited = "true";
+});
+
+document.getElementById("postForm")?.addEventListener("submit", async function (event) {
+  event.preventDefault();
+
+  const id = document.getElementById("postId").value;
+
+  const post = {
+    title: document.getElementById("postTitle").value.trim(),
+    slug: document.getElementById("postSlug").value.trim(),
+    excerpt: document.getElementById("postExcerpt").value.trim(),
+    content: document.getElementById("postContent").value.trim(),
+    image_url: document.getElementById("postImage").value.trim(),
+    status: document.getElementById("postStatus").value
+  };
+
+  if (!post.title || !post.slug || !post.content) {
+    alert("Başlık, bağlantı adresi ve içerik zorunludur.");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      id ? `/api/posts?id=${encodeURIComponent(id)}` : "/api/posts",
+      {
+        method: id ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(post)
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Kayıt yapılamadı.");
+    }
+
+    alert("Blog yazısı kaydedildi.");
+    resetPostEditor();
+    await loadPosts();
+
+  } catch (error) {
+    alert(error.message);
+  }
+});
+
+async function deletePost(id) {
+  if (!confirm("Bu blog yazısını silmek istediğine emin misin?")) return;
+
+  try {
+    const response = await fetch(`/api/posts?id=${encodeURIComponent(id)}`, {
+      method: "DELETE"
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Silme işlemi başarısız.");
+    }
+
+    await loadPosts();
+    alert("Blog yazısı silindi.");
+
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
 checkSession();
 </script>
 </body>
