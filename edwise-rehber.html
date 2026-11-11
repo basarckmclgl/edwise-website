@@ -13,7 +13,7 @@
 
   <style>
     .guide-page {
-      max-width: 1150px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 55px 22px 80px;
       min-height: 65vh;
@@ -39,31 +39,40 @@
       opacity: .8;
     }
 
+    /* Masaüstünde tam 3 kart */
     .guide-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 25px;
+      align-items: stretch;
     }
 
     .guide-card {
+      min-width: 0;
       overflow: hidden;
       border-radius: 16px;
       border: 1px solid rgba(128,128,128,.2);
       background: var(--card-bg, #fff);
       display: flex;
       flex-direction: column;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .guide-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 28px rgba(0,0,0,.08);
     }
 
     .guide-card-image {
       width: 100%;
-      height: 205px;
+      height: 165px;
       object-fit: cover;
       display: block;
       background: #eee;
     }
 
     .guide-card-content {
-      padding: 22px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       flex: 1;
@@ -76,15 +85,17 @@
     }
 
     .guide-card h2 {
-      font-size: 21px;
+      font-size: 20px;
       line-height: 1.4;
       margin: 0 0 12px;
+      overflow-wrap: anywhere;
     }
 
     .guide-card p {
       line-height: 1.7;
       opacity: .8;
-      margin-bottom: 20px;
+      margin: 0 0 20px;
+      overflow-wrap: anywhere;
     }
 
     .guide-read {
@@ -117,20 +128,97 @@
       font-size: clamp(30px, 5vw, 44px);
       line-height: 1.3;
       margin-bottom: 18px;
+      overflow-wrap: anywhere;
     }
 
     .guide-detail-image {
+      display: block;
       width: 100%;
-      max-height: 430px;
-      object-fit: cover;
-      border-radius: 16px;
-      margin: 25px 0;
+      max-width: 100%;
+      max-height: 420px;
+      object-fit: contain;
+      border-radius: 14px;
+      margin: 25px auto;
     }
 
     .guide-detail-content {
       line-height: 1.9;
       font-size: 17px;
       overflow-wrap: anywhere;
+    }
+
+    .guide-detail-content h1,
+    .guide-detail-content h2,
+    .guide-detail-content h3 {
+      line-height: 1.4;
+      margin: 28px 0 14px;
+    }
+
+    .guide-detail-content p {
+      margin: 0 0 18px;
+    }
+
+    .guide-detail-content ul,
+    .guide-detail-content ol {
+      padding-left: 28px;
+      margin: 15px 0 22px;
+    }
+
+    .guide-detail-content blockquote {
+      margin: 22px 0;
+      padding: 15px 20px;
+      border-left: 4px solid #6b46c1;
+      background: rgba(128,128,128,.08);
+      border-radius: 5px;
+    }
+
+    .guide-detail-content a {
+      text-decoration: underline;
+      overflow-wrap: anywhere;
+    }
+
+    .guide-detail-content figure {
+      margin: 25px auto;
+      max-width: 100%;
+    }
+
+    .guide-detail-content figure img,
+    .guide-detail-content > img {
+      display: block;
+      max-width: 100%;
+      max-height: 420px;
+      height: auto;
+      object-fit: contain;
+      border-radius: 12px;
+      margin: 18px auto;
+    }
+
+    .guide-detail-content figcaption {
+      font-size: 14px;
+      opacity: .7;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .guide-detail-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      display: block;
+      overflow-x: auto;
+    }
+
+    .guide-detail-content th,
+    .guide-detail-content td {
+      border: 1px solid rgba(128,128,128,.3);
+      padding: 10px;
+      text-align: left;
+    }
+
+    .guide-detail-content iframe,
+    .guide-detail-content video,
+    .guide-detail-content script {
+      display: none !important;
     }
 
     .guide-back {
@@ -140,12 +228,33 @@
       font-weight: 700;
     }
 
+    @media (max-width: 900px) {
+      .guide-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+      }
+    }
+
     @media (max-width: 600px) {
       .guide-page {
         padding: 35px 16px 55px;
       }
+
       .guide-grid {
         grid-template-columns: 1fr;
+        gap: 18px;
+      }
+
+      .guide-card-image {
+        height: 180px;
+      }
+
+      .guide-card-content {
+        padding: 18px;
+      }
+
+      .guide-detail-content {
+        font-size: 16px;
       }
     }
   </style>
@@ -225,7 +334,7 @@
 <a class="whatsapp-float"
    href="https://wa.me/905512501701"
    target="_blank"
-   rel="noopener"
+   rel="noopener noreferrer"
    aria-label="WhatsApp üzerinden EDWISE ile iletişime geç">
   WhatsApp ↗
 </a>
@@ -246,12 +355,15 @@
 
 <script>
 (function () {
+  "use strict";
+
   const content = document.getElementById("guide-content");
+  const heading = document.getElementById("guide-heading");
   const params = new URLSearchParams(window.location.search);
   const selectedSlug = params.get("slug");
 
   function escapeHTML(value) {
-    return String(value || "").replace(/[&<>"']/g, function (char) {
+    return String(value ?? "").replace(/[&<>"']/g, function (char) {
       return {
         "&": "&amp;",
         "<": "&lt;",
@@ -262,21 +374,33 @@
     });
   }
 
-  function safeImageUrl(value) {
+  function safeUrl(value, imageOnly = false) {
     if (!value) return "";
+
     try {
       const url = new URL(value, window.location.origin);
+
       if (url.protocol === "https:" || url.protocol === "http:") {
         return url.href;
       }
-    } catch (error) {}
+
+      if (!imageOnly && url.protocol === "mailto:") {
+        return url.href;
+      }
+    } catch (error) {
+      return "";
+    }
+
     return "";
   }
 
   function formatDate(value) {
     if (!value) return "";
+
     const date = new Date(value);
+
     if (Number.isNaN(date.getTime())) return "";
+
     return date.toLocaleDateString("tr-TR", {
       day: "numeric",
       month: "long",
@@ -284,8 +408,154 @@
     });
   }
 
+  /*
+   * Blog içeriğindeki HTML güvenli biçimde temizlenir.
+   * Yalnızca izin verilen biçimlendirme etiketleri korunur.
+   */
+  function sanitizeContent(html) {
+    const allowedTags = new Set([
+      "P", "BR", "DIV",
+      "H1", "H2", "H3", "H4",
+      "STRONG", "B", "EM", "I", "U", "S",
+      "UL", "OL", "LI",
+      "BLOCKQUOTE",
+      "A",
+      "IMG", "FIGURE", "FIGCAPTION",
+      "TABLE", "THEAD", "TBODY", "TR", "TH", "TD",
+      "HR",
+      "SPAN"
+    ]);
+
+    const parser = new DOMParser();
+    const parsed = parser.parseFromString(
+      String(html || ""),
+      "text/html"
+    );
+
+    const dangerousTags = new Set([
+      "SCRIPT", "STYLE", "IFRAME", "OBJECT",
+      "EMBED", "FORM", "INPUT", "BUTTON",
+      "VIDEO", "AUDIO", "SOURCE",
+      "LINK", "META", "SVG", "MATH"
+    ]);
+
+    function cleanNode(node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return document.createTextNode(node.textContent);
+      }
+
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        return document.createDocumentFragment();
+      }
+
+      const tag = node.tagName;
+
+      if (dangerousTags.has(tag)) {
+        return document.createDocumentFragment();
+      }
+
+      if (!allowedTags.has(tag)) {
+        const fragment = document.createDocumentFragment();
+
+        Array.from(node.childNodes).forEach(child => {
+          fragment.appendChild(cleanNode(child));
+        });
+
+        return fragment;
+      }
+
+      const clean = document.createElement(tag.toLowerCase());
+
+      if (tag === "A") {
+        const href = safeUrl(node.getAttribute("href"));
+
+        if (href) {
+          clean.setAttribute("href", href);
+          clean.setAttribute("rel", "noopener noreferrer");
+
+          if (node.getAttribute("target") === "_blank") {
+            clean.setAttribute("target", "_blank");
+          }
+        }
+      }
+
+      if (tag === "IMG") {
+        const src = safeUrl(node.getAttribute("src"), true);
+
+        if (!src) {
+          return document.createDocumentFragment();
+        }
+
+        clean.setAttribute("src", src);
+        clean.setAttribute(
+          "alt",
+          node.getAttribute("alt") || ""
+        );
+        clean.setAttribute("loading", "lazy");
+        clean.setAttribute("decoding", "async");
+
+        const title = node.getAttribute("title");
+        if (title) clean.setAttribute("title", title);
+
+        clean.style.maxWidth = "100%";
+        clean.style.maxHeight = "420px";
+        clean.style.width = "auto";
+        clean.style.height = "auto";
+        clean.style.objectFit = "contain";
+
+        const alignment = node.style.textAlign;
+
+        if (["left", "center", "right"].includes(alignment)) {
+          clean.style.display = "block";
+          clean.style.marginLeft = alignment === "center" ? "auto" : "0";
+          clean.style.marginRight = alignment === "center" ? "auto" : "0";
+        }
+      }
+
+      if (tag === "FIGURE") {
+        clean.style.maxWidth = "100%";
+        clean.style.margin = "25px auto";
+      }
+
+      if (tag === "SPAN" || tag === "P" || tag === "DIV" ||
+          tag === "H1" || tag === "H2" || tag === "H3" ||
+          tag === "H4") {
+        const alignment = node.style.textAlign;
+
+        if (["left", "center", "right", "justify"].includes(alignment)) {
+          clean.style.textAlign = alignment;
+        }
+      }
+
+      if (tag === "TH" || tag === "TD") {
+        const colspan = parseInt(node.getAttribute("colspan"), 10);
+
+        if (Number.isInteger(colspan) && colspan > 0 && colspan <= 10) {
+          clean.setAttribute("colspan", String(colspan));
+        }
+      }
+
+      Array.from(node.childNodes).forEach(child => {
+        clean.appendChild(cleanNode(child));
+      });
+
+      return clean;
+    }
+
+    const result = document.createDocumentFragment();
+
+    Array.from(parsed.body.childNodes).forEach(node => {
+      result.appendChild(cleanNode(node));
+    });
+
+    const wrapper = document.createElement("div");
+    wrapper.appendChild(result);
+
+    return wrapper.innerHTML;
+  }
+
   function renderList(posts) {
-    document.getElementById("guide-heading").hidden = false;
+    heading.hidden = false;
 
     if (!posts.length) {
       content.innerHTML = `
@@ -300,23 +570,33 @@
     content.innerHTML = `
       <div class="guide-grid">
         ${posts.map(post => {
-          const image = safeImageUrl(post.image_url);
+          const image = safeUrl(post.image_url, true);
+          const title = escapeHTML(post.title);
+          const excerpt = escapeHTML(post.excerpt || "");
+          const slug = encodeURIComponent(post.slug || "");
 
           return `
             <article class="guide-card">
               ${image ? `
-                <img class="guide-card-image"
-                     src="${escapeHTML(image)}"
-                     alt="${escapeHTML(post.title)}"
-                     loading="lazy">
+                <img
+                  class="guide-card-image"
+                  src="${escapeHTML(image)}"
+                  alt="${title}"
+                  loading="lazy"
+                  decoding="async">
               ` : ""}
 
               <div class="guide-card-content">
-                <div class="guide-date">${escapeHTML(formatDate(post.published_at))}</div>
-                <h2>${escapeHTML(post.title)}</h2>
-                <p>${escapeHTML(post.excerpt || "")}</p>
+                <div class="guide-date">
+                  ${escapeHTML(formatDate(post.published_at))}
+                </div>
+
+                <h2>${title}</h2>
+
+                <p>${excerpt}</p>
+
                 <a class="guide-read"
-                   href="edwise-rehber.html?slug=${encodeURIComponent(post.slug)}">
+                   href="edwise-rehber.html?slug=${slug}">
                   Devamını Oku →
                 </a>
               </div>
@@ -328,32 +608,50 @@
   }
 
   function renderDetail(post) {
-    document.getElementById("guide-heading").hidden = true;
+    heading.hidden = true;
 
-    const image = safeImageUrl(post.image_url);
+    const image = safeUrl(post.image_url, true);
+    const title = escapeHTML(post.title);
+    const safeContent = sanitizeContent(post.content);
 
     content.innerHTML = `
       <article class="guide-detail">
-        <a class="guide-back" href="edwise-rehber.html">← Tüm rehber içeriklerine dön</a>
+        <a class="guide-back" href="edwise-rehber.html">
+          ← Tüm rehber içeriklerine dön
+        </a>
 
-        <div class="guide-date">${escapeHTML(formatDate(post.published_at))}</div>
-        <h1>${escapeHTML(post.title)}</h1>
+        <div class="guide-date">
+          ${escapeHTML(formatDate(post.published_at))}
+        </div>
+
+        <h1>${title}</h1>
 
         ${image ? `
-          <img class="guide-detail-image"
-               src="${escapeHTML(image)}"
-               alt="${escapeHTML(post.title)}">
+          <img
+            class="guide-detail-image"
+            src="${escapeHTML(image)}"
+            alt="${title}"
+            loading="lazy"
+            decoding="async">
         ` : ""}
 
-        <div class="guide-detail-content">${escapeHTML(post.content).replace(/\n/g, "<br>")}</div>
+        <div class="guide-detail-content">
+          ${safeContent}
+        </div>
       </article>
     `;
 
     document.title = post.title + " | EDWISE Rehber";
 
-    const description = document.querySelector('meta[name="description"]');
+    const description = document.querySelector(
+      'meta[name="description"]'
+    );
+
     if (description && post.excerpt) {
-      description.setAttribute("content", post.excerpt);
+      description.setAttribute(
+        "content",
+        String(post.excerpt).slice(0, 160)
+      );
     }
   }
 
@@ -361,7 +659,9 @@
     try {
       const response = await fetch("/api/public-posts", {
         method: "GET",
-        headers: { "Accept": "application/json" },
+        headers: {
+          "Accept": "application/json"
+        },
         cache: "no-store"
       });
 
@@ -380,9 +680,13 @@
       );
 
       if (selectedSlug) {
-        const post = publishedPosts.find(item => item.slug === selectedSlug);
+        const post = publishedPosts.find(item =>
+          item.slug === selectedSlug
+        );
 
         if (!post) {
+          heading.hidden = true;
+
           content.innerHTML = `
             <div class="guide-error">
               <h2>İçerik bulunamadı.</h2>
@@ -390,6 +694,7 @@
               <a href="edwise-rehber.html">EDWISE Rehber'e dön</a>
             </div>
           `;
+
           return;
         }
 
