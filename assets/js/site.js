@@ -316,3 +316,31 @@
   });
 
   
+  // CMS üzerinden yayımlanan ortak site tasarımını uygula.
+  (async function applyPublishedSiteTheme(){
+    try{
+      const response=await fetch("/api/public-settings",{headers:{"Accept":"application/json"},cache:"no-store"});
+      if(!response.ok)return;
+      const data=await response.json();
+      if(!data.success||!data.theme)return;
+      const t=data.theme,root=document.documentElement;
+      if(/^#[0-9a-fA-F]{6}$/.test(t.primary||""))root.style.setProperty("--navy",t.primary);
+      if(/^#[0-9a-fA-F]{6}$/.test(t.accent||""))root.style.setProperty("--gold",t.accent);
+      if(/^#[0-9a-fA-F]{6}$/.test(t.surface||""))root.style.setProperty("--cream",t.surface);
+      if(/^#[0-9a-fA-F]{6}$/.test(t.text||""))root.style.setProperty("--ink",t.text);
+      if(/^#[0-9a-fA-F]{6}$/.test(t.header||"")){
+        document.querySelectorAll("header").forEach(el=>el.style.backgroundColor=t.header);
+        const menu=document.querySelector("header nav#site-menu");if(menu)menu.style.backgroundColor=t.header;
+      }
+      if(/^#[0-9a-fA-F]{6}$/.test(t.hero||"")){
+        document.querySelectorAll(".hero").forEach(el=>el.style.background="linear-gradient(110deg,"+t.hero+"f2 0%,"+t.hero+"e8 55%,"+t.primary+"dd 100%)");
+      }
+      if(/^#[0-9a-fA-F]{6}$/.test(t.footer||""))document.querySelectorAll("footer").forEach(el=>el.style.backgroundColor=t.footer);
+      if(["Inter","Arial","Georgia","'Times New Roman'","Verdana"].includes(t.font||"")){
+        document.body.style.fontFamily=t.font+",ui-sans-serif,system-ui,sans-serif";
+      }
+      if(/^(0|[2-9]|1[0-8])px$/.test(t.buttonRadius||"")){
+        document.querySelectorAll(".btn,.nav-cta,.btn-outline").forEach(el=>el.style.borderRadius=t.buttonRadius);
+      }
+    }catch(error){console.warn("Site tasarımı yüklenemedi:",error);}
+  })();
