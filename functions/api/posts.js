@@ -82,6 +82,8 @@ export async function onRequestGet(context) {
         excerpt,
         content,
         image_url,
+        meta_title,
+        meta_description,
         status,
         published_at,
         created_at,
@@ -248,16 +250,21 @@ export async function onRequestPut(context) {
         excerpt = ?,
         content = ?,
         image_url = ?,
+        meta_title = ?,
+        meta_description = ?,
         status = ?,
         published_at = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
+    `      WHERE id = ?
     `).bind(
       post.title,
       post.slug,
       post.excerpt,
       post.content,
       post.image_url,
+      post.meta_title,
+      post.meta_description,
       post.status,
       publishedAt,
       id
