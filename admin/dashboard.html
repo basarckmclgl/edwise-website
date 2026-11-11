@@ -1662,6 +1662,14 @@ async function loadDesignRecords(){
  const path=designPageSelect.value;
  designRecordSelect.innerHTML='<option value="">İçerik aranıyor...</option>';
  try{
+  const pageData=await api("/api/pages");
+  pages=pageData.pages||pages;
+  const dynamicOptions=pages.filter(x=>x.status==="published"&&!["hakkimizda","hizmetlerimiz","basvuru","iletisim"].includes(x.slug)).map(x=>'<option value="/pages/sayfa.html?slug='+encodeURIComponent(x.slug)+'">Özel sayfa: '+escapeHtml(x.title)+'</option>').join("");
+  const fixedOptions=[...designPageSelect.options].filter(o=>!o.dataset.dynamic).map(o=>o.outerHTML).join("");
+  designPageSelect.innerHTML=fixedOptions+dynamicOptions;
+  const selectedOption=[...designPageSelect.options].find(o=>o.value===path);
+  if(!selectedOption)designPageSelect.value="/";
+  if(designPageSelect.value!==path){refreshDesignFrame()}
   if(path==="/pages/hizmetlerimiz.html"){
    const data=await api("/api/services");
    designRecordSelect.innerHTML='<option value="">Bir hizmet seçin</option>'+data.services.map(x=>'<option value="service:'+escapeHtml(x.id)+'">'+escapeHtml(x.title)+(x.status==="published"?"":" (Taslak)")+'</option>').join("");
@@ -1669,9 +1677,8 @@ async function loadDesignRecords(){
    const data=await api("/api/posts");
    designRecordSelect.innerHTML='<option value="">Bir blog yazısı seçin</option>'+data.posts.map(x=>'<option value="post:'+escapeHtml(x.id)+'">'+escapeHtml(x.title)+(x.status==="published"?"":" (Taslak)")+'</option>').join("");
   }else{
-   const data=await api("/api/pages");
-   pages=data.pages||pages;
-   const slug=path==="/pages/hakkimizda.html"?"hakkimizda":path==="/pages/basvuru.html"?"basvuru":path==="/pages/iletisim.html"?"iletisim":null;
+   const dynamicSlug=new URL(path,location.origin).searchParams.get("slug");
+   const slug=dynamicSlug||(path==="/pages/hakkimizda.html"?"hakkimizda":path==="/pages/basvuru.html"?"basvuru":path==="/pages/iletisim.html"?"iletisim":null);
    const matches=slug?pages.filter(x=>x.slug===slug):pages.filter(x=>x.status==="published");
    designRecordSelect.innerHTML='<option value="">Bir CMS sayfası seçin</option>'+matches.map(x=>'<option value="page:'+Number(x.id)+'">'+escapeHtml(x.title)+(x.status==="published"?"":" (Taslak)")+'</option>').join("");
    if(!matches.length)designRecordSelect.innerHTML='<option value="">Bu sayfa için düzenlenebilir CMS kaydı bulunamadı</option>';
