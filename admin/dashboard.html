@@ -125,7 +125,7 @@ td{color:#e8e5f3}
     <div class="module" data-open="applications" data-superadmin><div class="module-icon">▣</div><h3>Başvurular ↗</h3><p>Gelen başvuruları takip edin.</p></div>
     <div class="module" data-open="media"><div class="module-icon">▧</div><h3>Medya Kütüphanesi ↗</h3><p>Fotoğraf ve dosyalarınızı yönetin.</p></div>
     <div class="module" data-open="settings" data-superadmin><div class="module-icon">⚙</div><h3>Site Ayarları ↗</h3><p>Logo, iletişim ve menü ayarları.</p></div>
-    <div class="module" data-open="users" data-superadmin><div class="module-icon">♙</div><h3>Kullanıcı ve Yetkiler ↗</h3><p>Yönetici hesaplarını yönetin.</p></div>
+    <div class="module" data-open="users" data-superadmin><div class="module-icon">♙</div><h3>Kullanıcı ve Yetkiler ↗</h3><p>Yönetici hesaplarını ve rol izinlerini yönetin.</p></div>
    </div>
   </section>
 
@@ -167,94 +167,77 @@ td{color:#e8e5f3}
     </div>
    </div>
   </section>
-  
-<section id="services" class="hidden">
-  <div class="section-head">
+
+  <section id="services" class="hidden">
+   <div class="section-head">
     <div>
-      <h2>Hizmet Yönetimi</h2>
-      <p>Eğitim ve danışmanlık hizmetlerinizi oluşturun ve yönetin.</p>
+     <h2>Hizmet Yönetimi</h2>
+     <p>Eğitim ve danışmanlık hizmetlerinizi oluşturun ve yönetin.</p>
     </div>
     <button class="primary" id="newService">+ Yeni Hizmet Ekle</button>
-  </div>
+   </div>
 
-  <div id="serviceMessage"></div>
+   <div id="serviceMessage"></div>
 
-  <div id="serviceEditor" class="panel hidden">
+   <div id="serviceEditor" class="panel hidden">
     <h2 id="serviceEditorTitle">Yeni Hizmet</h2>
-
     <form id="serviceForm">
-      <input type="hidden" id="serviceId">
-
-      <div class="form-grid">
-        <div class="field">
-          <label for="serviceTitle">Hizmet başlığı *</label>
-          <input id="serviceTitle" required maxlength="200" placeholder="Örn. Eğitim Danışmanlığı">
-        </div>
-
-        <div class="field">
-          <label for="serviceSlug">URL adresi *</label>
-          <input id="serviceSlug" required placeholder="egitim-danismanligi">
-        </div>
-
-        <div class="field full">
-          <label for="serviceDescription">Kısa açıklama</label>
-          <textarea id="serviceDescription" placeholder="Hizmet hakkında kısa bilgi..."></textarea>
-        </div>
-
-        <div class="field full">
-          <label for="serviceImage">Görsel URL adresi</label>
-          <input id="serviceImage" placeholder="https://...">
-        </div>
-
-        <div class="field full">
-          <label for="serviceContent">Detaylı hizmet içeriği</label>
-          <textarea id="serviceContent" placeholder="Hizmetin ayrıntılarını yazın..."></textarea>
-        </div>
-
-        <div class="field">
-          <label for="serviceStatus">Yayın durumu</label>
-          <select id="serviceStatus">
-            <option value="draft">Taslak</option>
-            <option value="published">Yayında</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="serviceOrder">Gösterim sırası</label>
-          <input id="serviceOrder" type="number" value="0">
-        </div>
+     <input type="hidden" id="serviceId">
+     <div class="form-grid">
+      <div class="field">
+       <label for="serviceTitle">Hizmet başlığı *</label>
+       <input id="serviceTitle" required maxlength="200" placeholder="Örn. Eğitim Danışmanlığı">
       </div>
-
-      <div class="actions">
-        <button class="primary" type="submit" id="saveService">Hizmeti Kaydet</button>
-        <button class="btn" type="button" id="cancelService">Vazgeç</button>
+      <div class="field">
+       <label for="serviceSlug">URL adresi *</label>
+       <input id="serviceSlug" required placeholder="egitim-danismanligi">
       </div>
+      <div class="field full">
+       <label for="serviceDescription">Kısa açıklama</label>
+       <textarea id="serviceDescription" placeholder="Hizmet hakkında kısa bilgi..."></textarea>
+      </div>
+      <div class="field full">
+       <label for="serviceImage">Görsel URL adresi</label>
+       <input id="serviceImage" placeholder="https://...">
+      </div>
+      <div class="field full">
+       <label for="serviceContent">Detaylı hizmet içeriği</label>
+       <textarea id="serviceContent" placeholder="Hizmetin ayrıntılarını yazın..."></textarea>
+      </div>
+      <div class="field">
+       <label for="serviceStatus">Yayın durumu</label>
+       <select id="serviceStatus">
+        <option value="draft">Taslak</option>
+        <option value="published">Yayında</option>
+       </select>
+      </div>
+      <div class="field">
+       <label for="serviceOrder">Gösterim sırası</label>
+       <input id="serviceOrder" type="number" value="0">
+      </div>
+     </div>
+     <div class="actions">
+      <button class="primary" type="submit" id="saveService">Hizmeti Kaydet</button>
+      <button class="btn" type="button" id="cancelService">Vazgeç</button>
+     </div>
     </form>
-  </div>
+   </div>
 
-  <div class="panel">
+   <div class="panel">
     <h2>Kayıtlı Hizmetler</h2>
     <p class="muted">Hizmetleri düzenleyebilir, yayına alabilir veya silebilirsiniz.</p>
-
     <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Hizmet</th>
-            <th>URL</th>
-            <th>Durum</th>
-            <th>Sıra</th>
-            <th>İşlemler</th>
-          </tr>
-        </thead>
-        <tbody id="servicesTable">
-          <tr><td colspan="5">Hizmetler yükleniyor...</td></tr>
-        </tbody>
-      </table>
+     <table>
+      <thead>
+       <tr><th>Hizmet</th><th>URL</th><th>Durum</th><th>Sıra</th><th>İşlemler</th></tr>
+      </thead>
+      <tbody id="servicesTable">
+       <tr><td colspan="5">Hizmetler yükleniyor...</td></tr>
+      </tbody>
+     </table>
     </div>
-  </div>
-</section>
-
+   </div>
+  </section>
 
   <section id="other" class="hidden">
    <div class="panel">
@@ -271,7 +254,6 @@ td{color:#e8e5f3}
 
 <script>
 const otherModules={
- services:["Hizmet Yönetimi","Eğitim ve danışmanlık hizmetleri ekleme ve düzenleme."],
  posts:["Blog Yönetimi","Blog yazısı oluşturma, taslak kaydetme ve yayınlama."],
  applications:["Başvuru Yönetimi","Ziyaretçi başvurularını görüntüleme ve takip etme."],
  media:["Medya Kütüphanesi","Görsel ve dosyaları yükleme ve yönetme."],
@@ -283,7 +265,6 @@ const $=id=>document.getElementById(id);
 let pages=[];
 let currentRole=null;
 
-const superAdminOnly=["applications","settings","users"];
 const editorAllowed=["overview","pages","services","posts","media"];
 
 function canAccess(page){
@@ -317,9 +298,7 @@ function escapeHtml(value){
 }
 
 function showPage(name){
- if(!canAccess(name)){
-  name="overview";
- }
+ if(!canAccess(name)) name="overview";
 
  $("overview").classList.toggle("hidden",name!=="overview");
  $("pages").classList.toggle("hidden",name!=="pages");
@@ -330,7 +309,7 @@ function showPage(name){
   n.classList.toggle("active",n.dataset.page===name);
  });
 
- $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="pages"?"Sayfa Yönetimi":otherModules[name]?.[0]||"";
+ $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":otherModules[name]?.[0]||"";
 
  if(name==="pages")loadPages();
  if(name==="services")loadServices();
@@ -561,176 +540,175 @@ $("logout").addEventListener("click",async()=>{
  }
 });
 
- 
-let services = [];
+let services=[];
 
-function serviceMessage(text, type = "error") {
-  $("serviceMessage").innerHTML =
-    '<div class="message ' + type + '">' + escapeHtml(text) + '</div>';
+function serviceMessage(text,type="error"){
+ $("serviceMessage").innerHTML=
+  '<div class="message '+type+'">'+escapeHtml(text)+'</div>';
 }
 
-async function loadServices() {
-  $("servicesTable").innerHTML =
-    '<tr><td colspan="5">Hizmetler yükleniyor...</td></tr>';
+async function loadServices(){
+ $("servicesTable").innerHTML=
+  '<tr><td colspan="5">Hizmetler yükleniyor...</td></tr>';
 
-  try {
-    const data = await api("/api/services");
-    services = data.services || [];
+ try{
+  const data=await api("/api/services");
+  services=data.services||[];
 
-    const count = document.getElementById("countServices");
-    if (count) count.textContent = services.length;
+  const count=$("countServices");
+  if(count)count.textContent=services.length;
 
-    if (!services.length) {
-      $("servicesTable").innerHTML =
-        '<tr><td colspan="5" class="empty">Henüz hizmet eklenmemiş.</td></tr>';
-      return;
-    }
-
-    $("servicesTable").innerHTML = services.map(service => `
-      <tr>
-        <td>${escapeHtml(service.title)}</td>
-        <td>/${escapeHtml(service.slug)}</td>
-        <td>
-          <span class="status ${service.status === "published" ? "published" : ""}">
-            ${service.status === "published" ? "Yayında" : "Taslak"}
-          </span>
-        </td>
-        <td>${Number(service.sort_order) || 0}</td>
-        <td>
-          <button class="btn" data-service-edit="${escapeHtml(service.id)}">Düzenle</button>
-          <button class="btn btn-danger" data-service-delete="${escapeHtml(service.id)}">Sil</button>
-        </td>
-      </tr>
-    `).join("");
-
-    document.querySelectorAll("[data-service-edit]").forEach(button => {
-      button.addEventListener("click", () => {
-        editService(button.dataset.serviceEdit);
-      });
-    });
-
-    document.querySelectorAll("[data-service-delete]").forEach(button => {
-      button.addEventListener("click", () => {
-        deleteService(button.dataset.serviceDelete);
-      });
-    });
-
-  } catch (error) {
-    $("servicesTable").innerHTML =
-      '<tr><td colspan="5" class="empty">Hizmetler yüklenemedi.</td></tr>';
-    serviceMessage(error.message);
+  if(!services.length){
+   $("servicesTable").innerHTML=
+    '<tr><td colspan="5" class="empty">Henüz hizmet eklenmemiş.</td></tr>';
+   return;
   }
+
+  $("servicesTable").innerHTML=services.map(service=>`
+   <tr>
+    <td>${escapeHtml(service.title)}</td>
+    <td>/${escapeHtml(service.slug)}</td>
+    <td>
+     <span class="status ${service.status==="published"?"published":""}">
+      ${service.status==="published"?"Yayında":"Taslak"}
+     </span>
+    </td>
+    <td>${Number(service.sort_order)||0}</td>
+    <td>
+     <button class="btn" data-service-edit="${escapeHtml(service.id)}">Düzenle</button>
+     <button class="btn btn-danger" data-service-delete="${escapeHtml(service.id)}">Sil</button>
+    </td>
+   </tr>
+  `).join("");
+
+  document.querySelectorAll("[data-service-edit]").forEach(button=>{
+   button.addEventListener("click",()=>{
+    editService(button.dataset.serviceEdit);
+   });
+  });
+
+  document.querySelectorAll("[data-service-delete]").forEach(button=>{
+   button.addEventListener("click",()=>{
+    deleteService(button.dataset.serviceDelete);
+   });
+  });
+
+ }catch(error){
+  $("servicesTable").innerHTML=
+   '<tr><td colspan="5" class="empty">Hizmetler yüklenemedi.</td></tr>';
+  serviceMessage(error.message);
+ }
 }
 
-function resetServiceEditor() {
-  $("serviceForm").reset();
-  $("serviceId").value = "";
-  $("serviceOrder").value = "0";
-  $("serviceEditorTitle").textContent = "Yeni Hizmet";
-  $("serviceEditor").classList.add("hidden");
+function resetServiceEditor(){
+ $("serviceForm").reset();
+ $("serviceId").value="";
+ $("serviceOrder").value="0";
+ $("serviceEditorTitle").textContent="Yeni Hizmet";
+ $("serviceEditor").classList.add("hidden");
 }
 
-$("newService").addEventListener("click", () => {
+$("newService").addEventListener("click",()=>{
+ resetServiceEditor();
+ $("serviceEditor").classList.remove("hidden");
+ $("serviceEditorTitle").textContent="Yeni Hizmet Oluştur";
+ $("serviceTitle").focus();
+});
+
+$("cancelService").addEventListener("click",resetServiceEditor);
+
+$("serviceTitle").addEventListener("input",()=>{
+ if(!$("serviceId").value){
+  $("serviceSlug").value=$("serviceTitle").value
+   .toLocaleLowerCase("tr-TR")
+   .replace(/ı/g,"i")
+   .replace(/ğ/g,"g")
+   .replace(/ü/g,"u")
+   .replace(/ş/g,"s")
+   .replace(/ö/g,"o")
+   .replace(/ç/g,"c")
+   .replace(/[^a-z0-9]+/g,"-")
+   .replace(/^-|-$/g,"");
+ }
+});
+
+function editService(id){
+ const service=services.find(item=>String(item.id)===String(id));
+ if(!service)return;
+
+ $("serviceId").value=service.id;
+ $("serviceTitle").value=service.title||"";
+ $("serviceSlug").value=service.slug||"";
+ $("serviceDescription").value=service.description||"";
+ $("serviceImage").value=service.image_url||"";
+ $("serviceContent").value=service.content||"";
+ $("serviceStatus").value=service.status||"draft";
+ $("serviceOrder").value=service.sort_order??0;
+
+ $("serviceEditorTitle").textContent="Hizmeti Düzenle";
+ $("serviceEditor").classList.remove("hidden");
+ $("serviceEditor").scrollIntoView({behavior:"smooth"});
+}
+
+$("serviceForm").addEventListener("submit",async event=>{
+ event.preventDefault();
+
+ const id=$("serviceId").value;
+
+ const payload={
+  id:id||undefined,
+  title:$("serviceTitle").value.trim(),
+  slug:$("serviceSlug").value.trim().toLowerCase(),
+  description:$("serviceDescription").value.trim(),
+  image_url:$("serviceImage").value.trim(),
+  content:$("serviceContent").value.trim(),
+  status:$("serviceStatus").value,
+  sort_order:Number($("serviceOrder").value)||0
+ };
+
+ $("saveService").disabled=true;
+ $("saveService").textContent="Kaydediliyor...";
+
+ try{
+  const result=await api("/api/services",{
+   method:id?"PUT":"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify(payload)
+  });
+
   resetServiceEditor();
-  $("serviceEditor").classList.remove("hidden");
-  $("serviceEditorTitle").textContent = "Yeni Hizmet Oluştur";
-  $("serviceTitle").focus();
+  serviceMessage(result.message,"success");
+  await loadServices();
+
+ }catch(error){
+  serviceMessage(error.message);
+ }finally{
+  $("saveService").disabled=false;
+  $("saveService").textContent="Hizmeti Kaydet";
+ }
 });
 
-$("cancelService").addEventListener("click", resetServiceEditor);
+async function deleteService(id){
+ const service=services.find(item=>String(item.id)===String(id));
+ if(!service)return;
 
-$("serviceTitle").addEventListener("input", () => {
-  if (!$("serviceId").value) {
-    $("serviceSlug").value = $("serviceTitle").value
-      .toLocaleLowerCase("tr-TR")
-      .replace(/ı/g, "i")
-      .replace(/ğ/g, "g")
-      .replace(/ü/g, "u")
-      .replace(/ş/g, "s")
-      .replace(/ö/g, "o")
-      .replace(/ç/g, "c")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
-  }
-});
+ if(!confirm('"'+service.title+'" hizmetini silmek istediğinizden emin misiniz?')){
+  return;
+ }
 
-function editService(id) {
-  const service = services.find(item => String(item.id) === String(id));
-  if (!service) return;
+ try{
+  const result=await api("/api/services",{
+   method:"DELETE",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({id})
+  });
 
-  $("serviceId").value = service.id;
-  $("serviceTitle").value = service.title || "";
-  $("serviceSlug").value = service.slug || "";
-  $("serviceDescription").value = service.description || "";
-  $("serviceImage").value = service.image_url || "";
-  $("serviceContent").value = service.content || "";
-  $("serviceStatus").value = service.status || "draft";
-  $("serviceOrder").value = service.sort_order ?? 0;
+  serviceMessage(result.message,"success");
+  await loadServices();
 
-  $("serviceEditorTitle").textContent = "Hizmeti Düzenle";
-  $("serviceEditor").classList.remove("hidden");
-  $("serviceEditor").scrollIntoView({ behavior: "smooth" });
-}
-
-$("serviceForm").addEventListener("submit", async event => {
-  event.preventDefault();
-
-  const id = $("serviceId").value;
-
-  const payload = {
-    id: id || undefined,
-    title: $("serviceTitle").value.trim(),
-    slug: $("serviceSlug").value.trim().toLowerCase(),
-    description: $("serviceDescription").value.trim(),
-    image_url: $("serviceImage").value.trim(),
-    content: $("serviceContent").value.trim(),
-    status: $("serviceStatus").value,
-    sort_order: Number($("serviceOrder").value) || 0
-  };
-
-  $("saveService").disabled = true;
-  $("saveService").textContent = "Kaydediliyor...";
-
-  try {
-    const result = await api("/api/services", {
-      method: id ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    resetServiceEditor();
-    serviceMessage(result.message, "success");
-    await loadServices();
-
-  } catch (error) {
-    serviceMessage(error.message);
-  } finally {
-    $("saveService").disabled = false;
-    $("saveService").textContent = "Hizmeti Kaydet";
-  }
-});
-
-async function deleteService(id) {
-  const service = services.find(item => String(item.id) === String(id));
-  if (!service) return;
-
-  if (!confirm('"' + service.title + '" hizmetini silmek istediğinizden emin misiniz?')) {
-    return;
-  }
-
-  try {
-    const result = await api("/api/services", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id })
-    });
-
-    serviceMessage(result.message, "success");
-    await loadServices();
-
-  } catch (error) {
-    serviceMessage(error.message);
-  }
+ }catch(error){
+  serviceMessage(error.message);
+ }
 }
 
 checkSession();
