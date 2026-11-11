@@ -228,14 +228,14 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
      <div class="stat"><span>Etkileşim Etkinlikleri</span><h2 id="anEvents">—</h2><p>Google Analytics eventCount</p></div>
      <div class="stat"><span>Tıklama / Form Etkinlikleri</span><h2 id="anClicks">—</h2><p>GA4 etkinlik adlarına göre</p></div>
      <div class="stat"><span>Kaydırma Etkinlikleri</span><h2 id="anScrolls">—</h2><p>GA4 scroll etkinliği</p></div>
-     <div class="stat"><span>Cloudflare Tekil IP</span><h2 id="anUniqueCF">—</h2><p>Cloudflare tahmini tekil ziyaretçi</p></div>
+     <div class="stat"><span>Günlük Tekil IP Toplamı</span><h2 id="anUniqueCF">—</h2><p>Cloudflare tahmini tekil ziyaretçi</p></div>
     </div>
     <div class="grid analytics-charts" style="grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);margin-top:16px">
      <div class="panel"><h3>Günlük trafik ve görüntüleme</h3><p class="muted">Google Analytics oturum ve sayfa görüntüleme</p><canvas id="analyticsDailyChart" height="260" style="width:100%;height:260px"></canvas></div>
      <div class="panel"><h3>Ziyaretçilerin ülkelere dağılımı</h3><p class="muted">Oturum bazında ilk 7 ülke</p><div id="analyticsDonut" class="analytics-donut"><div class="analytics-donut-center"><strong id="analyticsCountryTotal">—</strong><small>Oturum</small></div></div><div id="analyticsLegend" class="analytics-legend"></div></div>
     </div>
     <div class="grid analytics-charts" style="grid-template-columns:minmax(0,1.2fr) minmax(280px,1fr);margin-top:16px">
-     <div class="panel"><h3>Ülkelere göre trafik</h3><p class="muted">Google Analytics oturum ve görüntüleme / Cloudflare istek sayısı ayrı sütunlarda</p><div class="table-wrap"><table style="min-width:500px"><thead><tr><th>Ülke</th><th>Oturum</th><th>Görüntüleme</th><th>CF İstek</th></tr></thead><tbody id="analyticsCountryTable"><tr><td colspan="4">Veriler bekleniyor...</td></tr></tbody></table></div></div>
+     <div class="panel"><h3>Ülkelere göre trafik</h3><p class="muted">Google Analytics oturum ve görüntüleme / Cloudflare istek sayısı ayrı sütunlarda</p><div class="table-wrap"><table style="min-width:500px"><thead><tr><th>Ülke</th><th>Oturum</th><th>Görüntüleme</th><th>Tıklama</th><th>Kaydırma</th><th>CF İstek</th></tr></thead><tbody id="analyticsCountryTable"><tr><td colspan="6">Veriler bekleniyor...</td></tr></tbody></table></div></div>
      <div class="panel"><h3>En çok görüntülenen sayfalar</h3><p class="muted">Google Analytics pagePath raporu</p><div class="table-wrap"><table style="min-width:280px"><thead><tr><th>Sayfa</th><th>Görüntüleme</th></tr></thead><tbody id="analyticsPagesTable"><tr><td colspan="2">Veriler bekleniyor...</td></tr></tbody></table></div></div>
     </div>
     <p class="muted" style="margin-top:14px">Not: Tıklama ve kaydırma sayıları, GA4 üzerinde ilgili etkinlikler kurulmuşsa görünür. Cloudflare istek sayısı sayfa görüntüleme veya gerçek kişi sayısı ile aynı değildir.</p>
@@ -1109,7 +1109,7 @@ function renderAnalytics(data){
  (g.countries||[]).forEach(x=>merged.set(x.country,{...x}));
  (cf.countries||[]).forEach(x=>{const old=merged.get(x.country)||{country:x.country,sessions:0,pageViews:0};old.requests=x.requests;merged.set(x.country,old);});
  const list=[...merged.values()].sort((a,b)=>(b.sessions||b.requests||0)-(a.sessions||a.requests||0));
- $("analyticsCountryTable").innerHTML=list.map(x=>'<tr><td>'+escapeHtml(x.country)+'</td><td>'+analyticsNumber(x.sessions)+'</td><td>'+analyticsNumber(x.pageViews)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="4">Henüz ülke verisi yok.</td></tr>';
+ $("analyticsCountryTable").innerHTML=list.map(x=>'<tr><td>'+escapeHtml(x.country)+'</td><td>'+analyticsNumber(x.sessions)+'</td><td>'+analyticsNumber(x.pageViews)+'</td><td>'+analyticsNumber(x.clicks)+'</td><td>'+analyticsNumber(x.scrolls)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="6">Henüz ülke verisi yok.</td></tr>';
  $("analyticsPagesTable").innerHTML=(g.pages||[]).map(x=>'<tr><td>'+escapeHtml(x.path)+'</td><td>'+analyticsNumber(x.pageViews)+'</td></tr>').join("")||'<tr><td colspan="2">Sayfa verisi bulunamadı.</td></tr>';
 }
 async function loadAnalytics(){
