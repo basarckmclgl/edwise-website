@@ -268,9 +268,25 @@
       if (!response.ok) throw new Error("Yayımlanmış sayfalar alınamadı: " + response.status);
       const data = await response.json();
       if (!data.success || !Array.isArray(data.pages)) return;
+      let menuConfig=[];
+      try{const settingsResponse=await fetch("/api/public-settings",{headers:{"Accept":"application/json"},cache:"no-store"});const settingsData=await settingsResponse.json();if(settingsData.success&&Array.isArray(settingsData.menu))menuConfig=settingsData.menu;}catch{}
+      const menuByKey=new Map(menuConfig.map(item=>[item.key,item]));
+      const hiddenSlugs=new Set(["hakkimizda","iletisim","hizmetlerimiz"]);
+      siteMenu.querySelectorAll("a").forEach(link=>{
+        const href=link.getAttribute("href")||"";
+        const match=menuConfig.find(item=>item.url===href || (item.key==="home"&&href==="/"));
+        if(match)link.style.display=match.visible===false?"none":"";
+      });
       const fixedSlugs = new Set(["hakkimizda", "iletisim", "hizmetlerimiz"]);
       const insertBefore = siteMenu.querySelector(":scope > .menu-apply") || siteMenu.querySelector(":scope > .menu-contact");
-      data.pages.filter(page => page && page.slug && page.title && !fixedSlugs.has(page.slug)).reverse().forEach(page => {
+      data.pages.filter(page => page && page.slug && page.title && !fixedSlugs.has(page.slug))
+        .sort((a,b)=>{
+          const ai=menuConfig.findIndex(item=>item.key==="page-"+a.id);
+          const bi=menuConfig.findIndex(item=>item.key==="page-"+b.id);
+          return (ai<0?9999:ai)-(bi<0?9999:bi);
+        }).forEach(page => {
+        const config=menuByKey.get("page-"+page.id);
+        if(config&&config.visible===false)return;
         const alreadyAdded = Array.from(siteMenu.querySelectorAll("a[data-cms-slug]")).some(link => link.dataset.cmsSlug === page.slug);
         if (alreadyAdded) return;
         const link = document.createElement("a");
@@ -324,6 +340,14 @@
       const data=await response.json();
       if(!data.success||!data.theme)return;
       const t=data.theme,root=document.documentElement;
+      const setText=(selector,value)=>{if(typeof value==="string"&&value.trim())document.querySelectorAll(selector).forEach(el=>el.textContent=value);};
+      setText(".hero .eyebrow",t.heroEyebrow);
+      setText(".hero .hero-content h1",t.heroTitle);
+      setText(".hero .hero-content > p",t.heroDescription);
+      setText(".hero .hero-actions .btn:first-child",t.heroButton);
+      setText(".home-about .section-head h2",t.surfaceTitle);
+      setText(".home-about .section-head > p",t.surfaceDescription);
+      setText("footer > span:nth-of-type(1)",t.footerText);
       if(/^#[0-9a-fA-F]{6}$/.test(t.primary||""))root.style.setProperty("--navy",t.primary);
       if(/^#[0-9a-fA-F]{6}$/.test(t.accent||""))root.style.setProperty("--gold",t.accent);
       if(/^#[0-9a-fA-F]{6}$/.test(t.surface||""))root.style.setProperty("--cream",t.surface);
