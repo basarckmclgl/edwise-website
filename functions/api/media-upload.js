@@ -34,8 +34,19 @@ function toBase64(bytes) {
   return btoa(binary);
 }
 
+function checkOrigin(request){const origin=request.headers.get("Origin");try{return !!origin&&origin===new URL(request.url).origin}catch{return false}}
+
+function validImageSignature(bytes,type){
+ if(type==="image/png")return bytes.length>=8&&[137,80,78,71,13,10,26,10].every((v,i)=>bytes[i]===v);
+ if(type==="image/jpeg")return bytes.length>=3&&bytes[0]===255&&bytes[1]===216&&bytes[2]===255;
+ if(type==="image/gif")return bytes.length>=6&&String.fromCharCode(...bytes.subarray(0,6)).match(/^GIF8[79]a$/);
+ if(type==="image/webp")return bytes.length>=12&&String.fromCharCode(...bytes.subarray(0,4))==="RIFF"&&String.fromCharCode(...bytes.subarray(8,12))==="WEBP";
+ return false;
+}
+
 export async function onRequestPost(context) {
   try {
+    if(!checkOrigin(context.request))return json({error:"İstek kaynağı geçersiz."},403);
     const auth = await requireEditor(context);
 
     if (auth.response) return auth.response;
@@ -75,6 +86,7 @@ export async function onRequestPost(context) {
     const url = `/api/media/${filename}`;
 
     const bytes = new Uint8Array(await file.arrayBuffer());
+    if(!validImageSignature(bytes,file.type))return json({error:"Dosya içeriği seçilen görsel türüyle eşleşmiyor."},400);
 
     const githubResponse = await fetch(
       `https://api.github.com/repos/${repo}/contents/${path}`,
