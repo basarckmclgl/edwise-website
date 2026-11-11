@@ -86,7 +86,36 @@ td{color:#e8e5f3}
 .post-canvas ul,.post-canvas ol{padding-left:32px}
 .editor-help{font-size:12px;color:var(--muted);line-height:1.6;margin:9px 0 0}
 @media(max-width:650px){.post-canvas{padding:18px 14px;min-height:350px}.word-toolbar{gap:6px}.toolbar-group{border-right:0;padding-right:0}}
+.image-drop-zone {
+    margin-top: 12px;
+    padding: 25px;
+    border: 2px dashed #8055ed;
+    border-radius: 10px;
+    background: #171326;
+    color: #eee8ff;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: .2s;
+}
 
+.image-drop-zone span,
+.image-drop-zone small {
+    color: #aaa7c0;
+    font-size: 12px;
+}
+
+.image-drop-zone.drag-over {
+    background: #292044;
+    border-color: #a78bfa;
+}
+
+.image-drop-zone.uploading {
+    opacity: .6;
+    pointer-events: none;
+}
 </style>
 </head>
 <body>
@@ -305,7 +334,9 @@ td{color:#e8e5f3}
         <div class="toolbar-group">
          <button type="button" class="editor-tool" data-insert="ul">• Liste</button>
          <button type="button" class="editor-tool" data-insert="ol">1. Liste</button>
-         <button type="button" class="editor-tool" id="insertImageBlock">＋ Görsel</button>
+         <button type="button" class="editor-tool" id="insertImageBlock">📁 Görsel Yükle</button>
+         <button type="button" class="editor-tool" id="insertImageUrl">🔗 URL ile Ekle</button>
+         <input type="file" id="postImageFile" accept="image/*" hidden>
         </div>
         <div class="toolbar-group">
          <button type="button" class="editor-tool" id="addParagraph">＋ Paragraf bloğu</button>
@@ -317,7 +348,13 @@ td{color:#e8e5f3}
          <button type="button" class="editor-tool danger-tool" id="deleteBlock">Bloğu sil</button>
         </div>
        </div>
-       <div id="postCanvas" class="post-canvas" contenteditable="true" spellcheck="true"><p>Yazınızı buraya yazmaya başlayın...</p></div>
+       <div id="postCanvas" class="post-canvas" contenteditable="true" spellcheck="true">
+       <div id="imageDropZone" class="image-drop-zone">
+       <strong>Görseli buraya sürükleyip bırakın</strong>
+       <span>veya bilgisayarınızdan seçmek için tıklayın.</span>
+       <small>JPG, PNG, WEBP — Maksimum 8 MB</small>
+       </div>
+        <p>Yazınızı buraya yazmaya başlayın...</p></div>
        <textarea id="postContent" class="hidden" required></textarea>
        <p class="editor-help">Bir bloğa tıklayarak seçin. Araçlarla biçimlendirin, blok ekleyin, taşıyın veya silin. Görsel eklemek için https:// ile başlayan görsel URL adresini girin.</p>
       </div>
@@ -881,14 +918,140 @@ $("postToolbar").querySelectorAll("[data-block]").forEach(button=>button.addEven
 $("postToolbar").querySelectorAll("[data-insert]").forEach(button=>button.addEventListener("click",()=>insertPostBlock(button.dataset.insert,"<li>Liste öğesi</li>")));
 $("addParagraph").addEventListener("click",()=>insertPostBlock("p","<br>"));
 $("addHeading").addEventListener("click",()=>insertPostBlock("h2","Başlık yazın"));
+function insertPostImage(url,altText="Blog görseli"){
+    const figure=document.createElement("figure");
+    const img=document.createElement("img");
+    const caption=document.createElement("figcaption");
+
+    img.src=url;
+    img.alt=altText;
+    img.loading="lazy";
+
+    caption.contentEditable="true";
+    caption.textContent="Görsel açıklaması (isteğe bağlı)";
+
+    figure.append(img,caption);
+
+    if(activePostBlock && activePostBlock.parentElement===$("postCanvas")){
+        activePostBlock.after(figure);
+    }else{
+        $("postCanvas").appendChild(figure);
+    }
+
+    selectPostBlock(figure);
+    $("postContent").value=$("postCanvas").innerHTML;
+}
+
+async function uploadPostImage(file){
+    if(!file)return;
+
+    if(!file.type.startsWith("image/")){
+        alert("Lütfen bir görsel dosyası seçin.");
+        return;
+    }
+
+    if(file.size>8*1024*1024){
+        alert("Görsel en fazla 8 MB olabilir.");
+        return;
+    }
+
+    const zone=$("imageDropZone");
+    zone.classList.add("uploading");
+    zone.querySelector("strong").textContent="Görsel yükleniyor...";
+
+    try{
+        const formData=new FormData();
+        formData.append("file",file);
+
+        const response=await fetch("/api/media-upload",{
+            method:"POST",
+            credentials:"same-origin",
+            body:formData
+        });
+
+        const data=await response.json();
+
+        if(!response.ok || data.success===false){
+            throw new Error(data.message||"Görsel yüklenemedi.");
+        }
+
+        const imageUrl=
+            data.file_url ||
+            data.url ||
+            data.media?.file_url ||
+            data.media?.url ||
+            data.file?.url;
+
+        if(!imageUrl){
+            throw new Error("Sunucu görsel adresi döndürmedi.");
+        }
+
+        insertPostImage(imageUrl,file.name);
+
+    }catch(error){
+        alert(error.message);
+    }finally{
+        zone.classList.remove("uploading");
+        zone.querySelector("strong").textContent="Görseli buraya sürükleyip bırakın";
+        $("postImageFile").value="";
+    }
+}
+
 $("insertImageBlock").addEventListener("click",()=>{
- const url=prompt("Görselin http:// veya https:// ile başlayan URL adresini girin:");
- if(!url)return;
- if(!/^https?:\/\//i.test(url)){alert("Geçerli bir http:// veya https:// görsel adresi girin.");return;}
- const figure=document.createElement("figure"),img=document.createElement("img"),caption=document.createElement("figcaption");
- img.src=url;img.alt="Blog görseli";img.loading="lazy";caption.contentEditable="true";caption.textContent="Görsel açıklaması (isteğe bağlı)";figure.append(img,caption);
- if(activePostBlock&&activePostBlock.parentElement===$("postCanvas"))activePostBlock.after(figure);else $("postCanvas").appendChild(figure);
- selectPostBlock(figure);$("postContent").value=$("postCanvas").innerHTML;
+    $("postImageFile").click();
+});
+
+$("postImageFile").addEventListener("change",event=>{
+    uploadPostImage(event.target.files[0]);
+});
+
+$("insertImageUrl").addEventListener("click",()=>{
+    const url=prompt("Görsel URL adresini girin:");
+    if(!url)return;
+
+    try{
+        const parsed=new URL(url);
+        if(!["http:","https:"].includes(parsed.protocol)){
+            throw new Error();
+        }
+    }catch{
+        alert("Geçerli bir görsel URL adresi girin.");
+        return;
+    }
+
+    insertPostImage(url);
+});
+
+const imageDropZone=$("imageDropZone");
+
+imageDropZone.addEventListener("click",()=>{
+    $("postImageFile").click();
+});
+
+[imageDropZone,$("postCanvas")].forEach(target=>{
+
+    target.addEventListener("dragover",event=>{
+        event.preventDefault();
+        imageDropZone.classList.add("drag-over");
+    });
+
+    target.addEventListener("dragleave",event=>{
+        if(!target.contains(event.relatedTarget)){
+            imageDropZone.classList.remove("drag-over");
+        }
+    });
+
+    target.addEventListener("drop",event=>{
+        event.preventDefault();
+        imageDropZone.classList.remove("drag-over");
+
+        const file=event.dataTransfer.files[0];
+
+        if(file){
+            uploadPostImage(file);
+        }
+    });
+
 });
 $("moveBlockUp").addEventListener("click",()=>{
  if(!activePostBlock||!activePostBlock.previousElementSibling)return;
