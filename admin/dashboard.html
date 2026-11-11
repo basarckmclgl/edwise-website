@@ -221,7 +221,6 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
     <div class="grid analytics-stats">
      <div class="stat"><span>Günlük Tekil IP Toplamı</span><h2 id="cfUnique">—</h2><p>Günlük tekil IP değerleri toplamı; 30 günlük tekil kişi değildir</p></div>
      <div class="stat"><span>Toplam İstek</span><h2 id="cfRequests">—</h2><p>Cloudflare üzerinden geçen HTTP istekleri</p></div>
-     <div class="stat"><span>Sayfa Görüntüleme</span><h2 id="cfPageViews">—</h2><p>Cloudflare HTML sayfa görüntüleme sayısı</p></div>
      <div class="stat"><span>Ülke Sayısı</span><h2 id="cfCountryCount">—</h2><p>Trafik alınan ülke ve bölgeler</p></div>
     </div>
     <div class="grid analytics-charts" style="grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);margin-top:16px">
@@ -1133,7 +1132,6 @@ function renderAnalytics(data){
  window._edwiseAnalyticsData=data;const cf=data.cloudflare||{},t=cf.totals||{};
  $("cfUnique").textContent=cf.configured?analyticsNumber(t.dailyUniqueIpTotal):"—";
  $("cfRequests").textContent=cf.configured?analyticsNumber(t.requests):"—";
- $("cfPageViews").textContent=cf.configured?analyticsNumber(t.pageViews):"—";
  $("cfCountryCount").textContent=cf.configured?analyticsNumber((cf.countries||[]).length):"—";
  $("analyticsMessage").className="message "+(cf.error?"error":"success");
  $("analyticsMessage").textContent=cf.error?cf.error:"Cloudflare verileri alındı. Dönem: "+data.period.startDate+" – "+data.period.endDate;
