@@ -349,10 +349,11 @@ td{color:#e8e5f3}
         </div>
        </div>
        <div id="postCanvas" class="post-canvas" contenteditable="true" spellcheck="true">
-       <div id="imageDropZone" class="image-drop-zone">
-       <strong>Görseli buraya sürükleyip bırakın</strong>
-       <span>veya bilgisayarınızdan seçmek için tıklayın.</span>
-       <small>JPG, PNG, WEBP — Maksimum 8 MB</small>
+       <div id="imageDropZone" class="image-drop-zone" role="button" tabindex="0" aria-label="Görsel yüklemek için tıklayın veya sürükleyip bırakın">
+        <strong>Görseli buraya sürükleyip bırakın</strong>
+        <span>veya bilgisayarınızdan seçmek için tıklayın.</span>
+        <small>JPG, PNG, WEBP — Maksimum 8 MB</small>
+        </div>
        </div>
         <p>Yazınızı buraya yazmaya başlayın...</p></div>
        <textarea id="postContent" class="hidden" required></textarea>
@@ -956,10 +957,11 @@ async function uploadPostImage(file){
     }
 
     const zone=$("imageDropZone");
-    zone.classList.add("uploading");
-    zone.querySelector("strong").textContent="Görsel yükleniyor...";
 
     try{
+        if(!zone) throw new Error("Görsel yükleme alanı bulunamadı. Sayfayı yenileyip tekrar deneyin.");
+        zone.classList.add("uploading");
+        zone.querySelector("strong").textContent="Görsel yükleniyor...";
         const formData=new FormData();
         formData.append("file",file);
 
@@ -991,9 +993,11 @@ async function uploadPostImage(file){
     }catch(error){
         alert(error.message);
     }finally{
+    if(zone){
         zone.classList.remove("uploading");
-        zone.querySelector("strong").textContent="Görseli buraya sürükleyip bırakın";
-        $("postImageFile").value="";
+        const label=zone.querySelector("strong");
+        if(label) label.textContent="Görseli buraya sürükleyip bırakın";
+    }$("postImageFile").value="";
     }
 }
 
