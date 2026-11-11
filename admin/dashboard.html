@@ -1298,6 +1298,195 @@ async function deletePost(id){
  }
 }
 
+let adminUsers=[];
+let editingUserActive=1;
+
+function showUsersMessage(text,type="error"){
+ $("usersMessage").innerHTML=
+  '<div class="message '+type+'">'+escapeHtml(text)+'</div>';
+}
+
+function resetUserForm(){
+ $("userForm").reset();
+ $("userId").value="";
+ $("userFormTitle").textContent="Yeni Kullanıcı Ekle";
+ $("saveUser").textContent="Kullanıcı Oluştur";
+ $("userPassword").required=true;
+ editingUserActive=1;
+}
+
+async function loadUsers(){
+ $("usersTable").innerHTML=
+  '<tr><td colspan="6">Kullanıcılar yükleniyor...</td></tr>';
+
+ try{
+  const data=await api("/api/admins");
+  adminUsers=data.admins||[];
+
+  if(!adminUsers.length){
+   $("usersTable").innerHTML=
+    '<tr><td colspan="6" class="empty">Henüz kullanıcı bulunmuyor.</td></tr>';
+   return;
+  }
+
+  const currentUsername=$("username").textContent;
+
+  $("usersTable").innerHTML=adminUsers.map(user=>{
+   const isSuper=user.role==="superadmin";
+   const isSelf=user.username===currentUsername;
+   const protectedUser=isSuper||isSelf;
+
+   return `
+    <tr>
+     <td>${escapeHtml(user.username)}</td>
+     <td>${escapeHtml(user.email)}</td>
+     <td>${isSuper?"Super Admin":"İçerik Editörü"}</td>
+     <td>
+      <span class="status ${Number(user.is_active)===1?"published":""}">
+       ${Number(user.is_active)===1?"Aktif":"Pasif"}
+      </span>
+     </td>
+     <td>${escapeHtml(user.last_login_at||"Henüz giriş yapmadı")}</td>
+     <td>
+      ${
+       protectedUser
+       ? '<span class="muted">Korunan hesap</span>'
+       : `
+        <button type="button" class="btn" data-user-edit="${Number(user.id)}">Düzenle</button>
+        <button type="button" class="btn ${Number(user.is_active)===1?"btn-danger":""}" data-user-toggle="${Number(user.id)}">
+         ${Number(user.is_active)===1?"Yetkiyi Kapat":"Yetkiyi Aç"}
+        </button>
+       `
+      }
+     </td>
+    </tr>
+   `;
+  }).join("");
+
+ }catch(error){
+  $("usersTable").innerHTML=
+   '<tr><td colspan="6" class="empty">'+escapeHtml(error.message)+'</td></tr>';
+ }
+}
+
+function editUser(id){
+ const user=adminUsers.find(item=>String(item.id)===String(id));
+ if(!user||user.role==="superadmin")return;
+
+ $("userId").value=user.id;
+ $("userUsername").value=user.username||"";
+ $("userEmail").value=user.email||"";
+ $("userPassword").value="";
+ $("userPassword").required=false;
+ $("userRole").value="content_admin";
+
+ editingUserActive=Number(user.is_active)===1?1:0;
+
+ $("userFormTitle").textContent="Kullanıcıyı Düzenle";
+ $("saveUser").textContent="Değişiklikleri Kaydet";
+
+ $("userFormTitle").scrollIntoView({behavior:"smooth"});
+}
+
+$("userForm").addEventListener("submit",async event=>{
+ event.preventDefault();
+
+ const id=$("userId").value;
+ const username=$("userUsername").value.trim();
+ const email=$("userEmail").value.trim();
+ const password=$("userPassword").value;
+
+ if(!username||!email||(!id&&!password)){
+  showUsersMessage("Lütfen zorunlu alanları doldurun.");
+  return;
+ }
+
+ if(password&&password.length<8){
+  showUsersMessage("Şifre en az 8 karakter olmalıdır.");
+  return;
+ }
+
+ const body={
+  username,
+  email,
+  role:"content_admin",
+  is_active:!!editingUserActive
+ };
+
+ if(password)body.password=password;
+
+ $("saveUser").disabled=true;
+ $("saveUser").textContent="Kaydediliyor...";
+
+ try{
+  const result=await api(
+   id?"/api/admins?id="+encodeURIComponent(id):"/api/admins",
+   {
+    method:id?"PUT":"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(body)
+   }
+  );
+
+  resetUserForm();
+  showUsersMessage(result.message||"Kullanıcı kaydedildi.","success");
+  await loadUsers();
+
+ }catch(error){
+  showUsersMessage(error.message);
+ }finally{
+  $("saveUser").disabled=false;
+  $("saveUser").textContent=$("userId").value
+   ?"Değişiklikleri Kaydet"
+   :"Kullanıcı Oluştur";
+ }
+});
+
+$("cancelUser").addEventListener("click",()=>{
+ resetUserForm();
+ $("usersMessage").innerHTML="";
+});
+
+$("usersTable").addEventListener("click",async event=>{
+ const editButton=event.target.closest("[data-user-edit]");
+ const toggleButton=event.target.closest("[data-user-toggle]");
+
+ if(editButton){
+  editUser(editButton.dataset.userEdit);
+  return;
+ }
+
+ if(!toggleButton)return;
+
+ const id=toggleButton.dataset.userToggle;
+ const user=adminUsers.find(item=>String(item.id)===String(id));
+
+ if(!user)return;
+
+ const currentlyActive=Number(user.is_active)===1;
+ const action=currentlyActive?"erişimini kapatmak":"erişimini açmak";
+
+ if(!confirm(user.username+" adlı kullanıcının "+action+" istediğinizden emin misiniz?"))return;
+
+ try{
+  const result=await api("/api/admins?id="+encodeURIComponent(id),{
+   method:"PUT",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+    username:user.username,
+    email:user.email,
+    role:"content_admin",
+    is_active:!currentlyActive
+   })
+  });
+
+  showUsersMessage(result.message||"Kullanıcı yetkisi güncellendi.","success");
+  await loadUsers();
+
+ }catch(error){
+  showUsersMessage(error.message);
+ }
+});
 checkSession();
 </script>
 </body>
