@@ -11,6 +11,17 @@ function json(data, status = 200) {
   });
 }
 
+async function checkOrigin(request) {
+  const origin = request.headers.get("Origin");
+  if (!origin) return false;
+
+  try {
+    return origin === new URL(request.url).origin;
+  } catch {
+    return false;
+  }
+}
+
 function cleanSlug(value) {
   return String(value || "")
     .trim()
@@ -58,6 +69,7 @@ function getRequestId(context, data = {}) {
 export async function onRequestGet(context) {
   const auth = await requireEditor(context);
   if (auth.response) return auth.response;
+  
 
   try {
     const { results } = await context.env.DB.prepare(`
@@ -93,6 +105,12 @@ export async function onRequestGet(context) {
 export async function onRequestPost(context) {
   const auth = await requireEditor(context);
   if (auth.response) return auth.response;
+  if (!(await checkOrigin(context.request))) {
+  return json({
+    success: false,
+    message: "Geçersiz istek kaynağı."
+  }, 403);
+}
 
   try {
     const data = await context.request.json();
@@ -175,6 +193,12 @@ export async function onRequestPost(context) {
 export async function onRequestPut(context) {
   const auth = await requireEditor(context);
   if (auth.response) return auth.response;
+  if (!(await checkOrigin(context.request))) {
+  return json({
+    success: false,
+    message: "Geçersiz istek kaynağı."
+  }, 403);
+}
 
   try {
     const data = await context.request.json();
@@ -251,6 +275,12 @@ export async function onRequestPut(context) {
 export async function onRequestDelete(context) {
   const auth = await requireEditor(context);
   if (auth.response) return auth.response;
+  if (!(await checkOrigin(context.request))) {
+  return json({
+    success: false,
+    message: "Geçersiz istek kaynağı."
+  }, 403);
+}
 
   try {
     const url = new URL(context.request.url);
