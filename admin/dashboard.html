@@ -138,6 +138,27 @@ td{color:#e8e5f3}
 .settings-empty{padding:22px;border:1px dashed var(--border);border-radius:10px;color:var(--muted);font-size:13px}
 @media(max-width:800px){.settings-layout{grid-template-columns:1fr;gap:10px}.settings-nav{position:static;display:flex;overflow-x:auto;gap:5px;padding:0 0 8px}.settings-nav-label{display:none}.settings-nav-item{white-space:nowrap;width:auto;flex:0 0 auto}.settings-nav-item span{display:none}.settings-search-wrap{margin-top:8px}}
 
+
+/* Admin panel preference presets */
+html.panel-light{--bg:#f4f5fa;--panel:#ffffff;--border:#d9dce8;--text:#242338;--muted:#66657b;--purple:#8055ed;--light:#8055ed;color-scheme:light}
+html.panel-light body{background:var(--bg);color:var(--text)}
+html.panel-light .sidebar{background:#fff;border-color:var(--border)}
+html.panel-light .nav{color:#56546b}
+html.panel-light .nav:hover,html.panel-light .nav.active{background:#eee8fb;color:#332052}
+html.panel-light .panel,html.panel-light .settings-main .actions{background:#fff;color:var(--text);border-color:var(--border)}
+html.panel-light input,html.panel-light select,html.panel-light textarea{background:#fff;color:#242338;border-color:#c9cada}
+html.panel-light .settings-nav-item{color:#4c4960}
+html.panel-light .settings-nav-item.active{background:#eee8fb;color:#302044}
+html.panel-compact .nav{padding:8px 10px;margin:1px 0}
+html.panel-compact .panel{padding:15px}
+html.panel-compact .settings-layout{gap:14px}
+html.panel-high-contrast{--muted:#dedbea}
+html.panel-light.panel-high-contrast{--muted:#333}
+html.panel-high-contrast a,html.panel-high-contrast button,html.panel-high-contrast input,html.panel-high-contrast select{outline-offset:3px}
+html.panel-high-contrast :focus-visible{outline:3px solid currentColor!important}
+html.panel-reduced-motion *,html.panel-reduced-motion *::before,html.panel-reduced-motion *::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+html.panel-underlined-links a{text-decoration:underline!important;text-underline-offset:3px}
+
 </style>
 </head>
 <body>
