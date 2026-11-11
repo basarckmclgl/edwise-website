@@ -160,23 +160,31 @@
     }
   }
 
+  const builtInServices = [
+    { title: "YÖKDİL", description: "YÖKDİL sınavına yönelik hazırlık ve hedef odaklı çalışma desteği.", href: "yokdil.html", slug: "yokdil" },
+    { title: "YDS", description: "YDS sınavına hazırlık, kelime, dil bilgisi ve soru çözüm çalışmaları.", href: "yds.html", slug: "yds" },
+    { title: "IELTS", description: "IELTS sınavının tüm bölümlerine yönelik hazırlık ve gelişim desteği.", href: "ielts.html", slug: "ielts" },
+    { title: "TOEFL", description: "TOEFL sınavına yönelik akademik İngilizce ve sınav hazırlık desteği.", href: "toefl.html", slug: "toefl" },
+    { title: "Speaking Club", description: "İngilizce konuşma pratiği, akıcılık ve özgüven geliştirme çalışmaları.", href: "speaking-club.html", slug: "speaking-club" },
+    { title: "Eğitim Danışmanlığı", description: "Hedeflerinize ve ihtiyaçlarınıza uygun eğitim planlaması ve rehberlik.", href: "egitim-danismanligi.html", slug: "egitim-danismanligi" },
+    { title: "Coaching & Mentoring", description: "Kişisel hedefler, öğrenme disiplini ve gelişim sürecine yönelik mentorluk.", href: "coaching-mentoring.html", slug: "coaching-mentoring" }
+  ];
+
   function renderServices(services) {
     container.replaceChildren();
+    const published = Array.isArray(services) ? services : [];
+    const known = new Set(builtInServices.map(item => item.slug));
+    const extra = published.filter(service => !known.has(String(service.slug || "").toLowerCase()));
+    const allServices = [
+      ...builtInServices,
+      ...extra.map(service => ({
+        ...service,
+        href: "basvuru.html"
+      }))
+    ];
 
-    if (!services.length) {
-      const message = createElement(
-        "p",
-        "services-empty",
-        "Şu anda yayımlanmış hizmet bulunmuyor. Yeni hizmetlerimiz yakında burada olacak."
-      );
-
-      container.appendChild(message);
-      return;
-    }
-
-    services.forEach(function (service) {
+    allServices.forEach(function (service) {
       const card = createElement("article", "card service-card");
-
       const imageUrl = safeImageUrl(service.image_url);
 
       if (imageUrl) {
@@ -184,54 +192,17 @@
         image.src = imageUrl;
         image.alt = service.title || "EDWISE hizmet görseli";
         image.loading = "lazy";
-        image.onerror = function () {
-          image.remove();
-        };
-
+        image.onerror = function () { image.remove(); };
         card.appendChild(image);
       } else {
-        card.appendChild(
-          createElement("div", "card-icon", "🎓")
-        );
+        card.appendChild(createElement("div", "card-icon", "🎓"));
       }
 
-      card.appendChild(
-        createElement("h3", "", service.title || "EDWISE Hizmeti")
-      );
+      card.appendChild(createElement("h3", "", service.title || "EDWISE Hizmeti"));
+      card.appendChild(createElement("p", "service-description", service.description || ""));
 
-      const description =
-        service.description ||
-        service.content ||
-        "Bu hizmet hakkında ayrıntılı bilgi almak için bizimle iletişime geçebilirsiniz.";
-
-      card.appendChild(
-        createElement("p", "service-description", service.description || "")
-      );
-
-      if (service.content) {
-        const detail = createElement("div", "service-rich-content");
-        if (window.EDWISEContent) window.EDWISEContent.render(detail, service.content);
-        else detail.textContent = service.content;
-        card.appendChild(detail);
-      }
-
-      const button = createElement(
-        "a",
-        "btn service-button",
-        "Bilgi Al"
-      );
-
-      const message = "Merhaba, " +
-        (service.title || "EDWISE hizmeti") +
-        " hakkında bilgi almak istiyorum.";
-
-      button.href =
-        "https://wa.me/905512501701?text=" +
-        encodeURIComponent(message);
-
-      button.target = "_blank";
-      button.rel = "noopener noreferrer";
-
+      const button = createElement("a", "btn service-button", "Detayları Gör");
+      button.href = service.href;
       card.appendChild(button);
       container.appendChild(card);
     });
