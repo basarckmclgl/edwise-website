@@ -6,7 +6,7 @@ async function originOk(request){
  try{return !!origin && origin===new URL(request.url).origin;}catch{return false;}
 }
 async function readSettings(DB){
- const result=await DB.prepare("SELECT setting_key, setting_value FROM site_settings WHERE setting_key IN ('draft_theme','live_theme','menu_theme','site_preferences')").all();
+ const result=await DB.prepare("SELECT setting_key, setting_value FROM site_settings WHERE setting_key IN ('draft_theme','live_theme','menu_theme','site_preferences','panel_preferences')").all();
  const values={};
  for(const row of result.results||[]){
   try{values[row.setting_key]=JSON.parse(row.setting_value);}catch{values[row.setting_key]={};}
@@ -18,7 +18,7 @@ export async function onRequestGet(context){
   const auth=await requireSuperAdmin(context);
   if(auth.response)return auth.response;
   const values=await readSettings(context.env.DB);
-  return json({success:true,draft:values.draft_theme||{},live:values.live_theme||{},menu:values.menu_theme||{},preferences:values.site_preferences||{}});
+  return json({success:true,draft:values.draft_theme||{},live:values.live_theme||{},menu:values.menu_theme||{},preferences:values.site_preferences||{},panelPreferences:values.panel_preferences||{}});
  }catch(error){return json({success:false,message:"Tasarım ayarları alınamadı."},500);}
 }
 export async function onRequestPost(context){
@@ -39,6 +39,17 @@ export async function onRequestPost(context){
    return json({success:true,message:"Menü ayarları kaydedildi."});
   }
 
+  if(body.action==="save_panel_preferences"){
+   const allowed=["theme","accent","density","fontScale","contrast","motion","links","timezone","dateFormat"];
+   const choices={theme:["dark","light","system"],accent:["purple","blue","green","orange"],density:["comfortable","compact"],fontScale:["normal","large","larger"],contrast:["normal","high"],motion:["full","reduced"],links:["normal","underlined"],timezone:["Europe/Istanbul","UTC"],dateFormat:["dd.mm.yyyy","yyyy-mm-dd","mm/dd/yyyy"]};
+   const preferences={};
+   for(const key of allowed){const value=body.preferences?.[key];if(typeof value!=="string"||!choices[key].includes(value))return json({success:false,message:"Panel ayarlarından biri geçersiz: "+key},400);preferences[key]=value;}
+   const serialized=JSON.stringify(preferences);
+   const existing=await context.env.DB.prepare("SELECT id FROM site_settings WHERE setting_key=? LIMIT 1").bind("panel_preferences").first();
+   if(existing)await context.env.DB.prepare("UPDATE site_settings SET setting_value=?, updated_at=datetime('now') WHERE setting_key=?").bind(serialized,"panel_preferences").run();
+   else await context.env.DB.prepare("INSERT INTO site_settings (setting_key, setting_value, updated_at) VALUES (?, ?, datetime('now'))").bind("panel_preferences",serialized).run();
+   return json({success:true,message:"Yönetim paneli tercihleri kaydedildi."});
+  }
   if(body.action==="save_preferences"){
    const allowed=["siteName","tagline","logoUrl","faviconUrl","language","timezone","phone","whatsapp","email","address","hours","mapUrl","seoTitle","seoDescription","seoKeywords","canonical","robots","instagram","facebook","youtube","linkedin","tiktok","gaId","gsc","metaPixel","colorMode","accentPreset","density","fontScale","contrast","motion","links","dateFormat","cookieBanner","analyticsConsent","externalLinks"];
    const preferences={};
