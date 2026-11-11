@@ -1,3 +1,4 @@
+import { logAudit, ensureAuditTable } from "./_audit.js";
 
 async function verifyPassword(password, storedHash) {
   const parts = storedHash.split("$");
@@ -87,9 +88,16 @@ export async function onRequestPost({ request, env }) {
       return json({ success: false, message: "İstek kaynağı geçersiz." }, 403);
     }
 
+    await env.DB.exec(`CREATE TABLE IF NOT EXISTS admin_login_attempts (ip_address TEXT NOT NULL, username TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, first_attempt_at TEXT NOT NULL DEFAULT (datetime('now')), last_attempt_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY(ip_address,username));`);
+    const ip = request.headers.get("CF-Connecting-IP") || "unknown";
     const data = await request.json();
-    const username = String(data.username || "").trim();
+    const username = String(data.username || "").trim().slice(0,50);
     const password = String(data.password || "");
+    const attempt = await env.DB.prepare("SELECT attempts,first_attempt_at FROM admin_login_attempts WHERE ip_address=? AND username=?").bind(ip,username.toLowerCase()).first();
+    if(attempt && Number(attempt.attempts)>=8 && (Date.now()-new Date(attempt.first_attempt_at+"Z").getTime())<15*60*1000){
+      await logAudit(env.DB,request,null,{action:"login_rate_limited",entity_type:"security",entity_title:"Giriş denemesi sınırlandı",details:{username,attempts:attempt.attempts}});
+      return json({success:false,message:"Çok fazla başarısız giriş denemesi. 15 dakika sonra tekrar deneyin."},429);
+    }
 
     if (!username || !password || password.length > 128) {
       return json({ success: false, message: "Kullanıcı adı veya parola hatalı." }, 400);
@@ -103,6 +111,8 @@ export async function onRequestPost({ request, env }) {
     `).bind(username).first();
 
     if (!admin) {
+      await env.DB.prepare(`INSERT INTO admin_login_attempts(ip_address,username,attempts) VALUES(?,?,1) ON CONFLICT(ip_address,username) DO UPDATE SET attempts=CASE WHEN (julianday('now')-julianday(first_attempt_at))*1440>15 THEN 1 ELSE attempts+1 END,first_attempt_at=CASE WHEN (julianday('now')-julianday(first_attempt_at))*1440>15 THEN datetime('now') ELSE first_attempt_at END,last_attempt_at=datetime('now')`).bind(ip,username.toLowerCase()).run();
+      await logAudit(env.DB,request,null,{action:"login_failed",entity_type:"security",entity_title:"Başarısız yönetici girişi",details:{username,reason:"account_not_found"}});
       return json({ success: false, message: "Kullanıcı adı veya parola hatalı." }, 401);
     }
 
@@ -112,8 +122,11 @@ export async function onRequestPost({ request, env }) {
     );
 
     if (!validPassword) {
+      await env.DB.prepare(`INSERT INTO admin_login_attempts(ip_address,username,attempts) VALUES(?,?,1) ON CONFLICT(ip_address,username) DO UPDATE SET attempts=CASE WHEN (julianday('now')-julianday(first_attempt_at))*1440>15 THEN 1 ELSE attempts+1 END,first_attempt_at=CASE WHEN (julianday('now')-julianday(first_attempt_at))*1440>15 THEN datetime('now') ELSE first_attempt_at END,last_attempt_at=datetime('now')`).bind(ip,username.toLowerCase()).run();
+      await logAudit(env.DB,request,null,{action:"login_failed",entity_type:"security",entity_title:"Başarısız yönetici girişi",details:{username,reason:"invalid_password"}});
       return json({ success: false, message: "Kullanıcı adı veya parola hatalı." }, 401);
     }
+    await env.DB.prepare("DELETE FROM admin_login_attempts WHERE ip_address=? AND username=?").bind(ip,username.toLowerCase()).run();
 
     const randomBytes = crypto.getRandomValues(new Uint8Array(32));
     const token = Array.from(randomBytes)
@@ -143,6 +156,7 @@ export async function onRequestPost({ request, env }) {
       WHERE id = ?
     `).bind(admin.id).run();
 
+    await logAudit(env.DB,request,{id:admin.id,username:admin.username,role:admin.role},{action:"login_success",entity_type:"admin",entity_id:admin.id,entity_title:admin.username,details:{}});
     const cookie = [
       `edwise_session=${token}`,
       "HttpOnly",
