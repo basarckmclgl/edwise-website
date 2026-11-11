@@ -527,7 +527,8 @@ function showPage(name){
  $("pages").classList.toggle("hidden",name!=="pages");
  $("services").classList.toggle("hidden",name!=="services");
  $("posts").classList.toggle("hidden",name!=="posts");
- $("other").classList.toggle("hidden",!otherModules[name]);
+ $("users").classList.toggle("hidden",name!=="users");
+$("other").classList.toggle("hidden",!otherModules[name] || name==="users");
 
  document.querySelectorAll(".nav").forEach(n=>{
   n.classList.toggle("active",n.dataset.page===name);
@@ -538,6 +539,7 @@ function showPage(name){
  if(name==="pages")loadPages();
  if(name==="services")loadServices();
  if(name==="posts")loadPosts();
+    if(name==="users")loadUsers();
 
  $("mediaLink").classList.toggle("hidden",name!=="media");
 
