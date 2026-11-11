@@ -259,6 +259,7 @@ export async function onRequestPut(context) {
 }
 
 export async function onRequestDelete(context) {
+  
   const auth = await requireEditor(context);
   if (auth.response) return auth.response;
 
