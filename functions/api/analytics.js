@@ -11,7 +11,7 @@ async function onCloudflare(env,startDate,endDate){
  const countryMap=new Map();
  groups.forEach(g=>(g.sum?.countryMap||[]).forEach(v=>{const key=v.clientCountryName||"Bilinmiyor";const row=countryMap.get(key)||{country:key,requests:0};row.requests+=Number(v.requests||0);countryMap.set(key,row);}));
  const daily=groups.map(g=>({date:g.dimensions.date,requests:Number(g.sum?.requests||0),uniqueVisitors:Number(g.uniq?.uniques||0)}));
- const totals=daily.reduce((a,v)=>({requests:a.requests+v.requests,dailyUniqueIpTotal:a.dailyUniqueIpTotal+v.uniqueVisitors}),{requests:0,pageViews:0,dailyUniqueIpTotal:0});
+ const totals=daily.reduce((a,v)=>({requests:a.requests+v.requests,dailyUniqueIpTotal:a.dailyUniqueIpTotal+v.uniqueVisitors}),{requests:0,dailyUniqueIpTotal:0});
  let pages=[],pathWarning="";
  try{
   const pq=`query($zone:String!,$from:Time!,$to:Time!){viewer{zones(filter:{zoneTag:$zone}){httpRequestsAdaptiveGroups(limit:10,filter:{datetime_geq:$from,datetime_lt:$to},orderBy:[count_DESC]){count dimensions{clientRequestPath}}}}}`;
