@@ -52,9 +52,14 @@ export async function onRequestGet(context) {
       ORDER BY updated_at DESC
     `).all();
 
+    const migration = await context.env.DB.prepare(
+      "SELECT setting_value FROM site_settings WHERE setting_key = ? LIMIT 1"
+    ).bind("static_pages_migrated_v1").first();
+
     return json({
       success: true,
-      pages: result.results || []
+      pages: result.results || [],
+      staticPagesMigrated: migration?.setting_value === "done"
     });
   } catch (error) {
     return json({
