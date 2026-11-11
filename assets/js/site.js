@@ -260,49 +260,33 @@
 
   const siteMenu = document.querySelector('#site-menu');
 
-  // CMS'de yayımlanan özel sayfaları ziyaretçi menüsüne otomatik ekle.
+  // Panelde yayımlanan tüm CMS sayfalarını ziyaretçi menüsüne ekle.
   (async function loadCmsMenuPages() {
     if (!siteMenu) return;
-
     try {
-      const response = await fetch("/api/public-pages", {
-        headers: { "Accept": "application/json" },
-        cache: "no-store"
-      });
-      if (!response.ok) return;
-
+      const response = await fetch("/api/public-pages", { headers: { "Accept": "application/json" }, cache: "no-store" });
+      if (!response.ok) throw new Error("Yayımlanmış sayfalar alınamadı: " + response.status);
       const data = await response.json();
       if (!data.success || !Array.isArray(data.pages)) return;
-
       const fixedSlugs = new Set(["hakkimizda", "iletisim", "hizmetlerimiz"]);
-      const insertBefore = siteMenu.querySelector(".menu-apply") || siteMenu.querySelector(".menu-contact");
-
-      data.pages
-        .filter(page => page && page.slug && page.title && !fixedSlugs.has(page.slug))
-        .reverse()
-        .forEach(page => {
-          const existing = siteMenu.querySelector('a[data-cms-slug="' + CSS.escape(page.slug) + '"]');
-          if (existing) return;
-
-          const link = document.createElement("a");
-          link.href = "/pages/sayfa.html?slug=" + encodeURIComponent(page.slug);
-          link.dataset.cmsSlug = page.slug;
-
-          const icon = document.createElement("span");
-          icon.className = "menu-item-icon";
-          icon.setAttribute("aria-hidden", "true");
-          icon.textContent = "📄";
-
-          const label = document.createElement("span");
-          label.textContent = page.title;
-
-          link.append(icon, label);
-          if (insertBefore) siteMenu.insertBefore(link, insertBefore);
-          else siteMenu.appendChild(link);
-        });
-    } catch (error) {
-      console.error("CMS menü sayfaları yüklenemedi:", error);
-    }
+      const insertBefore = siteMenu.querySelector(":scope > .menu-apply") || siteMenu.querySelector(":scope > .menu-contact");
+      data.pages.filter(page => page && page.slug && page.title && !fixedSlugs.has(page.slug)).reverse().forEach(page => {
+        const alreadyAdded = Array.from(siteMenu.querySelectorAll("a[data-cms-slug]")).some(link => link.dataset.cmsSlug === page.slug);
+        if (alreadyAdded) return;
+        const link = document.createElement("a");
+        link.href = "/pages/sayfa.html?slug=" + encodeURIComponent(page.slug);
+        link.dataset.cmsSlug = page.slug;
+        const icon = document.createElement("span");
+        icon.className = "menu-item-icon";
+        icon.setAttribute("aria-hidden", "true");
+        icon.textContent = "📄";
+        const label = document.createElement("span");
+        label.textContent = page.title;
+        link.append(icon, label);
+        if (insertBefore && insertBefore.parentElement === siteMenu) siteMenu.insertBefore(link, insertBefore);
+        else siteMenu.appendChild(link);
+      });
+    } catch (error) { console.error("CMS menü sayfaları yüklenemedi:", error); }
   })();
 
   function setMenuOpen(open) {
