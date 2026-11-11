@@ -274,7 +274,15 @@
       const hiddenSlugs=new Set(["hakkimizda","iletisim","hizmetlerimiz"]);
       siteMenu.querySelectorAll("a").forEach(link=>{
         const href=link.getAttribute("href")||"";
-        const match=menuConfig.find(item=>item.url===href || (item.key==="home"&&href==="/"));
+        const path=(new URL(link.href,location.origin)).pathname;
+        const key=link.classList.contains("menu-contact")?"contact-cta":
+          path==="/index.html"||path==="/"?"home":
+          path.endsWith("/hizmetlerimiz.html")?"services":
+          path.endsWith("/edwise-rehber.html")?"guide":
+          path.endsWith("/hakkimizda.html")?"about":
+          path.endsWith("/basvuru.html")?"apply":
+          path.endsWith("/iletisim.html")?"contact":null;
+        const match=menuConfig.find(item=>item.key===key);
         if(match)link.style.display=match.visible===false?"none":"";
       });
       const fixedSlugs = new Set(["hakkimizda", "iletisim", "hizmetlerimiz"]);
