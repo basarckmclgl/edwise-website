@@ -6,7 +6,7 @@ window.EDWISEContent={
   const value=String(raw||"");if(!value.trim()){root.replaceChildren();return}
   if(!/<\/?[a-z][\s\S]*>/i.test(value)){root.textContent=value;return}
   const parsed=new DOMParser().parseFromString(value,"text/html");
-  const tags=new Set(["P","H2","H3","H4","UL","OL","LI","BLOCKQUOTE","STRONG","B","EM","I","U","A","IMG","FIGURE","FIGCAPTION","HR","DIV","SPAN"]);
+  const tags=new Set(["P","H2","H3","H4","UL","OL","LI","BLOCKQUOTE","STRONG","B","EM","I","U","A","IMG","FIGURE","FIGCAPTION","HR","DIV","SPAN","TABLE","TBODY","THEAD","TR","TD","TH"]);
   const fonts=["Arial","Helvetica","Times New Roman","Times","Calibri","Georgia","Verdana","Tahoma"];
   const clean=node=>{
    if(node.nodeType===Node.TEXT_NODE)return document.createTextNode(node.textContent);
