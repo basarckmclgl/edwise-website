@@ -1665,7 +1665,7 @@ async function loadDesignRecords(){
  try{
   const pageData=await api("/api/pages");
   pages=pageData.pages||pages;
-  const dynamicOptions=pages.filter(x=>x.status==="published"&&!["hakkimizda","hizmetlerimiz","basvuru","iletisim"].includes(x.slug)).map(x=>'<option value="/pages/sayfa.html?slug='+encodeURIComponent(x.slug)+'">Özel sayfa: '+escapeHtml(x.title)+'</option>').join("");
+  const dynamicOptions=pages.filter(x=>x.status==="published"&&!["hakkimizda","hizmetlerimiz","basvuru","iletisim"].includes(x.slug)).map(x=>'<option data-dynamic="1" value="/pages/sayfa.html?slug='+encodeURIComponent(x.slug)+'">Özel sayfa: '+escapeHtml(x.title)+'</option>').join("");
   const fixedOptions=[...designPageSelect.options].filter(o=>!o.dataset.dynamic).map(o=>o.outerHTML).join("");
   designPageSelect.innerHTML=fixedOptions+dynamicOptions;
   const selectedOption=[...designPageSelect.options].find(o=>o.value===path);
