@@ -966,6 +966,7 @@ async function checkSession(){
   $("welcomeName").textContent=name;
 
   applyRolePermissions();
+  if(currentRole==="superadmin")await loadSiteSettings();
   showPage("overview");
 
  }catch{
