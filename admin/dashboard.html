@@ -556,7 +556,6 @@ td{color:#e8e5f3}
 const otherModules={
  applications:["Başvuru Yönetimi","Ziyaretçi başvurularını görüntüleme ve takip etme."],
  media:["Medya Kütüphanesi","Görsel ve dosyaları yükleme ve yönetme."],
- settings:["Site Ayarları","Logo, iletişim bilgileri, menüler ve sosyal medya bağlantıları."],
  users:["Kullanıcı ve Yetkiler","Yönetici hesapları ve rol izinlerini yönetme."]
 };
 
@@ -605,8 +604,7 @@ function showPage(name){
  $("services").classList.toggle("hidden",name!=="services");
  $("posts").classList.toggle("hidden",name!=="posts");
  $("users").classList.toggle("hidden",name!=="users");
-$("other").classList.toggle("hidden",!otherModules[name] || name==="users" || name==="settings");
- $("settings").classList.toggle("hidden",name!=="settings");
+$("other").classList.toggle("hidden",!otherModules[name] || name==="users");
 
  document.querySelectorAll(".nav").forEach(n=>{
   n.classList.toggle("active",n.dataset.page===name);
@@ -619,12 +617,12 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users" || na
  if(name==="services")loadServices();
  if(name==="posts")loadPosts();
     if(name==="users")loadUsers();
- if(name==="settings")loadThemeSettings();
+ if(name==="designcenter")loadThemeSettings();
 
  $("mediaLink").classList.toggle("hidden",name!=="media");
 
- if(name==="settings")$("breadcrumb").textContent="Tasarım Yönetimi";
- if(otherModules[name] && name!=="settings"){
+ if(name==="designcenter")$("breadcrumb").textContent="Tasarım Yönetimi";
+ if(otherModules[name]){
   $("otherTitle").textContent=otherModules[name][0];
   $("otherDescription").textContent=otherModules[name][1];
  }
