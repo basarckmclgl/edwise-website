@@ -125,6 +125,7 @@ td{color:#e8e5f3}
  <div class="menu-label">ANA MENÜ</div>
  <button class="nav active" data-page="overview"><span class="ico">▦</span><span>Genel Bakış</span></button>
  <button class="nav" data-page="designcenter"><span class="ico">▣</span><span>Site Tasarım Merkezi</span></button>
+ <button class="nav" data-page="sitesettings" data-superadmin><span class="ico">⚙</span><span>Site Ayarları</span></button>
 
  <div class="menu-label">İÇERİK YÖNETİMİ</div>
  <button class="nav" data-page="pages"><span class="ico">▤</span><span>Sayfa Yönetimi</span></button>
@@ -471,6 +472,56 @@ td{color:#e8e5f3}
    </div>
   </section>
     
+
+<section id="sitesettings" class="hidden" data-superadmin>
+ <div class="section-head"><div><h2>Site Ayarları</h2><p>Site kimliği, iletişim, SEO, sosyal medya ve ölçümleme bilgilerini yönetin.</p></div></div>
+ <div id="siteSettingsMessage"></div>
+ <div class="actions">
+  <button class="primary" type="button" data-settings-tab="general">Genel</button>
+  <button class="btn" type="button" data-settings-tab="contact">İletişim</button>
+  <button class="btn" type="button" data-settings-tab="seo">SEO</button>
+  <button class="btn" type="button" data-settings-tab="social">Sosyal Medya</button>
+  <button class="btn" type="button" data-settings-tab="tracking">Ölçümleme</button>
+ </div>
+ <form id="siteSettingsForm">
+  <div class="panel" data-settings-panel="general"><h2>Genel bilgiler</h2><div class="form-grid">
+   <div class="field"><label>Site adı</label><input id="ssSiteName" maxlength="100"></div>
+   <div class="field"><label>Kısa slogan</label><input id="ssTagline" maxlength="180"></div>
+   <div class="field"><label>Logo URL</label><input id="ssLogoUrl" type="url" maxlength="500" placeholder="https://..."></div>
+   <div class="field"><label>Favicon URL</label><input id="ssFaviconUrl" type="url" maxlength="500" placeholder="https://..."></div>
+   <div class="field"><label>Varsayılan dil</label><select id="ssLanguage"><option value="tr">Türkçe</option><option value="en">English</option></select></div>
+   <div class="field"><label>Saat dilimi</label><select id="ssTimezone"><option value="Europe/Istanbul">Türkiye</option><option value="UTC">UTC</option></select></div>
+  </div></div>
+  <div class="panel hidden" data-settings-panel="contact"><h2>İletişim bilgileri</h2><div class="form-grid">
+   <div class="field"><label>Telefon</label><input id="ssPhone" maxlength="40"></div>
+   <div class="field"><label>WhatsApp (ülke koduyla)</label><input id="ssWhatsapp" maxlength="30"></div>
+   <div class="field"><label>E-posta</label><input id="ssEmail" type="email" maxlength="254"></div>
+   <div class="field"><label>Adres</label><input id="ssAddress" maxlength="300"></div>
+   <div class="field"><label>Çalışma saatleri</label><input id="ssHours" maxlength="180"></div>
+   <div class="field"><label>Harita bağlantısı</label><input id="ssMapUrl" type="url" maxlength="500"></div>
+  </div></div>
+  <div class="panel hidden" data-settings-panel="seo"><h2>SEO varsayılanları</h2><p class="muted">Sayfaya özel SEO bilgileri varsa onlar önceliklidir.</p><div class="form-grid">
+   <div class="field full"><label>Varsayılan SEO başlığı</label><input id="ssSeoTitle" maxlength="250"></div>
+   <div class="field full"><label>Varsayılan SEO açıklaması</label><textarea id="ssSeoDescription" maxlength="500"></textarea></div>
+   <div class="field full"><label>Anahtar kelimeler</label><input id="ssSeoKeywords" maxlength="500"></div>
+   <div class="field"><label>Canonical site adresi</label><input id="ssCanonical" type="url" maxlength="300"></div>
+   <div class="field"><label>Arama motoru indeksleme</label><select id="ssRobots"><option value="index,follow">İzin ver</option><option value="noindex,nofollow">Engelle</option></select></div>
+  </div></div>
+  <div class="panel hidden" data-settings-panel="social"><h2>Sosyal medya bağlantıları</h2><div class="form-grid">
+   <div class="field"><label>Instagram</label><input id="ssInstagram" type="url" maxlength="500"></div>
+   <div class="field"><label>Facebook</label><input id="ssFacebook" type="url" maxlength="500"></div>
+   <div class="field"><label>YouTube</label><input id="ssYoutube" type="url" maxlength="500"></div>
+   <div class="field"><label>LinkedIn</label><input id="ssLinkedin" type="url" maxlength="500"></div>
+   <div class="field"><label>TikTok</label><input id="ssTiktok" type="url" maxlength="500"></div>
+  </div></div>
+  <div class="panel hidden" data-settings-panel="tracking"><h2>Analitik ve doğrulama</h2><p class="muted">Kimlikleri kaydetmek entegrasyonu tek başına çalıştırmaz; site koduna bağlanmaları ayrıca gerekir. Gizli API anahtarı veya şifre girmeyin.</p><div class="form-grid">
+   <div class="field"><label>Google Analytics ID</label><input id="ssGaId" maxlength="40" placeholder="G-XXXXXXXXXX"></div>
+   <div class="field"><label>Google Search Console doğrulama kodu</label><input id="ssGsc" maxlength="200"></div>
+   <div class="field"><label>Meta Pixel ID</label><input id="ssMetaPixel" maxlength="30"></div>
+  </div></div>
+  <div class="actions"><button class="primary" type="submit" id="saveSiteSettings">Ayarları Kaydet</button><button class="btn" type="button" id="reloadSiteSettings">Son Kaydedileni Yükle</button></div>
+ </form>
+</section>
 <section id="users" class="hidden">
  <div class="section-head">
   <div>
@@ -601,6 +652,7 @@ function showPage(name){
 
  $("overview").classList.toggle("hidden",name!=="overview");
  $("designcenter").classList.toggle("hidden",name!=="designcenter");
+ $("sitesettings").classList.toggle("hidden",name!=="sitesettings");
  $("pages").classList.toggle("hidden",name!=="pages");
  $("services").classList.toggle("hidden",name!=="services");
  $("posts").classList.toggle("hidden",name!=="posts");
@@ -611,7 +663,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
   n.classList.toggle("active",n.dataset.page===name);
  });
 
- $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="designcenter"?"Site Tasarım Merkezi":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":otherModules[name]?.[0]||"";
+ $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="designcenter"?"Site Tasarım Merkezi":name==="sitesettings"?"Site Ayarları":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":otherModules[name]?.[0]||"";
 
  if(name==="designcenter")loadDesignRecords();
  if(name==="pages")loadPages();
@@ -619,6 +671,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
  if(name==="posts")loadPosts();
     if(name==="users")loadUsers();
  if(name==="designcenter")loadThemeSettings();
+ if(name==="sitesettings")loadSiteSettings();
 
  $("mediaLink").classList.toggle("hidden",name!=="media");
 
@@ -1667,6 +1720,15 @@ $("editDesignRecord").addEventListener("click",()=>{
  if(type==="service"){showPage("services");editService(id)}
  if(type==="post"){showPage("posts");editPost(id)}
 });
+
+
+const siteSettingFields={siteName:"ssSiteName",tagline:"ssTagline",logoUrl:"ssLogoUrl",faviconUrl:"ssFaviconUrl",language:"ssLanguage",timezone:"ssTimezone",phone:"ssPhone",whatsapp:"ssWhatsapp",email:"ssEmail",address:"ssAddress",hours:"ssHours",mapUrl:"ssMapUrl",seoTitle:"ssSeoTitle",seoDescription:"ssSeoDescription",seoKeywords:"ssSeoKeywords",canonical:"ssCanonical",robots:"ssRobots",instagram:"ssInstagram",facebook:"ssFacebook",youtube:"ssYoutube",linkedin:"ssLinkedin",tiktok:"ssTiktok",gaId:"ssGaId",gsc:"ssGsc",metaPixel:"ssMetaPixel"};
+let activeSettingsTab="general";
+function showSettingsTab(tab){activeSettingsTab=tab;document.querySelectorAll("[data-settings-panel]").forEach(p=>p.classList.toggle("hidden",p.dataset.settingsPanel!==tab));document.querySelectorAll("[data-settings-tab]").forEach(b=>{const on=b.dataset.settingsTab===tab;b.classList.toggle("primary",on);b.classList.toggle("btn",!on);});}
+document.querySelectorAll("[data-settings-tab]").forEach(b=>b.addEventListener("click",()=>showSettingsTab(b.dataset.settingsTab)));
+async function loadSiteSettings(){try{const data=await api("/api/settings");const values=data.preferences||{};Object.entries(siteSettingFields).forEach(([key,id])=>{if($(id))$(id).value=values[key]||"";});showSettingsTab(activeSettingsTab);$("siteSettingsMessage").innerHTML="";}catch(error){$("siteSettingsMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}}
+$("reloadSiteSettings").addEventListener("click",loadSiteSettings);
+$("siteSettingsForm").addEventListener("submit",async event=>{event.preventDefault();const preferences={};Object.entries(siteSettingFields).forEach(([key,id])=>preferences[key]=$(id).value.trim());const button=$("saveSiteSettings");button.disabled=true;button.textContent="Kaydediliyor...";try{const result=await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"save_preferences",preferences})});$("siteSettingsMessage").innerHTML='<div class="message success">'+escapeHtml(result.message||"Site ayarları kaydedildi.")+'</div>';}catch(error){$("siteSettingsMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}finally{button.disabled=false;button.textContent="Ayarları Kaydet";}});
 
 checkSession();
 </script>
