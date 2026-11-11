@@ -327,6 +327,68 @@ td{color:#e8e5f3}
     </div>
   </div>
 </section>
+  
+<section id="posts" class="hidden">
+  <div class="page-header">
+    <h2>Blog Yönetimi</h2>
+    <p>Blog yazılarını oluştur, düzenle ve yayınla.</p>
+  </div>
+
+  <div id="postEditor">
+    <h3 id="postEditorTitle">Yeni Blog Yazısı</h3>
+
+    <form id="postForm">
+      <input type="hidden" id="postId">
+
+      <label>Yazı Başlığı</label>
+      <input type="text" id="postTitle" placeholder="Blog başlığı" required>
+
+      <label>Bağlantı Adresi (Slug)</label>
+      <input type="text" id="postSlug" placeholder="blog-yazi-adresi" required>
+
+      <label>Kısa Açıklama</label>
+      <textarea id="postExcerpt" placeholder="Yazının kısa açıklaması"></textarea>
+
+      <label>Blog İçeriği</label>
+      <textarea id="postContent" rows="10" placeholder="Blog yazısının içeriği..." required></textarea>
+
+      <label>Kapak Görseli URL</label>
+      <input type="text" id="postImage" placeholder="Görsel bağlantısı">
+
+      <label>Yayın Durumu</label>
+      <select id="postStatus">
+        <option value="draft">Taslak</option>
+        <option value="published">Yayınla</option>
+      </select>
+
+      <button type="submit">Kaydet</button>
+      <button type="button" onclick="resetPostEditor()">Temizle</button>
+    </form>
+  </div>
+
+  <hr>
+
+  <h3>Blog Yazıları</h3>
+
+  <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>Başlık</th>
+          <th>Bağlantı</th>
+          <th>Durum</th>
+          <th>Yayın Tarihi</th>
+          <th>İşlemler</th>
+        </tr>
+      </thead>
+      <tbody id="postsTableBody">
+        <tr>
+          <td colspan="5">Blog yazıları yükleniyor...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
 
   <section id="other" class="hidden">
    <div class="panel">
