@@ -11,25 +11,6 @@ function json(data, status = 200) {
   });
 }
 
-async function getIdInfo(DB) {
-  const result = await DB.prepare(
-    "PRAGMA table_info(posts)"
-  ).all();
-
-  const idColumn = (result.results || []).find(
-    column => column.name === "id"
-  );
-
-  if (!idColumn) {
-    throw new Error("Posts tablosunda ID sütunu bulunamadı.");
-  }
-
-  return {
-    integer: String(idColumn.type || "").toUpperCase().includes("INT"),
-    primaryKey: Number(idColumn.pk) > 0
-  };
-}
-
 function cleanSlug(value) {
   return String(value || "")
     .trim()
@@ -50,17 +31,8 @@ function validatePost(data) {
   const slug = cleanSlug(data.slug || title);
   const status = data.status === "published" ? "published" : "draft";
 
-  if (!title) {
-    throw new Error("Blog başlığı zorunludur.");
-  }
-
-  if (!slug) {
-    throw new Error("Geçerli bir URL adresi girilmelidir.");
-  }
-
-  if (!/^[a-z0-9-]+$/.test(slug)) {
-    throw new Error("URL adresi yalnızca İngilizce harf, rakam ve tire içerebilir.");
-  }
+  if (!title) throw new Error("Blog başlığı zorunludur.");
+  if (!slug) throw new Error("Geçerli bir URL adresi girilmelidir.");
 
   return {
     title,
@@ -72,13 +44,24 @@ function validatePost(data) {
   };
 }
 
+function getRequestId(context, data = {}) {
+  const url = new URL(context.request.url);
+
+  return (
+    data.id ??
+    url.searchParams.get("id") ??
+    context.params?.id ??
+    null
+  );
+}
+
 export async function onRequestGet(context) {
   const auth = await requireEditor(context);
   if (auth.response) return auth.response;
 
   try {
-    const { results } = await context.env.DB.prepare(
-      `SELECT
+    const { results } = await context.env.DB.prepare(`
+      SELECT
         id,
         title,
         slug,
@@ -90,8 +73,8 @@ export async function onRequestGet(context) {
         created_at,
         updated_at
       FROM posts
-      ORDER BY created_at DESC`
-    ).all();
+      ORDER BY created_at DESC
+    `).all();
 
     return json({
       success: true,
@@ -100,7 +83,6 @@ export async function onRequestGet(context) {
 
   } catch (error) {
     console.error("Posts GET error:", error);
-
     return json({
       success: false,
       message: "Blog yazıları alınamadı."
@@ -116,7 +98,6 @@ export async function onRequestPost(context) {
     const data = await context.request.json();
     const post = validatePost(data);
     const DB = context.env.DB;
-    const idInfo = await getIdInfo(DB);
 
     const columns = [
       "title",
@@ -138,8 +119,24 @@ export async function onRequestPost(context) {
       post.status === "published" ? new Date().toISOString() : null
     ];
 
-    if (!idInfo.integer) {
-      if (!idInfo.primaryKey) {
+    const tableInfo = await DB.prepare(
+      "PRAGMA table_info(posts)"
+    ).all();
+
+    const idColumn = (tableInfo.results || []).find(
+      column => column.name === "id"
+    );
+
+    if (!idColumn) {
+      throw new Error("Posts tablosunda ID sütunu bulunamadı.");
+    }
+
+    const isInteger = String(idColumn.type || "")
+      .toUpperCase()
+      .includes("INT");
+
+    if (!isInteger) {
+      if (Number(idColumn.pk) < 1) {
         throw new Error("Posts ID sütunu birincil anahtar değil.");
       }
 
@@ -149,13 +146,18 @@ export async function onRequestPost(context) {
 
     const placeholders = columns.map(() => "?").join(", ");
 
-    await DB.prepare(
-      `INSERT INTO posts (${columns.join(", ")})
-       VALUES (${placeholders})`
-    ).bind(...values).run();
+    const result = await DB.prepare(`
+      INSERT INTO posts (${columns.join(", ")})
+      VALUES (${placeholders})
+    `).bind(...values).run();
+
+    let newId = isInteger
+      ? result.meta?.last_row_id
+      : values[0];
 
     return json({
       success: true,
+      id: newId,
       message: post.status === "published"
         ? "Blog yazısı başarıyla yayımlandı."
         : "Blog yazısı taslak olarak kaydedildi."
@@ -163,7 +165,6 @@ export async function onRequestPost(context) {
 
   } catch (error) {
     console.error("Posts POST error:", error);
-
     return json({
       success: false,
       message: error.message || "Blog yazısı kaydedilemedi."
@@ -177,8 +178,9 @@ export async function onRequestPut(context) {
 
   try {
     const data = await context.request.json();
+    const id = getRequestId(context, data);
 
-    if (data.id === undefined || data.id === null || data.id === "") {
+    if (id === undefined || id === null || String(id).trim() === "") {
       return json({
         success: false,
         message: "Düzenlenecek blog yazısının ID bilgisi eksik."
@@ -190,7 +192,7 @@ export async function onRequestPut(context) {
 
     const existing = await DB.prepare(
       "SELECT id, published_at FROM posts WHERE id = ?"
-    ).bind(data.id).first();
+    ).bind(id).first();
 
     if (!existing) {
       return json({
@@ -209,8 +211,8 @@ export async function onRequestPut(context) {
       publishedAt = null;
     }
 
-    await DB.prepare(
-      `UPDATE posts SET
+    await DB.prepare(`
+      UPDATE posts SET
         title = ?,
         slug = ?,
         excerpt = ?,
@@ -219,8 +221,8 @@ export async function onRequestPut(context) {
         status = ?,
         published_at = ?,
         updated_at = CURRENT_TIMESTAMP
-       WHERE id = ?`
-    ).bind(
+      WHERE id = ?
+    `).bind(
       post.title,
       post.slug,
       post.excerpt,
@@ -228,17 +230,17 @@ export async function onRequestPut(context) {
       post.image_url,
       post.status,
       publishedAt,
-      data.id
+      id
     ).run();
 
     return json({
       success: true,
+      id,
       message: "Blog yazısı başarıyla güncellendi."
     });
 
   } catch (error) {
     console.error("Posts PUT error:", error);
-
     return json({
       success: false,
       message: error.message || "Blog yazısı güncellenemedi."
@@ -251,14 +253,15 @@ export async function onRequestDelete(context) {
   if (auth.response) return auth.response;
 
   try {
-    let id = new URL(context.request.url).searchParams.get("id");
+    const url = new URL(context.request.url);
+    let id = url.searchParams.get("id");
 
     if (!id) {
-      const data = await context.request.json();
-      id = data.id;
+      const data = await context.request.json().catch(() => ({}));
+      id = getRequestId(context, data);
     }
 
-    if (id === undefined || id === null || id === "") {
+    if (id === undefined || id === null || String(id).trim() === "") {
       return json({
         success: false,
         message: "Silinecek blog yazısının ID bilgisi eksik."
@@ -278,15 +281,15 @@ export async function onRequestDelete(context) {
 
     return json({
       success: true,
+      id,
       message: "Blog yazısı başarıyla silindi."
     });
 
   } catch (error) {
     console.error("Posts DELETE error:", error);
-
     return json({
       success: false,
-      message: "Blog yazısı silinemedi."
+      message: error.message || "Blog yazısı silinemedi."
     }, 500);
   }
 }
