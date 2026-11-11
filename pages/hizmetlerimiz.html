@@ -123,6 +123,7 @@
 <script defer src="../assets/js/site.js"></script>
 <script defer src="../assets/js/consent-and-forms.js"></script>
 
+<script src="../assets/js/cms-renderer.js"></script>
 <script>
 (function () {
   "use strict";
@@ -204,8 +205,15 @@
         "Bu hizmet hakkında ayrıntılı bilgi almak için bizimle iletişime geçebilirsiniz.";
 
       card.appendChild(
-        createElement("p", "service-description", description)
+        createElement("p", "service-description", service.description || "")
       );
+
+      if (service.content) {
+        const detail = createElement("div", "service-rich-content");
+        if (window.EDWISEContent) window.EDWISEContent.render(detail, service.content);
+        else detail.textContent = service.content;
+        card.appendChild(detail);
+      }
 
       const button = createElement(
         "a",
