@@ -264,15 +264,6 @@
   (async function loadCmsMenuPages() {
     if (!siteMenu) return;
 
-    const homeLink = siteMenu.querySelector('a[href="index.html"], a[href="../index.html"]');
-    if (homeLink) {
-      const label = homeLink.querySelector('span:last-child');
-      if (label) {
-        const language = document.documentElement.lang || "tr";
-        label.textContent = language === "en" ? "Home" : language === "ar" ? "الرئيسية" : "Ana Merkez Sayfa";
-      }
-    }
-
     try {
       const response = await fetch("/api/public-pages", {
         headers: { "Accept": "application/json" },
@@ -283,7 +274,7 @@
       const data = await response.json();
       if (!data.success || !Array.isArray(data.pages)) return;
 
-      const fixedSlugs = new Set(["anasayfa", "hakkimizda", "iletisim", "hizmetlerimiz"]);
+      const fixedSlugs = new Set(["hakkimizda", "iletisim", "hizmetlerimiz"]);
       const insertBefore = siteMenu.querySelector(".menu-apply") || siteMenu.querySelector(".menu-contact");
 
       data.pages
