@@ -1,4 +1,4 @@
-import { logAudit, ensureAuditTable } from "./_audit.js";
+import { logAudit } from "./_audit.js";
 
 async function verifyPassword(password, storedHash) {
   const parts = storedHash.split("$");
@@ -84,7 +84,7 @@ export async function onRequestPost({ request, env }) {
 
     const origin = request.headers.get("Origin");
 
-    if (origin && origin !== new URL(request.url).origin) {
+    if (!origin || origin !== new URL(request.url).origin) {
       return json({ success: false, message: "İstek kaynağı geçersiz." }, 403);
     }
 
@@ -93,8 +93,9 @@ export async function onRequestPost({ request, env }) {
     const data = await request.json();
     const username = String(data.username || "").trim().slice(0,50);
     const password = String(data.password || "");
-    const attempt = await env.DB.prepare("SELECT attempts,first_attempt_at FROM admin_login_attempts WHERE ip_address=? AND username=?").bind(ip,username.toLowerCase()).first();
-    if(attempt && Number(attempt.attempts)>=8 && (Date.now()-new Date(attempt.first_attempt_at+"Z").getTime())<15*60*1000){
+    const attempt = await env.DB.prepare("SELECT attempts,(julianday('now')-julianday(first_attempt_at))*1440 AS age_minutes FROM admin_login_attempts WHERE ip_address=? AND username=?").bind(ip,username.toLowerCase()).first();
+    const ipAttempts = await env.DB.prepare("SELECT COALESCE(SUM(attempts),0) AS attempts FROM admin_login_attempts WHERE ip_address=? AND (julianday('now')-julianday(last_attempt_at))*1440<15").bind(ip).first();
+    if((attempt && Number(attempt.attempts)>=8 && Number(attempt.age_minutes)<15) || Number(ipAttempts?.attempts)>=20){
       await logAudit(env.DB,request,null,{action:"login_rate_limited",entity_type:"security",entity_title:"Giriş denemesi sınırlandı",details:{username,attempts:attempt.attempts}});
       return json({success:false,message:"Çok fazla başarısız giriş denemesi. 15 dakika sonra tekrar deneyin."},429);
     }
