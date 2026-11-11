@@ -21,9 +21,14 @@ export async function onRequestGet(context) {
       ORDER BY created_at DESC, id DESC
     `).all();
 
+    const media = (result.results || []).map(item => ({
+      ...item,
+      file_url: `/api/media/${encodeURIComponent(item.file_name)}`
+    }));
+
     return Response.json({
       success: true,
-      media: result.results || []
+      media
     });
 
   } catch (error) {
