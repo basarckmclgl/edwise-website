@@ -675,9 +675,7 @@
         throw new Error("Rehber içerikleri şu anda görüntülenemiyor.");
       }
 
-      const publishedPosts = data.posts.filter(post =>
-        post.status === "published"
-      );
+      const publishedPosts = data.posts;
 
       if (selectedSlug) {
         const post = publishedPosts.find(item =>
