@@ -73,13 +73,13 @@ export async function onRequestGet(context) {
   if (auth.response) return auth.response;
 
   try {
-    const { results } = await context.env.DB.prepare(
+    const result = await context.env.DB.prepare(
       "SELECT id, title, slug, excerpt, content, image_url, meta_title, meta_description, status, published_at, created_at, updated_at FROM posts ORDER BY created_at DESC"
     ).all();
 
     return json({
       success: true,
-      posts: results || []
+      posts: result.results || []
     });
   } catch (error) {
     console.error("Posts GET error:", error);
@@ -157,9 +157,16 @@ export async function onRequestPost(context) {
 
     const placeholders = columns.map(() => "?").join(", ");
 
-    const result = await DB.prepare(
-      `INSERT INTO posts (${columns.join(", ")}) VALUES (${placeholders})`
-    ).bind(...values).run();
+    const insertSQL =
+      "INSERT INTO posts (" +
+      columns.join(", ") +
+      ") VALUES (" +
+      placeholders +
+      ")";
+
+    const result = await DB.prepare(insertSQL)
+      .bind(...values)
+      .run();
 
     const newId = isInteger
       ? result.meta?.last_row_id
@@ -228,9 +235,21 @@ export async function onRequestPut(context) {
       publishedAt = null;
     }
 
-    await DB.prepare(
-      "UPDATE posts SET title = ?, slug = ?, excerpt = ?, content = ?, image_url = ?, meta_title = ?, meta_description = ?, status = ?, published_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
-    ).bind(
+    const updateSQL =
+      "UPDATE posts SET " +
+      "title = ?, " +
+      "slug = ?, " +
+      "excerpt = ?, " +
+      "content = ?, " +
+      "image_url = ?, " +
+      "meta_title = ?, " +
+      "meta_description = ?, " +
+      "status = ?, " +
+      "published_at = ?, " +
+      "updated_at = CURRENT_TIMESTAMP " +
+      "WHERE id = ?";
+
+    await DB.prepare(updateSQL).bind(
       post.title,
       post.slug,
       post.excerpt,
@@ -259,7 +278,6 @@ export async function onRequestPut(context) {
 }
 
 export async function onRequestDelete(context) {
-  
   const auth = await requireEditor(context);
   if (auth.response) return auth.response;
 
