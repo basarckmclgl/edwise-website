@@ -36,7 +36,7 @@ export async function logAudit(db, request, admin, event) {
    String(event.entity_type || "system").slice(0,40),
    event.entity_id == null ? null : String(event.entity_id).slice(0,100),
    event.entity_title == null ? null : String(event.entity_title).slice(0,250),
-   event.details == null ? null : JSON.stringify(event.details).slice(0,20000),
+   event.details == null ? null : JSON.stringify(event.details),
    ip, agent
   ).run();
  } catch (error) {
