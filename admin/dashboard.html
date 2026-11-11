@@ -472,6 +472,43 @@ td{color:#e8e5f3}
  </div>
 </section>
 
+  <section id="settings" class="hidden">
+   <div class="section-head">
+    <div><h2>Tasarım Yönetimi</h2><p>Renkleri, yazı tipini ve ana bölümlerin görünümünü değiştirin. Önce önizleyin; yayımlamadan ziyaretçiler görmez.</p></div>
+   </div>
+   <div id="themeMessage"></div>
+   <div class="panel">
+    <h2>Marka renkleri ve görünüm</h2>
+    <div class="form-grid">
+     <div class="field"><label for="themePrimary">Ana marka rengi</label><input id="themePrimary" type="color" value="#291447"></div>
+     <div class="field"><label for="themeAccent">Vurgu / buton rengi</label><input id="themeAccent" type="color" value="#c5a0f2"></div>
+     <div class="field"><label for="themeSurface">Açık bölüm arka planı</label><input id="themeSurface" type="color" value="#f7f3fb"></div>
+     <div class="field"><label for="themeText">Ana yazı rengi</label><input id="themeText" type="color" value="#261a35"></div>
+     <div class="field"><label for="themeHeader">Üst menü arka planı</label><input id="themeHeader" type="color" value="#ffffff"></div>
+     <div class="field"><label for="themeHero">Ana karşılama alanı rengi</label><input id="themeHero" type="color" value="#291447"></div>
+     <div class="field"><label for="themeFooter">Alt bilgi (footer) arka planı</label><input id="themeFooter" type="color" value="#1b0d2d"></div>
+     <div class="field"><label for="themeFont">Site yazı tipi</label><select id="themeFont"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="'Times New Roman'">Times New Roman</option><option value="Verdana">Verdana</option></select></div>
+     <div class="field"><label for="themeRadius">Buton köşe yuvarlaklığı</label><select id="themeRadius"><option value="0px">Keskin (0 px)</option><option value="4px">4 px</option><option value="6px" selected>6 px</option><option value="8px">8 px</option><option value="12px">12 px</option><option value="16px">16 px</option><option value="18px">18 px</option></select></div>
+    </div>
+    <div class="actions">
+     <button class="btn" type="button" id="previewTheme">Önizlemeyi Uygula</button>
+     <button class="btn" type="button" id="saveThemeDraft">Taslak Kaydet</button>
+     <button class="primary" type="button" id="publishTheme">Siteye Yayımla</button>
+     <button class="btn" type="button" id="resetTheme">Varsayılan Tasarıma Dön</button>
+    </div>
+    <p class="muted">Önemli: Önizleme yalnızca bu yönetim ekranında görünür. “Siteye Yayımla” dediğinizde ziyaretçiler yeni tasarımı görür. Mevcut sayfa düzeni ve içerikler silinmez.</p>
+   </div>
+   <div class="panel">
+    <h2>Canlı önizleme</h2>
+    <div id="themePreview" style="background:#fff;border-radius:12px;overflow:hidden;border:1px solid #ddd;color:#261a35">
+     <div id="previewHeader" style="padding:18px 22px;font-weight:800">EDWISE　　Ana Sayfa　 Hizmetlerimiz　 Hakkımızda　 İletişim</div>
+     <div id="previewHero" style="padding:42px 24px;color:#fff"><small>EDUCATION & CONSULTANCY</small><h2 style="color:inherit;margin:12px 0">Geleceğine doğru adımla başla.</h2><p>Doğru rehberlik, parlak gelecek.</p><button id="previewButton" type="button" style="border:0;padding:10px 18px;margin-top:15px">Bize Ulaşın</button></div>
+     <div id="previewSurface" style="padding:24px"><strong>Hedeflerine uygun eğitim desteği</strong><p style="margin-top:8px">Bu alan, açık bölüm rengini ve yazı tipini gösterir.</p></div>
+     <div id="previewFooter" style="padding:18px 22px;color:#fff">EDWISE · Education & Consultancy</div>
+    </div>
+   </div>
+  </section>
+
   <section id="other" class="hidden">
    <div class="panel">
     <h2 id="otherTitle"></h2>
@@ -537,7 +574,8 @@ function showPage(name){
  $("services").classList.toggle("hidden",name!=="services");
  $("posts").classList.toggle("hidden",name!=="posts");
  $("users").classList.toggle("hidden",name!=="users");
-$("other").classList.toggle("hidden",!otherModules[name] || name==="users");
+$("other").classList.toggle("hidden",!otherModules[name] || name==="users" || name==="settings");
+ $("settings").classList.toggle("hidden",name!=="settings");
 
  document.querySelectorAll(".nav").forEach(n=>{
   n.classList.toggle("active",n.dataset.page===name);
@@ -549,10 +587,12 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
  if(name==="services")loadServices();
  if(name==="posts")loadPosts();
     if(name==="users")loadUsers();
+ if(name==="settings")loadThemeSettings();
 
  $("mediaLink").classList.toggle("hidden",name!=="media");
 
- if(otherModules[name]){
+ if(name==="settings")$("breadcrumb").textContent="Tasarım Yönetimi";
+ if(otherModules[name] && name!=="settings"){
   $("otherTitle").textContent=otherModules[name][0];
   $("otherDescription").textContent=otherModules[name][1];
  }
@@ -732,6 +772,45 @@ async function deletePage(id){
   message(error.message);
  }
 }
+
+
+const themeDefaults={primary:"#291447",accent:"#c5a0f2",surface:"#f7f3fb",text:"#261a35",header:"#ffffff",hero:"#291447",footer:"#1b0d2d",font:"Inter",buttonRadius:"6px"};
+const themeFields={primary:"themePrimary",accent:"themeAccent",surface:"themeSurface",text:"themeText",header:"themeHeader",hero:"themeHero",footer:"themeFooter",font:"themeFont",buttonRadius:"themeRadius"};
+function currentTheme(){const value={};Object.keys(themeFields).forEach(key=>value[key]=$(themeFields[key]).value);return value;}
+function fillTheme(theme){Object.keys(themeFields).forEach(key=>{if(theme&&theme[key])$(themeFields[key]).value=theme[key];});applyThemePreview(currentTheme());}
+function applyThemePreview(t){
+ $("previewHeader").style.background=t.header;
+ $("previewHeader").style.color=t.primary;
+ $("previewHero").style.background="linear-gradient(115deg,"+t.hero+","+t.primary+")";
+ $("previewSurface").style.background=t.surface;
+ $("previewSurface").style.color=t.text;
+ $("previewFooter").style.background=t.footer;
+ $("previewButton").style.background=t.accent;
+ $("previewButton").style.color=t.primary;
+ $("previewButton").style.borderRadius=t.buttonRadius;
+ $("themePreview").style.fontFamily=t.font+",Arial,sans-serif";
+}
+function themeMessage(message,type="success"){$("themeMessage").innerHTML='<div class="message '+type+'">'+escapeHtml(message)+'</div>';}
+async function loadThemeSettings(){
+ try{
+  const data=await api("/api/settings");
+  fillTheme(data.draft&&Object.keys(data.draft).length?data.draft:(data.live&&Object.keys(data.live).length?data.live:themeDefaults));
+ }catch(error){themeMessage(error.message,"error");}
+}
+$("previewTheme").addEventListener("click",()=>{applyThemePreview(currentTheme());themeMessage("Önizleme uygulandı. Henüz ziyaretçilere yayımlanmadı.");});
+$("resetTheme").addEventListener("click",()=>{fillTheme(themeDefaults);themeMessage("Varsayılan renkler önizlemeye yansıtıldı. Kaydetmek veya yayımlamak için ilgili düğmeye basın.");});
+$("saveThemeDraft").addEventListener("click",()=>saveTheme("draft"));
+$("publishTheme").addEventListener("click",()=>saveTheme("publish"));
+async function saveTheme(action){
+ const button=action==="publish"?$("publishTheme"):$("saveThemeDraft");
+ button.disabled=true;
+ try{
+  const data=await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action,theme:currentTheme()})});
+  themeMessage(data.message,"success");
+ }catch(error){themeMessage(error.message,"error");}
+ finally{button.disabled=false;}
+}
+Object.values(themeFields).forEach(id=>$(id).addEventListener("input",()=>applyThemePreview(currentTheme())));
 
 async function checkSession(){
  try{
