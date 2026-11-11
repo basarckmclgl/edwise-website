@@ -1,5 +1,6 @@
 
 import { requireEditor } from "./_auth.js";
+import { logAudit } from "./_audit.js";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
@@ -118,6 +119,8 @@ export async function onRequestPost(context) {
       }, 207);
     }
 
+    const mediaRecord = await db.prepare("SELECT * FROM media WHERE file_name = ?").bind(filename).first();
+    await logAudit(db,context.request,auth.admin,{action:"media_uploaded",entity_type:"media",entity_id:filename,entity_title:filename,details:{before:null,after:mediaRecord||{file_name:filename,file_url:url,file_type:file.type}}});
     return json({
       success: true,
       filename,
