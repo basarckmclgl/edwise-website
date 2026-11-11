@@ -260,6 +260,60 @@
 
   const siteMenu = document.querySelector('#site-menu');
 
+  // CMS'de yayımlanan özel sayfaları ziyaretçi menüsüne otomatik ekle.
+  (async function loadCmsMenuPages() {
+    if (!siteMenu) return;
+
+    const homeLink = siteMenu.querySelector('a[href="index.html"], a[href="../index.html"]');
+    if (homeLink) {
+      const label = homeLink.querySelector('span:last-child');
+      if (label) {
+        const language = document.documentElement.lang || "tr";
+        label.textContent = language === "en" ? "Home" : language === "ar" ? "الرئيسية" : "Ana Merkez Sayfa";
+      }
+    }
+
+    try {
+      const response = await fetch("/api/public-pages", {
+        headers: { "Accept": "application/json" },
+        cache: "no-store"
+      });
+      if (!response.ok) return;
+
+      const data = await response.json();
+      if (!data.success || !Array.isArray(data.pages)) return;
+
+      const fixedSlugs = new Set(["anasayfa", "hakkimizda", "iletisim", "hizmetlerimiz"]);
+      const insertBefore = siteMenu.querySelector(".menu-apply") || siteMenu.querySelector(".menu-contact");
+
+      data.pages
+        .filter(page => page && page.slug && page.title && !fixedSlugs.has(page.slug))
+        .reverse()
+        .forEach(page => {
+          const existing = siteMenu.querySelector('a[data-cms-slug="' + CSS.escape(page.slug) + '"]');
+          if (existing) return;
+
+          const link = document.createElement("a");
+          link.href = "/pages/sayfa.html?slug=" + encodeURIComponent(page.slug);
+          link.dataset.cmsSlug = page.slug;
+
+          const icon = document.createElement("span");
+          icon.className = "menu-item-icon";
+          icon.setAttribute("aria-hidden", "true");
+          icon.textContent = "📄";
+
+          const label = document.createElement("span");
+          label.textContent = page.title;
+
+          link.append(icon, label);
+          if (insertBefore) siteMenu.insertBefore(link, insertBefore);
+          else siteMenu.appendChild(link);
+        });
+    } catch (error) {
+      console.error("CMS menü sayfaları yüklenemedi:", error);
+    }
+  })();
+
   function setMenuOpen(open) {
 
     siteMenu.classList.toggle('open', open);
