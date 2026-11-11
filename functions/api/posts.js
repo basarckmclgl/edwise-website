@@ -120,24 +120,28 @@ export async function onRequestPost(context) {
     const DB = context.env.DB;
 
     const columns = [
-      "title",
-      "slug",
-      "excerpt",
-      "content",
-      "image_url",
-      "status",
-      "published_at"
-    ];
+  "title",
+  "slug",
+  "excerpt",
+  "content",
+  "image_url",
+  "meta_title",
+  "meta_description",
+  "status",
+  "published_at"
+];
 
     const values = [
-      post.title,
-      post.slug,
-      post.excerpt,
-      post.content,
-      post.image_url,
-      post.status,
-      post.status === "published" ? new Date().toISOString() : null
-    ];
+  post.title,
+  post.slug,
+  post.excerpt,
+  post.content,
+  post.image_url,
+  post.meta_title,
+  post.meta_description,
+  post.status,
+  post.status === "published" ? new Date().toISOString() : null
+];
 
     const tableInfo = await DB.prepare(
       "PRAGMA table_info(posts)"
