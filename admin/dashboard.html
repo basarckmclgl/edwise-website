@@ -617,6 +617,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users" || na
 
  $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="designcenter"?"Sayfa Tasarım Merkezi":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":otherModules[name]?.[0]||"";
 
+ if(name==="designcenter")loadDesignRecords();
  if(name==="pages")loadPages();
  if(name==="services")loadServices();
  if(name==="posts")loadPosts();
