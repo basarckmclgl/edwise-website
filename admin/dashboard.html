@@ -110,7 +110,7 @@ td{color:#e8e5f3}
    <div class="grid">
     <div class="stat"><span>Toplam Sayfa</span><h2 id="countPages">—</h2><p>Veritabanındaki sayfalar</p></div>
     <div class="stat"><span>Hizmetler</span><h2 id="countServices">—</h2><p>Toplam kayıtlı hizmet</p></div>
-    <div class="stat"><span>Blog Yazıları</span><h2>—</h2><p>Sonraki modülde bağlanacak</p></div>
+    <div class="stat"><span>Blog Yazıları</span><h2 id="countPosts">—</h2><p>Toplam kayıtlı blog yazısı</p></div>
     <div class="stat" data-superadmin><span>Başvurular</span><h2>—</h2><p>Başvuru modülü kurulacak</p></div>
    </div>
 
@@ -239,156 +239,72 @@ td{color:#e8e5f3}
    </div>
   </section>
 
-  
-<section id="posts" class="hidden">
-  <div class="section-head">
+  <section id="posts" class="hidden">
+   <div class="section-head">
     <div>
-      <h2>Blog Yönetimi</h2>
-      <p>Blog yazılarınızı oluşturun, düzenleyin ve yayımlayın.</p>
+     <h2>Blog Yönetimi</h2>
+     <p>Blog yazılarınızı oluşturun, düzenleyin ve yayımlayın.</p>
     </div>
     <button class="primary" id="newPost">+ Yeni Blog Yazısı</button>
-  </div>
+   </div>
 
-  <div id="postMessage"></div>
+   <div id="postMessage"></div>
 
-  <div id="postEditor" class="panel hidden">
+   <div id="postEditor" class="panel hidden">
     <h2 id="postEditorTitle">Yeni Blog Yazısı</h2>
-
     <form id="postForm">
-      <input type="hidden" id="postId">
-
-      <div class="form-grid">
-        <div class="field">
-          <label for="postTitle">Blog başlığı *</label>
-          <input id="postTitle" required maxlength="200"
-            placeholder="Örn. Yurt Dışında Eğitim Rehberi">
-        </div>
-
-        <div class="field">
-          <label for="postSlug">URL adresi *</label>
-          <input id="postSlug" required placeholder="yurt-disinda-egitim-rehberi">
-        </div>
-
-        <div class="field full">
-          <label for="postExcerpt">Kısa açıklama</label>
-          <textarea id="postExcerpt"
-            placeholder="Blog yazısının kısa tanıtım metni..."></textarea>
-        </div>
-
-        <div class="field full">
-          <label for="postContent">Blog içeriği *</label>
-          <textarea id="postContent" required
-            placeholder="Blog yazınızın tamamını buraya yazın..."></textarea>
-        </div>
-
-        <div class="field full">
-          <label for="postImage">Kapak görseli URL adresi</label>
-          <input id="postImage" placeholder="https://...">
-        </div>
-
-        <div class="field">
-          <label for="postStatus">Yayın durumu</label>
-          <select id="postStatus">
-            <option value="draft">Taslak</option>
-            <option value="published">Yayında</option>
-          </select>
-        </div>
+     <input type="hidden" id="postId">
+     <div class="form-grid">
+      <div class="field">
+       <label for="postTitle">Blog başlığı *</label>
+       <input id="postTitle" required maxlength="200" placeholder="Örn. Yurt Dışında Eğitim Rehberi">
       </div>
-
-      <div class="actions">
-        <button class="primary" type="submit" id="savePost">
-          Blog Yazısını Kaydet
-        </button>
-        <button class="btn" type="button" id="cancelPost">
-          Vazgeç
-        </button>
+      <div class="field">
+       <label for="postSlug">URL adresi *</label>
+       <input id="postSlug" required placeholder="yurt-disinda-egitim-rehberi">
       </div>
+      <div class="field full">
+       <label for="postExcerpt">Kısa açıklama</label>
+       <textarea id="postExcerpt" placeholder="Blog yazısının kısa tanıtım metni..."></textarea>
+      </div>
+      <div class="field full">
+       <label for="postContent">Blog içeriği *</label>
+       <textarea id="postContent" required placeholder="Blog yazınızın tamamını buraya yazın..."></textarea>
+      </div>
+      <div class="field full">
+       <label for="postImage">Kapak görseli URL adresi</label>
+       <input id="postImage" placeholder="https://...">
+      </div>
+      <div class="field">
+       <label for="postStatus">Yayın durumu</label>
+       <select id="postStatus">
+        <option value="draft">Taslak</option>
+        <option value="published">Yayında</option>
+       </select>
+      </div>
+     </div>
+     <div class="actions">
+      <button class="primary" type="submit" id="savePost">Blog Yazısını Kaydet</button>
+      <button class="btn" type="button" id="cancelPost">Vazgeç</button>
+     </div>
     </form>
-  </div>
+   </div>
 
-  <div class="panel">
+   <div class="panel">
     <h2>Blog Yazıları</h2>
     <p class="muted">Kayıtlı yazıları görüntüleyin, düzenleyin veya silin.</p>
-
     <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Başlık</th>
-            <th>URL</th>
-            <th>Durum</th>
-            <th>İşlemler</th>
-          </tr>
-        </thead>
-        <tbody id="postsTable">
-          <tr><td colspan="4">Blog yazıları yükleniyor...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-  
-<section id="posts" class="hidden">
-  <div class="page-header">
-    <h2>Blog Yönetimi</h2>
-    <p>Blog yazılarını oluştur, düzenle ve yayınla.</p>
-  </div>
-
-  <div id="postEditor">
-    <h3 id="postEditorTitle">Yeni Blog Yazısı</h3>
-
-    <form id="postForm">
-      <input type="hidden" id="postId">
-
-      <label>Yazı Başlığı</label>
-      <input type="text" id="postTitle" placeholder="Blog başlığı" required>
-
-      <label>Bağlantı Adresi (Slug)</label>
-      <input type="text" id="postSlug" placeholder="blog-yazi-adresi" required>
-
-      <label>Kısa Açıklama</label>
-      <textarea id="postExcerpt" placeholder="Yazının kısa açıklaması"></textarea>
-
-      <label>Blog İçeriği</label>
-      <textarea id="postContent" rows="10" placeholder="Blog yazısının içeriği..." required></textarea>
-
-      <label>Kapak Görseli URL</label>
-      <input type="text" id="postImage" placeholder="Görsel bağlantısı">
-
-      <label>Yayın Durumu</label>
-      <select id="postStatus">
-        <option value="draft">Taslak</option>
-        <option value="published">Yayınla</option>
-      </select>
-
-      <button type="submit">Kaydet</button>
-      <button type="button" onclick="resetPostEditor()">Temizle</button>
-    </form>
-  </div>
-
-  <hr>
-
-  <h3>Blog Yazıları</h3>
-
-  <div style="overflow-x:auto;">
-    <table>
+     <table>
       <thead>
-        <tr>
-          <th>Başlık</th>
-          <th>Bağlantı</th>
-          <th>Durum</th>
-          <th>Yayın Tarihi</th>
-          <th>İşlemler</th>
-        </tr>
+       <tr><th>Başlık</th><th>URL</th><th>Durum</th><th>İşlemler</th></tr>
       </thead>
-      <tbody id="postsTableBody">
-        <tr>
-          <td colspan="5">Blog yazıları yükleniyor...</td>
-        </tr>
+      <tbody id="postsTable">
+       <tr><td colspan="4">Blog yazıları yükleniyor...</td></tr>
       </tbody>
-    </table>
-  </div>
-</section>
+     </table>
+    </div>
+   </div>
+  </section>
 
   <section id="other" class="hidden">
    <div class="panel">
@@ -460,7 +376,7 @@ function showPage(name){
   n.classList.toggle("active",n.dataset.page===name);
  });
 
- $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":otherModules[name]?.[0]||"";
+ $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":otherModules[name]?.[0]||"";
 
  if(name==="pages")loadPages();
  if(name==="services")loadServices();
@@ -863,167 +779,151 @@ async function deleteService(id){
  }
 }
 
- 
-let posts = [];
+let posts=[];
 
-async function loadPosts() {
-  const table = document.getElementById("postsTableBody");
-  if (!table) return;
+async function loadPosts(){
+ const table=$("postsTable");
+ if(!table)return;
 
-  table.innerHTML = `<tr><td colspan="5">Yazılar yükleniyor...</td></tr>`;
+ table.innerHTML='<tr><td colspan="4">Blog yazıları yükleniyor...</td></tr>';
 
-  try {
-    const response = await fetch("/api/posts");
-    const data = await response.json();
+ try{
+  const data=await api("/api/posts");
+  posts=data.posts||[];
 
-    if (!response.ok || !data.success) {
-      throw new Error(data.message || "Yazılar alınamadı.");
-    }
+  const count=$("countPosts");
+  if(count)count.textContent=posts.length;
 
-    posts = data.posts || [];
-
-    const count = document.getElementById("countPosts");
-    if (count) count.textContent = posts.length;
-
-    if (!posts.length) {
-      table.innerHTML = `<tr><td colspan="5">Henüz blog yazısı yok.</td></tr>`;
-      return;
-    }
-
-    table.innerHTML = posts.map(post => `
-      <tr>
-        <td>${escapePostHTML(post.title)}</td>
-        <td>${escapePostHTML(post.slug)}</td>
-        <td>${post.status === "published" ? "Yayında" : "Taslak"}</td>
-        <td>${post.published_at ? new Date(post.published_at).toLocaleDateString("tr-TR") : "-"}</td>
-        <td>
-          <button onclick="editPost('${post.id}')">Düzenle</button>
-          <button onclick="deletePost('${post.id}')">Sil</button>
-        </td>
-      </tr>
-    `).join("");
-
-  } catch (error) {
-    table.innerHTML = `<tr><td colspan="5">${escapePostHTML(error.message)}</td></tr>`;
+  if(!posts.length){
+   table.innerHTML='<tr><td colspan="4" class="empty">Henüz blog yazısı yok.</td></tr>';
+   return;
   }
+
+  table.innerHTML=posts.map(post=>`
+   <tr>
+    <td>${escapeHtml(post.title)}</td>
+    <td>/${escapeHtml(post.slug)}</td>
+    <td><span class="status ${post.status==="published"?"published":""}">${post.status==="published"?"Yayında":"Taslak"}</span></td>
+    <td>
+     <button class="btn" data-post-edit="${escapeHtml(post.id)}">Düzenle</button>
+     <button class="btn btn-danger" data-post-delete="${escapeHtml(post.id)}">Sil</button>
+    </td>
+   </tr>
+  `).join("");
+
+  document.querySelectorAll("[data-post-edit]").forEach(button=>{
+   button.addEventListener("click",()=>editPost(button.dataset.postEdit));
+  });
+
+  document.querySelectorAll("[data-post-delete]").forEach(button=>{
+   button.addEventListener("click",()=>deletePost(button.dataset.postDelete));
+  });
+
+ }catch(error){
+  table.innerHTML=`<tr><td colspan="4" class="empty">${escapeHtml(error.message)}</td></tr>`;
+ }
 }
 
-function escapePostHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  })[char]);
+function resetPostEditor(){
+ $("postForm").reset();
+ $("postId").value="";
+ $("postSlug").dataset.edited="";
+ $("postEditorTitle").textContent="Yeni Blog Yazısı";
+ $("postEditor").classList.add("hidden");
 }
 
-function resetPostEditor() {
-  document.getElementById("postForm").reset();
-  document.getElementById("postId").value = "";
-  document.getElementById("postEditorTitle").textContent = "Yeni Blog Yazısı";
-}
-
-function editPost(id) {
-  const post = posts.find(item => String(item.id) === String(id));
-  if (!post) return;
-
-  document.getElementById("postId").value = post.id;
-  document.getElementById("postTitle").value = post.title || "";
-  document.getElementById("postSlug").value = post.slug || "";
-  document.getElementById("postExcerpt").value = post.excerpt || "";
-  document.getElementById("postContent").value = post.content || "";
-  document.getElementById("postImage").value = post.image_url || "";
-  document.getElementById("postStatus").value = post.status || "draft";
-
-  document.getElementById("postEditorTitle").textContent = "Blog Yazısını Düzenle";
-  document.getElementById("postEditor").scrollIntoView({ behavior: "smooth" });
-}
-
-document.getElementById("postTitle")?.addEventListener("input", function () {
-  const slug = document.getElementById("postSlug");
-  if (!slug.dataset.edited) {
-    slug.value = this.value
-      .toLocaleLowerCase("tr-TR")
-      .replace(/ı/g, "i")
-      .replace(/ğ/g, "g")
-      .replace(/ü/g, "u")
-      .replace(/ş/g, "s")
-      .replace(/ö/g, "o")
-      .replace(/ç/g, "c")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
-  }
+$("newPost").addEventListener("click",()=>{
+ resetPostEditor();
+ $("postEditor").classList.remove("hidden");
+ $("postEditorTitle").textContent="Yeni Blog Yazısı";
+ $("postEditor").scrollIntoView({behavior:"smooth"});
+ $("postTitle").focus();
 });
 
-document.getElementById("postSlug")?.addEventListener("input", function () {
-  this.dataset.edited = "true";
+$("cancelPost").addEventListener("click",resetPostEditor);
+
+$("postTitle").addEventListener("input",()=>{
+ if(!$("postId").value&&!$("postSlug").dataset.edited){
+  $("postSlug").value=$("postTitle").value.toLocaleLowerCase("tr-TR")
+   .replace(/ı/g,"i").replace(/ğ/g,"g").replace(/ü/g,"u")
+   .replace(/ş/g,"s").replace(/ö/g,"o").replace(/ç/g,"c")
+   .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+ }
 });
 
-document.getElementById("postForm")?.addEventListener("submit", async function (event) {
-  event.preventDefault();
-
-  const id = document.getElementById("postId").value;
-
-  const post = {
-    title: document.getElementById("postTitle").value.trim(),
-    slug: document.getElementById("postSlug").value.trim(),
-    excerpt: document.getElementById("postExcerpt").value.trim(),
-    content: document.getElementById("postContent").value.trim(),
-    image_url: document.getElementById("postImage").value.trim(),
-    status: document.getElementById("postStatus").value
-  };
-
-  if (!post.title || !post.slug || !post.content) {
-    alert("Başlık, bağlantı adresi ve içerik zorunludur.");
-    return;
-  }
-
-  try {
-    const response = await fetch(
-      id ? `/api/posts?id=${encodeURIComponent(id)}` : "/api/posts",
-      {
-        method: id ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(post)
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.message || "Kayıt yapılamadı.");
-    }
-
-    alert("Blog yazısı kaydedildi.");
-    resetPostEditor();
-    await loadPosts();
-
-  } catch (error) {
-    alert(error.message);
-  }
+$("postSlug").addEventListener("input",()=>{
+ $("postSlug").dataset.edited="1";
 });
 
-async function deletePost(id) {
-  if (!confirm("Bu blog yazısını silmek istediğine emin misin?")) return;
+function editPost(id){
+ const post=posts.find(item=>String(item.id)===String(id));
+ if(!post)return;
 
-  try {
-    const response = await fetch(`/api/posts?id=${encodeURIComponent(id)}`, {
-      method: "DELETE"
-    });
+ $("postId").value=post.id;
+ $("postTitle").value=post.title||"";
+ $("postSlug").value=post.slug||"";
+ $("postSlug").dataset.edited="1";
+ $("postExcerpt").value=post.excerpt||"";
+ $("postContent").value=post.content||"";
+ $("postImage").value=post.image_url||"";
+ $("postStatus").value=post.status||"draft";
 
-    const data = await response.json();
+ $("postEditorTitle").textContent="Blog Yazısını Düzenle";
+ $("postEditor").classList.remove("hidden");
+ $("postEditor").scrollIntoView({behavior:"smooth"});
+}
 
-    if (!response.ok || !data.success) {
-      throw new Error(data.message || "Silme işlemi başarısız.");
-    }
+$("postForm").addEventListener("submit",async event=>{
+ event.preventDefault();
 
-    await loadPosts();
-    alert("Blog yazısı silindi.");
+ const id=$("postId").value;
+ const post={
+  title:$("postTitle").value.trim(),
+  slug:$("postSlug").value.trim(),
+  excerpt:$("postExcerpt").value.trim(),
+  content:$("postContent").value.trim(),
+  image_url:$("postImage").value.trim(),
+  status:$("postStatus").value
+ };
 
-  } catch (error) {
-    alert(error.message);
-  }
+ if(!post.title||!post.slug||!post.content){
+  $("postMessage").innerHTML='<div class="message error">Başlık, URL adresi ve içerik zorunludur.</div>';
+  return;
+ }
+
+ $("savePost").disabled=true;
+ $("savePost").textContent="Kaydediliyor...";
+
+ try{
+  const result=await api(id?`/api/posts?id=${encodeURIComponent(id)}`:"/api/posts",{
+   method:id?"PUT":"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify(post)
+  });
+
+  resetPostEditor();
+  $("postMessage").innerHTML='<div class="message success">'+escapeHtml(result.message||"Blog yazısı kaydedildi.")+'</div>';
+  await loadPosts();
+
+ }catch(error){
+  $("postMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';
+ }finally{
+  $("savePost").disabled=false;
+  $("savePost").textContent="Blog Yazısını Kaydet";
+ }
+});
+
+async function deletePost(id){
+ const post=posts.find(item=>String(item.id)===String(id));
+ if(!post||!confirm('"'+post.title+'" blog yazısını silmek istediğinizden emin misiniz?'))return;
+
+ try{
+  const result=await api(`/api/posts?id=${encodeURIComponent(id)}`,{method:"DELETE"});
+  $("postMessage").innerHTML='<div class="message success">'+escapeHtml(result.message||"Blog yazısı silindi.")+'</div>';
+  await loadPosts();
+ }catch(error){
+  $("postMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';
+ }
 }
 
 checkSession();
