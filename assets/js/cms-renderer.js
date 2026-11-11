@@ -6,15 +6,19 @@ window.EDWISEContent={
   const value=String(raw||"");if(!value.trim()){root.replaceChildren();return}
   if(!/<\/?[a-z][\s\S]*>/i.test(value)){root.textContent=value;return}
   const parsed=new DOMParser().parseFromString(value,"text/html");
-  const tags=new Set(["P","H2","H3","H4","UL","OL","LI","BLOCKQUOTE","STRONG","B","EM","I","U","A","IMG","FIGURE","FIGCAPTION","HR","DIV","SPAN","TABLE","TBODY","THEAD","TR","TD","TH"]);
+  const tags=new Set(["P","H1","H2","H3","H4","UL","OL","LI","BLOCKQUOTE","STRONG","B","EM","I","U","A","IMG","FIGURE","FIGCAPTION","HR","BR","DIV","SPAN","MAIN","SECTION","ARTICLE","ASIDE","NAV","SMALL","TABLE","TBODY","THEAD","TR","TD","TH","FORM","LABEL","INPUT","SELECT","OPTION","TEXTAREA","BUTTON"]);
   const fonts=["Arial","Helvetica","Times New Roman","Times","Calibri","Georgia","Verdana","Tahoma"];
   const clean=node=>{
    if(node.nodeType===Node.TEXT_NODE)return document.createTextNode(node.textContent);
    if(node.nodeType!==Node.ELEMENT_NODE)return document.createDocumentFragment();
    if(!tags.has(node.tagName)){const fragment=document.createDocumentFragment();node.childNodes.forEach(child=>fragment.append(clean(child)));return fragment}
    const el=document.createElement(node.tagName.toLowerCase());
-   if(node.tagName==="A"){const href=safe(node.getAttribute("href"));if(href){el.href=href;el.rel="noopener noreferrer";el.target="_blank"}}
-   if(node.tagName==="IMG"){const src=safe(node.getAttribute("src"));if(!src)return document.createTextNode("");el.src=src;el.alt=node.getAttribute("alt")||"";el.loading="lazy"}
+   const id=node.getAttribute("id");if(id&&/^[a-zA-Z][\\w:-]{0,79}$/.test(id))el.id=id;
+   const cls=node.getAttribute("class");if(cls)el.className=cls.split(/\\s+/).filter(x=>/^[a-zA-Z_][\\w-]{0,49}$/.test(x)).join(" ");
+   ["role","aria-label","aria-live","aria-busy","aria-hidden","name","type","placeholder","maxlength","autocomplete","rows","cols","value","for","required","checked","disabled","selected","target","rel","alt","title"].forEach(name=>{if(node.hasAttribute(name)){if(["required","checked","disabled","selected"].includes(name)){if(node.hasAttribute(name))el.setAttribute(name,"");}else el.setAttribute(name,node.getAttribute(name));}});
+   Array.from(node.attributes).filter(a=>a.name.startsWith("data-")&&/^data-[a-z0-9_-]{1,40}$/.test(a.name)).forEach(a=>el.setAttribute(a.name,a.value));
+   if(node.tagName==="A"){const href=safe(node.getAttribute("href"));if(href){el.href=href;if(node.getAttribute("target")==="_blank"){el.target="_blank";el.rel="noopener noreferrer";}}}
+   if(node.tagName==="IMG"){const src=safe(node.getAttribute("src"));if(!src)return document.createTextNode("");el.src=src;el.alt=node.getAttribute("alt")||"";el.loading="lazy"}\n   if(node.tagName==="INPUT"&&node.getAttribute("type")==="checkbox")el.type="checkbox";
    const style=node.getAttribute("style")||"";
    const align=style.match(/text-align\s*:\s*(left|center|right)/i);if(align)el.style.textAlign=align[1].toLowerCase();
    const color=style.match(/(?:^|;)\s*color\s*:\s*(#[0-9a-f]{3,8}|[a-z]{3,20})/i);if(color)el.style.color=color[1];
