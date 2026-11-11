@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="description" content="EDWISE sayfa içeriği."/>
+<title>EDWISE | Sayfa</title>
+<link rel="canonical" href="https://edwisedanismanlik.com/pages/sayfa.html"/>
+<meta name="robots" content="index, follow"/>
+<link href="../assets/css/style.css" rel="stylesheet"/>
+<style>
+.cms-dynamic-content{white-space:pre-wrap;line-height:1.85;color:inherit;max-width:900px;margin:24px auto;padding:0 20px}
+.cms-dynamic-content h1{margin-bottom:18px}
+</style>
+</head>
+<body>
+<div class="topbar">
+<span>Hatay · Antakya</span>
+<span>Bilgi ve kayıt: <a href="tel:+905512501701">0551 250 17 01</a></span>
+</div>
+<header>
+<a aria-label="EDWISE ana sayfa" class="brand" href="../index.html">
+<img alt="EDWISE Education &amp; Consultancy" class="logo" src="../assets/images/logo.png"/>
+</a>
+<button aria-controls="site-menu" aria-expanded="false" aria-label="Menüyü aç" class="menu" type="button">☰ <span>Menü</span></button>
+<nav aria-label="Ana menü" id="site-menu">
+<div aria-label="Dil seçimi" class="dropdown-languages">
+<span aria-hidden="true" class="language-icon">🌐</span>
+<button aria-label="Türkçe" aria-pressed="true" class="lang-btn active" data-lang="tr" type="button">TR</button>
+<button aria-label="English" aria-pressed="false" class="lang-btn" data-lang="en" type="button">EN</button>
+<button aria-label="العربية" aria-pressed="false" class="lang-btn" data-lang="ar" type="button">AR</button>
+</div>
+<div class="dropdown-divider"></div>
+<a href="../index.html"><span aria-hidden="true" class="menu-item-icon">🏠</span><span>Ana Sayfa</span></a>
+<a href="hizmetlerimiz.html"><span aria-hidden="true" class="menu-item-icon">🎓</span><span>Hizmetlerimiz</span></a>
+<a href="hakkimizda.html"><span aria-hidden="true" class="menu-item-icon">ℹ️</span><span>Hakkımızda</span></a>
+<a class="menu-apply" href="basvuru.html"><span aria-hidden="true" class="menu-item-icon">📝</span><span>Başvur</span></a>
+<a href="iletisim.html"><span aria-hidden="true" class="menu-item-icon">📍</span><span>İletişim ve Konum</span></a>
+<div class="dropdown-divider"></div>
+<a class="menu-contact" href="iletisim.html"><span aria-hidden="true" class="menu-item-icon">📞</span><span>Bize Ulaşın · WhatsApp</span></a>
+</nav>
+</header>
+<main class="section single-page-content cms-dynamic-content">
+<div class="eyebrow">EDWISE · Education &amp; Consultancy</div>
+<h1 id="cms-dynamic-title">Sayfa yükleniyor...</h1>
+<div id="cms-dynamic-body"></div>
+<p id="cms-dynamic-error" hidden>Bu sayfa şu anda görüntülenemiyor.</p>
+</main>
+<footer>
+<strong>EDWISE</strong>
+<span>Education &amp; Consultancy · Hatay, Türkiye</span>
+<span>© 2026 EDWISE. Tüm hakları saklıdır.</span>
+</footer>
+<a class="whatsapp-float" href="https://wa.me/905512501701" target="_blank" rel="noopener" aria-label="WhatsApp üzerinden EDWISE ile iletişime geç">WhatsApp ↗</a>
+<script>
+(async function () {
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get("slug");
+  const title = document.getElementById("cms-dynamic-title");
+  const body = document.getElementById("cms-dynamic-body");
+  const error = document.getElementById("cms-dynamic-error");
+
+  if (!slug) {
+    title.textContent = "Sayfa bulunamadı";
+    error.hidden = false;
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/public-pages?slug=" + encodeURIComponent(slug), {
+      headers: { "Accept": "application/json" },
+      cache: "no-store"
+    });
+    const data = await response.json();
+
+    if (!response.ok || !data.success || !data.page) throw new Error("Page not found");
+
+    title.textContent = data.page.title || "EDWISE";
+    body.textContent = data.page.content || "";
+    document.title = data.page.meta_title || (data.page.title + " | EDWISE");
+    if (data.page.meta_description) {
+      const description = document.querySelector('meta[name="description"]');
+      if (description) description.content = data.page.meta_description;
+    }
+  } catch (err) {
+    title.textContent = "Sayfa bulunamadı";
+    error.hidden = false;
+  }
+})();
+</script>
+<script defer src="../assets/js/site.js"></script>
+<script defer src="../assets/js/consent-and-forms.js"></script>
+</body>
+</html>
