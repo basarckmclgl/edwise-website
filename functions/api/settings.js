@@ -47,7 +47,13 @@ export async function onRequestPost(context){
   const action=body.action;
   if(!["draft","publish"].includes(action))return json({success:false,message:"Geçersiz işlem."},400);
   const key=action==="publish"?"live_theme":"draft_theme";
-  await context.env.DB.prepare("INSERT INTO site_settings (setting_key, setting_value, updated_at) VALUES (?, ?, datetime('now')) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value, updated_at=datetime('now')").bind(key,JSON.stringify(theme)).run();
+  const serialized=JSON.stringify(theme);
+  const existing=await context.env.DB.prepare("SELECT id FROM site_settings WHERE setting_key=? LIMIT 1").bind(key).first();
+  if(existing){
+   await context.env.DB.prepare("UPDATE site_settings SET setting_value=?, updated_at=datetime('now') WHERE setting_key=?").bind(serialized,key).run();
+  }else{
+   await context.env.DB.prepare("INSERT INTO site_settings (setting_key, setting_value, updated_at) VALUES (?, ?, datetime('now'))").bind(key,serialized).run();
+  }
   return json({success:true,message:action==="publish"?"Tasarım yayımlandı.":"Tasarım taslak olarak kaydedildi."});
  }catch(error){return json({success:false,message:"Tasarım kaydedilemedi."},500);}
 }
