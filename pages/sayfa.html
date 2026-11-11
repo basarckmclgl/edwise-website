@@ -52,6 +52,7 @@
 <span>© 2026 EDWISE. Tüm hakları saklıdır.</span>
 </footer>
 <a class="whatsapp-float" href="https://wa.me/905512501701" target="_blank" rel="noopener" aria-label="WhatsApp üzerinden EDWISE ile iletişime geç">WhatsApp ↗</a>
+<script src="../assets/js/cms-renderer.js"></script>
 <script>
 (async function () {
   const params = new URLSearchParams(window.location.search);
@@ -76,7 +77,8 @@
     if (!response.ok || !data.success || !data.page) throw new Error("Page not found");
 
     title.textContent = data.page.title || "EDWISE";
-    body.textContent = data.page.content || "";
+    if (window.EDWISEContent) window.EDWISEContent.render(body, data.page.content || "");
+    else body.textContent = data.page.content || "";
     document.title = data.page.meta_title || (data.page.title + " | EDWISE");
     if (data.page.meta_description) {
       const description = document.querySelector('meta[name="description"]');
