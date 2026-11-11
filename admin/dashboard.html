@@ -686,7 +686,7 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
     </div>
     <div id="applicationsModule" class="hidden">
   <div class="actions"><button class="btn" id="refreshApplications">↻ Yenile</button><span id="applicationsMessage" class="muted"></span></div>
-  <div class="table-wrap"><table><thead><tr><th>Tarih</th><th>Ad Soyad</th><th>Telefon</th><th>E-posta</th><th>Program</th><th>Tercih</th><th>Durum</th><th>İşlem</th></tr></thead><tbody id="applicationsTable"><tr><td colspan="8">Başvurular yükleniyor...</td></tr></tbody></table></div>
+  <div class="table-wrap"><table><thead><tr><th>Tarih</th><th>Ad soyad</th><th>Telefon</th><th>E-posta</th><th>Program</th><th>Eğitim tercihi</th><th>Uygun zaman</th><th>Açıklama</th><th>Durum</th></tr></thead><tbody id="applicationsTable"><tr><td colspan="9">Başvurular yükleniyor...</td></tr></tbody></table></div>
  </div>
  <div class="message" id="otherModuleMessage">Bu modül henüz geliştirme aşamasında. Gerçek işlemler, güvenli API bağlantıları tamamlandığında açılacak.</div>
    </div>
@@ -766,6 +766,8 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
  if(name==="sitesettings")loadSiteSettings();
 
  $("mediaLink").classList.toggle("hidden",name!=="media");
+ $("applicationsModule").classList.toggle("hidden",name!=="applications");
+ $("otherModuleMessage").classList.toggle("hidden",name==="applications" || name==="media");
 
  if(name==="designcenter")$("breadcrumb").textContent="Tasarım Yönetimi";
  if(otherModules[name]){
@@ -785,19 +787,31 @@ document.querySelectorAll("[data-open]").forEach(n=>{
 
 async function loadApplications(){
  const body=$("applicationsTable");
- body.innerHTML='<tr><td colspan="8">Başvurular yükleniyor...</td></tr>';
+ body.innerHTML='<tr><td colspan="9">Başvurular yükleniyor...</td></tr>';
  try{
   const data=await api("/api/applications");
   const rows=data.applications||[];
   $("countApplications").textContent=rows.length;
   $("applicationsMessage").textContent=rows.length+" başvuru";
-  body.innerHTML=rows.map(x=>'<tr><td>'+escapeHtml(x.created_at)+'</td><td>'+escapeHtml(x.name)+'</td><td><a href="tel:'+escapeHtml(x.phone)+'">'+escapeHtml(x.phone)+'</a></td><td>'+escapeHtml(x.email||"-")+'</td><td>'+escapeHtml(x.program)+'</td><td>'+escapeHtml(x.format)+'</td><td><select data-app-status="'+x.id+'"><option value="new" '+(x.status==="new"?"selected":"")+'>Yeni</option><option value="contacted" '+(x.status==="contacted"?"selected":"")+'>İletişime geçildi</option><option value="completed" '+(x.status==="completed"?"selected":"")+'>Tamamlandı</option></select></td><td><button class="btn" data-app-detail="'+x.id+'">Detay</button></td></tr><tr class="hidden" id="app-detail-'+x.id+'"><td colspan="8"><strong>Uygun zaman:</strong> '+escapeHtml(x.availability||"-")+'<br><strong>Not:</strong> '+escapeHtml(x.note||"-")+'</td></tr>').join("")||'<tr><td colspan="8">Henüz başvuru yok.</td></tr>';
+  body.innerHTML=rows.map(x=>'<tr>'+
+   '<td>'+escapeHtml(x.created_at||"-")+'</td>'+
+   '<td>'+escapeHtml(x.name||"-")+'</td>'+
+   '<td><a href="tel:'+escapeHtml(x.phone||"")+'">'+escapeHtml(x.phone||"-")+'</a></td>'+
+   '<td>'+escapeHtml(x.email||"-")+'</td>'+
+   '<td>'+escapeHtml(x.program||"-")+'</td>'+
+   '<td>'+escapeHtml(x.format||"-")+'</td>'+
+   '<td>'+escapeHtml(x.availability||"-")+'</td>'+
+   '<td style="min-width:220px;white-space:normal">'+escapeHtml(x.note||"-")+'</td>'+
+   '<td><select aria-label="Başvuru durumu" data-app-status="'+x.id+'"><option value="new" '+(x.status==="new"?"selected":"")+'>Yeni</option><option value="contacted" '+(x.status==="contacted"?"selected":"")+'>İletişime geçildi</option><option value="completed" '+(x.status==="completed"?"selected":"")+'>Tamamlandı</option></select></td>'+
+   '</tr>').join("")||'<tr><td colspan="9">Henüz başvuru yok.</td></tr>';
   body.querySelectorAll("[data-app-status]").forEach(select=>select.addEventListener("change",async()=>{
    try{await api("/api/applications",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:select.dataset.appStatus,status:select.value})});}
-   catch(e){alert("Durum kaydedilemedi.");}
+   catch(e){alert("Durum kaydedilemedi: "+e.message);loadApplications();}
   }));
-  body.querySelectorAll("[data-app-detail]").forEach(button=>button.addEventListener("click",()=> $("app-detail-"+button.dataset.appDetail).classList.toggle("hidden")));
- }catch(error){body.innerHTML='<tr><td colspan="8">Başvurular yüklenemedi.</td></tr>';$("applicationsMessage").textContent=error.message;}
+ }catch(error){
+  body.innerHTML='<tr><td colspan="9">Başvurular yüklenemedi: '+escapeHtml(error.message)+'</td></tr>';
+  $("applicationsMessage").textContent="Bağlantı hatası";
+ }
 }
 $("refreshApplications")?.addEventListener("click",loadApplications);
 
