@@ -1108,7 +1108,7 @@ async function checkSession(){
   applyRolePermissions();
   if(currentRole==="superadmin")await loadSiteSettings();
   showPage("overview");
-  // Analiz entegrasyonu şimdilik gizli; yapılandırma tamamlandığında yeniden açılacak.
+  if(currentRole==="superadmin")loadAnalytics();
 
  }catch{
   location.replace("/admin/");
