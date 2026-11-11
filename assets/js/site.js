@@ -260,57 +260,33 @@
 
   const siteMenu = document.querySelector('#site-menu');
 
-  // Panelde yayımlanan tüm CMS sayfalarını ziyaretçi menüsüne ekle.
-  (async function loadCmsMenuPages() {
+  // Ziyaretçi ana menüsünde yalnızca ana gezinme bağlantıları bulunur.
+  // CMS sayfaları otomatik olarak ana menüye eklenmez; ilgili içerik alanlarında
+  // (Hizmet Yönetimi, Sayfa Yönetimi ve footer yasal bağlantıları) yönetilir.
+  (function applyCoreMenuVisibility() {
     if (!siteMenu) return;
-    try {
-      const response = await fetch("/api/public-pages", { headers: { "Accept": "application/json" }, cache: "no-store" });
-      if (!response.ok) throw new Error("Yayımlanmış sayfalar alınamadı: " + response.status);
-      const data = await response.json();
-      if (!data.success || !Array.isArray(data.pages)) return;
-      let menuConfig=[];
-      try{const settingsResponse=await fetch("/api/public-settings",{headers:{"Accept":"application/json"},cache:"no-store"});const settingsData=await settingsResponse.json();if(settingsData.success&&Array.isArray(settingsData.menu))menuConfig=settingsData.menu;}catch{}
-      const menuByKey=new Map(menuConfig.map(item=>[item.key,item]));
-      const hiddenSlugs=new Set(["hakkimizda","iletisim","hizmetlerimiz"]);
-      siteMenu.querySelectorAll("a").forEach(link=>{
-        const href=link.getAttribute("href")||"";
-        const path=(new URL(link.href,location.origin)).pathname;
-        const key=link.classList.contains("menu-contact")?"contact-cta":
-          path==="/index.html"||path==="/"?"home":
-          path.endsWith("/hizmetlerimiz.html")?"services":
-          path.endsWith("/edwise-rehber.html")?"guide":
-          path.endsWith("/hakkimizda.html")?"about":
-          path.endsWith("/basvuru.html")?"apply":
-          path.endsWith("/iletisim.html")?"contact":null;
-        const match=menuConfig.find(item=>item.key===key);
-        if(match)link.style.display=match.visible===false?"none":"";
-      });
-      const fixedSlugs = new Set(["hakkimizda", "iletisim", "hizmetlerimiz"]);
-      const insertBefore = siteMenu.querySelector(":scope > .menu-apply") || siteMenu.querySelector(":scope > .menu-contact");
-      data.pages.filter(page => page && page.slug && page.title && !fixedSlugs.has(page.slug))
-        .sort((a,b)=>{
-          const ai=menuConfig.findIndex(item=>item.key==="page-"+a.id);
-          const bi=menuConfig.findIndex(item=>item.key==="page-"+b.id);
-          return (ai<0?9999:ai)-(bi<0?9999:bi);
-        }).forEach(page => {
-        const config=menuByKey.get("page-"+page.id);
-        if(config&&config.visible===false)return;
-        const alreadyAdded = Array.from(siteMenu.querySelectorAll("a[data-cms-slug]")).some(link => link.dataset.cmsSlug === page.slug);
-        if (alreadyAdded) return;
-        const link = document.createElement("a");
-        link.href = "/pages/sayfa.html?slug=" + encodeURIComponent(page.slug);
-        link.dataset.cmsSlug = page.slug;
-        const icon = document.createElement("span");
-        icon.className = "menu-item-icon";
-        icon.setAttribute("aria-hidden", "true");
-        icon.textContent = "📄";
-        const label = document.createElement("span");
-        label.textContent = page.title;
-        link.append(icon, label);
-        if (insertBefore && insertBefore.parentElement === siteMenu) siteMenu.insertBefore(link, insertBefore);
-        else siteMenu.appendChild(link);
-      });
-    } catch (error) { console.error("CMS menü sayfaları yüklenemedi:", error); }
+    fetch("/api/public-settings", { headers: { "Accept": "application/json" }, cache: "no-store" })
+      .then(response => response.ok ? response.json() : null)
+      .then(data => {
+        if (!data || !data.success || !Array.isArray(data.menu)) return;
+        const keyFor = link => {
+          const path = new URL(link.href, location.origin).pathname;
+          if (link.classList.contains("menu-contact")) return "contact-cta";
+          if (path === "/" || path.endsWith("/index.html")) return "home";
+          if (path.endsWith("/hizmetlerimiz.html")) return "services";
+          if (path.endsWith("/edwise-rehber.html")) return "guide";
+          if (path.endsWith("/hakkimizda.html")) return "about";
+          if (path.endsWith("/basvuru.html")) return "apply";
+          if (path.endsWith("/iletisim.html")) return "contact";
+          return null;
+        };
+        siteMenu.querySelectorAll(":scope > a").forEach(link => {
+          const key = keyFor(link);
+          const setting = key && data.menu.find(item => item.key === key);
+          if (setting) link.style.display = setting.visible === false ? "none" : "";
+        });
+      })
+      .catch(error => console.warn("Menü ayarları yüklenemedi:", error));
   })();
 
   function setMenuOpen(open) {
