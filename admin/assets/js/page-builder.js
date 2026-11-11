@@ -1,332 +1,57 @@
-(function () {
+(function(){
 "use strict";
-
-const FONT_OPTIONS = [
-  ["Arial", "Arial, Helvetica, sans-serif"],
-  ["Times New Roman", "'Times New Roman', Times, serif"],
-  ["Calibri", "Calibri, Arial, sans-serif"],
-  ["Georgia", "Georgia, serif"],
-  ["Verdana", "Verdana, sans-serif"],
-  ["Tahoma", "Tahoma, sans-serif"]
-];
-
-function safeUrl(value) {
-  try {
-    const url = new URL(value, window.location.origin);
-    return ["http:", "https:"].includes(url.protocol) ? url.href : "";
-  } catch (_) { return ""; }
+const fonts=[["Arial","Arial, sans-serif"],["Times New Roman","'Times New Roman',serif"],["Calibri","Calibri,Arial,sans-serif"],["Georgia","Georgia,serif"],["Verdana","Verdana,sans-serif"],["Tahoma","Tahoma,sans-serif"]];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safe=s=>{try{let u=new URL(s,location.origin);return ["http:","https:"].includes(u.protocol)?u.href:""}catch(_){return ""}};
+function make(id,label){
+ const source=document.getElementById(id);if(!source||source.dataset.builderReady)return;source.dataset.builderReady="1";source.classList.add("hidden");
+ const app=document.createElement("section");app.className="word-app";
+ const tabs=document.createElement("nav");tabs.className="word-tabs";
+ const ribbon=document.createElement("div");ribbon.className="word-ribbon";
+ const tools=document.createElement("div");tools.className="word-tools";
+ const stage=document.createElement("div");stage.className="word-stage";
+ const page=document.createElement("article");page.className="word-page";page.contentEditable="true";page.setAttribute("role","textbox");page.setAttribute("aria-label",label+" belge alanı");
+ const status=document.createElement("div");status.className="word-status";status.textContent="Belge düzenleyici";
+ stage.append(page);ribbon.append(tools);app.append(tabs,ribbon,stage,status);source.parentNode.insertBefore(app,source);
+ let saved=null,img=null;
+ function remember(){let s=getSelection();if(s&&s.rangeCount&&page.contains(s.anchorNode))saved=s.getRangeAt(0).cloneRange()}
+ function restore(){page.focus();if(saved){let s=getSelection();s.removeAllRanges();s.addRange(saved)}}
+ function block(){let n=getSelection()?.anchorNode;if(n?.nodeType===3)n=n.parentElement;while(n&&n.parentElement!==page)n=n.parentElement;return n?.parentElement===page?n:null}
+ function sync(){source.value=page.innerHTML;source.dispatchEvent(new Event("input",{bubbles:true}));status.textContent="Belge · "+page.innerText.trim().split(/\s+/).filter(Boolean).length+" kelime"}
+ function cmd(c,v){restore();document.execCommand(c,false,v||null);remember();sync()}
+ function add(h){restore();document.execCommand("insertHTML",false,h);remember();sync()}
+ function group(name){let g=document.createElement("div");g.className="word-group";let b=document.createElement("div");b.className="word-group-body";g.append(b);let t=document.createElement("small");t.textContent=name;g.append(t);tools.append(g);return b}
+ function button(p,t,f){let b=document.createElement("button");b.type="button";b.className="word-btn";b.textContent=t;b.addEventListener("mousedown",e=>e.preventDefault());b.onclick=f;p.append(b)}
+ function select(p,title,opts,fn,width){let l=document.createElement("label");l.className="word-label";l.textContent=title;let s=document.createElement("select");s.style.width=width||"auto";opts.forEach(([a,v])=>{let o=document.createElement("option");o.textContent=a;o.value=v;s.append(o)});s.addEventListener("mousedown",remember);s.onchange=()=>{fn(s.value);s.selectedIndex=0};l.append(s);p.append(l)}
+ function color(p,title,command){let l=document.createElement("label");l.className="word-color";l.textContent=title;let i=document.createElement("input");i.type="color";i.value=command==="hiliteColor"?"#fff2a8":"#222222";i.onmousedown=remember;i.oninput=()=>cmd(command,i.value);l.append(i);p.append(l)}
+ function inlineStyle(prop,value){restore();let s=getSelection();if(!s?.rangeCount)return;let r=s.getRangeAt(0);if(r.collapsed){let b=block();if(b)b.style[prop]=value}else{let span=document.createElement("span");span.style[prop]=value;span.append(r.extractContents());r.insertNode(span);let nr=document.createRange();nr.selectNodeContents(span);s.removeAllRanges();s.addRange(nr)}remember();sync()}
+ function imageStyle(prop,value){if(!img){alert("Önce görseli seç.");return}img.style[prop]=value;img.style.maxWidth="100%";img.style.height="auto";sync()}
+ function render(tab){
+  tools.replaceChildren();let g;
+  if(tab==="Giriş"){
+   g=group("Pano");button(g,"Geri al",()=>cmd("undo"));button(g,"Yinele",()=>cmd("redo"));
+   g=group("Yazı tipi");select(g,"Yazı tipi",fonts,v=>inlineStyle("fontFamily",v),"145px");select(g,"Punto",["8","9","10","11","12","14","16","18","20","22","24","28","36","48","72"].map(x=>[x+" pt",x+"pt"]),v=>inlineStyle("fontSize",v),"65px");button(g,"B",()=>cmd("bold"));button(g,"I",()=>cmd("italic"));button(g,"U",()=>cmd("underline"));button(g,"abc̶",()=>cmd("strikeThrough"));color(g,"Yazı rengi","foreColor");color(g,"Vurgu","hiliteColor");
+   g=group("Paragraf");select(g,"Stil",[["Normal","p"],["Başlık","h2"],["Alt başlık","h3"],["Alıntı","blockquote"]],v=>cmd("formatBlock",v),"110px");button(g,"• Liste",()=>cmd("insertUnorderedList"));button(g,"1. Liste",()=>cmd("insertOrderedList"));button(g,"Sola",()=>cmd("justifyLeft"));button(g,"Ortala",()=>cmd("justifyCenter"));button(g,"Sağa",()=>cmd("justifyRight"));button(g,"İki yana",()=>cmd("justifyFull"));
+  }else if(tab==="Ekle"){
+   g=group("Ekle");button(g,"Görsel yükle",()=>picker.click());button(g,"Görsel URL",()=>{let u=prompt("Görsel URL");if(u&&safe(u))add('<p><img src="'+esc(safe(u))+'" style="width:70%;height:auto"></p>')});button(g,"Tablo",()=>{let n=Number(prompt("Satır sayısı","3"))||3,m=Number(prompt("Sütun sayısı","3"))||3;let h="<table>";for(let y=0;y<Math.min(n,10);y++){h+="<tr>";for(let x=0;x<Math.min(m,8);x++)h+="<td>Metin</td>";h+="</tr>"}add(h+"</table>")});button(g,"Bağlantı",()=>{let u=prompt("Bağlantı adresi");if(u&&safe(u))cmd("createLink",safe(u))});button(g,"Düğme",()=>{let u=prompt("Düğme adresi"),t=prompt("Düğme metni","Bilgi al");if(u&&t&&safe(u))add('<p><a class="cms-button" href="'+esc(safe(u))+'">'+esc(t)+'</a></p>')});button(g,"Harita",()=>{let u=prompt("Harita bağlantısı");if(u&&safe(u))add('<p><a href="'+esc(safe(u))+'">Konumu haritada aç</a></p>')});button(g,"Video",()=>{let u=prompt("Video URL");if(u&&safe(u))add('<p><a href="'+esc(safe(u))+'">Videoyu izle</a></p>')});button(g,"Yatay çizgi",()=>add("<hr>"));
+  }else if(tab==="Düzen"){
+   g=group("Görsel düzeni");button(g,"Küçült",()=>imageStyle("width","40%"));button(g,"Orta",()=>imageStyle("width","70%"));button(g,"Tam genişlik",()=>imageStyle("width","100%"));button(g,"Metin solunda",()=>imageStyle("float","left"));button(g,"Metin sağında",()=>imageStyle("float","right"));button(g,"Satır içinde",()=>imageStyle("float","none"));
+   g=group("Blok");button(g,"↑ Yukarı",()=>move(-1));button(g,"↓ Aşağı",()=>move(1));button(g,"Bloğu sil",()=>{let b=block();if(b&&confirm("Seçili blok silinsin mi?")){b.remove();sync()}});
+  }else{
+   g=group("Sayfa tasarımı");select(g,"Sayfa yazı tipi",fonts,v=>page.style.fontFamily=v,"160px");button(g,"Beyaz sayfa",()=>page.style.background="#fff");button(g,"Sayfa geniş",()=>page.style.maxWidth="900px");button(g,"Sayfa dar",()=>page.style.maxWidth="720px");
+  }
+ }
+ function move(d){let b=block(),s=b&&(d<0?b.previousElementSibling:b.nextElementSibling);if(!s)return;if(d<0)b.parentNode.insertBefore(b,s);else b.parentNode.insertBefore(s,b);sync()}
+ const picker=document.createElement("input");picker.type="file";picker.accept="image/jpeg,image/png,image/webp,image/gif";picker.hidden=true;app.append(picker);
+ picker.onchange=async()=>{let f=picker.files?.[0];if(!f)return;if(f.size>5242880){alert("Görsel en fazla 5 MB olabilir.");return}try{let fd=new FormData();fd.append("file",f);let r=await fetch("/api/media-upload",{method:"POST",credentials:"same-origin",body:fd}),d=await r.json();if(!r.ok||!d.success)throw Error(d.message||"Yüklenemedi");let u=safe(d.file_url||d.url);if(!u)throw Error("Görsel adresi bulunamadı");add('<p><img src="'+esc(u)+'" alt="'+esc(f.name)+'" style="width:70%;height:auto"></p>')}catch(e){alert(e.message)}finally{picker.value=""}};
+ ["Giriş","Ekle","Düzen","Tasarım"].forEach((t,i)=>{let b=document.createElement("button");b.type="button";b.className="word-tab"+(!i?" active":"");b.textContent=t;b.onclick=()=>{tabs.querySelectorAll("button").forEach(x=>x.classList.toggle("active",x===b));render(t)};tabs.append(b)});
+ let raw=source.value.trim();page.innerHTML=raw&&/<[a-z][\s\S]*>/i.test(raw)?raw:raw?raw.split(/\n+/).filter(Boolean).map(x=>"<p>"+esc(x)+"</p>").join(""):"<p><br></p>";
+ page.oninput=()=>{remember();sync()};page.onkeyup=remember;page.onmouseup=remember;page.onclick=e=>{img=e.target?.tagName==="IMG"?e.target:null;page.querySelectorAll(".word-image-selected").forEach(x=>x.classList.remove("word-image-selected"));if(img)img.classList.add("word-image-selected");remember()};
+ page.ondragover=e=>e.preventDefault();page.ondrop=async e=>{e.preventDefault();let f=e.dataTransfer.files?.[0];if(!f||!f.type.startsWith("image/"))return;picker.files;let dt=new DataTransfer();dt.items.add(f);picker.files=dt.files;picker.dispatchEvent(new Event("change"))};
+ page.onpaste=()=>setTimeout(()=>{remember();sync()},0);render("Giriş");
 }
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, function (char) {
-    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char];
-  });
-}
-
-function makeEditor(textareaId, label) {
-  const source = document.getElementById(textareaId);
-  if (!source || source.dataset.builderReady) return;
-  source.dataset.builderReady = "1";
-  source.classList.add("hidden");
-
-  const wrap = document.createElement("div");
-  wrap.className = "pb-wrap";
-  const bar = document.createElement("div");
-  bar.className = "pb-toolbar";
-  const canvas = document.createElement("div");
-  canvas.className = "pb-canvas";
-  canvas.contentEditable = "true";
-  canvas.setAttribute("role", "textbox");
-  canvas.setAttribute("aria-label", label + " içerik düzenleyicisi");
-  canvas.setAttribute("aria-multiline", "true");
-
-  let savedRange = null;
-  let selectedImage = null;
-
-  function saveSelection() {
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount && canvas.contains(selection.anchorNode)) {
-      savedRange = selection.getRangeAt(0).cloneRange();
-    }
-  }
-  function restoreSelection() {
-    canvas.focus();
-    if (!savedRange) return;
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(savedRange);
-  }
-  function sync() {
-    source.value = canvas.innerHTML;
-    source.dispatchEvent(new Event("input", {bubbles:true}));
-  }
-  function currentBlock() {
-    const selection = window.getSelection();
-    let node = selection && selection.anchorNode;
-    if (node && node.nodeType === Node.TEXT_NODE) node = node.parentElement;
-    while (node && node.parentElement !== canvas) node = node.parentElement;
-    return node && node.parentElement === canvas ? node : null;
-  }
-  function addHtml(html) {
-    restoreSelection();
-    document.execCommand("insertHTML", false, html);
-    saveSelection();
-    sync();
-  }
-  function button(group, labelText, action, title) {
-    const item = document.createElement("button");
-    item.type = "button";
-    item.className = "editor-tool";
-    item.textContent = labelText;
-    item.title = title || labelText;
-    item.addEventListener("mousedown", function (event) { event.preventDefault(); });
-    item.addEventListener("click", action);
-    group.appendChild(item);
-    return item;
-  }
-  function group() {
-    const element = document.createElement("div");
-    element.className = "pb-group";
-    bar.appendChild(element);
-    return element;
-  }
-  function selectControl(groupElement, labelText, options, action) {
-    const label = document.createElement("label");
-    label.className = "pb-select-label";
-    label.textContent = labelText;
-    const select = document.createElement("select");
-    select.className = "pb-select";
-    options.forEach(function (option) {
-      const item = document.createElement("option");
-      item.value = option[1];
-      item.textContent = option[0];
-      select.appendChild(item);
-    });
-    select.addEventListener("mousedown", saveSelection);
-    select.addEventListener("change", function () { action(select.value); select.selectedIndex = 0; });
-    label.appendChild(select);
-    groupElement.appendChild(label);
-  }
-  function applyInlineStyle(property, value) {
-    restoreSelection();
-    const selection = window.getSelection();
-    if (!selection || !selection.rangeCount) return;
-    const range = selection.getRangeAt(0);
-    if (range.collapsed) {
-      const block = currentBlock();
-      if (block) block.style[property] = value;
-    } else {
-      const span = document.createElement("span");
-      span.style[property] = value;
-      span.appendChild(range.extractContents());
-      range.insertNode(span);
-      const next = document.createRange();
-      next.selectNodeContents(span);
-      selection.removeAllRanges();
-      selection.addRange(next);
-    }
-    saveSelection();
-    sync();
-  }
-  function runCommand(command, value) {
-    restoreSelection();
-    document.execCommand(command, false, value || null);
-    saveSelection();
-    sync();
-  }
-
-  let g = group();
-  button(g, "B", function () { runCommand("bold"); }, "Kalın");
-  button(g, "I", function () { runCommand("italic"); }, "İtalik");
-  button(g, "U", function () { runCommand("underline"); }, "Altı çizili");
-  button(g, "S", function () { runCommand("strikeThrough"); }, "Üstü çizili");
-
-  g = group();
-  selectControl(g, "Yazı tipi", [["Yazı tipi seç", ""], ...FONT_OPTIONS], function (font) {
-    if (font) applyInlineStyle("fontFamily", font);
-  });
-  selectControl(g, "Boyut", [["Boyut", ""], ...[12,14,16,18,20,22,24,28,32,36,42,48].map(function (n) { return [n + " px", n + "px"]; })], function (size) {
-    if (!size) return;
-    applyInlineStyle("fontSize", size);
-  });
-  const colorLabel = document.createElement("label");
-  colorLabel.className = "pb-color-label";
-  colorLabel.textContent = "Metin rengi";
-  const colorInput = document.createElement("input");
-  colorInput.type = "color"; colorInput.value = "#24212b"; colorInput.title = "Metin rengi";
-  colorInput.addEventListener("mousedown", saveSelection);
-  colorInput.addEventListener("input", function () { applyInlineStyle("color", colorInput.value); });
-  colorLabel.appendChild(colorInput); g.appendChild(colorLabel);
-  const markLabel = document.createElement("label");
-  markLabel.className = "pb-color-label";
-  markLabel.textContent = "Vurgu";
-  const markInput = document.createElement("input");
-  markInput.type = "color"; markInput.value = "#fff2a8"; markInput.title = "Metin vurgusu";
-  markInput.addEventListener("mousedown", saveSelection);
-  markInput.addEventListener("input", function () { applyInlineStyle("backgroundColor", markInput.value); });
-  markLabel.appendChild(markInput); g.appendChild(markLabel);
-
-  g = group();
-  button(g, "Paragraf", function () { runCommand("formatBlock", "p"); });
-  button(g, "Başlık", function () { runCommand("formatBlock", "h2"); });
-  button(g, "Alt başlık", function () { runCommand("formatBlock", "h3"); });
-  button(g, "Alıntı", function () { runCommand("formatBlock", "blockquote"); });
-  button(g, "• Liste", function () { runCommand("insertUnorderedList"); });
-  button(g, "1. Liste", function () { runCommand("insertOrderedList"); });
-
-  g = group();
-  button(g, "Bağlantı", function () {
-    const url = prompt("Bağlantı adresini girin (https://)");
-    if (url && safeUrl(url)) runCommand("createLink", safeUrl(url));
-  });
-  button(g, "Düğme", function () {
-    const url = prompt("Düğmenin açacağı adres (https://)");
-    const text = prompt("Düğme üzerinde görünecek yazı", "Bilgi al");
-    if (url && text && safeUrl(url)) addHtml('<p><a class="cms-button" href="' + escapeHtml(safeUrl(url)) + '">' + escapeHtml(text) + '</a></p>');
-  });
-  button(g, "Harita / Konum", function () {
-    const url = prompt("Google Maps veya OpenStreetMap bağlantısı");
-    if (url && safeUrl(url)) addHtml('<p><a href="' + escapeHtml(safeUrl(url)) + '" target="_blank" rel="noopener">Konumu haritada aç</a></p>');
-  });
-  button(g, "Video URL", function () {
-    const url = prompt("YouTube veya Vimeo video bağlantısı");
-    if (!url || !safeUrl(url)) return;
-    addHtml('<p><a href="' + escapeHtml(safeUrl(url)) + '" target="_blank" rel="noopener">Videoyu izle</a></p>');
-  });
-  button(g, "Yatay çizgi", function () { addHtml("<hr>"); });
-
-  g = group();
-  const picker = document.createElement("input");
-  picker.type = "file"; picker.accept = "image/jpeg,image/png,image/webp,image/gif"; picker.hidden = true;
-  button(g, "Görsel Yükle", function () { saveSelection(); picker.click(); });
-  button(g, "Görsel URL", function () {
-    const url = prompt("Görselin https:// adresi");
-    if (!url || !safeUrl(url)) return;
-    const alt = prompt("Görsel açıklaması", "");
-    addHtml('<figure><img src="' + escapeHtml(safeUrl(url)) + '" alt="' + escapeHtml(alt || "") + '" style="width:70%;height:auto"><figcaption>' + escapeHtml(alt || "") + '</figcaption></figure>');
-  });
-  picker.addEventListener("change", async function () {
-    const file = picker.files && picker.files[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { alert("Görsel en fazla 5 MB olabilir."); picker.value = ""; return; }
-    try {
-      const data = new FormData(); data.append("file", file);
-      const response = await fetch("/api/media-upload", {method:"POST",credentials:"same-origin",body:data});
-      const result = await response.json();
-      if (!response.ok || !result.success) throw new Error(result.message || "Görsel yüklenemedi.");
-      const url = safeUrl(result.file_url || result.url);
-      if (!url) throw new Error("Görsel adresi alınamadı.");
-      addHtml('<figure><img src="' + escapeHtml(url) + '" alt="' + escapeHtml(file.name) + '" style="width:70%;height:auto"><figcaption>' + escapeHtml(file.name) + '</figcaption></figure>');
-    } catch (error) { alert(error.message); }
-    finally { picker.value = ""; }
-  });
-  wrap.appendChild(picker);
-
-  g = group();
-  button(g, "Sola", function () { runCommand("justifyLeft"); });
-  button(g, "Ortala", function () { runCommand("justifyCenter"); });
-  button(g, "Sağa", function () { runCommand("justifyRight"); });
-  button(g, "Görseli küçült", function () { resizeImage("60%"); });
-  button(g, "Görseli büyüt", function () { resizeImage("100%"); });
-  button(g, "Metin yanı", function () { imageFloat("left"); });
-  button(g, "Sağda", function () { imageFloat("right"); });
-  button(g, "Alt alta", function () { imageFloat("none"); });
-
-  g = group();
-  button(g, "↑ Yukarı", function () { moveBlock(-1); });
-  button(g, "↓ Aşağı", function () { moveBlock(1); });
-  button(g, "Bloğu sil", function () { const block = currentBlock(); if (block && confirm("Seçili içerik bloğu silinsin mi?")) { block.remove(); selectedImage = null; sync(); } });
-
-  const help = document.createElement("p");
-  help.className = "editor-help";
-  help.textContent = "Word benzeri düzenleme: metni seçerek biçimlendirin. Görseli seçerek boyutunu ve metinle konumunu ayarlayın. Değişiklikler kaydedilen içerikle birlikte yayımlanır.";
-  wrap.append(bar, canvas, help);
-  source.parentNode.insertBefore(wrap, source);
-
-  function resizeImage(width) {
-    if (!selectedImage) { alert("Önce düzenlemek istediğiniz görsele tıklayın."); return; }
-    selectedImage.style.width = width; selectedImage.style.maxWidth = "100%"; selectedImage.style.height = "auto"; sync();
-  }
-  function imageFloat(direction) {
-    if (!selectedImage) { alert("Önce düzenlemek istediğiniz görsele tıklayın."); return; }
-    selectedImage.style.float = direction === "none" ? "none" : direction;
-    selectedImage.style.display = direction === "none" ? "block" : "inline-block";
-    selectedImage.style.margin = direction === "left" ? "8px 20px 12px 0" : direction === "right" ? "8px 0 12px 20px" : "12px auto";
-    if (direction === "none" && selectedImage.parentElement.tagName === "FIGURE") selectedImage.parentElement.style.textAlign = "center";
-    sync();
-  }
-  function moveBlock(direction) {
-    const block = currentBlock();
-    if (!block) return;
-    const sibling = direction < 0 ? block.previousElementSibling : block.nextElementSibling;
-    if (!sibling) return;
-    if (direction < 0) block.parentNode.insertBefore(block, sibling);
-    else block.parentNode.insertBefore(sibling, block);
-    sync();
-  }
-
-  const existing = source.value.trim();
-  canvas.innerHTML = existing && /<[a-z][\s\S]*>/i.test(existing)
-    ? existing
-    : existing ? existing.split(/\n+/).filter(Boolean).map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; }).join("") : "<p><br></p>";
-
-  canvas.addEventListener("input", function () { saveSelection(); sync(); });
-  canvas.addEventListener("keyup", saveSelection);
-  canvas.addEventListener("mouseup", saveSelection);
-  canvas.addEventListener("click", function (event) {
-    selectedImage = event.target && event.target.tagName === "IMG" ? event.target : null;
-    canvas.querySelectorAll("img.pb-selected").forEach(function (img) { img.classList.remove("pb-selected"); });
-    if (selectedImage) selectedImage.classList.add("pb-selected");
-    saveSelection();
-  });
-  canvas.addEventListener("dragover", function (event) { event.preventDefault(); canvas.classList.add("pb-over"); });
-  canvas.addEventListener("dragleave", function () { canvas.classList.remove("pb-over"); });
-  canvas.addEventListener("drop", async function (event) {
-    event.preventDefault(); canvas.classList.remove("pb-over");
-    const file = event.dataTransfer.files && event.dataTransfer.files[0];
-    if (!file || !file.type.startsWith("image/")) return;
-    if (file.size > 5 * 1024 * 1024) { alert("Görsel en fazla 5 MB olabilir."); return; }
-    try {
-      const form = new FormData(); form.append("file", file);
-      const response = await fetch("/api/media-upload", {method:"POST",credentials:"same-origin",body:form});
-      const result = await response.json();
-      if (!response.ok || !result.success) throw new Error(result.message || "Görsel yüklenemedi.");
-      const url = safeUrl(result.file_url || result.url);
-      if (!url) throw new Error("Görsel adresi alınamadı.");
-      addHtml('<figure><img src="' + escapeHtml(url) + '" alt="' + escapeHtml(file.name) + '" style="width:70%;height:auto"><figcaption>' + escapeHtml(file.name) + '</figcaption></figure>');
-    } catch (error) { alert(error.message); }
-  });
-  canvas.addEventListener("paste", function () { setTimeout(function () { saveSelection(); sync(); }, 0); });
-}
-
-const style = document.createElement("style");
-style.textContent = [
-  ".pb-wrap{margin:12px 0;min-width:0}",
-  ".pb-toolbar{display:flex;flex-wrap:wrap;gap:7px;padding:11px;background:#11111e;border:1px solid #45405f;border-radius:9px 9px 0 0}",
-  ".pb-group{display:flex;align-items:center;gap:5px;flex-wrap:wrap;border-right:1px solid #45405f;padding:0 8px 0 0}",
-  ".pb-group:last-child{border-right:0}",
-  ".pb-select-label,.pb-color-label{display:flex;align-items:center;gap:5px;color:#ddd6f5;font-size:11px}",
-  ".pb-select{width:auto;min-width:100px;padding:7px 8px;background:#242039;color:#fff;border:1px solid #45405f;border-radius:6px;font-size:12px}",
-  ".pb-color-label input{width:30px;height:29px;padding:2px;border:1px solid #45405f;background:#242039;border-radius:5px}",
-  ".pb-canvas{min-height:440px;padding:30px;background:#fff;color:#24212b;border:1px solid #c9c5d5;border-radius:0 0 9px 9px;font:17px/1.75 Arial,Helvetica,sans-serif;outline:none;overflow-wrap:anywhere}",
-  ".pb-canvas:focus{border-color:#a78bfa;box-shadow:0 0 0 2px #8055ed22}",
-  ".pb-canvas>*{margin:0 0 16px}",
-  ".pb-canvas h2{font-size:30px;line-height:1.3}.pb-canvas h3{font-size:24px;line-height:1.4}",
-  ".pb-canvas blockquote{border-left:4px solid #8055ed;padding:13px 18px;background:#f4f0ff;color:#51446d}",
-  ".pb-canvas img{max-width:100%;height:auto;cursor:pointer;border-radius:5px}",
-  ".pb-canvas img.pb-selected{outline:3px solid #8055ed;outline-offset:3px}",
-  ".pb-canvas figure{margin:18px 0;text-align:center;clear:both}.pb-canvas figcaption{font-size:13px;color:#777;margin-top:7px}",
-  ".pb-canvas .cms-button{display:inline-block;padding:11px 18px;border-radius:7px;background:#5632a8;color:#fff;text-decoration:none}",
-  ".pb-over{outline:3px dashed #8055ed;outline-offset:-5px}",
-  ".editor-help{font-size:12px;color:#aaa7c0;line-height:1.6;margin:9px 0 0}",
-  "@media(max-width:650px){.pb-canvas{padding:18px 14px;min-height:350px}.pb-group{border:0}.pb-toolbar{gap:8px}}"
-].join("");
-document.head.appendChild(style);
-
-function init() {
-  makeEditor("contentText", "Sayfa");
-  makeEditor("serviceContent", "Hizmet");
-}
-if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-else init();
+const style=document.createElement("style");style.textContent=".word-app{margin:14px 0;background:#e9e9ec;border:1px solid #c9c9d2;border-radius:8px;overflow:hidden;color:#292735}.word-tabs{display:flex;gap:3px;padding:7px 10px 0;background:#f7f7f9;border-bottom:1px solid #ccc}.word-tab{border:0;background:transparent;padding:10px 18px;cursor:pointer;color:#333;border-radius:6px 6px 0 0}.word-tab.active{background:#fff;border:1px solid #d5d5dc;border-bottom:2px solid #7653c5;font-weight:bold}.word-ribbon{background:#fff}.word-tools{display:flex;gap:5px;min-height:92px;padding:8px;overflow-x:auto}.word-group{display:flex;flex-direction:column;justify-content:space-between;gap:5px;padding:3px 9px;border-right:1px solid #ddd;min-width:max-content}.word-group>small{text-align:center;color:#777;font-size:10px}.word-group-body{display:flex;align-items:center;gap:4px;flex-wrap:wrap;max-width:520px}.word-btn{padding:6px 9px;border:1px solid transparent;border-radius:4px;background:#fff;color:#252331;cursor:pointer;font-size:12px}.word-btn:hover{background:#f0edfa;border-color:#c9bdec}.word-label{display:flex;flex-direction:column;gap:3px;font-size:10px;color:#777}.word-label select{height:29px;background:#fff;color:#222;border:1px solid #ccc;border-radius:4px;padding:3px}.word-color{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:#777}.word-color input{width:30px;height:27px;padding:1px}.word-stage{padding:24px 10px;max-height:850px;overflow:auto;background:#e9e9ec}.word-page{box-sizing:border-box;width:100%;max-width:794px;min-height:1050px;margin:0 auto;padding:80px 76px;background:#fff;color:#222;box-shadow:0 1px 6px #0002;outline:none;font:11pt/1.65 Calibri,Arial,sans-serif;overflow-wrap:anywhere}.word-page p{margin:0 0 12px}.word-page h2{font-size:22pt;margin:18px 0 10px}.word-page h3{font-size:16pt;margin:15px 0 8px}.word-page blockquote{margin:14px 20px;padding:12px 18px;border-left:4px solid #7653c5;background:#f5f2fb}.word-page img{max-width:100%;height:auto;cursor:pointer}.word-page img.word-image-selected{outline:2px solid #7653c5;outline-offset:3px}.word-page table{border-collapse:collapse;width:100%}.word-page td{border:1px solid #999;padding:7px}.word-page a.cms-button{display:inline-block;background:#5937a6;color:white;padding:10px 18px;border-radius:5px;text-decoration:none}.word-status{padding:7px 12px;background:#f7f7f9;color:#777;font-size:11px;border-top:1px solid #ddd}@media(max-width:650px){.word-stage{padding:10px 4px}.word-page{padding:35px 22px;min-height:700px}}";
+document.head.append(style);
+function init(){make("contentText","Sayfa");make("serviceContent","Hizmet")}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
