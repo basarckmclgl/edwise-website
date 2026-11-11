@@ -20,6 +20,17 @@ async function authorize(context) {
 
   return null;
 }
+async function checkOrigin(request) {
+  const origin = request.headers.get("Origin");
+
+  if (!origin) return false;
+
+  try {
+    return origin === new URL(request.url).origin;
+  } catch {
+    return false;
+  }
+}
 
 function clean(value, maxLength = 10000) {
   return String(value ?? "").trim().slice(0, maxLength);
@@ -173,13 +184,20 @@ export async function onRequestGet(context) {
 
 // YENİ HİZMET OLUŞTUR
 export async function onRequestPost(context) {
+
+  if (!(await checkOrigin(context.request))) {
+    return json({
+      success: false,
+      message: "İstek kaynağı geçersiz."
+    }, 403);
+  }
+
   const denied = await authorize(context);
   if (denied) return denied;
 
   try {
     const body = await context.request.json();
     const values = prepareServiceValues(body);
-
     const columns = await getServiceSchema(context);
 
     const idColumn = columns.find(
@@ -258,6 +276,14 @@ export async function onRequestPost(context) {
 
 // HİZMET DÜZENLE
 export async function onRequestPut(context) {
+
+  if (!(await checkOrigin(context.request))) {
+    return json({
+      success: false,
+      message: "İstek kaynağı geçersiz."
+    }, 403);
+  }
+
   const denied = await authorize(context);
   if (denied) return denied;
 
@@ -332,6 +358,14 @@ export async function onRequestPut(context) {
 
 // HİZMET SİL
 export async function onRequestDelete(context) {
+
+  if (!(await checkOrigin(context.request))) {
+    return json({
+      success: false,
+      message: "İstek kaynağı geçersiz."
+    }, 403);
+  }
+
   const denied = await authorize(context);
   if (denied) return denied;
 
