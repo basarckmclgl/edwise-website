@@ -755,6 +755,7 @@ async function loadPublishedContentCounts(){
 
 function showPage(name){
  if(!canAccess(name)) name="overview";
+ if(name==="overview")loadPublishedContentCounts();
 
  $("overview").classList.toggle("hidden",name!=="overview");
  $("designcenter").classList.toggle("hidden",name!=="designcenter");
