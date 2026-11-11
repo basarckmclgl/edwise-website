@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -65,6 +64,29 @@ td{color:#e8e5f3}
 .role-label{display:inline-block;margin-left:8px;padding:5px 8px;border-radius:20px;background:#29213f;color:var(--light);font-size:10px}
 @media(max-width:950px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:650px){.sidebar{width:65px;padding:15px 7px}.logo{font-size:14px;padding:5px}.logo small,.menu-label,.nav span:last-child{display:none}.nav{justify-content:center;padding:13px 4px}.main{margin-left:65px;width:calc(100% - 65px)}.content{padding:16px 12px}.topbar{padding:0 12px}.grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
+
+/* Word benzeri blog editörü */
+.word-toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:#11111e;border:1px solid var(--border);border-bottom:0;border-radius:9px 9px 0 0}
+.toolbar-group{display:flex;flex-wrap:wrap;gap:5px;padding-right:9px;margin-right:2px;border-right:1px solid var(--border)}
+.toolbar-group:last-child{border-right:0}
+.editor-tool{background:#242039;color:#eee8ff;border:1px solid #45405f;border-radius:6px;padding:8px 10px;cursor:pointer;font-size:12px}
+.editor-tool:hover,.editor-tool:focus{border-color:var(--light);background:#352953}
+.danger-tool{color:#ff9da8;border-color:#64333f}
+.post-canvas{background:#fff;color:#24212b;border:1px solid #c9c5d5;border-radius:0 0 9px 9px;min-height:420px;padding:30px 34px;font:17px/1.8 Arial,sans-serif;outline:none}
+.post-canvas:focus{border-color:var(--light);box-shadow:0 0 0 2px #8055ed22}
+.post-canvas>*{margin:0 0 18px;padding:5px 8px;border:1px solid transparent;border-radius:5px}
+.post-canvas>*.active-block{border-color:#b9a5f5;background:#faf8ff}
+.post-canvas p{font-size:17px;line-height:1.85}
+.post-canvas h2{font-size:29px;line-height:1.3;color:#242039}
+.post-canvas h3{font-size:23px;line-height:1.4;color:#352953}
+.post-canvas blockquote{border-left:4px solid #8055ed;background:#f4f0ff;padding:14px 18px;color:#51446d}
+.post-canvas img{max-width:100%;height:auto;border-radius:8px;display:block}
+.post-canvas figure{margin:18px 0;text-align:center}
+.post-canvas figcaption{font-size:13px;color:#777;margin-top:7px}
+.post-canvas ul,.post-canvas ol{padding-left:32px}
+.editor-help{font-size:12px;color:var(--muted);line-height:1.6;margin:9px 0 0}
+@media(max-width:650px){.post-canvas{padding:18px 14px;min-height:350px}.word-toolbar{gap:6px}.toolbar-group{border-right:0;padding-right:0}}
+
 </style>
 </head>
 <body>
@@ -238,8 +260,7 @@ td{color:#e8e5f3}
     </div>
    </div>
   </section>
-
-  <section id="posts" class="hidden">
+    <section id="posts" class="hidden">
    <div class="section-head">
     <div>
      <h2>Blog Yönetimi</h2>
@@ -268,8 +289,37 @@ td{color:#e8e5f3}
        <textarea id="postExcerpt" placeholder="Blog yazısının kısa tanıtım metni..."></textarea>
       </div>
       <div class="field full">
-       <label for="postContent">Blog içeriği *</label>
-       <textarea id="postContent" required placeholder="Blog yazınızın tamamını buraya yazın..."></textarea>
+       <label>Blog içeriği *</label>
+       <div class="word-toolbar" id="postToolbar">
+        <div class="toolbar-group">
+         <button type="button" class="editor-tool" data-command="bold"><b>B</b></button>
+         <button type="button" class="editor-tool" data-command="italic"><i>İ</i></button>
+         <button type="button" class="editor-tool" data-command="underline"><u>A</u></button>
+        </div>
+        <div class="toolbar-group">
+         <button type="button" class="editor-tool" data-block="p">Paragraf</button>
+         <button type="button" class="editor-tool" data-block="h2">Başlık</button>
+         <button type="button" class="editor-tool" data-block="h3">Alt başlık</button>
+         <button type="button" class="editor-tool" data-block="blockquote">Alıntı</button>
+        </div>
+        <div class="toolbar-group">
+         <button type="button" class="editor-tool" data-insert="ul">• Liste</button>
+         <button type="button" class="editor-tool" data-insert="ol">1. Liste</button>
+         <button type="button" class="editor-tool" id="insertImageBlock">＋ Görsel</button>
+        </div>
+        <div class="toolbar-group">
+         <button type="button" class="editor-tool" id="addParagraph">＋ Paragraf bloğu</button>
+         <button type="button" class="editor-tool" id="addHeading">＋ Başlık bloğu</button>
+        </div>
+        <div class="toolbar-group">
+         <button type="button" class="editor-tool" id="moveBlockUp">↑ Yukarı</button>
+         <button type="button" class="editor-tool" id="moveBlockDown">↓ Aşağı</button>
+         <button type="button" class="editor-tool danger-tool" id="deleteBlock">Bloğu sil</button>
+        </div>
+       </div>
+       <div id="postCanvas" class="post-canvas" contenteditable="true" spellcheck="true"><p>Yazınızı buraya yazmaya başlayın...</p></div>
+       <textarea id="postContent" class="hidden" required></textarea>
+       <p class="editor-help">Bir bloğa tıklayarak seçin. Araçlarla biçimlendirin, blok ekleyin, taşıyın veya silin. Görsel eklemek için https:// ile başlayan görsel URL adresini girin.</p>
       </div>
       <div class="field full">
        <label for="postImage">Kapak görseli URL adresi</label>
@@ -711,7 +761,7 @@ function editService(id){
  $("serviceImage").value=service.image_url||"";
  $("serviceContent").value=service.content||"";
  $("serviceStatus").value=service.status||"draft";
- $("serviceOrder").value=service.sort_order??0;
+ $("serviceOrder").value=Number(service.sort_order)||0;
 
  $("serviceEditorTitle").textContent="Hizmeti Düzenle";
  $("serviceEditor").classList.remove("hidden");
@@ -722,14 +772,12 @@ $("serviceForm").addEventListener("submit",async event=>{
  event.preventDefault();
 
  const id=$("serviceId").value;
-
- const payload={
-  id:id||undefined,
+ const service={
   title:$("serviceTitle").value.trim(),
-  slug:$("serviceSlug").value.trim().toLowerCase(),
+  slug:$("serviceSlug").value.trim(),
   description:$("serviceDescription").value.trim(),
   image_url:$("serviceImage").value.trim(),
-  content:$("serviceContent").value.trim(),
+  content:$("serviceContent").value,
   status:$("serviceStatus").value,
   sort_order:Number($("serviceOrder").value)||0
  };
@@ -741,7 +789,7 @@ $("serviceForm").addEventListener("submit",async event=>{
   const result=await api("/api/services",{
    method:id?"PUT":"POST",
    headers:{"Content-Type":"application/json"},
-   body:JSON.stringify(payload)
+   body:JSON.stringify({...service,id:id?Number(id):undefined})
   });
 
   resetServiceEditor();
@@ -780,6 +828,86 @@ async function deleteService(id){
 }
 
 let posts=[];
+
+// Word benzeri blok editörü
+let activePostBlock=null;
+function getPostBlock(node){
+ const canvas=$("postCanvas");
+ let element=node&&node.nodeType===Node.TEXT_NODE?node.parentElement:node;
+ while(element&&element.parentElement!==canvas) element=element.parentElement;
+ return element&&element.parentElement===canvas?element:null;
+}
+function selectPostBlock(block){
+ if(!block)return;
+ document.querySelectorAll("#postCanvas > .active-block").forEach(item=>item.classList.remove("active-block"));
+ activePostBlock=block;
+ block.classList.add("active-block");
+}
+function insertPostBlock(tag,html){
+ const canvas=$("postCanvas");
+ const block=document.createElement(tag);
+ block.innerHTML=html||"<br>";
+ if(activePostBlock&&activePostBlock.parentElement===canvas) activePostBlock.after(block);
+ else canvas.appendChild(block);
+ selectPostBlock(block);
+ const range=document.createRange();
+ range.selectNodeContents(block); range.collapse(false);
+ const selection=window.getSelection(); selection.removeAllRanges(); selection.addRange(range);
+ canvas.focus();
+ $("postContent").value=canvas.innerHTML;
+}
+function normalizePostContent(content){
+ const value=String(content||"").trim();
+ if(!value)return "<p><br></p>";
+ if(/<\/?(p|h[1-6]|div|ul|ol|li|blockquote|figure|img|table|hr)\b/i.test(value))return value;
+ return value.split(/\n+/).map(line=>line.trim()?`<p>${escapeHtml(line)}</p>`:"").join("")||"<p><br></p>";
+}
+$("postCanvas").addEventListener("click",event=>selectPostBlock(getPostBlock(event.target)));
+$("postCanvas").addEventListener("keyup",()=>{
+ const selection=window.getSelection();
+ if(selection.rangeCount){const block=getPostBlock(selection.anchorNode);if(block)selectPostBlock(block);}
+});
+$("postCanvas").addEventListener("input",()=>$("postContent").value=$("postCanvas").innerHTML);
+$("postToolbar").querySelectorAll("button").forEach(button=>button.addEventListener("mousedown",event=>event.preventDefault()));
+$("postToolbar").querySelectorAll("[data-command]").forEach(button=>button.addEventListener("click",()=>{
+ $("postCanvas").focus(); document.execCommand(button.dataset.command,false,null);
+ $("postContent").value=$("postCanvas").innerHTML;
+}));
+$("postToolbar").querySelectorAll("[data-block]").forEach(button=>button.addEventListener("click",()=>{
+ $("postCanvas").focus(); document.execCommand("formatBlock",false,button.dataset.block);
+ const selection=window.getSelection(); if(selection.rangeCount)selectPostBlock(getPostBlock(selection.anchorNode));
+ $("postContent").value=$("postCanvas").innerHTML;
+}));
+$("postToolbar").querySelectorAll("[data-insert]").forEach(button=>button.addEventListener("click",()=>insertPostBlock(button.dataset.insert,"<li>Liste öğesi</li>")));
+$("addParagraph").addEventListener("click",()=>insertPostBlock("p","<br>"));
+$("addHeading").addEventListener("click",()=>insertPostBlock("h2","Başlık yazın"));
+$("insertImageBlock").addEventListener("click",()=>{
+ const url=prompt("Görselin http:// veya https:// ile başlayan URL adresini girin:");
+ if(!url)return;
+ if(!/^https?:\/\//i.test(url)){alert("Geçerli bir http:// veya https:// görsel adresi girin.");return;}
+ const figure=document.createElement("figure"),img=document.createElement("img"),caption=document.createElement("figcaption");
+ img.src=url;img.alt="Blog görseli";img.loading="lazy";caption.contentEditable="true";caption.textContent="Görsel açıklaması (isteğe bağlı)";figure.append(img,caption);
+ if(activePostBlock&&activePostBlock.parentElement===$("postCanvas"))activePostBlock.after(figure);else $("postCanvas").appendChild(figure);
+ selectPostBlock(figure);$("postContent").value=$("postCanvas").innerHTML;
+});
+$("moveBlockUp").addEventListener("click",()=>{
+ if(!activePostBlock||!activePostBlock.previousElementSibling)return;
+ activePostBlock.parentElement.insertBefore(activePostBlock,activePostBlock.previousElementSibling);
+ $("postContent").value=$("postCanvas").innerHTML;
+});
+$("moveBlockDown").addEventListener("click",()=>{
+ if(!activePostBlock||!activePostBlock.nextElementSibling)return;
+ activePostBlock.parentElement.insertBefore(activePostBlock.nextElementSibling,activePostBlock);
+ $("postContent").value=$("postCanvas").innerHTML;
+});
+$("deleteBlock").addEventListener("click",()=>{
+ if(!activePostBlock)return;
+ if(!confirm("Seçili bloğu silmek istiyor musunuz?"))return;
+ const next=activePostBlock.nextElementSibling||activePostBlock.previousElementSibling;
+ activePostBlock.remove();activePostBlock=null;if(next)selectPostBlock(next);
+ $("postContent").value=$("postCanvas").innerHTML;
+});
+
 
 async function loadPosts(){
  const table=$("postsTable");
@@ -828,6 +956,9 @@ function resetPostEditor(){
  $("postForm").reset();
  $("postId").value="";
  $("postSlug").dataset.edited="";
+ $("postCanvas").innerHTML="<p>Yazınızı buraya yazmaya başlayın...</p>";
+ $("postContent").value="";
+ activePostBlock=null;
  $("postEditorTitle").textContent="Yeni Blog Yazısı";
  $("postEditor").classList.add("hidden");
 }
@@ -864,7 +995,9 @@ function editPost(id){
  $("postSlug").value=post.slug||"";
  $("postSlug").dataset.edited="1";
  $("postExcerpt").value=post.excerpt||"";
- $("postContent").value=post.content||"";
+ $("postCanvas").innerHTML=normalizePostContent(post.content||"");
+ $("postContent").value=$("postCanvas").innerHTML;
+ activePostBlock=null;
  $("postImage").value=post.image_url||"";
  $("postStatus").value=post.status||"draft";
 
@@ -877,6 +1010,7 @@ $("postForm").addEventListener("submit",async event=>{
  event.preventDefault();
 
  const id=$("postId").value;
+ $("postContent").value=$("postCanvas").innerHTML;
  const post={
   title:$("postTitle").value.trim(),
   slug:$("postSlug").value.trim(),
