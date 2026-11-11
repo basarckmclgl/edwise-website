@@ -67,7 +67,7 @@ async function getGoogleAnalytics(env, startDate, endDate) {
   const account = JSON.parse(env.GA4_SERVICE_ACCOUNT_JSON);
   const token = await googleAccessToken(account);
   const range = { startDate, endDate };
-  const [totals, countries, daily, events, pages] = await Promise.all([
+  const [totals, countries, daily, events, countryEvents, pages] = await Promise.all([
     gaReport(token, env.GA4_PROPERTY_ID, {
       dateRanges: [range],
       metrics: [{ name: "totalUsers" }, { name: "sessions" }, { name: "screenPageViews" }, { name: "eventCount" }]
@@ -94,6 +94,12 @@ async function getGoogleAnalytics(env, startDate, endDate) {
     }),
     gaReport(token, env.GA4_PROPERTY_ID, {
       dateRanges: [range],
+      dimensions: [{ name: "country" }, { name: "eventName" }],
+      metrics: [{ name: "eventCount" }],
+      limit: "500"
+    }),
+    gaReport(token, env.GA4_PROPERTY_ID, {
+      dateRanges: [range],
       dimensions: [{ name: "pagePath" }],
       metrics: [{ name: "screenPageViews" }],
       limit: "10",
@@ -103,6 +109,14 @@ async function getGoogleAnalytics(env, startDate, endDate) {
   const total = totals.rows?.[0];
   const eventRows = events.rows || [];
   const eventCount = name => eventRows.filter(row => name.test(dimension(row, 0))).reduce((sum, row) => sum + metric(row, 0), 0);
+  const countryEventMap = new Map();
+  (countryEvents.rows || []).forEach(row => {
+    const country = dimension(row, 0), eventName = dimension(row, 1), count = metric(row, 0);
+    const current = countryEventMap.get(country) || { clicks: 0, scrolls: 0 };
+    if (/click|file_download|form_submit|generate_lead|select_content/i.test(eventName)) current.clicks += count;
+    if (/scroll/i.test(eventName)) current.scrolls += count;
+    countryEventMap.set(country, current);
+  });
   return {
     configured: true,
     totals: {
@@ -115,7 +129,8 @@ async function getGoogleAnalytics(env, startDate, endDate) {
     },
     countries: (countries.rows || []).map(row => ({
       country: dimension(row, 0), sessions: metric(row, 0),
-      pageViews: metric(row, 1), events: metric(row, 2)
+      pageViews: metric(row, 1), events: metric(row, 2),
+      ...(countryEventMap.get(dimension(row, 0)) || { clicks: 0, scrolls: 0 })
     })),
     daily: (daily.rows || []).map(row => ({
       date: dimension(row, 0),
