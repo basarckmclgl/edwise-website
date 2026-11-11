@@ -116,6 +116,28 @@ td{color:#e8e5f3}
     opacity: .6;
     pointer-events: none;
 }
+
+/* Chrome benzeri Site Ayarları düzeni */
+.settings-search-wrap{max-width:720px;margin:18px auto 22px;position:relative}
+.settings-search-wrap>span{position:absolute;left:16px;top:10px;font-size:23px;color:var(--muted)}
+.settings-search-wrap input{height:46px;border-radius:24px;padding:0 18px 0 48px;background:#202033;border:1px solid #4b4765;font-size:14px}
+.settings-layout{display:grid;grid-template-columns:235px minmax(0,1fr);gap:24px;align-items:start}
+.settings-nav{position:sticky;top:16px;padding:8px 0}
+.settings-nav-label{font-size:10px;letter-spacing:1.2px;color:var(--muted);padding:16px 13px 7px}
+.settings-nav-item{width:100%;display:flex;align-items:center;gap:13px;text-align:left;border:0;background:transparent;color:#d5d1e4;padding:12px 14px;border-radius:9px;cursor:pointer;font-size:13px;margin:2px 0}
+.settings-nav-item span{width:20px;text-align:center;font-size:18px;color:#aaa1c9}
+.settings-nav-item:hover{background:#242039}
+.settings-nav-item.active{background:#302448;color:#fff;box-shadow:inset 3px 0 #a78bfa}
+.settings-main{min-width:0}
+.settings-main .panel{margin:0 0 15px;padding:22px}
+.settings-main .panel h2{font-size:18px;margin-bottom:7px}
+.settings-main .field{padding:3px 0}
+.settings-main .field label{font-size:13px}
+.settings-main .field input,.settings-main .field select,.settings-main .field textarea{max-width:100%}
+.settings-main .actions{position:sticky;bottom:0;padding:14px;background:#171727eF;border:1px solid var(--border);border-radius:10px;backdrop-filter:blur(12px);z-index:2}
+.settings-empty{padding:22px;border:1px dashed var(--border);border-radius:10px;color:var(--muted);font-size:13px}
+@media(max-width:800px){.settings-layout{grid-template-columns:1fr;gap:10px}.settings-nav{position:static;display:flex;overflow-x:auto;gap:5px;padding:0 0 8px}.settings-nav-label{display:none}.settings-nav-item{white-space:nowrap;width:auto;flex:0 0 auto}.settings-nav-item span{display:none}.settings-search-wrap{margin-top:8px}}
+
 </style>
 </head>
 <body>
@@ -476,14 +498,23 @@ td{color:#e8e5f3}
 <section id="sitesettings" class="hidden" data-superadmin>
  <div class="section-head"><div><h2>Site Ayarları</h2><p>Site kimliği, iletişim, SEO, sosyal medya ve ölçümleme bilgilerini yönetin.</p></div></div>
  <div id="siteSettingsMessage"></div>
- <div class="actions">
-  <button class="primary" type="button" data-settings-tab="general">Genel</button>
-  <button class="btn" type="button" data-settings-tab="contact">İletişim</button>
-  <button class="btn" type="button" data-settings-tab="seo">SEO</button>
-  <button class="btn" type="button" data-settings-tab="social">Sosyal Medya</button>
-  <button class="btn" type="button" data-settings-tab="tracking">Ölçümleme</button>
+ <div class="settings-search-wrap">
+  <span>⌕</span><input id="settingsSearch" type="search" placeholder="Ayarlarda arayın" autocomplete="off">
  </div>
- <form id="siteSettingsForm">
+ <div id="siteSettingsMessage"></div>
+ <div class="settings-layout">
+  <nav class="settings-nav" aria-label="Site ayarları kategorileri">
+   <div class="settings-nav-label">SİTE YÖNETİMİ</div>
+   <button type="button" class="settings-nav-item active" data-settings-tab="general"><span>◎</span><b>Genel</b></button>
+   <button type="button" class="settings-nav-item" data-settings-tab="contact"><span>♧</span><b>İletişim</b></button>
+   <div class="settings-nav-label">GÖRÜNÜRLÜK</div>
+   <button type="button" class="settings-nav-item" data-settings-tab="seo"><span>⌕</span><b>Arama motoru</b></button>
+   <button type="button" class="settings-nav-item" data-settings-tab="social"><span>↗</span><b>Sosyal medya</b></button>
+   <div class="settings-nav-label">ÖLÇÜMLEME</div>
+   <button type="button" class="settings-nav-item" data-settings-tab="tracking"><span>▥</span><b>Analitik ve doğrulama</b></button>
+  </nav>
+  <div class="settings-main">
+   <form id="siteSettingsForm">
   <div class="panel" data-settings-panel="general"><h2>Genel bilgiler</h2><div class="form-grid">
    <div class="field"><label>Site adı</label><input id="ssSiteName" maxlength="100"></div>
    <div class="field"><label>Kısa slogan</label><input id="ssTagline" maxlength="180"></div>
@@ -520,7 +551,9 @@ td{color:#e8e5f3}
    <div class="field"><label>Meta Pixel ID</label><input id="ssMetaPixel" maxlength="30"></div>
   </div></div>
   <div class="actions"><button class="primary" type="submit" id="saveSiteSettings">Ayarları Kaydet</button><button class="btn" type="button" id="reloadSiteSettings">Son Kaydedileni Yükle</button></div>
- </form>
+   </form>
+  </div>
+ </div>
 </section>
 <section id="users" class="hidden">
  <div class="section-head">
@@ -1724,8 +1757,10 @@ $("editDesignRecord").addEventListener("click",()=>{
 
 const siteSettingFields={siteName:"ssSiteName",tagline:"ssTagline",logoUrl:"ssLogoUrl",faviconUrl:"ssFaviconUrl",language:"ssLanguage",timezone:"ssTimezone",phone:"ssPhone",whatsapp:"ssWhatsapp",email:"ssEmail",address:"ssAddress",hours:"ssHours",mapUrl:"ssMapUrl",seoTitle:"ssSeoTitle",seoDescription:"ssSeoDescription",seoKeywords:"ssSeoKeywords",canonical:"ssCanonical",robots:"ssRobots",instagram:"ssInstagram",facebook:"ssFacebook",youtube:"ssYoutube",linkedin:"ssLinkedin",tiktok:"ssTiktok",gaId:"ssGaId",gsc:"ssGsc",metaPixel:"ssMetaPixel"};
 let activeSettingsTab="general";
-function showSettingsTab(tab){activeSettingsTab=tab;document.querySelectorAll("[data-settings-panel]").forEach(p=>p.classList.toggle("hidden",p.dataset.settingsPanel!==tab));document.querySelectorAll("[data-settings-tab]").forEach(b=>{const on=b.dataset.settingsTab===tab;b.classList.toggle("primary",on);b.classList.toggle("btn",!on);});}
+function showSettingsTab(tab){activeSettingsTab=tab;document.querySelectorAll("[data-settings-panel]").forEach(p=>p.classList.toggle("hidden",p.dataset.settingsPanel!==tab));document.querySelectorAll("[data-settings-tab]").forEach(b=>b.classList.toggle("active",b.dataset.settingsTab===tab));const search=$("settingsSearch");if(search)search.value="";}
 document.querySelectorAll("[data-settings-tab]").forEach(b=>b.addEventListener("click",()=>showSettingsTab(b.dataset.settingsTab)));
+$("settingsSearch").addEventListener("input",event=>{const query=event.target.value.trim().toLocaleLowerCase("tr-TR");const panels=[...document.querySelectorAll("[data-settings-panel]")];if(!query){showSettingsTab(activeSettingsTab);return;}let first=null;panels.forEach(panel=>{let matched=0;panel.querySelectorAll(".field").forEach(field=>{const label=field.querySelector("label")?.textContent||"";const input=field.querySelector("input,select,textarea");const hay=(label+" "+(input?.placeholder||"")+" "+(input?.id||"")).toLocaleLowerCase("tr-TR");const hit=hay.includes(query);field.classList.toggle("hidden",!hit);if(hit)matched++;});const hit=matched>0||panel.querySelector("h2")?.textContent.toLocaleLowerCase("tr-TR").includes(query);panel.classList.toggle("hidden",!hit);if(hit&&!first)first=panel.dataset.settingsPanel;});document.querySelectorAll("[data-settings-tab]").forEach(b=>b.classList.toggle("active",!!first&&b.dataset.settingsTab===first));if(!first){let empty=$("settingsSearchEmpty");if(!empty){empty=document.createElement("div");empty.id="settingsSearchEmpty";empty.className="settings-empty";$("siteSettingsForm").prepend(empty);}empty.textContent="Aramanızla eşleşen bir ayar bulunamadı.";}else $("settingsSearchEmpty")?.remove();});
+
 async function loadSiteSettings(){try{const data=await api("/api/settings");const values=data.preferences||{};Object.entries(siteSettingFields).forEach(([key,id])=>{if($(id))$(id).value=values[key]||"";});showSettingsTab(activeSettingsTab);$("siteSettingsMessage").innerHTML="";}catch(error){$("siteSettingsMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}}
 $("reloadSiteSettings").addEventListener("click",loadSiteSettings);
 $("siteSettingsForm").addEventListener("submit",async event=>{event.preventDefault();const preferences={};Object.entries(siteSettingFields).forEach(([key,id])=>preferences[key]=$(id).value.trim());const button=$("saveSiteSettings");button.disabled=true;button.textContent="Kaydediliyor...";try{const result=await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"save_preferences",preferences})});$("siteSettingsMessage").innerHTML='<div class="message success">'+escapeHtml(result.message||"Site ayarları kaydedildi.")+'</div>';}catch(error){$("siteSettingsMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}finally{button.disabled=false;button.textContent="Ayarları Kaydet";}});
