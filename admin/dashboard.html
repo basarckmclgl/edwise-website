@@ -833,7 +833,10 @@ async function loadMenuSettings(){
    {key:"home",label:"Ana Sayfa",url:"/",visible:true},
    {key:"services",label:"Hizmetlerimiz",url:"/pages/hizmetlerimiz.html",visible:true},
    {key:"about",label:"Hakkımızda",url:"/pages/hakkimizda.html",visible:true},
-   {key:"contact",label:"İletişim",url:"/#iletisim",visible:true}
+   {key:"guide",label:"EDWISE Rehber",url:"/edwise-rehber.html",visible:true},
+   {key:"apply",label:"Başvur",url:"/pages/basvuru.html",visible:true},
+   {key:"contact",label:"İletişim ve Konum",url:"/pages/iletisim.html",visible:true},
+   {key:"contact-cta",label:"Bize Ulaşın · WhatsApp",url:"/pages/iletisim.html",visible:true}
   ];
   (pageData.pages||[]).filter(p=>p.status==="published"&&!["hakkimizda","iletisim","hizmetlerimiz","anasayfa"].includes(p.slug)).forEach(p=>defaults.push({key:"page-"+p.id,label:p.title,url:"/pages/sayfa.html?slug="+encodeURIComponent(p.slug),visible:true}));
   let items=saved&&saved.length?saved:defaults;
