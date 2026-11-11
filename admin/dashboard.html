@@ -239,6 +239,95 @@ td{color:#e8e5f3}
    </div>
   </section>
 
+  
+<section id="posts" class="hidden">
+  <div class="section-head">
+    <div>
+      <h2>Blog Yönetimi</h2>
+      <p>Blog yazılarınızı oluşturun, düzenleyin ve yayımlayın.</p>
+    </div>
+    <button class="primary" id="newPost">+ Yeni Blog Yazısı</button>
+  </div>
+
+  <div id="postMessage"></div>
+
+  <div id="postEditor" class="panel hidden">
+    <h2 id="postEditorTitle">Yeni Blog Yazısı</h2>
+
+    <form id="postForm">
+      <input type="hidden" id="postId">
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="postTitle">Blog başlığı *</label>
+          <input id="postTitle" required maxlength="200"
+            placeholder="Örn. Yurt Dışında Eğitim Rehberi">
+        </div>
+
+        <div class="field">
+          <label for="postSlug">URL adresi *</label>
+          <input id="postSlug" required placeholder="yurt-disinda-egitim-rehberi">
+        </div>
+
+        <div class="field full">
+          <label for="postExcerpt">Kısa açıklama</label>
+          <textarea id="postExcerpt"
+            placeholder="Blog yazısının kısa tanıtım metni..."></textarea>
+        </div>
+
+        <div class="field full">
+          <label for="postContent">Blog içeriği *</label>
+          <textarea id="postContent" required
+            placeholder="Blog yazınızın tamamını buraya yazın..."></textarea>
+        </div>
+
+        <div class="field full">
+          <label for="postImage">Kapak görseli URL adresi</label>
+          <input id="postImage" placeholder="https://...">
+        </div>
+
+        <div class="field">
+          <label for="postStatus">Yayın durumu</label>
+          <select id="postStatus">
+            <option value="draft">Taslak</option>
+            <option value="published">Yayında</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" type="submit" id="savePost">
+          Blog Yazısını Kaydet
+        </button>
+        <button class="btn" type="button" id="cancelPost">
+          Vazgeç
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Blog Yazıları</h2>
+    <p class="muted">Kayıtlı yazıları görüntüleyin, düzenleyin veya silin.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Başlık</th>
+            <th>URL</th>
+            <th>Durum</th>
+            <th>İşlemler</th>
+          </tr>
+        </thead>
+        <tbody id="postsTable">
+          <tr><td colspan="4">Blog yazıları yükleniyor...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
   <section id="other" class="hidden">
    <div class="panel">
     <h2 id="otherTitle"></h2>
@@ -303,6 +392,7 @@ function showPage(name){
  $("overview").classList.toggle("hidden",name!=="overview");
  $("pages").classList.toggle("hidden",name!=="pages");
  $("services").classList.toggle("hidden",name!=="services");
+ $("posts").classList.toggle("hidden",name!=="posts");
  $("other").classList.toggle("hidden",!otherModules[name]);
 
  document.querySelectorAll(".nav").forEach(n=>{
@@ -313,6 +403,7 @@ function showPage(name){
 
  if(name==="pages")loadPages();
  if(name==="services")loadServices();
+ if(name==="posts")loadPosts();
 
  $("mediaLink").classList.toggle("hidden",name!=="media");
 
