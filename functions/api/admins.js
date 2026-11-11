@@ -214,6 +214,14 @@ export async function onRequestPut(context) {
 
     const username = clean(data.username, 50);
     const email = clean(data.email, 254).toLowerCase();
+    const role = clean(data.role || target.role, 50);
+
+if (role !== "content_admin") {
+  return json({
+    success: false,
+    message: "Geçersiz kullanıcı yetkisi."
+  }, 400);
+}
 
     if (username.length < 3) {
       return json({
@@ -252,20 +260,22 @@ export async function onRequestPut(context) {
     }
 
     await context.env.DB.prepare(`
-      UPDATE admins
-      SET username = ?,
-          email = ?,
-          is_active = ?,
-          password_hash = COALESCE(?, password_hash),
-          updated_at = datetime('now')
-      WHERE id = ?
+     UPDATE admins
+SET username = ?,
+    email = ?,
+    role = ?,
+    is_active = ?,
+    password_hash = COALESCE(?, password_hash),
+    updated_at = datetime('now')
+WHERE id = ?
     `).bind(
-      username,
-      email,
-      data.is_active ? 1 : 0,
-      passwordHash,
-      id
-    ).run();
+  username,
+  email,
+  role,
+  data.is_active ? 1 : 0,
+  passwordHash,
+  id
+).run();
 
     if (!data.is_active || password) {
       await context.env.DB.prepare(
