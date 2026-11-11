@@ -46,13 +46,15 @@ function validatePost(data) {
   if (!slug) throw new Error("Geçerli bir URL adresi girilmelidir.");
 
   return {
-    title,
-    slug,
-    excerpt: String(data.excerpt || "").trim(),
-    content: String(data.content || "").trim(),
-    image_url: String(data.image_url || "").trim(),
-    status
-  };
+  title,
+  slug,
+  excerpt: String(data.excerpt || "").trim(),
+  content: String(data.content || "").trim(),
+  image_url: String(data.image_url || "").trim(),
+  meta_title: String(data.meta_title || "").trim(),
+  meta_description: String(data.meta_description || "").trim(),
+  status
+};
 }
 
 function getRequestId(context, data = {}) {
