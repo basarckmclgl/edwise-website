@@ -3,15 +3,15 @@ const json=(data,status=200)=>Response.json(data,{status,headers:{"Cache-Control
 async function onCloudflare(env,startDate,endDate){
  if(!env.CF_ZONE_TAG||!env.CF_ANALYTICS_API_TOKEN)return {configured:false,error:"Cloudflare için CF_ZONE_TAG ve CF_ANALYTICS_API_TOKEN ayarlanmalı."};
  const headers={Authorization:"Bearer "+env.CF_ANALYTICS_API_TOKEN,"Content-Type":"application/json"};
- const query=`query($zone:String!,$from:Date!,$to:Date!){viewer{zones(filter:{zoneTag:$zone}){httpRequests1dGroups(limit:100,filter:{date_geq:$from,date_leq:$to},orderBy:[date_ASC]){dimensions{date} sum{requests pageViews countryMap{clientCountryName requests pageViews}} uniq{uniques}}}}}`;
+ const query=`query($zone:String!,$from:Date!,$to:Date!){viewer{zones(filter:{zoneTag:$zone}){httpRequests1dGroups(limit:100,filter:{date_geq:$from,date_leq:$to},orderBy:[date_ASC]){dimensions{date} sum{requests countryMap{clientCountryName requests}} uniq{uniques}}}}}`;
  const response=await fetch("https://api.cloudflare.com/client/v4/graphql",{method:"POST",headers,body:JSON.stringify({query,variables:{zone:env.CF_ZONE_TAG,from:startDate,to:endDate}})});
  const result=await response.json();
  if(!response.ok||result.errors?.length)throw new Error(result.errors?.[0]?.message||"Cloudflare trafik verisi alınamadı.");
  const groups=result.data?.viewer?.zones?.[0]?.httpRequests1dGroups||[];
  const countryMap=new Map();
- groups.forEach(g=>(g.sum?.countryMap||[]).forEach(v=>{const key=v.clientCountryName||"Bilinmiyor";const row=countryMap.get(key)||{country:key,requests:0,pageViews:0};row.requests+=Number(v.requests||0);row.pageViews+=Number(v.pageViews||0);countryMap.set(key,row);}));
- const daily=groups.map(g=>({date:g.dimensions.date,requests:Number(g.sum?.requests||0),pageViews:Number(g.sum?.pageViews||0),uniqueVisitors:Number(g.uniq?.uniques||0)}));
- const totals=daily.reduce((a,v)=>({requests:a.requests+v.requests,pageViews:a.pageViews+v.pageViews,dailyUniqueIpTotal:a.dailyUniqueIpTotal+v.uniqueVisitors}),{requests:0,pageViews:0,dailyUniqueIpTotal:0});
+ groups.forEach(g=>(g.sum?.countryMap||[]).forEach(v=>{const key=v.clientCountryName||"Bilinmiyor";const row=countryMap.get(key)||{country:key,requests:0};row.requests+=Number(v.requests||0);countryMap.set(key,row);}));
+ const daily=groups.map(g=>({date:g.dimensions.date,requests:Number(g.sum?.requests||0),uniqueVisitors:Number(g.uniq?.uniques||0)}));
+ const totals=daily.reduce((a,v)=>({requests:a.requests+v.requests,dailyUniqueIpTotal:a.dailyUniqueIpTotal+v.uniqueVisitors}),{requests:0,pageViews:0,dailyUniqueIpTotal:0});
  let pages=[],pathWarning="";
  try{
   const pq=`query($zone:String!,$from:Time!,$to:Time!){viewer{zones(filter:{zoneTag:$zone}){httpRequestsAdaptiveGroups(limit:10,filter:{datetime_geq:$from,datetime_lt:$to},orderBy:[count_DESC]){count dimensions{clientRequestPath}}}}}`;
