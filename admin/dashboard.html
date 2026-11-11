@@ -124,6 +124,7 @@ td{color:#e8e5f3}
  <div class="logo">EDWISE<small>CONTENT MANAGEMENT SYSTEM</small></div>
  <div class="menu-label">ANA MENÜ</div>
  <button class="nav active" data-page="overview"><span class="ico">▦</span><span>Genel Bakış</span></button>
+ <button class="nav" data-page="designcenter"><span class="ico">▣</span><span>Sayfa Tasarım Merkezi</span></button>
 
  <div class="menu-label">İÇERİK YÖNETİMİ</div>
  <button class="nav" data-page="pages"><span class="ico">▤</span><span>Sayfa Yönetimi</span></button>
@@ -177,6 +178,27 @@ td{color:#e8e5f3}
     <div class="module" data-open="media"><div class="module-icon">▧</div><h3>Medya Kütüphanesi ↗</h3><p>Fotoğraf ve dosyalarınızı yönetin.</p></div>
     <div class="module" data-open="settings" data-superadmin><div class="module-icon">⚙</div><h3>Site Ayarları ↗</h3><p>Logo, iletişim ve menü ayarları.</p></div>
     <div class="module" data-open="users" data-superadmin><div class="module-icon">♙</div><h3>Kullanıcı ve Yetkiler ↗</h3><p>Yönetici hesaplarını ve rol izinlerini yönetin.</p></div>
+   </div>
+  </section>
+
+  <section id="designcenter" class="hidden">
+   <div class="section-head">
+    <div><h2>Sayfa Tasarım Merkezi</h2><p>Önizlemek istediğiniz site sayfasını seçin. Gerçek site görünümü aşağıda açılır.</p></div>
+   </div>
+   <div class="panel">
+    <div class="form-grid">
+     <div class="field"><label for="designPageSelect">Önizlenecek sayfa</label><select id="designPageSelect"><option value="/">Ana Sayfa</option><option value="/pages/hizmetlerimiz.html">Hizmetlerimiz</option><option value="/pages/hakkimizda.html">Hakkımızda</option><option value="/pages/basvuru.html">Başvuru</option><option value="/pages/iletisim.html">İletişim ve Konum</option><option value="/edwise-rehber.html">EDWISE Rehber</option></select></div>
+     <div class="field"><label for="designRecordSelect">Düzenlenecek içerik</label><select id="designRecordSelect"><option value="">Sayfa seçimine göre içerik bulunacak</option></select></div>
+    </div>
+    <div class="actions">
+     <button class="btn" type="button" id="refreshDesignPreview">Önizlemeyi Yenile</button>
+     <button class="primary" type="button" id="editDesignRecord">Seçili İçeriği Düzenle</button>
+     <a class="btn" id="openDesignPage" href="/" target="_blank" rel="noopener" style="text-decoration:none">Sayfayı Yeni Sekmede Aç ↗</a>
+    </div>
+    <p id="designCenterMessage" class="muted">Önizleme, sitenin mevcut görünümünü gösterir. İçeriği düzenle düğmesi ilgili yönetim ekranını açar; tasarım değişiklikleri henüz bu ekrandan doğrudan yayımlanmaz.</p>
+   </div>
+   <div class="panel" style="padding:10px">
+    <iframe id="designPreviewFrame" title="EDWISE sayfa önizlemesi" src="/" loading="lazy" style="display:block;width:100%;height:760px;border:1px solid #d8d5df;border-radius:8px;background:#fff"></iframe>
    </div>
   </section>
 
@@ -581,6 +603,7 @@ function showPage(name){
  if(!canAccess(name)) name="overview";
 
  $("overview").classList.toggle("hidden",name!=="overview");
+ $("designcenter").classList.toggle("hidden",name!=="designcenter");
  $("pages").classList.toggle("hidden",name!=="pages");
  $("services").classList.toggle("hidden",name!=="services");
  $("posts").classList.toggle("hidden",name!=="posts");
@@ -592,7 +615,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users" || na
   n.classList.toggle("active",n.dataset.page===name);
  });
 
- $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":otherModules[name]?.[0]||"";
+ $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="designcenter"?"Sayfa Tasarım Merkezi":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":otherModules[name]?.[0]||"";
 
  if(name==="pages")loadPages();
  if(name==="services")loadServices();
@@ -1627,6 +1650,45 @@ $("usersTable").addEventListener("click",async event=>{
   showUsersMessage(error.message);
  }
 });
+
+const designPageSelect=$("designPageSelect");
+const designRecordSelect=$("designRecordSelect");
+function refreshDesignFrame(){
+ const url=designPageSelect.value;
+ $("designPreviewFrame").src=url+(url.includes("?")?"&":"?")+"preview="+Date.now();
+ $("openDesignPage").href=url;
+}
+async function loadDesignRecords(){
+ const path=designPageSelect.value;
+ designRecordSelect.innerHTML='<option value="">İçerik aranıyor...</option>';
+ try{
+  if(path==="/pages/hizmetlerimiz.html"){
+   const data=await api("/api/services");
+   designRecordSelect.innerHTML='<option value="">Bir hizmet seçin</option>'+data.services.map(x=>'<option value="service:'+escapeHtml(x.id)+'">'+escapeHtml(x.title)+(x.status==="published"?"":" (Taslak)")+'</option>').join("");
+  }else if(path==="/edwise-rehber.html"){
+   const data=await api("/api/posts");
+   designRecordSelect.innerHTML='<option value="">Bir blog yazısı seçin</option>'+data.posts.map(x=>'<option value="post:'+escapeHtml(x.id)+'">'+escapeHtml(x.title)+(x.status==="published"?"":" (Taslak)")+'</option>').join("");
+  }else{
+   const data=await api("/api/pages");
+   pages=data.pages||pages;
+   const slug=path==="/pages/hakkimizda.html"?"hakkimizda":path==="/pages/basvuru.html"?"basvuru":path==="/pages/iletisim.html"?"iletisim":null;
+   const matches=slug?pages.filter(x=>x.slug===slug):pages.filter(x=>x.status==="published");
+   designRecordSelect.innerHTML='<option value="">Bir CMS sayfası seçin</option>'+matches.map(x=>'<option value="page:'+Number(x.id)+'">'+escapeHtml(x.title)+(x.status==="published"?"":" (Taslak)")+'</option>').join("");
+   if(!matches.length)designRecordSelect.innerHTML='<option value="">Bu sayfa için düzenlenebilir CMS kaydı bulunamadı</option>';
+  }
+ }catch(e){designRecordSelect.innerHTML='<option value="">İçerikler yüklenemedi</option>';$("designCenterMessage").textContent=e.message}
+}
+designPageSelect.addEventListener("change",()=>{refreshDesignFrame();loadDesignRecords()});
+$("refreshDesignPreview").addEventListener("click",refreshDesignFrame);
+$("editDesignRecord").addEventListener("click",()=>{
+ const value=designRecordSelect.value;
+ if(!value){$("designCenterMessage").textContent="Önce düzenlenecek bir içerik seçin. Bu sayfa için CMS kaydı yoksa ilgili yönetim modülünü kullanın.";return}
+ const [type,id]=value.split(":");
+ if(type==="page"){showPage("pages");editPage(Number(id))}
+ if(type==="service"){showPage("services");editService(id)}
+ if(type==="post"){showPage("posts");editPost(id)}
+});
+
 checkSession();
 </script>
 <script src="/admin/assets/js/page-builder.js?v=wps-ribbon-20261111"></script>
