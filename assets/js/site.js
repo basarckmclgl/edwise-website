@@ -274,7 +274,6 @@
           if (link.classList.contains("menu-contact")) return "contact-cta";
           if (path === "/" || path.endsWith("/index.html")) return "home";
           if (path.endsWith("/hizmetlerimiz.html")) return "services";
-          if (path.endsWith("/edwise-rehber.html")) return "guide";
           if (path.endsWith("/hakkimizda.html")) return "about";
           if (path.endsWith("/basvuru.html")) return "apply";
           if (path.endsWith("/iletisim.html")) return "contact";
