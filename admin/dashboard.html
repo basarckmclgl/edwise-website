@@ -234,6 +234,15 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
 @media print{
  body.printing-applications #reports .panel:has(#applicationsTable)::before{content:"EDWISE";display:block;font-family:Arial,sans-serif;font-size:22pt;font-weight:800;letter-spacing:3px;color:#291447!important;margin:0 0 14pt;padding:0 0 8pt;border-bottom:2px solid #291447}
 }
+
+@media print{
+ body.printing-applications #reports .application-print-header{display:flex!important;align-items:center;justify-content:space-between;width:100%;margin:0 0 18pt;padding:0 0 9pt;border-bottom:2px solid #291447}
+ body.printing-applications #reports .application-print-header img{display:block!important;width:125px;height:auto;max-height:42px;object-fit:contain;object-position:left center}
+ body.printing-applications #reports .application-print-header strong{display:block!important;margin-left:auto;text-align:right;font-size:11pt!important;font-weight:800!important;color:#111!important;white-space:nowrap}
+ body.printing-applications #reports .panel:has(#applicationsTable) .section-head{display:none!important}
+ body.printing-applications #reports .panel:has(#applicationsTable)>p{display:none!important}
+ body.printing-applications #reports .panel:has(#applicationsTable) .muted{display:none!important}
+}
 </style>
 </head>
 <body>
@@ -1342,7 +1351,13 @@ async function exportApplicationsXlsx(){
 }
 function exportApplicationsPdf(){
  const section=$("reports"),panel=$("applicationsTable")?.closest(".panel");if(!section||!panel){alert("Başvuru tablosu bulunamadı.");return;}
- document.body.classList.add("printing-applications");window.print();setTimeout(()=>document.body.classList.remove("printing-applications"),1200);
+ const header=document.createElement("div");header.className="application-print-header";
+ const logo=document.createElement("img");logo.src="/assets/images/logo.png";logo.alt="EDWISE";
+ const date=document.createElement("strong");date.textContent=new Date().toLocaleString("tr-TR");
+ header.append(logo,date);panel.prepend(header);
+ document.body.classList.add("printing-applications");
+ const cleanup=()=>{document.body.classList.remove("printing-applications");header.remove();window.removeEventListener("afterprint",cleanup);};
+ window.addEventListener("afterprint",cleanup,{once:true});window.print();setTimeout(cleanup,5000);
 }
 const exportToggle=$("applicationExportToggle"),exportMenu=$("applicationExportMenu");
 exportToggle?.addEventListener("click",()=>{const open=exportMenu.classList.toggle("hidden")===false;exportToggle.setAttribute("aria-expanded",String(open));});
