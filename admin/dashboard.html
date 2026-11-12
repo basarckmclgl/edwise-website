@@ -1385,15 +1385,6 @@ menuToggle?.addEventListener("click",()=>{
 function showPage(name){
  if(!canAccess(name)) name="overview";
  document.body.dataset.activePage=name;
- const contentRoot=document.querySelector(".content");
- const targetSection=document.getElementById(name) || (name==="applications" || name==="media" ? $("other") : null);
- if(contentRoot && targetSection && targetSection.parentElement===contentRoot){
-  Array.from(contentRoot.children).forEach(element=>{
-   const isActive=element===targetSection;
-   element.classList.toggle("hidden",!isActive);
-   element.style.display=isActive?"":"none";
-  });
- }
  if(name==="overview"){loadPublishedContentCounts();if(currentRole==="superadmin"){loadApplicationFunnel();loadSiteReports();}}
 
  document.querySelectorAll(".content > section").forEach(section=>{
