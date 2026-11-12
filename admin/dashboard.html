@@ -236,8 +236,11 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
    </section>
 
    <div class="panel" data-superadmin style="margin-top:18px">
-    <div class="section-head"><div><h2>Site İnceleme Özeti</h2><p class="muted">Son 30 gün · sayfa görüntüleme ve kaydırma hareketleri</p></div><button class="btn" type="button" data-open="reports">Tüm Raporlar</button></div>
-    <div class="table-wrap"><table style="min-width:650px"><thead><tr><th>Sayfa</th><th>Görüntülenme</th><th>Ziyaretçi oturumu</th><th>%50 kaydırma</th><th>%90 kaydırma</th></tr></thead><tbody id="overviewPageReports"><tr><td colspan="5">Rapor yükleniyor...</td></tr></tbody></table></div>
+    <div class="section-head"><div><h2>EDWISE Site İnceleme Raporu</h2><p class="muted">Son 30 gün · tüm sayfaların görüntülenme ve kaydırılma verileri</p></div><button class="btn" type="button" id="refreshOverviewReports">↻ Raporları Yenile</button></div>
+    <div class="table-wrap"><table style="min-width:760px"><thead><tr><th>Sayfa</th><th>Görüntülenme</th><th>Ziyaretçi oturumu</th><th>%25 kaydırma</th><th>%50 kaydırma</th><th>%75 kaydırma</th><th>%90 kaydırma</th></tr></thead><tbody id="overviewPageReports"><tr><td colspan="7">Rapor yükleniyor...</td></tr></tbody></table></div>
+    <div class="section-head" style="margin-top:22px"><div><h3>Başvuru ve İletişim Hareketleri</h3><p class="muted">Başvurular, e-posta ve WhatsApp hareketleri · kişisel iletişim bilgileri bu rapora eklenmez.</p></div></div>
+    <div class="table-wrap"><table style="min-width:620px"><thead><tr><th>İşlem</th><th>Toplam işlem</th><th>Oturum</th></tr></thead><tbody id="overviewFunnelTable"><tr><td colspan="3">Rapor yükleniyor...</td></tr></tbody></table></div>
+    <p class="muted" style="margin-top:12px">Görüntüleme ve kaydırma raporları yalnızca analiz çerezlerine izin veren ziyaretçilerden alınır. Telefon ve e-posta gibi başvuru bilgileri ayrı Başvurular bölümünde maskeli tutulur.</p>
    </div>
    <div class="section-head">
     <div><h2>Yönetim Modülleri</h2><p>İşlem yapmak istediğiniz alanı seçin.</p></div>
@@ -1223,16 +1226,17 @@ async function loadSiteReports(){
   const html=rows.map(row=>'<tr><td>'+escapeHtml(row.path)+'</td><td>'+row.views.toLocaleString("tr-TR")+'</td><td>'+row.visitors.toLocaleString("tr-TR")+'</td><td>'+row.scroll25.toLocaleString("tr-TR")+'</td><td>'+row.scroll50.toLocaleString("tr-TR")+'</td><td>'+row.scroll75.toLocaleString("tr-TR")+'</td><td>'+row.scroll90.toLocaleString("tr-TR")+'</td></tr>').join("");
   table.innerHTML=html||'<tr><td colspan="7">Henüz analiz verisi yok. Analiz izni veren ziyaretçiler geldikçe burada görünecek.</td></tr>';
   const overview=$("overviewPageReports");
-  if(overview)overview.innerHTML=rows.slice(0,8).map(row=>'<tr><td>'+escapeHtml(row.path)+'</td><td>'+row.views.toLocaleString("tr-TR")+'</td><td>'+row.visitors.toLocaleString("tr-TR")+'</td><td>'+row.scroll50.toLocaleString("tr-TR")+'</td><td>'+row.scroll90.toLocaleString("tr-TR")+'</td></tr>').join("")||'<tr><td colspan="5">Henüz analiz verisi yok.</td></tr>';
-  const funnel=$("reportFunnelTable");
-  if(funnel){
-   const labels={apply_click:"Başvur butonuna tıklama",form_view:"Başvuru formu açıldı",form_start:"Form doldurmaya başlandı",submit_attempt:"Gönderim denendi",application_saved:"Başvuru kaydedildi",email_sent:"E-posta gönderildi",email_failed:"E-posta gönderilemedi",whatsapp_redirect:"WhatsApp açıldı",form_abandon:"Form yarım bırakıldı",site_return:"Siteye geri dönüldü"};
-   funnel.innerHTML=Object.entries(labels).map(([key,label])=>{const item=data.totals?.[key]||{count:0,sessions:0};return '<tr><td>'+label+'</td><td>'+item.count.toLocaleString("tr-TR")+'</td><td>'+item.sessions.toLocaleString("tr-TR")+'</td></tr>';}).join("");
-  }
+  if(overview)overview.innerHTML=rows.map(row=>'<tr><td>'+escapeHtml(row.path)+'</td><td>'+row.views.toLocaleString("tr-TR")+'</td><td>'+row.visitors.toLocaleString("tr-TR")+'</td><td>'+row.scroll25.toLocaleString("tr-TR")+'</td><td>'+row.scroll50.toLocaleString("tr-TR")+'</td><td>'+row.scroll75.toLocaleString("tr-TR")+'</td><td>'+row.scroll90.toLocaleString("tr-TR")+'</td></tr>').join("")||'<tr><td colspan="7">Henüz analiz verisi yok. Analiz izni veren ziyaretçiler geldikçe burada görünecek.</td></tr>';
+  const funnelLabels={apply_click:"Başvur butonuna tıklama",form_view:"Başvuru formu açıldı",form_start:"Form doldurulmaya başlandı",submit_attempt:"Gönderim denendi",application_saved:"Başvuru kaydedildi",email_sent:"E-posta gönderildi",email_failed:"E-posta gönderilemedi",whatsapp_redirect:"WhatsApp açıldı",form_abandon:"Form yarım bırakıldı",site_return:"Siteye geri dönüldü"};
+  ["reportFunnelTable","overviewFunnelTable"].forEach(id=>{
+   const funnel=$(id);
+   if(funnel)funnel.innerHTML=Object.entries(funnelLabels).map(([key,label])=>{const item=data.totals?.[key]||{count:0,sessions:0};return '<tr><td>'+label+'</td><td>'+item.count.toLocaleString("tr-TR")+'</td><td>'+item.sessions.toLocaleString("tr-TR")+'</td></tr>';}).join("");
+  });
   if(message){message.className="message success";message.textContent="Son 30 günlük raporlar güncellendi.";}
  }catch(error){if(message){message.className="message error";message.textContent=error.message;}table.innerHTML='<tr><td colspan="7">Raporlar yüklenemedi.</td></tr>';}
 }
 $("refreshSiteReports")?.addEventListener("click",loadSiteReports);
+$("refreshOverviewReports")?.addEventListener("click",loadSiteReports);
 
 async function loadApplicationFunnel(){
  const message=$("applicationFunnelMessage"),table=$("applicationFunnelTable");
