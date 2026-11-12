@@ -1848,6 +1848,11 @@ async function loadMenuSettings(){
   let items=saved&&saved.length?saved:defaults;
   const existing=new Set(items.map(x=>x.key));
   defaults.forEach(item=>{if(!existing.has(item.key))items.push(item);});
+  const pinnedMenuOrder=["home","services","about","apply","contact"];
+  items.sort((a,b)=>{
+   const ai=pinnedMenuOrder.indexOf(a.key),bi=pinnedMenuOrder.indexOf(b.key);
+   return (ai<0?99:ai)-(bi<0?99:bi);
+  });
   window.edwiseMenuItems=items;
   renderMenuItems();
  }catch(error){$("menuMessage").textContent=error.message;}
@@ -1856,8 +1861,8 @@ function renderMenuItems(){
  const items=window.edwiseMenuItems||[];
  $("menuItems").innerHTML=items.map((item,index)=>'<div class="menu-setting-row" data-menu-index="'+index+'" style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid #eee"><label style="flex:1"><input type="checkbox" data-menu-visible="'+index+'" '+(item.visible!==false?'checked':'')+'> '+escapeHtml(item.label)+'</label><small style="color:#777;max-width:45%;overflow-wrap:anywhere">'+escapeHtml(item.url)+'</small><button type="button" class="btn" data-menu-up="'+index+'" '+(index===0?'disabled':'')+'>↑</button><button type="button" class="btn" data-menu-down="'+index+'" '+(index===items.length-1?'disabled':'')+'>↓</button></div>').join("");
  document.querySelectorAll("[data-menu-visible]").forEach(el=>el.addEventListener("change",()=>{items[Number(el.dataset.menuVisible)].visible=el.checked;}));
- document.querySelectorAll("[data-menu-up]").forEach(el=>el.addEventListener("click",()=>{const i=Number(el.dataset.menuUp);if(i>0){[items[i-1],items[i]]=[items[i],items[i-1]];renderMenuItems();}}));
- document.querySelectorAll("[data-menu-down]").forEach(el=>el.addEventListener("click",()=>{const i=Number(el.dataset.menuDown);if(i<items.length-1){[items[i+1],items[i]]=[items[i],items[i+1]];renderMenuItems();}}));
+ document.querySelectorAll("[data-menu-up]").forEach(el=>el.addEventListener("click",()=>{const i=Number(el.dataset.menuUp);const pinned=["home","services","about","apply","contact"];if(i>0&&!pinned.includes(items[i].key)&&!pinned.includes(items[i-1].key)){[items[i-1],items[i]]=[items[i],items[i-1]];renderMenuItems();}}));
+ document.querySelectorAll("[data-menu-down]").forEach(el=>el.addEventListener("click",()=>{const i=Number(el.dataset.menuDown);const pinned=["home","services","about","apply","contact"];if(i<items.length-1&&!pinned.includes(items[i].key)&&!pinned.includes(items[i+1].key)){[items[i+1],items[i]]=[items[i],items[i+1]];renderMenuItems();}}));
 }
 $("saveMenu").addEventListener("click",async()=>{
  try{const data=await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"save_menu",items:window.edwiseMenuItems||[]})});$("menuMessage").innerHTML='<div class="message success">'+escapeHtml(data.message)+'</div>';}
