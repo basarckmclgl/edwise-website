@@ -6,7 +6,7 @@ function b64url(value){
  let binary="";for(const byte of bytes)binary+=String.fromCharCode(byte);
  return btoa(binary).replace(/=/g,"").replace(/\\+/g,"-").replace(/\\//g,"_");
 }
-function decodePem(value){
+function b64urlBytes(bytes){let binary="";for(const byte of bytes)binary+=String.fromCharCode(byte);return btoa(binary).replace(/=/g,"").replace(/\\+/g,"-").replace(/\\//g,"_");}\nfunction decodePem(value){
  const raw=value.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\\s/g,"");
  const binary=atob(raw);return Uint8Array.from(binary,c=>c.charCodeAt(0));
 }
@@ -19,7 +19,7 @@ async function getGoogleAccessToken(secret){
  const unsigned=header+"."+claim;
  const key=await crypto.subtle.importKey("pkcs8",decodePem(account.private_key),{name:"RSASSA-PKCS1-v1_5",hash:"SHA-256"},false,["sign"]);
  const signature=await crypto.subtle.sign("RSASSA-PKCS1-v1_5",key,new TextEncoder().encode(unsigned));
- const jwt=unsigned+"."+b64url(String.fromCharCode(...new Uint8Array(signature)));
+ const jwt=unsigned+"."+b64urlBytes(new Uint8Array(signature));
  const response=await fetch("https://oauth2.googleapis.com/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({grant_type:"urn:ietf:params:oauth:grant-type:jwt-bearer",assertion:jwt})});
  const data=await response.json();
  if(!response.ok||!data.access_token)throw new Error(data.error_description||data.error||"Google erişim anahtarı alınamadı.");
