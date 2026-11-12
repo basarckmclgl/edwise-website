@@ -203,6 +203,17 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
 .report-history-grid th,.report-history-grid td{padding:6px 7px!important;font-size:10px!important;white-space:nowrap}
 .report-history-grid td:last-child{white-space:normal}
 @media(max-width:900px){.report-history-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);overflow-x:auto}.report-history-grid>.panel{min-width:420px}}
+
+.report-pair-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:stretch;margin:12px 0}
+.report-pair-grid>.panel{min-width:0;width:100%;margin:0!important;padding:12px!important;overflow:hidden}
+.report-pair-grid .section-head{margin-bottom:8px!important}
+.report-pair-grid h3{font-size:13px!important;margin:0 0 5px!important}
+.report-pair-grid .muted{font-size:10px!important;line-height:1.35}
+.report-pair-grid .table-wrap{width:100%;max-width:100%;overflow-x:auto}
+.report-pair-grid table{width:100%;min-width:520px!important;font-size:10px!important}
+.report-pair-grid th,.report-pair-grid td{padding:6px 7px!important;font-size:10px!important;white-space:nowrap}
+.report-pair-grid td:last-child{white-space:normal}
+.application-pair-grid table{min-width:650px!important}
 </style>
 </head>
 <body>
@@ -303,14 +314,18 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
   <section id="reports" class="hidden" data-superadmin>
    <div class="section-head"><div><h2>Site Raporları</h2><p>Son 30 günlük sayfa görüntüleme, ziyaretçi oturumu ve kaydırma derinliği.</p></div><div class="actions"><button class="btn" id="refreshSiteReports">↻ Raporları Yenile</button><div class="report-export" id="applicationExport"><button class="primary" type="button" id="applicationExportToggle" aria-haspopup="true" aria-expanded="false">Başvuru Kayıtlarını Raporla <span aria-hidden="true">▾</span></button><div class="report-export-menu hidden" id="applicationExportMenu"><button type="button" data-export-applications="pdf">PDF olarak indir</button><button type="button" data-export-applications="doc">Word (.doc) olarak indir</button><button type="button" data-export-applications="xlsx">Excel (.xlsx) olarak indir</button></div></div></div></div>
    <div id="siteReportsMessage" class="message">Raporlar yükleniyor...</div>
-   <div class="panel"><h3>Sayfa İnceleme Raporu</h3><div class="table-wrap"><table style="min-width:760px"><thead><tr><th>Sayfa</th><th>Görüntülenme</th><th>Ziyaretçi oturumu</th><th>%25 kaydırma</th><th>%50 kaydırma</th><th>%75 kaydırma</th><th>%90 kaydırma</th></tr></thead><tbody id="siteReportsTable"><tr><td colspan="8">Veriler bekleniyor...</td></tr></tbody></table></div></div>
-   <div class="report-history-grid">
-       <div class="panel"><div class="section-head"><div><h3>Sayfa Ziyaret Kayıtları</h3><p class="muted">Analiz izni veren ziyaretçilerin son 30 gündeki sayfa görüntüleme ve kaydırma kayıtları. Oturum kodları kısaltılmıştır.</p></div></div><div class="table-wrap"><table style="min-width:650px"><thead><tr><th>Tarih</th><th>Sayfa</th><th>Ülke</th><th>Anonim oturum</th><th>İşlem</th></tr></thead><tbody id="pageVisitRecords"><tr><td colspan="5">Kayıtlar bekleniyor...</td></tr></tbody></table></div></div>
-       <div class="panel compact-report"><div class="section-head"><div><h3>Başvuru Dönüşüm Kayıtları</h3><p class="muted">Son 30 gün · Her hareket ayrı kayıt edilir.</p></div><span id="funnelRecordCount" class="muted"></span></div><div class="table-wrap"><table class="compact-table"><thead><tr><th>Tarih</th><th>Ülke</th><th>Oturum</th><th>İşlem</th></tr></thead><tbody id="funnelEventRecords"><tr><td colspan="4">Kayıtlar bekleniyor...</td></tr></tbody></table></div></div>
+   <div class="report-pair-grid">
+    <div class="panel"><h3>Sayfa İnceleme Raporu</h3><div class="table-wrap"><table style="min-width:760px"><thead><tr><th>Sayfa</th><th>Görüntülenme</th><th>Ziyaretçi oturumu</th><th>%25 kaydırma</th><th>%50 kaydırma</th><th>%75 kaydırma</th><th>%90 kaydırma</th></tr></thead><tbody id="siteReportsTable"><tr><td colspan="8">Veriler bekleniyor...</td></tr></tbody></table></div></div>
+    <div class="report-history-grid">
+           <div class="panel"><div class="section-head"><div><h3>Sayfa Ziyaret Kayıtları</h3><p class="muted">Analiz izni veren ziyaretçilerin son 30 gündeki sayfa görüntüleme ve kaydırma kayıtları. Oturum kodları kısaltılmıştır.</p></div></div><div class="table-wrap"><table style="min-width:650px"><thead><tr><th>Tarih</th><th>Sayfa</th><th>Ülke</th><th>Anonim oturum</th><th>İşlem</th></tr></thead><tbody id="pageVisitRecords"><tr><td colspan="5">Kayıtlar bekleniyor...</td></tr></tbody></table></div></div>
+       
    </div>
-   <div class="panel">
-    <div class="section-head"><div><h3>Başvuru Kayıtları</h3><p class="muted">Kişisel veriler yalnızca yetkili yönetici tarafından görüntülenebilir. Telefon ve e-posta varsayılan olarak maskelidir.</p></div><div class="actions"><button class="btn" id="refreshApplications">↻ Başvuruları Yenile</button><span id="applicationsMessage" class="muted"></span></div></div>
-    <div class="table-wrap"><table><thead><tr><th>Tarih</th><th>Ad soyad</th><th>Telefon</th><th>E-posta</th><th>Program</th><th>Eğitim tercihi</th><th>Uygun zaman</th><th>Açıklama</th><th>Durum</th></tr></thead><tbody id="applicationsTable"><tr><td colspan="9">Başvurular yükleniyor...</td></tr></tbody></table></div>
+   <div class="report-pair-grid application-pair-grid">
+    <div class="panel">
+        <div class="section-head"><div><h3>Başvuru Kayıtları</h3><p class="muted">Kişisel veriler yalnızca yetkili yönetici tarafından görüntülenebilir. Telefon ve e-posta varsayılan olarak maskelidir.</p></div><div class="actions"><button class="btn" id="refreshApplications">↻ Başvuruları Yenile</button><span id="applicationsMessage" class="muted"></span></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Tarih</th><th>Ad soyad</th><th>Telefon</th><th>E-posta</th><th>Program</th><th>Eğitim tercihi</th><th>Uygun zaman</th><th>Açıklama</th><th>Durum</th></tr></thead><tbody id="applicationsTable"><tr><td colspan="9">Başvurular yükleniyor...</td></tr></tbody></table></div>
+       </div>
+    <div class="panel compact-report"><div class="section-head"><div><h3>Başvuru Dönüşüm Kayıtları</h3><p class="muted">Son 30 gün · Her hareket ayrı kayıt edilir.</p></div><span id="funnelRecordCount" class="muted"></span></div><div class="table-wrap"><table class="compact-table"><thead><tr><th>Tarih</th><th>Ülke</th><th>Oturum</th><th>İşlem</th></tr></thead><tbody id="funnelEventRecords"><tr><td colspan="4">Kayıtlar bekleniyor...</td></tr></tbody></table></div></div>
    </div>
    <p class="muted">Not: Analiz verileri yalnızca analiz çerezlerine izin veren ziyaretçilerden toplanır. Kaydırma oranları aynı oturumdaki olay sayılarını gösterir; kişileri kesin olarak tanımlamaz.</p>
   </section>
