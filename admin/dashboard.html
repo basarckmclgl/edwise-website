@@ -470,7 +470,7 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
 <aside class="sidebar">
  <button class="logo" id="dashboardHomeLogo" type="button" title="Genel Bakış" aria-label="EDWISE — Genel Bakış"><img src="/assets/images/logo.png" alt="EDWISE" onerror="this.style.display='none'"><span>EDWISE</span><small>CONTENT MANAGEMENT SYSTEM</small></button>
  <div class="menu-label">ANA MENÜ</div>
- <button class="nav active" data-page="overview"><span class="ico">▦</span><span>Genel Bakış</span></button>
+ <button class="nav active" data-page="overview"><span class="ico">▦</span><span>Ana Sayfa</span></button>
  <button class="nav" data-page="messages"><span class="ico">✉</span><span>Mesaj Kutusu <b id="chatUnreadBadge" class="role-label">0</b></span></button>
  <button class="nav" data-page="reports" data-superadmin><span class="ico">▤</span><span>Raporlar</span></button>
  <button class="nav" data-page="history" data-superadmin><span class="ico">◷</span><span>Geçmiş</span></button>
@@ -495,7 +495,7 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
 
 <main class="main">
  <header class="topbar">
-  <div style="display:flex;align-items:center;gap:16px"><button type="button" class="menu-toggle" id="menuToggle" aria-label="Menüyü aç veya kapat" aria-expanded="true" title="Menüyü aç/kapat"><span></span><span></span><span></span></button><span>EDWISE / <strong id="breadcrumb">Genel Bakış</strong></span></div>
+  <div style="display:flex;align-items:center;gap:16px"><button type="button" class="menu-toggle" id="menuToggle" aria-label="Menüyü aç veya kapat" aria-expanded="true" title="Menüyü aç/kapat"><span></span><span></span><span></span></button><span>EDWISE / <strong id="breadcrumb">Ana Sayfa</strong></span></div>
   <div>
    <span id="username">Yönetici</span>
    <span id="roleLabel" class="role-label"></span>
@@ -1244,7 +1244,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
   n.classList.toggle("active",n.dataset.page===name);
  });
 
- $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="designcenter"?"Site Tasarım Merkezi":name==="sitesettings"?"Site Ayarları":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":name==="audit"?"Güvenlik ve İşlem Geçmişi":name==="profile"?"Profilim":name==="history"?"Geçmiş":name==="archive"?"Arşiv":name==="reports"?"Raporlar":name==="messages"?"Mesaj Kutusu":otherModules[name]?.[0]||"";
+ $("breadcrumb").textContent=name==="overview"?"Ana Sayfa":name==="designcenter"?"Site Tasarım Merkezi":name==="sitesettings"?"Site Ayarları":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":name==="audit"?"Güvenlik ve İşlem Geçmişi":name==="profile"?"Profilim":name==="history"?"Geçmiş":name==="archive"?"Arşiv":name==="reports"?"Raporlar":name==="messages"?"Mesaj Kutusu":otherModules[name]?.[0]||"";
 
  if(name==="designcenter")loadDesignRecords();
  if(name==="pages")loadPages();
