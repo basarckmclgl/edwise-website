@@ -10,10 +10,30 @@ document.addEventListener('click',function(event){
  box.replaceChildren(frame);
 });
 
+// Google Analytics 4: yalnızca ziyaretçi analiz çerezlerine izin verdikten sonra yüklenir.
+const EDWISE_GA4_ID = "G-EM5WNPP2EM";
+let edwiseGA4Started = false;
+window.edwiseStartGoogleAnalytics = () => {
+ if (edwiseGA4Started) return;
+ let allowed = false;
+ try { allowed = localStorage.getItem("edwise_cookie_choice") === "allowed"; } catch(e) {}
+ if (!allowed) return;
+ edwiseGA4Started = true;
+ window.dataLayer = window.dataLayer || [];
+ window.gtag = window.gtag || function(){ window.dataLayer.push(arguments); };
+ window.gtag("js", new Date());
+ window.gtag("config", EDWISE_GA4_ID);
+ const script = document.createElement("script");
+ script.async = true;
+ script.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(EDWISE_GA4_ID);
+ script.onerror = () => { edwiseGA4Started = false; };
+ document.head.appendChild(script);
+};
+
 // Çerez tercihleri: her yeni sayfa girişinde görünür; seçiminiz kaydedilir.
 (function(){
  const cookie=document.getElementById('cookie-banner');
- function chooseCookie(value){try{localStorage.setItem('edwise_cookie_choice',value);}catch(e){}if(cookie)cookie.hidden=true;if(value==="allowed")window.edwiseStartPageTracking?.();}
+ function chooseCookie(value){try{localStorage.setItem('edwise_cookie_choice',value);}catch(e){}if(cookie)cookie.hidden=true;if(value==="allowed"){window.edwiseStartPageTracking?.();window.edwiseStartGoogleAnalytics?.();}}
  if(cookie)cookie.hidden=false;
  document.getElementById('cookie-accept')?.addEventListener('click',()=>chooseCookie('allowed'));
  document.getElementById('cookie-essential')?.addEventListener('click',()=>chooseCookie('essential'));
@@ -64,6 +84,7 @@ window.edwiseStartPageTracking=()=>{
  measureScroll();
 };
 if(EDWISE_TRACKING.sessionId)window.edwiseStartPageTracking();
+if(EDWISE_TRACKING.sessionId)window.edwiseStartGoogleAnalytics?.();
 let edwiseFormStarted=false;
 let edwiseSubmitSucceeded=false;
 let edwiseAbandonSent=false;
