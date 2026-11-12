@@ -56,6 +56,12 @@ body.sidebar-collapsed .menu-toggle span:last-child{transform:translateY(-7px) r
 .panel{margin-top:20px}
 .panel h2{font-size:18px;margin:0 0 8px}
 .hidden{display:none!important}
+/* Ana Sayfa ve Derslikler içerik alanları bilinçli olarak boş tutulur. */
+body[data-active-page="panelhome"] .content > section:not(#panelhome),
+body[data-active-page="classrooms"] .content > section:not(#classrooms){display:none!important}
+body[data-active-page="panelhome"] #panelhome,
+body[data-active-page="classrooms"] #classrooms{display:block!important;min-height:0!important;padding:0!important;margin:0!important}
+
 .btn{border:1px solid var(--border);background:#242039;color:#e5dcff;padding:9px 13px;border-radius:7px;cursor:pointer;font-size:12px}
 .btn:hover{border-color:var(--light)}
 .btn-danger{color:#ff9da8;border-color:#64333f}
