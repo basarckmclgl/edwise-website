@@ -1356,16 +1356,24 @@ async function exportApplicationsXlsx(){
  if(!window.XLSX)await new Promise((resolve,reject)=>{const script=document.createElement("script");script.src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";script.onload=resolve;script.onerror=()=>reject(new Error("Excel aracı yüklenemedi. İnternet bağlantısını kontrol edin."));document.head.appendChild(script);});
  const wb=XLSX.utils.book_new();const ws=XLSX.utils.table_to_sheet(table);XLSX.utils.book_append_sheet(wb,ws,"Başvuru Kayıtları");XLSX.writeFile(wb,applicationExportName()+".xlsx");
 }
-function exportApplicationsPdf(){
- const section=$("reports"),panel=$("applicationsTable")?.closest(".panel");if(!section||!panel){alert("Başvuru tablosu bulunamadı.");return;}
- const header=document.createElement("div");header.className="application-print-header";
- const logo=document.createElement("img");logo.src="/assets/images/logo.png";logo.alt="EDWISE";
- const brand=document.createElement("strong");brand.className="application-print-brand";brand.textContent="EDWISE | Eğitim Danışmanlığı";
- const date=document.createElement("strong");date.className="application-print-date";date.textContent=new Date().toLocaleDateString("tr-TR");
- header.append(logo,brand,date);panel.prepend(header);
- document.body.classList.add("printing-applications");
- const cleanup=()=>{document.body.classList.remove("printing-applications");header.remove();window.removeEventListener("afterprint",cleanup);};
- window.addEventListener("afterprint",cleanup,{once:true});window.print();setTimeout(cleanup,5000);
+async function exportApplicationsPdf(){
+ const table=applicationExportTable();if(!table){alert("Başvuru tablosu bulunamadı.");return;}
+ if(!window.html2pdf)await new Promise((resolve,reject)=>{const script=document.createElement("script");script.src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";script.onload=resolve;script.onerror=()=>reject(new Error("PDF oluşturma aracı yüklenemedi. İnternet bağlantısını kontrol edin."));document.head.appendChild(script);});
+ const report=document.createElement("div");report.style.cssText="position:fixed;left:-10000px;top:0;width:1100px;padding:34px;background:#fff;color:#171326;font-family:Arial,sans-serif;z-index:-1";
+ const header=document.createElement("div");header.style.cssText="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;padding:0 0 18px;margin-bottom:22px;border-bottom:3px solid #291447";
+ const logo=document.createElement("img");logo.src=new URL("/assets/images/logo.png",location.origin).href;logo.alt="EDWISE";logo.style.cssText="width:145px;max-height:55px;object-fit:contain;object-position:left center";
+ const brand=document.createElement("strong");brand.textContent="EDWISE | Eğitim Danışmanlığı";brand.style.cssText="text-align:center;font-size:17px;color:#291447;white-space:nowrap";
+ const date=document.createElement("strong");date.textContent=new Date().toLocaleDateString("tr-TR");date.style.cssText="text-align:right;font-size:15px;color:#171326;white-space:nowrap";
+ header.append(logo,brand,date);
+ const title=document.createElement("h2");title.textContent="Başvuru Kayıtları";title.style.cssText="font-size:18px;margin:0 0 14px;color:#171326";
+ const clonedTable=table.cloneNode(true);clonedTable.removeAttribute("id");clonedTable.style.cssText="width:100%;border-collapse:collapse;table-layout:fixed;font-size:10px;color:#171326";
+ clonedTable.querySelectorAll("th,td").forEach(cell=>{cell.style.cssText+=";border:1px solid #999;padding:7px 5px;text-align:left;vertical-align:top;overflow-wrap:anywhere;color:#171326;background:#fff"});
+ clonedTable.querySelectorAll("button").forEach(button=>button.remove());
+ clonedTable.querySelectorAll("select").forEach(select=>{const label=document.createElement("span");label.textContent=select.options[select.selectedIndex]?.text||"";select.replaceWith(label)});
+ clonedTable.querySelectorAll("a").forEach(link=>{const label=document.createElement("span");label.textContent=link.textContent;link.replaceWith(label)});
+ report.append(header,title,clonedTable);document.body.appendChild(report);
+ try{await window.html2pdf().set({margin:[8,8,8,8],filename:applicationExportName()+".pdf",image:{type:"jpeg",quality:0.98},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff",scrollX:0,scrollY:0},jsPDF:{unit:"mm",format:"a4",orientation:"landscape"}}).from(report).save();}
+ finally{report.remove();}
 }
 const exportToggle=$("applicationExportToggle"),exportMenu=$("applicationExportMenu");
 exportToggle?.addEventListener("click",()=>{const open=exportMenu.classList.toggle("hidden")===false;exportToggle.setAttribute("aria-expanded",String(open));});
