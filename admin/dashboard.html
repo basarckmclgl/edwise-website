@@ -1391,6 +1391,10 @@ menuToggle?.addEventListener("click",()=>{
 function showPage(name){
  if(!canAccess(name)) name="overview";
  document.body.dataset.activePage=name;
+ const isBlankWorkspace=name==="panelhome" || name==="classrooms";
+ document.querySelectorAll(".content > *").forEach(element=>{
+  element.style.display=isBlankWorkspace?(element.id===name?"block":"none"):"";
+ });
  if(name==="overview"){loadPublishedContentCounts();if(currentRole==="superadmin"){loadApplicationFunnel();loadSiteReports();}}
 
  document.querySelectorAll(".content > section").forEach(section=>{
