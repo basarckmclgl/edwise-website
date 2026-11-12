@@ -821,6 +821,17 @@ document.querySelectorAll("[data-open]").forEach(n=>{
 });
 
 
+function maskPhone(value){
+ const digits=String(value||"").replace(/\D/g,"");
+ if(!digits)return "—";
+ return "••••••"+digits.slice(-2);
+}
+function maskEmail(value){
+ const email=String(value||"");
+ const at=email.indexOf("@");
+ if(at<1)return email?"••••":"—";
+ return email.slice(0,1)+"••••"+email.slice(at);
+}
 async function loadApplications(){
  const body=$("applicationsTable");
  body.innerHTML='<tr><td colspan="9">Başvurular yükleniyor...</td></tr>';
@@ -829,17 +840,30 @@ async function loadApplications(){
   const rows=data.applications||[];
   $("countApplications").textContent=rows.length;
   $("applicationsMessage").textContent=rows.length+" başvuru";
-  body.innerHTML=rows.map(x=>'<tr>'+
+  body.innerHTML=rows.map((x,index)=>'<tr>'+
    '<td>'+escapeHtml(x.created_at||"-")+'</td>'+
    '<td>'+escapeHtml(x.name||"-")+'</td>'+
-   '<td><a href="tel:'+escapeHtml(x.phone||"")+'">'+escapeHtml(x.phone||"-")+'</a></td>'+
-   '<td>'+escapeHtml(x.email||"-")+'</td>'+
+   '<td><span data-app-phone="'+index+'">'+escapeHtml(maskPhone(x.phone))+'</span></td>'+
+   '<td><span data-app-email="'+index+'">'+escapeHtml(maskEmail(x.email))+'</span></td>'+
    '<td>'+escapeHtml(x.program||"-")+'</td>'+
    '<td>'+escapeHtml(x.format||"-")+'</td>'+
    '<td>'+escapeHtml(x.availability||"-")+'</td>'+
    '<td style="min-width:220px;white-space:normal">'+escapeHtml(x.note||"-")+'</td>'+
-   '<td><select aria-label="Başvuru durumu" data-app-status="'+x.id+'"><option value="new" '+(x.status==="new"?"selected":"")+'>Yeni</option><option value="contacted" '+(x.status==="contacted"?"selected":"")+'>İletişime geçildi</option><option value="completed" '+(x.status==="completed"?"selected":"")+'>Tamamlandı</option></select></td>'+
+   '<td><select aria-label="Başvuru durumu" data-app-status="'+escapeHtml(x.id)+'"><option value="new" '+(x.status==="new"?"selected":"")+'>Yeni</option><option value="contacted" '+(x.status==="contacted"?"selected":"")+'>İletişime geçildi</option><option value="completed" '+(x.status==="completed"?"selected":"")+'>Tamamlandı</option></select><br><button type="button" class="btn" style="margin-top:6px" data-app-contact="'+index+'" aria-expanded="false">İletişim bilgilerini göster</button></td>'+
    '</tr>').join("")||'<tr><td colspan="9">Henüz başvuru yok.</td></tr>';
+  body.querySelectorAll("[data-app-contact]").forEach(button=>button.addEventListener("click",()=>{
+   const index=Number(button.dataset.appContact),item=rows[index];
+   const phone=body.querySelector('[data-app-phone="'+index+'"]');
+   const email=body.querySelector('[data-app-email="'+index+'"]');
+   const revealed=button.getAttribute("aria-expanded")==="true";
+   if(revealed){
+    phone.textContent=maskPhone(item.phone);email.textContent=maskEmail(item.email);
+    button.textContent="İletişim bilgilerini göster";button.setAttribute("aria-expanded","false");
+   }else{
+    phone.textContent=item.phone||"—";email.textContent=item.email||"—";
+    button.textContent="İletişim bilgilerini gizle";button.setAttribute("aria-expanded","true");
+   }
+  }));
   body.querySelectorAll("[data-app-status]").forEach(select=>select.addEventListener("change",async()=>{
    try{await api("/api/applications",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:select.dataset.appStatus,status:select.value})});}
    catch(e){alert("Durum kaydedilemedi: "+e.message);loadApplications();}
