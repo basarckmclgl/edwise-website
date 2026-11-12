@@ -1181,7 +1181,10 @@ function applyRolePermissions(){
   element.classList.toggle("hidden",!canAccess(page));
  });
 
- $("roleLabel").textContent=isSuperAdmin?"Super Admin":"İçerik Editörü";
+ const roleLabel = $("roleLabel");
+ if(roleLabel){
+  roleLabel.textContent=isSuperAdmin?"Super Admin":"İçerik Editörü";
+ }
 }
 
 function escapeHtml(value){
