@@ -1476,8 +1476,6 @@ menuToggle?.addEventListener("click",()=>{
 function showPage(name){
  if(!canAccess(name)) name="overview";
  document.body.dataset.activePage=name;
- const blogPanel=$("posts");
- if(blogPanel) blogPanel.style.setProperty("display",name==="posts"?"block":"none","important");
  if(name==="overview"){loadPublishedContentCounts();if(currentRole==="superadmin"){loadApplicationFunnel();loadSiteReports();}}
 
  // Her ana menü sekmesi yalnızca kendi içeriğini gösterir; diğer sekmelerin panelleri görünmez.
