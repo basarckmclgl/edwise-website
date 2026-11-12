@@ -336,6 +336,28 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
  word-break:normal!important;
 }
 
+
+/* Başvuru dönüşüm görünümü: işlemler yatay, alanlar dikey */
+#reports .application-pair-grid .compact-report .funnel-horizontal-actions{
+ width:max-content!important;
+ min-width:100%!important;
+ table-layout:auto!important;
+ border-collapse:collapse!important;
+}
+#reports .application-pair-grid .compact-report .funnel-horizontal-actions th,
+#reports .application-pair-grid .compact-report .funnel-horizontal-actions td{
+ min-width:150px!important;
+ white-space:nowrap!important;
+ padding:9px 12px!important;
+ vertical-align:top!important;
+}
+#reports .application-pair-grid .compact-report .funnel-horizontal-actions th:first-child{
+ position:sticky;
+ left:0;
+ z-index:2;
+ min-width:85px!important;
+ background:#211c35!important;
+}
 </style>
 </head>
 <body>
@@ -1454,7 +1476,22 @@ async function loadSiteReports(){
   const funnelRows=data.funnelRecords||[];
   const funnelTable=$("funnelEventRecords");
   if($("funnelRecordCount"))$("funnelRecordCount").textContent=funnelRows.length+" kayıt";
-  if(funnelTable)funnelTable.innerHTML=funnelRows.map(item=>'<tr><td>'+escapeHtml(item.date)+'</td><td>'+countryBadge(item.country)+'</td><td>'+escapeHtml(item.session)+'</td><td>'+escapeHtml(funnelLabels[item.event]||item.event)+'</td></tr>').join("")||'<tr><td colspan="4">Henüz başvuru hareketi kaydı yok.</td></tr>';
+  if(funnelTable){
+   const table=funnelTable.closest("table");
+   if(funnelRows.length){
+    const headings=funnelRows.map(item=>'<th scope="col">'+escapeHtml(funnelLabels[item.event]||item.event)+'</th>').join("");
+    const cells=field=>funnelRows.map(item=>'<td>'+field(item)+'</td>').join("");
+    table.innerHTML='<thead><tr><th scope="col">Bilgi</th>'+headings+'</tr></thead><tbody>'+
+     '<tr><th scope="row">Tarih</th>'+cells(item=>escapeHtml(item.date))+'</tr>'+
+     '<tr><th scope="row">Ülke</th>'+cells(item=>countryBadge(item.country))+'</tr>'+
+     '<tr><th scope="row">Oturum</th>'+cells(item=>escapeHtml(item.session))+'</tr>'+
+     '</tbody>';
+    table.classList.add("funnel-horizontal-actions");
+   }else{
+    table.innerHTML='<tbody><tr><td colspan="2">Henüz başvuru hareketi kaydı yok.</td></tr></tbody>';
+    table.classList.add("funnel-horizontal-actions");
+   }
+  }
   if(message){message.className="message success";message.textContent="Son 30 günlük raporlar güncellendi.";}
  }catch(error){if(message){message.className="message error";message.textContent=error.message;}table.innerHTML='<tr><td colspan="7">Raporlar yüklenemedi.</td></tr>';}
 }
