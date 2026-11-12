@@ -82,7 +82,22 @@ export async function onRequestGet(context) {
       scroll25:Number(row.scroll_25)||0,scroll50:Number(row.scroll_50)||0,
       scroll75:Number(row.scroll_75)||0,scroll90:Number(row.scroll_90)||0
     }));
-    return json({ success:true, periodDays:30, totals, pageReports });
+    const detailResult = await DB.prepare(`
+      SELECT substr(session_id,1,7) || '…' AS session_label,
+             event_name, page_path, created_at
+      FROM application_events
+      WHERE datetime(created_at) >= datetime('now','-30 days')
+        AND event_name IN ('page_view','scroll_25','scroll_50','scroll_75','scroll_90')
+      ORDER BY datetime(created_at) DESC
+      LIMIT 300
+    `).all();
+    const pageRecords = (detailResult.results || []).map(row => ({
+      session: row.session_label || '—',
+      event: row.event_name,
+      path: row.page_path || '/',
+      date: row.created_at || ''
+    }));
+    return json({ success:true, periodDays:30, totals, pageReports, pageRecords });
   } catch {
     return json({ success:false, message:"Başvuru hunisi verileri alınamadı." },500);
   }
