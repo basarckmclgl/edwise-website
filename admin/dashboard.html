@@ -243,6 +243,13 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
  body.printing-applications #reports .panel:has(#applicationsTable)>p{display:none!important}
  body.printing-applications #reports .panel:has(#applicationsTable) .muted{display:none!important}
 }
+
+@media print{
+ body.printing-applications #reports .application-print-header{display:grid!important;grid-template-columns:1fr auto 1fr;align-items:center;gap:12pt;width:100%;margin:0 0 18pt;padding:0 0 9pt;border-bottom:2px solid #291447}
+ body.printing-applications #reports .application-print-header img{display:block!important;grid-column:1;justify-self:start;width:125px;height:auto;max-height:42px;object-fit:contain;object-position:left center}
+ body.printing-applications #reports .application-print-header .application-print-brand{display:block!important;grid-column:2;justify-self:center;text-align:center;font-size:11pt!important;font-weight:700!important;color:#291447!important;white-space:nowrap}
+ body.printing-applications #reports .application-print-header .application-print-date{display:block!important;grid-column:3;justify-self:end;text-align:right;font-size:10pt!important;font-weight:800!important;color:#111!important;white-space:nowrap}
+}
 </style>
 </head>
 <body>
@@ -1353,8 +1360,9 @@ function exportApplicationsPdf(){
  const section=$("reports"),panel=$("applicationsTable")?.closest(".panel");if(!section||!panel){alert("Başvuru tablosu bulunamadı.");return;}
  const header=document.createElement("div");header.className="application-print-header";
  const logo=document.createElement("img");logo.src="/assets/images/logo.png";logo.alt="EDWISE";
- const date=document.createElement("strong");date.textContent=new Date().toLocaleString("tr-TR");
- header.append(logo,date);panel.prepend(header);
+ const brand=document.createElement("strong");brand.className="application-print-brand";brand.textContent="EDWISE | Eğitim Danışmanlığı";
+ const date=document.createElement("strong");date.className="application-print-date";date.textContent=new Date().toLocaleDateString("tr-TR");
+ header.append(logo,brand,date);panel.prepend(header);
  document.body.classList.add("printing-applications");
  const cleanup=()=>{document.body.classList.remove("printing-applications");header.remove();window.removeEventListener("afterprint",cleanup);};
  window.addEventListener("afterprint",cleanup,{once:true});window.print();setTimeout(cleanup,5000);
