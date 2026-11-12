@@ -255,7 +255,7 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
     <div class="section-head"><div><h2>EDWISE Site İnceleme Raporu</h2><p class="muted">Son 30 gün · tüm sayfaların görüntülenme ve kaydırılma verileri</p></div><button class="btn" type="button" id="refreshOverviewReports">↻ Raporları Yenile</button></div>
     <div class="table-wrap"><table style="min-width:760px"><thead><tr><th>Sayfa</th><th>Görüntülenme</th><th>Ziyaretçi oturumu</th><th>%25 kaydırma</th><th>%50 kaydırma</th><th>%75 kaydırma</th><th>%90 kaydırma</th></tr></thead><tbody id="overviewPageReports"><tr><td colspan="7">Rapor yükleniyor...</td></tr></tbody></table></div>
     <div class="section-head" style="margin-top:22px"><div><h3>Başvuru ve İletişim Hareketleri</h3><p class="muted">Başvurular, e-posta ve WhatsApp hareketleri · kişisel iletişim bilgileri bu rapora eklenmez.</p></div></div>
-    <div class="table-wrap"><table style="min-width:620px"><thead><tr><th>İşlem</th><th>Toplam işlem</th><th>Oturum</th></tr></thead><tbody id="overviewFunnelTable"><tr><td colspan="3">Rapor yükleniyor...</td></tr></tbody></table></div>
+    <div class="table-wrap"><table style="min-width:1100px;table-layout:fixed"><thead id="overviewFunnelHead"><tr><th>Ölçüm</th></tr></thead><tbody id="overviewFunnelTable"><tr><td colspan="3">Rapor yükleniyor...</td></tr></tbody></table></div>
     <p class="muted" style="margin-top:12px">Görüntüleme ve kaydırma raporları yalnızca analiz çerezlerine izin veren ziyaretçilerden alınır. Telefon ve e-posta gibi başvuru bilgileri ayrı Başvurular bölümünde maskeli tutulur.</p>
    </div>
    <div class="section-head">
@@ -277,7 +277,7 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
    <div class="section-head"><div><h2>Site Raporları</h2><p>Son 30 günlük sayfa görüntüleme, ziyaretçi oturumu ve kaydırma derinliği.</p></div><button class="btn" id="refreshSiteReports">↻ Raporları Yenile</button></div>
    <div id="siteReportsMessage" class="message">Raporlar yükleniyor...</div>
    <div class="panel"><h3>Sayfa İnceleme Raporu</h3><div class="table-wrap"><table style="min-width:760px"><thead><tr><th>Sayfa</th><th>Görüntülenme</th><th>Ziyaretçi oturumu</th><th>%25 kaydırma</th><th>%50 kaydırma</th><th>%75 kaydırma</th><th>%90 kaydırma</th></tr></thead><tbody id="siteReportsTable"><tr><td colspan="7">Veriler bekleniyor...</td></tr></tbody></table></div></div>
-   <div class="panel"><h3>Başvuru Dönüşüm Raporu</h3><p class="muted">Başvuru hunisi ve e-posta / WhatsApp hareketleri.</p><div class="table-wrap"><table style="min-width:700px"><thead><tr><th>İşlem</th><th>Toplam işlem</th><th>Oturum</th></tr></thead><tbody id="reportFunnelTable"><tr><td colspan="3">Veriler bekleniyor...</td></tr></tbody></table></div></div>
+   <div class="panel"><h3>Başvuru Dönüşüm Raporu</h3><p class="muted">Başvuru hunisi ve e-posta / WhatsApp hareketleri.</p><div class="table-wrap"><table style="min-width:1100px;table-layout:fixed"><thead id="reportFunnelHead"><tr><th>Ölçüm</th></tr></thead><tbody id="reportFunnelTable"><tr><td colspan="3">Veriler bekleniyor...</td></tr></tbody></table></div></div>
    <p class="muted">Not: Analiz verileri yalnızca analiz çerezlerine izin veren ziyaretçilerden toplanır. Kaydırma oranları aynı oturumdaki olay sayılarını gösterir; kişileri kesin olarak tanımlamaz.</p>
   </section>
   <section id="designcenter" class="hidden">
@@ -1249,9 +1249,15 @@ async function loadSiteReports(){
   const overview=$("overviewPageReports");
   if(overview)overview.innerHTML=rows.map(row=>'<tr><td>'+escapeHtml(row.path)+'</td><td>'+row.views.toLocaleString("tr-TR")+'</td><td>'+row.visitors.toLocaleString("tr-TR")+'</td><td>'+row.scroll25.toLocaleString("tr-TR")+'</td><td>'+row.scroll50.toLocaleString("tr-TR")+'</td><td>'+row.scroll75.toLocaleString("tr-TR")+'</td><td>'+row.scroll90.toLocaleString("tr-TR")+'</td></tr>').join("")||'<tr><td colspan="7">Henüz analiz verisi yok. Analiz izni veren ziyaretçiler geldikçe burada görünecek.</td></tr>';
   const funnelLabels={apply_click:"Başvur butonuna tıklama",form_view:"Başvuru formu açıldı",form_start:"Form doldurulmaya başlandı",submit_attempt:"Gönderim denendi",application_saved:"Başvuru kaydedildi",email_sent:"E-posta gönderildi",email_failed:"E-posta gönderilemedi",whatsapp_redirect:"WhatsApp açıldı",form_abandon:"Form yarım bırakıldı",site_return:"Siteye geri dönüldü"};
-  ["reportFunnelTable","overviewFunnelTable"].forEach(id=>{
-   const funnel=$(id);
-   if(funnel)funnel.innerHTML=Object.entries(funnelLabels).map(([key,label])=>{const item=data.totals?.[key]||{count:0,sessions:0};return '<tr><td>'+label+'</td><td>'+item.count.toLocaleString("tr-TR")+'</td><td>'+item.sessions.toLocaleString("tr-TR")+'</td></tr>';}).join("");
+  const funnelStages=Object.entries(funnelLabels);
+  ["report","overview"].forEach(prefix=>{
+   const head=$(prefix+"FunnelHead"),body=$(prefix+"FunnelTable");
+   if(head)head.innerHTML='<tr><th style="min-width:145px">Ölçüm</th>'+funnelStages.map(([,label])=>'<th style="min-width:105px;white-space:normal">'+label+'</th>').join("")+'</tr>';
+   if(body){
+    const counts=funnelStages.map(([key])=>{const item=data.totals?.[key]||{count:0,sessions:0};return '<td style="text-align:center;font-weight:700">'+item.count.toLocaleString("tr-TR")+'</td>';}).join("");
+    const sessions=funnelStages.map(([key])=>{const item=data.totals?.[key]||{count:0,sessions:0};return '<td style="text-align:center">'+item.sessions.toLocaleString("tr-TR")+'</td>';}).join("");
+    body.innerHTML='<tr><th style="text-align:left">İşlem sayısı</th>'+counts+'</tr><tr><th style="text-align:left">Oturum sayısı</th>'+sessions+'</tr>';
+   }
   });
   if(message){message.className="message success";message.textContent="Son 30 günlük raporlar güncellendi.";}
  }catch(error){if(message){message.className="message error";message.textContent=error.message;}table.innerHTML='<tr><td colspan="7">Raporlar yüklenemedi.</td></tr>';}
