@@ -455,6 +455,14 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
 .overview-funnel-table .funnel-number{font-size:14px!important;font-weight:700!important;font-variant-numeric:tabular-nums}
 #overviewFunnelMessage{margin:8px 0 10px!important;font-size:12px!important}
 
+
+/* Geçmiş raporu okunabilir tablo düzeni */
+.history-table{width:100%;min-width:1050px!important;border-collapse:collapse;table-layout:auto}
+.history-table th,.history-table td{padding:10px 9px!important;border:1px solid #45405c!important;font-size:12px!important;line-height:1.4!important;text-align:center;white-space:nowrap}
+.history-table thead th{background:#211c35!important;font-weight:700!important}
+.history-table td:first-child,.history-table th:first-child{text-align:left}
+#history .stat h2{font-variant-numeric:tabular-nums}
+
 </style>
 </head>
 <body>
@@ -464,6 +472,7 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
  <div class="menu-label">ANA MENÜ</div>
  <button class="nav active" data-page="overview"><span class="ico">▦</span><span>Genel Bakış</span></button>
  <button class="nav" data-page="reports" data-superadmin><span class="ico">▤</span><span>Raporlar</span></button>
+ <button class="nav" data-page="history" data-superadmin><span class="ico">◷</span><span>Geçmiş</span></button>
  <div class="menu-label">İÇERİK YÖNETİMİ</div>
  <button class="nav" data-page="pages"><span class="ico">▤</span><span>Sayfa Yönetimi</span></button>
  <button class="nav" data-page="services"><span class="ico">✧</span><span>Hizmet Yönetimi</span></button>
@@ -990,6 +999,37 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
  <div class="panel"><h3>Güvenlik sınırları</h3><p>Bu merkez sunucu tarafındaki yönetici işlemlerini, oturumları ve içerik değişikliklerini denetler. CTRL+U, F12, ekran görüntüsü veya tarayıcı geliştirici araçları teknik olarak tamamen engellenemez; tarayıcıya gönderilen HTML/CSS/JavaScript kullanıcı tarafından görüntülenebilir. Gerçek koruma, gizli anahtarları sunucuda tutmak, API yetkilerini doğrulamak, girişleri sınırlamak ve veritabanını yedeklemektir.</p></div>
 </section>
 
+<section id="history" class="hidden" data-superadmin>
+ <div class="section-head">
+  <div><h2>Başvuru ve İletişim Geçmişi</h2><p class="muted">Ziyaretçi hareketleri günlük, haftalık ve son 30 günlük dönemlerde raporlanır. Kayıtlar 30 gün saklanır.</p></div>
+  <div class="actions" style="display:flex;gap:8px;align-items:center">
+   <select id="historyRange" aria-label="Rapor dönemi" style="min-width:150px">
+    <option value="day">Günlük · Son 24 saat</option>
+    <option value="week">Haftalık · Son 7 gün</option>
+    <option value="30days" selected>Son 30 gün</option>
+   </select>
+   <button class="primary" type="button" id="refreshHistory">↻ Yenile</button>
+  </div>
+ </div>
+ <div id="historyMessage" class="message" aria-live="polite">Geçmiş kayıtları yükleniyor...</div>
+ <div class="grid analytics-stats" id="historyStats">
+  <div class="stat"><span>Toplam hareket</span><h2 id="historyTotal">—</h2><p>Seçilen dönem</p></div>
+  <div class="stat"><span>Ziyaretçi oturumu</span><h2 id="historySessions">—</h2><p>Tekil oturum sayısı</p></div>
+  <div class="stat"><span>Başvuru kaydı</span><h2 id="historyApplications">—</h2><p>Panele başarıyla kaydedilen</p></div>
+  <div class="stat"><span>WhatsApp hareketi</span><h2 id="historyWhatsapp">—</h2><p>WhatsApp açılma sayısı</p></div>
+ </div>
+ <div class="panel" style="margin-top:16px">
+  <div class="section-head"><div><h3>Günlük hareket dökümü</h3><p class="muted">Seçilen dönemde gün gün oluşan ziyaret ve iletişim hareketleri</p></div></div>
+  <div class="table-wrap">
+   <table class="history-table">
+    <thead><tr><th>Tarih</th><th>Toplam hareket</th><th>Oturum</th><th>Sayfa görüntüleme</th><th>Başvur tıklaması</th><th>Form açıldı</th><th>Form başladı</th><th>Başvuru kaydı</th><th>E-posta</th><th>WhatsApp</th></tr></thead>
+    <tbody id="historyTable"><tr><td colspan="10">Kayıtlar yükleniyor...</td></tr></tbody>
+   </table>
+  </div>
+ </div>
+ <p class="muted" style="margin-top:12px">Bu rapor kişisel telefon ve e-posta bilgilerini içermez. 30 günden eski analiz hareketleri otomatik olarak temizlenir.</p>
+</section>
+
 <section id="other" class="hidden">
    <div class="panel">
     <h2 id="otherTitle"></h2>
@@ -1110,13 +1150,14 @@ function showPage(name){
  $("posts").classList.toggle("hidden",name!=="posts");
  $("users").classList.toggle("hidden",name!=="users");
  $("audit").classList.toggle("hidden",name!=="audit");
+ $("history").classList.toggle("hidden",name!=="history");
 $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
 
  document.querySelectorAll(".nav").forEach(n=>{
   n.classList.toggle("active",n.dataset.page===name);
  });
 
- $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="designcenter"?"Site Tasarım Merkezi":name==="sitesettings"?"Site Ayarları":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":name==="audit"?"Güvenlik ve İşlem Geçmişi":name==="reports"?"Raporlar":otherModules[name]?.[0]||"";
+ $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="designcenter"?"Site Tasarım Merkezi":name==="sitesettings"?"Site Ayarları":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":name==="audit"?"Güvenlik ve İşlem Geçmişi":name==="history"?"Geçmiş":name==="reports"?"Raporlar":otherModules[name]?.[0]||"";
 
  if(name==="designcenter")loadDesignRecords();
  if(name==="pages")loadPages();
@@ -1124,6 +1165,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
  if(name==="posts")loadPosts();
     if(name==="users")loadUsers();
  if(name==="audit")loadAudit();
+ if(name==="history")loadActivityHistory();
  if(name==="reports"){loadSiteReports();loadApplications();}
  if(name==="applications"){loadApplications();loadApplicationFunnel();}
  if(name==="designcenter")loadThemeSettings();
@@ -1698,6 +1740,44 @@ async function loadApplicationFunnel(){
 }
 $("refreshApplicationFunnel")?.addEventListener("click",loadApplicationFunnel);
 $("refreshOverviewFunnel")?.addEventListener("click",loadApplicationFunnel);
+
+async function loadActivityHistory(){
+ const message=$("historyMessage"),table=$("historyTable");
+ if(!message||!table)return;
+ const range=$("historyRange")?.value||"30days";
+ message.className="message";message.textContent="Geçmiş kayıtları getiriliyor...";
+ table.innerHTML='<tr><td colspan="10">Kayıtlar yükleniyor...</td></tr>';
+ try{
+  const response=await fetch("/api/application-events?range="+encodeURIComponent(range),{credentials:"same-origin",cache:"no-store"});
+  const data=await response.json();
+  if(!response.ok||!data.success)throw new Error(data.message||"Geçmiş kayıtları alınamadı.");
+  const totals=data.historyTotals||{};
+  const fmt=value=>Number(value||0).toLocaleString("tr-TR");
+  $("historyTotal").textContent=fmt(totals.total);
+  $("historySessions").textContent=fmt(totals.sessions);
+  $("historyApplications").textContent=fmt(totals.applications);
+  $("historyWhatsapp").textContent=fmt(totals.whatsapp);
+  const rows=data.historyRows||[];
+  if(!rows.length){
+   table.innerHTML='<tr><td colspan="10">Seçilen dönemde henüz kayıt bulunmuyor.</td></tr>';
+  }else{
+   table.innerHTML=rows.map(row=>'<tr>'+
+    '<td>'+String(row.date||"—")+'</td>'+
+    '<td>'+fmt(row.total)+'</td><td>'+fmt(row.sessions)+'</td>'+
+    '<td>'+fmt(row.pageViews)+'</td><td>'+fmt(row.applyClick)+'</td>'+
+    '<td>'+fmt(row.formView)+'</td><td>'+fmt(row.formStart)+'</td>'+
+    '<td>'+fmt(row.applications)+'</td><td>'+fmt(row.emails)+'</td>'+
+    '<td>'+fmt(row.whatsapp)+'</td></tr>').join("");
+  }
+  message.className="message success";
+  message.textContent=range==="day"?"Son 24 saatlik geçmiş yüklendi.":range==="week"?"Son 7 günlük geçmiş yüklendi.":"Son 30 günlük geçmiş yüklendi.";
+ }catch(error){
+  table.innerHTML='<tr><td colspan="10">Geçmiş kayıtları yüklenemedi.</td></tr>';
+  message.className="message error";message.textContent=error.message||"Geçmiş kayıtları yüklenemedi.";
+ }
+}
+$("refreshHistory")?.addEventListener("click",loadActivityHistory);
+$("historyRange")?.addEventListener("change",loadActivityHistory);
 
 async function loadAnalytics(){
  const message=$("analyticsMessage");if(!message)return;message.className="message";message.textContent="Cloudflare verileri getiriliyor...";
