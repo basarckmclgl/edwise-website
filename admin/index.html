@@ -6,90 +6,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EDWISE | Yönetici Girişi</title>
   <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 20px;
-      background: #11101d;
-      color: #fff;
-      font-family: Arial, sans-serif;
-    }
-
-    .login {
-      width: 100%;
-      max-width: 410px;
-      padding: 36px;
-      background: #1c1a2c;
-      border: 1px solid #37334e;
-      border-radius: 16px;
-      box-shadow: 0 20px 60px #0005;
-    }
-
-    .logo {
-      color: #a18aff;
-      font-size: 27px;
-      font-weight: bold;
-      letter-spacing: 3px;
-    }
-
-    h1 { font-size: 23px; margin: 25px 0 8px; }
-
-    p { color: #aaa7bd; line-height: 1.5; }
-
-    label {
-      display: block;
-      margin: 20px 0 8px;
-      font-size: 14px;
-    }
-
-    input {
-      width: 100%;
-      padding: 14px;
-      color: white;
-      background: #11101d;
-      border: 1px solid #49445f;
-      border-radius: 8px;
-      font-size: 15px;
-    }
-
-    input:focus {
-      outline: 2px solid #8064e8;
-      border-color: transparent;
-    }
-
-    button {
-      width: 100%;
-      margin-top: 25px;
-      padding: 14px;
-      border: 0;
-      border-radius: 8px;
-      background: #6848d8;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:disabled { opacity: .6; cursor: wait; }
-
-    #message {
-      margin-top: 18px;
-      font-size: 14px;
-      overflow-wrap: anywhere;
-    }
-
-    .back {
-      display: block;
-      margin-top: 24px;
-      color: #aaa7bd;
-      text-align: center;
-      text-decoration: none;
-      font-size: 13px;
-    }
+    *{box-sizing:border-box}
+    :root{font-family:Arial,sans-serif;color-scheme:light}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#f8f7fb 0%,#f1eff7 100%);color:#292638;font-family:Arial,sans-serif}
+    .login{width:100%;max-width:430px;padding:42px;background:#fff;border:1px solid #e8e4f0;border-radius:20px;box-shadow:0 18px 55px rgba(39,29,66,.09)}
+    .logo{color:#7650d8;font-size:29px;font-weight:800;letter-spacing:3px}
+    h1{font-size:25px;line-height:1.25;margin:28px 0 9px;color:#282538}
+    p{color:#777487;line-height:1.6;margin:0 0 26px}
+    label{display:block;margin:19px 0 8px;font-size:13px;font-weight:700;color:#464256}
+    input{width:100%;padding:14px 15px;color:#292638;background:#fff;border:1px solid #dedbe7;border-radius:10px;font-size:15px;transition:border-color .15s,box-shadow .15s}
+    input:focus{outline:none;border-color:#9476df;box-shadow:0 0 0 3px rgba(118,80,216,.12)}
+    button{width:100%;margin-top:25px;padding:14px;border:0;border-radius:10px;background:#7650d8;color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:background .15s,transform .15s}
+    button:hover{background:#6540c3}button:active{transform:translateY(1px)}button:disabled{opacity:.6;cursor:wait}
+    #message{margin-top:18px;font-size:13px;color:#5d5870;overflow-wrap:anywhere}
+    .back{display:block;margin-top:25px;color:#777487;text-align:center;text-decoration:none;font-size:13px}
+    .back:hover{color:#7650d8}
+    #forgotPasswordLink{display:block;margin-top:17px;color:#7650d8!important;text-align:center;font-size:13px;text-decoration:none}
+    #forgotPasswordLink:hover{text-decoration:underline}
+    [hidden]{display:none!important}
+    @media(max-width:480px){body{padding:16px}.login{padding:30px 24px;border-radius:16px}}
   </style>
 </head>
 <body>
