@@ -12,7 +12,7 @@ export async function onRequestPost({request,env}){
 
     const {email=""}=await request.json();
     const address=String(email).trim().toLowerCase().slice(0,160);
-    if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(address))return json({success:false,message:"E-posta adresini kontrol edin."},400);
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address))return json({success:false,message:"E-posta adresini kontrol edin."},400);
 
     const emailHash=await hash(address);
     if(!env.RESEND_API_KEY||!env.RESEND_FROM_EMAIL){
@@ -55,7 +55,7 @@ export async function onRequestPost({request,env}){
           from:env.RESEND_FROM_EMAIL,
           to:[admin.email],
           subject:"EDWISE yönetici şifre yenileme",
-          text:"Şifrenizi yenilemek için bu bağlantıyı 30 dakika içinde açın:\\n"+link+"\\nBu isteği siz yapmadıysanız bu e-postayı dikkate almayın."
+          text:"Şifrenizi yenilemek için bu bağlantıyı 30 dakika içinde açın:\n"+link+"\nBu isteği siz yapmadıysanız bu e-postayı dikkate almayın."
         })
       });
       try{responseBody=await sent.json()}catch{responseBody={}}
