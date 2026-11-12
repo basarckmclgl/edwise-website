@@ -41,7 +41,6 @@ export async function onRequestPost({ request, env }) {
       return json({ success:false, message:"Analiz kaydı geçersiz." },400);
     }
     await ensureTable(env.DB);
-    await env.DB.prepare("DELETE FROM application_events WHERE datetime(created_at) < datetime('now','-30 days')").run();
     const countryCode = clean(request.cf?.country || request.headers.get("CF-IPCountry") || "",2).toUpperCase().replace(/[^A-Z]/g,"");
     await recordEvent(env.DB,sessionId,eventName,pagePath,countryCode || null);
     return json({ success:true });
@@ -55,8 +54,7 @@ export async function onRequestGet(context) {
   try {
     const DB = context.env.DB;
     await ensureTable(DB);
-    // Analiz kayıtları en fazla 30 gün saklanır.
-    await DB.prepare("DELETE FROM application_events WHERE datetime(created_at) < datetime('now','-30 days')").run();
+    // Eski kayıtlar arşiv doğrulanana kadar korunur; burada otomatik silme yapılmaz.
     const range = new URL(context.request.url).searchParams.get("range") || "30days";
     const rangeDays = range === "day" ? 1 : range === "week" ? 7 : 30;
     const { results } = await DB.prepare(`
