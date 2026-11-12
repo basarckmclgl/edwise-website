@@ -51,7 +51,7 @@ document.addEventListener("click",event=>{
  let target;
  try{target=new URL(link.href,location.href)}catch(e){return}
  if(target.origin===location.origin && /\/pages\/basvuru\.html(?:$|[?#])/.test(target.pathname+target.search+target.hash)){
-  EDWISE_TRACKING.send("apply_click");
+  EDWISE_TRACKING.send("apply_click",true);
  }
 });
 if(location.pathname.endsWith("/pages/basvuru.html")){
