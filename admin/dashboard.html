@@ -1406,6 +1406,12 @@ const otherModules={
 };
 
 const $=id=>document.getElementById(id);
+
+// Blog Yönetimi panelini sekmeler arasında taşımak için kalıcı DOM referansı.
+const blogPanelElement=$("posts");
+const blogPanelSlot=document.createComment("Blog Yönetimi panelinin konumu");
+if(blogPanelElement?.parentNode) blogPanelElement.parentNode.insertBefore(blogPanelSlot,blogPanelElement);
+
 let pages=[];
 let currentRole=null;
 
@@ -1478,18 +1484,12 @@ function showPage(name){
  document.body.dataset.activePage=name;
  if(name==="overview"){loadPublishedContentCounts();if(currentRole==="superadmin"){loadApplicationFunnel();loadSiteReports();}}
 
- // Her ana menü sekmesi yalnızca kendi içeriğini gösterir; diğer sekmelerin panelleri görünmez.
- // Blog Yönetimi panelini diğer sekmelerin DOM ağacından tamamen çıkar.
- const blogPanel=$("posts");
- if(!blogPanel._blogSlot){
-  blogPanel._blogSlot=document.createComment("Blog Yönetimi panelinin yeri");
-  blogPanel.parentNode.insertBefore(blogPanel._blogSlot,blogPanel);
- }
+ // Blog listesi yalnızca Blog Yönetimi seçiliyken DOM içinde bulunur.
  if(name==="posts"){
-  if(!blogPanel.isConnected) blogPanel._blogSlot.parentNode.insertBefore(blogPanel,blogPanel._blogSlot.nextSibling);
-  blogPanel.classList.remove("hidden");
+  if(!blogPanelElement.isConnected) blogPanelSlot.parentNode.insertBefore(blogPanelElement,blogPanelSlot.nextSibling);
+  blogPanelElement.classList.remove("hidden");
  }else{
-  blogPanel.remove();
+  blogPanelElement.remove();
  }
 
  document.querySelectorAll(".content > section").forEach(section=>{
