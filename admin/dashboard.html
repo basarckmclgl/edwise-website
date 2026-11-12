@@ -35,6 +35,7 @@ body.sidebar-collapsed .menu-toggle span:last-child{transform:translateY(-7px) r
 .main{margin-left:245px;width:calc(100% - 245px);min-height:100vh}
 .topbar{height:68px;background:#131322;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 30px}
 .topbar span{font-size:12px;color:var(--muted)}
+.topbar-account{position:relative;display:flex;align-items:center;gap:8px}.account-trigger{display:flex;align-items:center;gap:8px;border:0;background:transparent;color:var(--text);cursor:pointer;padding:5px 8px;border-radius:10px}.account-trigger:hover{background:#29213f}.account-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;background:#29213f;border:2px solid #8055ed}.account-name{display:block;color:var(--text)!important;font-size:12px;font-weight:700;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.account-role{display:block;color:var(--muted)!important;font-size:10px!important}.account-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:50;width:220px;padding:8px;background:#1b1a2b;border:1px solid var(--border);border-radius:12px;box-shadow:0 16px 36px #0008}.account-menu[hidden]{display:none}.account-menu button{display:block;width:100%;text-align:left;padding:11px;border:0;border-radius:8px;background:transparent;color:var(--text);font-size:13px;cursor:pointer}.account-menu button:hover{background:#302448}.account-menu-role{padding:8px 11px;color:var(--muted);font-size:11px;border-bottom:1px solid var(--border);margin-bottom:5px}@media(max-width:650px){.account-name{max-width:80px}.account-avatar{width:32px;height:32px}.topbar-account .logout{display:none}}
 .logout,.primary{background:var(--purple);color:white;border:0;padding:11px 16px;border-radius:8px;cursor:pointer;font-weight:600}
 .content{padding:30px;max-width:1450px;margin:auto}
 .welcome{background:linear-gradient(120deg,#292044,#19192c);border:1px solid #42345f;border-radius:14px;padding:25px;margin-bottom:25px}
@@ -495,14 +496,9 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
 
 <main class="main">
  <header class="topbar">
-  <div style="display:flex;align-items:center;gap:16px"><button type="button" class="menu-toggle" id="menuToggle" aria-label="Menüyü aç veya kapat" aria-expanded="true" title="Menüyü aç/kapat"><span></span><span></span><span></span></button><span>EDWISE / <strong id="breadcrumb">Ana Sayfa</strong></span></div>
-  <div>
-   <span id="username">Yönetici</span>
-   <span id="roleLabel" class="role-label"></span>
-   &nbsp;
-   <button class="logout" id="logout">Güvenli Çıkış ↗</button>
-  </div>
- </header>
+<div style="display:flex;align-items:center;gap:16px"><button type="button" class="menu-toggle" id="menuToggle" aria-label="Menüyü aç veya kapat" aria-expanded="true" title="Menüyü aç/kapat"><span></span><span></span><span></span></button><span>EDWISE / <strong id="breadcrumb">Ana Sayfa</strong></span></div>
+<div class="topbar-account"><button type="button" class="account-trigger" id="accountMenuToggle" aria-expanded="false" aria-controls="accountMenu"><img class="account-avatar" id="topbarAvatar" alt="Profil fotoğrafı"><span><span class="account-name" id="username">Yönetici</span><span class="account-role" id="topbarRole">Yönetici</span></span>▾</button><div class="account-menu" id="accountMenu" hidden><div class="account-menu-role" id="accountMenuIdentity">Yönetici hesabı</div><button type="button" id="accountProfileLink">◉ &nbsp; Profilim</button><button type="button" id="accountLogout">↗ &nbsp; Güvenli Çıkış Yap</button></div><button class="logout" id="logout">Güvenli Çıkış ↗</button></div>
+</header>
 
  <div class="content">
   <section id="overview">
@@ -1655,9 +1651,11 @@ async function checkSession(){
   }
 
   $("username").textContent=name;
+   const roleName=data.admin.role==="superadmin"?"Ana Yönetici":data.admin.role==="content_admin"?"İçerik Editörü":"Yönetici";
+   $("topbarRole").textContent=roleName;$("accountMenuIdentity").textContent=name+" · "+roleName;
    $("profileUsername").value=data.admin.username||"";
    $("profileEmail").value=data.admin.email||"";
-   $("profileRole").value=data.admin.role==="superadmin"?"Ana Yönetici":"İçerik Editörü";
+   $("profileRole").value=roleName;
    $("profileId").value="#"+data.admin.id;
 
   $("welcomeName").textContent=name;
@@ -2003,14 +2001,13 @@ async function loadAnalytics(){
 $("refreshAnalytics")?.addEventListener("click",loadAnalytics);
 window.addEventListener("resize",()=>{if(window._edwiseAnalyticsData?.cloudflare?.daily)drawAnalyticsBars(window._edwiseAnalyticsData.cloudflare.daily);});
 
-$("logout").addEventListener("click",async()=>{
- try{
-  await fetch("/api/logout",{method:"POST",credentials:"same-origin"});
- }finally{
-  location.replace("/admin/");
- }
-});
-
+async function performAdminLogout(){try{await fetch("/api/logout",{method:"POST",credentials:"same-origin"});}finally{location.replace("/admin/");}}
+$("logout").addEventListener("click",performAdminLogout);$("accountLogout").addEventListener("click",performAdminLogout);
+const accountMenuToggle=$("accountMenuToggle"),accountMenu=$("accountMenu");
+accountMenuToggle.addEventListener("click",()=>{const open=accountMenu.hidden;accountMenu.hidden=!open;accountMenuToggle.setAttribute("aria-expanded",open?"true":"false");});
+$("accountProfileLink").addEventListener("click",()=>{accountMenu.hidden=true;accountMenuToggle.setAttribute("aria-expanded","false");showPage("profile");});
+document.addEventListener("click",event=>{if(!event.target.closest(".topbar-account")){accountMenu.hidden=true;accountMenuToggle.setAttribute("aria-expanded","false");}});
+document.addEventListener("keydown",event=>{if(event.key==="Escape"){accountMenu.hidden=true;accountMenuToggle.setAttribute("aria-expanded","false");}});
 let services=[];
 
 function serviceMessage(text,type="error"){
@@ -2797,8 +2794,8 @@ $("siteSettingsForm").addEventListener("submit",async event=>{event.preventDefau
 
 
 
-async function loadAdminProfile(){try{const r=await fetch("/api/profile",{credentials:"same-origin"});if(!r.ok)return;const d=await r.json();if(d.profile?.avatar_data)$("profileAvatarPreview").src=d.profile.avatar_data;if(d.profile?.cover_data)$("profileCoverPreview").style.backgroundImage='url("'+d.profile.cover_data+'")';}catch{}}
-async function saveProfileImage(type,file){const msg=$("profileImageMessage");if(!file)return;if(file.size>1024*1024){msg.textContent="Dosya 1 MB sınırını aşıyor.";return;}const reader=new FileReader();reader.onload=async()=>{try{const r=await fetch("/api/profile",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({type,data:reader.result})});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||"Görsel kaydedilemedi.");if(type==="avatar")$("profileAvatarPreview").src=reader.result;else $("profileCoverPreview").style.backgroundImage='url("'+reader.result+'")';msg.textContent=d.message;}catch(e){msg.textContent=e.message;}};reader.readAsDataURL(file);}
+async function loadAdminProfile(){try{const r=await fetch("/api/profile",{credentials:"same-origin"});if(!r.ok)return;const d=await r.json();if(d.profile?.avatar_data){$("profileAvatarPreview").src=d.profile.avatar_data;$("topbarAvatar").src=d.profile.avatar_data;}if(d.profile?.cover_data)$("profileCoverPreview").style.backgroundImage='url("'+d.profile.cover_data+'")';}catch{}}
+async function saveProfileImage(type,file){const msg=$("profileImageMessage");if(!file)return;if(file.size>1024*1024){msg.textContent="Dosya 1 MB sınırını aşıyor.";return;}const reader=new FileReader();reader.onload=async()=>{try{const r=await fetch("/api/profile",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({type,data:reader.result})});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||"Görsel kaydedilemedi.");if(type==="avatar"){$("profileAvatarPreview").src=reader.result;$("topbarAvatar").src=reader.result;}else $("profileCoverPreview").style.backgroundImage='url("'+reader.result+'")';msg.textContent=d.message;}catch(e){msg.textContent=e.message;}};reader.readAsDataURL(file);}
 $("profileAvatarFile").addEventListener("change",e=>saveProfileImage("avatar",e.target.files[0]));
 $("profileForgotPassword").addEventListener("click",async()=>{const msg=$("profileResetMessage");msg.textContent="İstek gönderiliyor...";try{const r=await fetch("/api/password-reset-request",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:$("profileEmail").value.trim()})});const d=await r.json();msg.textContent=d.message||"İstek tamamlandı.";}catch{msg.textContent="Sunucuya ulaşılamadı.";}});
 setInterval(()=>{if(!$("messages").classList.contains("hidden")){loadChatConversations();if(activeChatId)openAdminChat(activeChatId);}},15000);
