@@ -699,6 +699,22 @@ td{color:#39334b!important;border-color:#eeebf4!important}
 .admin-chat-popup #chatReplyInput{min-width:0}
 .admin-chat-popup #chatCloseConversation{font-size:11px}
 @media(max-width:600px){.admin-chat-popup{right:8px;bottom:82px;width:calc(100vw - 16px);height:min(75vh,620px)}.admin-chat-popup #messages>.grid{grid-template-columns:1fr!important}.admin-chat-popup #chatConversationList{max-height:130px}.admin-chat-popup #chatThread{height:220px!important}}
+
+.admin-chat-popup{position:fixed;right:24px;bottom:98px;z-index:9997;width:min(760px,calc(100vw - 32px));height:min(620px,calc(100vh - 130px));background:var(--panel,#fff);border:1px solid var(--border,#ddd);border-radius:18px;box-shadow:0 18px 60px rgba(20,15,40,.25);overflow:hidden;display:flex;flex-direction:column}
+.admin-chat-popup.hidden{display:none!important}
+.admin-chat-popup-head{height:62px;flex:0 0 62px;padding:0 18px;background:linear-gradient(110deg,#6036c4,#8052e7);color:#fff;display:flex;align-items:center;justify-content:space-between}
+.admin-chat-popup-head strong{display:block;font-size:14px}.admin-chat-popup-head small{display:block;opacity:.8;font-size:11px;margin-top:3px}
+.admin-chat-popup-head button{width:34px;height:34px;border:1px solid rgba(255,255,255,.45);border-radius:50%;background:transparent;color:#fff;font-size:24px;cursor:pointer;line-height:1}
+.admin-chat-popup #messages{display:block!important;min-height:0;flex:1;overflow:auto;padding:14px}
+.admin-chat-popup #messages>.section-head{margin-bottom:10px}
+.admin-chat-popup #messages>.grid{display:grid!important;grid-template-columns:minmax(150px,.72fr) minmax(240px,1.5fr)!important;gap:10px!important;min-height:0}
+.admin-chat-popup #messages>.grid>.panel{min-width:0;padding:12px;overflow:auto}
+.admin-chat-popup #chatConversationList{max-height:430px;overflow:auto}
+.admin-chat-popup #chatThread{height:330px!important;max-height:calc(100vh - 300px);overflow:auto}
+.admin-chat-popup #chatReplyForm{position:sticky;bottom:0;background:var(--panel);padding-top:8px}
+.admin-chat-popup #chatReplyInput{min-width:0}
+.admin-chat-popup #chatCloseConversation{font-size:11px}
+@media(max-width:600px){.admin-chat-popup{right:8px;bottom:82px;width:calc(100vw - 16px);height:min(75vh,620px)}.admin-chat-popup #messages>.grid{grid-template-columns:1fr!important}.admin-chat-popup #chatConversationList{max-height:130px}.admin-chat-popup #chatThread{height:220px!important}}
 </style>
 </head>
 <body>
@@ -1952,9 +1968,7 @@ function applicationExportTable(){return $("applicationsTable")?.closest("table"
 function applicationExportName(){return "EDWISE-Basvuru-Kayitlari";}
 function exportApplicationsDoc(){
  const table=applicationExportTable();if(!table){alert("Başvuru tablosu bulunamadı.");return;}
-  const html='<!doctype html><html><head><meta charset="utf-8"><title>EDWISE Başvuru Kayıtları</title><style>body{font-family:Arial,sans-serif;color:#222}h1{color:#291447}table{border-collapse:collapse;width:100%;font-size:9pt}th,td{border:1px solid #aaa;padding:6px;text-align:left}th{background:#eee}
-
-</style></head><body><h1>EDWISE Başvuru Kayıtları</h1><p>Rapor tarihi: '+new Date().toLocaleDateString("tr-TR")+'</p>'+table.outerHTML+'</body></html>';
+  const html='<!doctype html><html><head><meta charset="utf-8"><title>EDWISE Başvuru Kayıtları</title><style>body{font-family:Arial,sans-serif;color:#222}h1{color:#291447}table{border-collapse:collapse;width:100%;font-size:9pt}th,td{border:1px solid #aaa;padding:6px;text-align:left}th{background:#eee}</style></head><body><h1>EDWISE Başvuru Kayıtları</h1><p>Rapor tarihi: '+new Date().toLocaleDateString("tr-TR")+'</p>'+table.outerHTML+'</body></html>';
   const blob=new Blob(["\ufeff",html],{type:"application/msword"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=applicationExportName()+".doc";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 async function exportApplicationsXlsx(){
