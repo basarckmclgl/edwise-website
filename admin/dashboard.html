@@ -1239,7 +1239,7 @@ function renderAnalytics(data){
  $("analyticsCountryTable").innerHTML=countries.map(x=>'<tr><td>'+escapeHtml(x.country)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="2">Henüz ülke verisi yok.</td></tr>';
  $("analyticsPagesTable").innerHTML=(cf.pages||[]).map(x=>'<tr><td>'+escapeHtml(x.path)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="2">'+(cf.pathWarning?escapeHtml(cf.pathWarning):"Sayfa verisi bulunamadı.")+'</td></tr>';
 }
-async async async function loadSiteReports(){
+async function loadSiteReports(){
  const message=$("siteReportsMessage"),table=$("siteReportsTable");
  if(!table)return;
  if(message){message.className="message";message.textContent="Site raporları getiriliyor...";}
