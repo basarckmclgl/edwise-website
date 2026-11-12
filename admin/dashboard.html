@@ -1337,7 +1337,7 @@ function escapeHtml(value){
  return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 
-async function loadPublishedContentCounts(){
+async async function loadPublishedContentCounts(){
  const ids=currentRole==="superadmin"?["countPages","countServices","countApplications"]:["countPages","countServices"];
  ids.forEach(id=>{const el=$(id);if(el)el.textContent="…";});
  try{
