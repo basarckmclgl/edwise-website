@@ -11,7 +11,8 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-seri
 .sidebar{width:245px;height:100vh;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#65518f #131322;background:#131322;border-right:1px solid var(--border);padding:23px 15px;position:fixed;inset:0 auto 0 0;z-index:5}
 .sidebar::-webkit-scrollbar{width:8px}.sidebar::-webkit-scrollbar-track{background:#131322}.sidebar::-webkit-scrollbar-thumb{background:#65518f;border-radius:8px}.sidebar::-webkit-scrollbar-thumb:hover{background:#9475d8}
 .nav-sub{margin-left:12px;width:calc(100% - 12px);padding-left:10px;border-left:1px solid #51436f;border-radius:0 8px 8px 0}.nav-sub .ico{font-size:14px}
-.logo{font-size:24px;font-weight:900;letter-spacing:3px;color:var(--light);padding:5px 12px 30px}
+.logo{display:block;width:100%;text-align:left;border:0;background:transparent;cursor:pointer}.logo img{display:block;max-width:150px;max-height:42px;object-fit:contain;object-position:left center;margin:0 0 5px}.logo span{display:block;font-size:24px;font-weight:900;letter-spacing:3px;color:var(--light)}.logo small{display:block;font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:6px;font-weight:400}
+.logo{padding:5px 12px 30px}
 .logo small{display:block;font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:6px;font-weight:400}
 .menu-label{font-size:10px;color:#77758f;letter-spacing:1.5px;padding:15px 12px 8px}
 .nav{display:flex;gap:12px;align-items:center;padding:12px;color:var(--muted);text-decoration:none;border:0;background:none;width:100%;text-align:left;border-radius:8px;cursor:pointer;font-size:13px;margin:3px 0}
@@ -22,7 +23,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-seri
 body.sidebar-collapsed .sidebar{width:74px;padding:18px 9px}
 body.sidebar-collapsed .main{margin-left:74px;width:calc(100% - 74px)}
 body.sidebar-collapsed .sidebar .logo{font-size:0;padding:7px 0 25px;text-align:center}
-body.sidebar-collapsed .sidebar .logo:before{content:"E";font-size:24px}
+body.sidebar-collapsed .sidebar .logo img{display:none!important}body.sidebar-collapsed .sidebar .logo span{font-size:0}body.sidebar-collapsed .sidebar .logo span:before{content:"E";font-size:24px}
 body.sidebar-collapsed .sidebar .logo small,body.sidebar-collapsed .sidebar .menu-label,body.sidebar-collapsed .sidebar .nav span:not(.ico){display:none}
 body.sidebar-collapsed .sidebar .nav{justify-content:center;padding:13px 5px}
 body.sidebar-collapsed .sidebar .nav .ico{width:auto;font-size:19px}
@@ -177,12 +178,18 @@ html.panel-reduced-motion *,html.panel-reduced-motion *::before,html.panel-reduc
 html.panel-underlined-links a{text-decoration:underline!important;text-underline-offset:3px}
 
 @media print{body.printing-reports *{visibility:hidden!important}body.printing-reports #reports,body.printing-reports #reports *{visibility:visible!important}body.printing-reports #reports{display:block!important;position:absolute;left:0;top:0;width:100%;padding:0;margin:0}body.printing-reports #reports .section-head .actions,body.printing-reports #reports #siteReportsMessage{display:none!important}body.printing-reports #reports .panel{break-inside:avoid;background:#fff!important;color:#111!important;box-shadow:none!important;border:0!important}body.printing-reports #reports table{width:100%!important;min-width:0!important;font-size:8pt!important}body.printing-reports #reports th,body.printing-reports #reports td{color:#111!important;border:1px solid #999!important;padding:4px!important}body.printing-reports #reports .table-wrap{overflow:visible!important}}
+
+.report-export{position:relative;display:inline-block}
+.report-export-menu{position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:220px;padding:6px;background:#201d32;border:1px solid var(--border);border-radius:9px;box-shadow:0 12px 30px #0008}
+.report-export-menu button{display:block;width:100%;padding:10px 12px;text-align:left;color:var(--text);background:transparent;border:0;border-radius:6px;cursor:pointer}
+.report-export-menu button:hover{background:#34294f}
+@media print{body.printing-applications *{visibility:hidden!important}body.printing-applications #reports,body.printing-applications #reports *{visibility:visible!important}body.printing-applications #reports{display:block!important;position:absolute;left:0;top:0;width:100%;margin:0;padding:0}body.printing-applications #reports>.section-head,body.printing-applications #reports>#siteReportsMessage,body.printing-applications #reports>.panel:not(:has(#applicationsTable)),body.printing-applications #reports>p{display:none!important}body.printing-applications #reports .panel:has(#applicationsTable){display:block!important;position:static!important;break-inside:auto;background:#fff!important;color:#111!important;border:0!important;box-shadow:none!important}body.printing-applications #reports table{width:100%!important;min-width:0!important;font-size:8pt!important}body.printing-applications #reports th,body.printing-applications #reports td{color:#111!important;background:#fff!important;border:1px solid #999!important;padding:4px!important}body.printing-applications #reports .table-wrap{overflow:visible!important}}
 </style>
 </head>
 <body>
 
 <aside class="sidebar">
- <div class="logo" id="dashboardHomeLogo" role="button" tabindex="0" title="Genel Bakış">EDWISE<small>CONTENT MANAGEMENT SYSTEM</small></div>
+ <button class="logo" id="dashboardHomeLogo" type="button" title="Genel Bakış" aria-label="EDWISE — Genel Bakış"><img src="/assets/images/logo.png" alt="EDWISE" onerror="this.style.display='none'"><span>EDWISE</span><small>CONTENT MANAGEMENT SYSTEM</small></button>
  <div class="menu-label">ANA MENÜ</div>
  <button class="nav active" data-page="overview"><span class="ico">▦</span><span>Genel Bakış</span></button>
  <button class="nav" data-page="reports" data-superadmin><span class="ico">▤</span><span>Raporlar</span></button>
@@ -275,7 +282,7 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
   </section>
 
   <section id="reports" class="hidden" data-superadmin>
-   <div class="section-head"><div><h2>Site Raporları</h2><p>Son 30 günlük sayfa görüntüleme, ziyaretçi oturumu ve kaydırma derinliği.</p></div><div class="actions"><button class="btn" id="refreshSiteReports">↻ Raporları Yenile</button><button class="btn" type="button" id="exportReportsXlsx">Excel (.xlsx)</button><button class="btn" type="button" id="exportReportsDoc">Word (.doc)</button><button class="primary" type="button" id="exportReportsPdf">PDF</button></div></div>
+   <div class="section-head"><div><h2>Site Raporları</h2><p>Son 30 günlük sayfa görüntüleme, ziyaretçi oturumu ve kaydırma derinliği.</p></div><div class="actions"><button class="btn" id="refreshSiteReports">↻ Raporları Yenile</button><div class="report-export" id="applicationExport"><button class="primary" type="button" id="applicationExportToggle" aria-haspopup="true" aria-expanded="false">Başvuru Kayıtlarını Raporla <span aria-hidden="true">▾</span></button><div class="report-export-menu hidden" id="applicationExportMenu"><button type="button" data-export-applications="pdf">PDF olarak indir</button><button type="button" data-export-applications="doc">Word (.doc) olarak indir</button><button type="button" data-export-applications="xlsx">Excel (.xlsx) olarak indir</button></div></div></div></div>
    <div id="siteReportsMessage" class="message">Raporlar yükleniyor...</div>
    <div class="panel"><h3>Sayfa İnceleme Raporu</h3><div class="table-wrap"><table style="min-width:760px"><thead><tr><th>Sayfa</th><th>Görüntülenme</th><th>Ziyaretçi oturumu</th><th>%25 kaydırma</th><th>%50 kaydırma</th><th>%75 kaydırma</th><th>%90 kaydırma</th></tr></thead><tbody id="siteReportsTable"><tr><td colspan="7">Veriler bekleniyor...</td></tr></tbody></table></div></div>
    <div class="panel"><h3>Başvuru Dönüşüm Raporu</h3><p class="muted">Başvuru hunisi ve e-posta / WhatsApp hareketleri.</p><div class="table-wrap"><table style="min-width:1100px;table-layout:fixed"><thead id="reportFunnelHead"><tr><th>Ölçüm</th></tr></thead><tbody id="reportFunnelTable"><tr><td colspan="3">Veriler bekleniyor...</td></tr></tbody></table></div></div>
@@ -1267,36 +1274,30 @@ async function loadSiteReports(){
  }catch(error){if(message){message.className="message error";message.textContent=error.message;}table.innerHTML='<tr><td colspan="7">Raporlar yüklenemedi.</td></tr>';}
 }
 
-function reportExportTables(){
- const ids=["siteReportsTable","reportFunnelTable","applicationsTable"];
- return ids.map(id=>{const body=$(id);return body?.closest("table")||null;}).filter(Boolean);
+function applicationExportTable(){return $("applicationsTable")?.closest("table")||null;}
+function applicationExportName(){return "EDWISE-Basvuru-Kayitlari";}
+function exportApplicationsDoc(){
+ const table=applicationExportTable();if(!table){alert("Başvuru tablosu bulunamadı.");return;}
+ const html='<!doctype html><html><head><meta charset="utf-8"><title>EDWISE Başvuru Kayıtları</title><style>body{font-family:Arial,sans-serif;color:#222}h1{color:#291447}table{border-collapse:collapse;width:100%;font-size:9pt}th,td{border:1px solid #aaa;padding:6px;text-align:left}th{background:#eee}</style></head><body><h1>EDWISE Başvuru Kayıtları</h1><p>Rapor tarihi: '+new Date().toLocaleString("tr-TR")+'</p>'+table.outerHTML+'</body></html>';
+ const blob=new Blob(["\ufeff",html],{type:"application/msword"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=applicationExportName()+".doc";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-function exportReportsDoc(){
- const tables=reportExportTables();
- const html='<!doctype html><html><head><meta charset="utf-8"><title>EDWISE Site Raporları</title><style>body{font-family:Arial,sans-serif;color:#222}h1,h2{color:#291447}table{border-collapse:collapse;width:100%;margin:12px 0 28px;font-size:10pt}th,td{border:1px solid #aaa;padding:6px;text-align:left}th{background:#eee}</style></head><body><h1>EDWISE Site Raporları</h1><p>Rapor tarihi: '+new Date().toLocaleString("tr-TR")+'</p>'+tables.map((table,i)=>'<h2>'+["Sayfa İnceleme Raporu","Başvuru Dönüşüm Raporu","Başvuru Kayıtları"][i]+'</h2>'+table.outerHTML).join("")+'</body></html>';
- const blob=new Blob(["\ufeff",html],{type:"application/msword"});
- const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="EDWISE-Site-Raporlari.doc";a.click();URL.revokeObjectURL(url);
+async function exportApplicationsXlsx(){
+ const table=applicationExportTable();if(!table)throw new Error("Başvuru tablosu bulunamadı.");
+ if(!window.XLSX)await new Promise((resolve,reject)=>{const script=document.createElement("script");script.src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";script.onload=resolve;script.onerror=()=>reject(new Error("Excel aracı yüklenemedi. İnternet bağlantısını kontrol edin."));document.head.appendChild(script);});
+ const wb=XLSX.utils.book_new();const ws=XLSX.utils.table_to_sheet(table);XLSX.utils.book_append_sheet(wb,ws,"Başvuru Kayıtları");XLSX.writeFile(wb,applicationExportName()+".xlsx");
 }
-async function exportReportsXlsx(){
- const tables=reportExportTables();
- if(!tables.length)throw new Error("Dışa aktarılacak rapor tablosu bulunamadı.");
- if(!window.XLSX){
-  await new Promise((resolve,reject)=>{const script=document.createElement("script");script.src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";script.onload=resolve;script.onerror=()=>reject(new Error("Excel dışa aktarma kütüphanesi yüklenemedi."));document.head.appendChild(script);});
- }
- const workbook=XLSX.utils.book_new();
- tables.forEach((table,i)=>{const sheet=XLSX.utils.table_to_sheet(table);XLSX.utils.book_append_sheet(workbook,sheet,["Sayfa İnceleme","Başvuru Dönüşüm","Başvuru Kayıtları"][i]);});
- XLSX.writeFile(workbook,"EDWISE-Site-Raporlari.xlsx");
+function exportApplicationsPdf(){
+ const section=$("reports"),panel=$("applicationsTable")?.closest(".panel");if(!section||!panel){alert("Başvuru tablosu bulunamadı.");return;}
+ document.body.classList.add("printing-applications");window.print();setTimeout(()=>document.body.classList.remove("printing-applications"),1200);
 }
-function exportReportsPdf(){
- const section=$("reports");if(!section)return;
- document.body.classList.add("printing-reports");
- window.print();
- setTimeout(()=>document.body.classList.remove("printing-reports"),1000);
-}
-$("exportReportsDoc")?.addEventListener("click",exportReportsDoc);
-$("exportReportsXlsx")?.addEventListener("click",()=>exportReportsXlsx().catch(error=>alert(error.message)));
-$("exportReportsPdf")?.addEventListener("click",exportReportsPdf);
-
+const exportToggle=$("applicationExportToggle"),exportMenu=$("applicationExportMenu");
+exportToggle?.addEventListener("click",()=>{const open=exportMenu.classList.toggle("hidden")===false;exportToggle.setAttribute("aria-expanded",String(open));});
+document.querySelectorAll("[data-export-applications]").forEach(button=>button.addEventListener("click",async()=>{
+ const type=button.dataset.exportApplications;exportMenu?.classList.add("hidden");exportToggle?.setAttribute("aria-expanded","false");
+ try{if(type==="pdf")exportApplicationsPdf();if(type==="doc")exportApplicationsDoc();if(type==="xlsx")await exportApplicationsXlsx();}
+ catch(error){alert(error.message||"Dosya oluşturulamadı.");}
+}));
+document.addEventListener("click",event=>{if(!event.target.closest("#applicationExport")){exportMenu?.classList.add("hidden");exportToggle?.setAttribute("aria-expanded","false");}});
 $("refreshSiteReports")?.addEventListener("click",loadSiteReports);
 $("refreshOverviewReports")?.addEventListener("click",loadSiteReports);
 
