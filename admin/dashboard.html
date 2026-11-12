@@ -1947,14 +1947,14 @@ function renderGoogleAnalytics(data){
   ["ga4ActiveUsers","ga4Sessions","ga4PageViews","ga4Events"].forEach(id=>$(id).textContent="—");
   return;
  }
- const t=ga.totals||{};msg.className="message success";msg.textContent="Google Analytics verileri alındı. Dönem: "+data.period.startDate+" – "+data.period.endDate;
+ const t=ga.totals||{};msg.className=ga.realtimeError?"message":"message success";msg.textContent="Google Analytics verileri alındı. Dönem: "+data.period.startDate+" – "+data.period.endDate+(ga.realtimeError?" Gerçek zamanlı veri: "+ga.realtimeError:"");
  $("ga4ActiveUsers").textContent=fmt(t.activeUsers);$("ga4Sessions").textContent=fmt(t.sessions);$("ga4PageViews").textContent=fmt(t.pageViews);$("ga4Events").textContent=fmt(t.eventCount);
  $("ga4Pages").innerHTML=(ga.pages||[]).map(x=>"<tr><td>"+escapeHtml(x.path)+"</td><td>"+fmt(x.pageViews)+"</td><td>"+fmt(x.activeUsers)+"</td></tr>").join("")||'<tr><td colspan="3">Henüz veri yok.</td></tr>';
  $("ga4Sources").innerHTML=(ga.sources||[]).map(x=>"<tr><td>"+escapeHtml(x.source)+"</td><td>"+fmt(x.sessions)+"</td><td>"+fmt(x.activeUsers)+"</td></tr>").join("")||'<tr><td colspan="3">Henüz veri yok.</td></tr>';
 }
 function renderAnalytics(data){
  window._edwiseAnalyticsData=data;renderGoogleAnalytics(data);const ga=data.googleAnalytics||{},gt=ga.totals||{};const cf=data.cloudflare||{},t=cf.totals||{};
- $("homeGaUsers").textContent=ga.configured?analyticsNumber(gt.activeUsers):"—";$("homeGaSessions").textContent=ga.configured?analyticsNumber(gt.sessions):"—";$("homeGaViews").textContent=ga.configured?analyticsNumber(gt.pageViews):"—";$("homeGaRealtime").textContent=ga.configured?analyticsNumber(ga.realtime?.activeUsers):"—";
+ $("homeGaUsers").textContent=ga.configured?analyticsNumber(gt.activeUsers):"—";$("homeGaSessions").textContent=ga.configured?analyticsNumber(gt.sessions):"—";$("homeGaViews").textContent=ga.configured?analyticsNumber(gt.pageViews):"—";$("homeGaRealtime").textContent=ga.configured&&ga.realtime?analyticsNumber(ga.realtime.activeUsers):"—";
  $("cfUnique").textContent=cf.configured?analyticsNumber(t.dailyUniqueIpTotal):"—";
  $("cfRequests").textContent=cf.configured?analyticsNumber(t.requests):"—";
  $("cfCountryCount").textContent=cf.configured?analyticsNumber((cf.countries||[]).length):"—";
