@@ -82,7 +82,6 @@ td{color:#e8e5f3}
 @media(max-width:950px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:650px){.sidebar{width:65px;padding:15px 7px}.logo{font-size:14px;padding:5px}.logo small,.menu-label,.nav span:last-child{display:none}.nav{justify-content:center;padding:13px 4px}.main{margin-left:65px;width:calc(100% - 65px)}.content{padding:16px 12px}.topbar{padding:0 12px}.grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
 
-/* Word benzeri blog editörü */
 .editor-tool{background:#242039;color:#eee8ff;border:1px solid #45405f;border-radius:6px;padding:8px 10px;cursor:pointer;font-size:12px}
 .editor-tool:hover,.editor-tool:focus{border-color:var(--light);background:#352953}
 .danger-tool{color:#ff9da8;border-color:#64333f}
@@ -1544,7 +1543,6 @@ const fixedSitePages=[
  {slug:"hakkimizda",title:"Hakkımızda",url:"/pages/hakkimizda.html",kind:"Kurumsal sayfa"},
  {slug:"basvuru",title:"Başvuru",url:"/pages/basvuru.html",kind:"Form sayfası"},
  {slug:"iletisim",title:"İletişim ve Konum",url:"/pages/iletisim.html",kind:"İletişim sayfası"},
- {slug:"edwise-rehber",title:"EDWISE Rehber",url:"/edwise-rehber.html",kind:"Blog liste sayfası"},
  {slug:"egitim-danismanligi",title:"Eğitim Danışmanlığı",url:"/pages/egitim-danismanligi.html",kind:"Hizmet detay sayfası"},
  {slug:"coaching-mentoring",title:"Coaching & Mentoring",url:"/pages/coaching-mentoring.html",kind:"Hizmet detay sayfası"},
  {slug:"ielts",title:"IELTS",url:"/pages/ielts.html",kind:"Eğitim sayfası"},
@@ -1705,10 +1703,6 @@ async function loadMenuSettings(){
   const saved=Array.isArray(settingsData.menu)?settingsData.menu:null;
   const defaults=[
    {key:"home",label:"Ana Sayfa",url:"/",visible:true},
-   {key:"services",label:"Hizmetlerimiz",url:"/pages/hizmetlerimiz.html",visible:true},
-   {key:"about",label:"Hakkımızda",url:"/pages/hakkimizda.html",visible:true},
-   {key:"guide",label:"EDWISE Rehber",url:"/edwise-rehber.html",visible:true},
-   {key:"apply",label:"Başvur",url:"/pages/basvuru.html",visible:true},
    {key:"contact",label:"İletişim ve Konum",url:"/pages/iletisim.html",visible:true},
    {key:"contact-cta",label:"Bize Ulaşın · WhatsApp",url:"/pages/iletisim.html",visible:true}
   ];
@@ -2580,7 +2574,7 @@ loadAdminProfile();
 checkSession();
 </script>
 <script src="/admin/assets/js/static-page-imports.js"></script>
-<script src="/admin/assets/js/page-builder.js?v=blog-only-20261112">
+<script src="/admin/assets/js/page-builder.js?v=blog-removed-20261112">
 const globalAdminSearch=document.getElementById("adminGlobalSearch");
 const globalAdminResults=document.getElementById("adminGlobalSearchResults");
 globalAdminSearch?.addEventListener("input",()=>{
