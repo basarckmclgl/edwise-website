@@ -8,7 +8,9 @@
 :root{--bg:#0d0d18;--panel:#171727;--border:#30304b;--purple:#8055ed;--light:#a78bfa;--text:#f5f3ff;--muted:#aaa7c0;--green:#42c99a;--red:#f07887}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif;display:flex;min-height:100vh}
-.sidebar{width:245px;background:#131322;border-right:1px solid var(--border);padding:23px 15px;position:fixed;inset:0 auto 0 0;z-index:5}
+.sidebar{width:245px;height:100vh;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#65518f #131322;background:#131322;border-right:1px solid var(--border);padding:23px 15px;position:fixed;inset:0 auto 0 0;z-index:5}
+.sidebar::-webkit-scrollbar{width:8px}.sidebar::-webkit-scrollbar-track{background:#131322}.sidebar::-webkit-scrollbar-thumb{background:#65518f;border-radius:8px}.sidebar::-webkit-scrollbar-thumb:hover{background:#9475d8}
+.nav-sub{margin-left:12px;width:calc(100% - 12px);padding-left:10px;border-left:1px solid #51436f;border-radius:0 8px 8px 0}.nav-sub .ico{font-size:14px}
 .logo{font-size:24px;font-weight:900;letter-spacing:3px;color:var(--light);padding:5px 12px 30px}
 .logo small{display:block;font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:6px;font-weight:400}
 .menu-label{font-size:10px;color:#77758f;letter-spacing:1.5px;padding:15px 12px 8px}
@@ -170,8 +172,9 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
  <div class="menu-label">ANA MENÜ</div>
  <button class="nav active" data-page="overview"><span class="ico">▦</span><span>Genel Bakış</span></button>
  <button class="nav" data-page="reports" data-superadmin><span class="ico">▤</span><span>Raporlar</span></button>
- <button class="nav" data-page="designcenter"><span class="ico">▣</span><span>Site Tasarım Merkezi</span></button>
+ <div class="menu-label">AYARLAR</div>
  <button class="nav" data-page="sitesettings" data-superadmin><span class="ico">⚙</span><span>Site Ayarları</span></button>
+ <button class="nav nav-sub" data-page="designcenter"><span class="ico">▣</span><span>Site Tasarım Merkezi</span></button>
 
  <div class="menu-label">İÇERİK YÖNETİMİ</div>
  <button class="nav" data-page="pages"><span class="ico">▤</span><span>Sayfa Yönetimi</span></button>
