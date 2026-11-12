@@ -772,7 +772,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
    <section class="analytics-wrap" id="analyticsOverview" data-superadmin>
     <div class="section-head">
      <div><h2>Birleşik Ziyaretçi Analizi</h2><p>Son 30 günlük trafik ve ziyaretçi verileri</p></div>
-     <div class="actions" style="margin:0"><button class="btn" id="refreshAnalytics">↻ Verileri Yenile</button><span id="analyticsUpdated" class="muted">Henüz yüklenmedi</span></div>
+     <div class="actions" style="margin:0"><span id="analyticsUpdated" class="muted">Otomatik güncelleme etkin</span></div>
     </div>
     <div id="analyticsMessage" class="message">Cloudflare verileri yükleniyor...</div>
     <div class="grid analytics-stats">
@@ -1384,7 +1384,7 @@ menuToggle?.addEventListener("click",()=>{
 function showPage(name){
  if(!canAccess(name)) name="overview";
  document.body.dataset.activePage=name;
- if(name==="overview"){loadPublishedContentCounts();if(currentRole==="superadmin"){loadApplicationFunnel();loadSiteReports();}}
+ if(name==="overview"){loadPublishedContentCounts();if(currentRole==="superadmin"){loadApplicationFunnel();loadSiteReports();loadAnalytics();}}
 
  document.querySelectorAll(".content > section").forEach(section=>{
   section.classList.toggle("hidden",section.id!==name);
@@ -2181,9 +2181,8 @@ async function loadAnalytics(){
  try{const response=await fetch("/api/analytics",{credentials:"same-origin",cache:"no-store",signal:AbortSignal.timeout(15000)});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||"Cloudflare analiz verileri alınamadı.");renderAnalytics(data);}
  catch(error){message.className="message error";message.textContent=error.name==="TimeoutError"||error.name==="AbortError"?"Cloudflare analiz isteği zaman aşımına uğradı. Diğer yönetim menülerini kullanmaya devam edebilirsiniz.":(error.message||"Cloudflare analizleri yüklenemedi.");}
 }
-$("refreshAnalytics")?.addEventListener("click",loadAnalytics);
 let analyticsAutoRefresh=null;
-function startAnalyticsAutoRefresh(){if(analyticsAutoRefresh)clearInterval(analyticsAutoRefresh);analyticsAutoRefresh=setInterval(()=>{if(!document.hidden&&$("overview")&&!$("overview").classList.contains("hidden"))loadAnalytics();},60000);}
+function startAnalyticsAutoRefresh(){if(analyticsAutoRefresh)clearInterval(analyticsAutoRefresh);analyticsAutoRefresh=setInterval(()=>{if(!document.hidden&&$("overview")&&!$("overview").classList.contains("hidden"))loadAnalytics();},30000);}
 startAnalyticsAutoRefresh();
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&$("overview")&&!$("overview").classList.contains("hidden"))loadAnalytics();});
 window.addEventListener("resize",()=>{if(window._edwiseAnalyticsData?.cloudflare?.daily)drawAnalyticsBars(window._edwiseAnalyticsData.cloudflare.daily);});
