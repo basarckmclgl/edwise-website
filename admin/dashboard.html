@@ -684,17 +684,18 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
     <button class="btn" id="refreshApplicationFunnel">↻ Takip Çizelgesini Yenile</button>
    </div>
    <div id="applicationFunnelMessage" class="message">Takip verileri yükleniyor...</div>
-   <div class="table-wrap" style="overflow-x:auto">
-    <table style="min-width:1500px;table-layout:fixed">
+   <div class="table-wrap" style="width:100%;overflow:visible">
+    <table style="width:100%;min-width:0;table-layout:fixed;font-size:11px">
      <thead id="applicationFunnelHead">
-      <tr><th style="min-width:170px">Ölçüm</th><th>Başvur butonu</th><th>Form açıldı</th><th>Form başladı</th><th>Gönderim denendi</th><th>Panele kaydedildi</th><th>E-posta gönderildi</th><th>E-posta başarısız</th><th>WhatsApp açıldı</th><th>Form terk edildi</th><th>Siteye dönüldü</th></tr>
+      <tr>
+       <th style="width:9%">Ölçüm</th><th>Başvur<br>butonu</th><th>Form<br>açıldı</th><th>Form<br>başladı</th><th>Gönderim<br>denendi</th><th>Panele<br>kaydedildi</th><th>E-posta<br>gönderildi</th><th>E-posta<br>başarısız</th><th>WhatsApp<br>açıldı</th><th>Form<br>terk edildi</th><th>Siteye<br>dönüldü</th>
+      </tr>
      </thead>
      <tbody id="applicationFunnelTable">
       <tr><td colspan="11">Takip verileri bekleniyor...</td></tr>
      </tbody>
     </table>
    </div>
-   <p class="muted" style="margin-top:12px">WhatsApp ekranının açılması mesajın gönderildiğini kanıtlamaz. Sayfadan ayrılma sayısı, analiz izni veren ve formu doldurmaya başlayan oturumlarla sınırlıdır.</p>
   </div>
   <div class="actions"><button class="btn" id="refreshApplications">↻ Başvuruları Yenile</button><span id="applicationsMessage" class="muted"></span></div>
   <div class="table-wrap"><table><thead><tr><th>Tarih</th><th>Ad soyad</th><th>Telefon</th><th>E-posta</th><th>Program</th><th>Eğitim tercihi</th><th>Uygun zaman</th><th>Açıklama</th><th>Durum</th></tr></thead><tbody id="applicationsTable"><tr><td colspan="9">Başvurular yükleniyor...</td></tr></tbody></table></div>
@@ -1179,30 +1180,28 @@ async function loadApplicationFunnel(){
   const data=await response.json();
   if(!response.ok||!data.success)throw new Error(data.message||"Başvuru takip verileri alınamadı.");
   const stages=[
-   ["apply_click","Başvur butonu","Başvuru bağlantısına tıklandı."],
-   ["form_view","Form açıldı","Başvuru sayfası görüntülendi."],
-   ["form_start","Form başladı","En az bir alan dolduruldu."],
-   ["submit_attempt","Gönderim denendi","Başvuru gönderimi denendi."],
-   ["application_saved","Panele kaydedildi","Kayıt veritabanına yazıldı."],
-   ["email_sent","E-posta gönderildi","Bildirim e-postası gönderildi."],
-   ["email_failed","E-posta başarısız","E-posta gönderilemedi veya servis etkin değildi."],
-   ["whatsapp_redirect","WhatsApp açıldı","WhatsApp bağlantısı açılmaya çalışıldı."],
-   ["form_abandon","Form terk edildi","Form başlatıldı ancak gönderilmeden ayrılındı."],
-   ["site_return","Siteye dönüldü","WhatsApp yönlendirmesinden sonra siteye dönüldü."]
+   ["apply_click","Başvur butonu"],
+   ["form_view","Form açıldı"],
+   ["form_start","Form başladı"],
+   ["submit_attempt","Gönderim denendi"],
+   ["application_saved","Panele kaydedildi"],
+   ["email_sent","E-posta gönderildi"],
+   ["email_failed","E-posta başarısız"],
+   ["whatsapp_redirect","WhatsApp açıldı"],
+   ["form_abandon","Form terk edildi"],
+   ["site_return","Siteye dönüldü"]
   ];
   const countRow=stages.map(([key])=>{
    const item=data.totals?.[key]||{count:0,sessions:0};
-   return '<td style="text-align:center;font-weight:700">'+Number(item.count||0).toLocaleString("tr-TR")+'</td>';
+   return '<td style="text-align:center;font-weight:700;overflow-wrap:anywhere">'+Number(item.count||0).toLocaleString("tr-TR")+'</td>';
   }).join("");
   const sessionRow=stages.map(([key])=>{
    const item=data.totals?.[key]||{count:0,sessions:0};
-   return '<td style="text-align:center">'+Number(item.sessions||0).toLocaleString("tr-TR")+'</td>';
+   return '<td style="text-align:center;overflow-wrap:anywhere">'+Number(item.sessions||0).toLocaleString("tr-TR")+'</td>';
   }).join("");
-  const descriptionRow=stages.map(([, ,description])=>'<td style="white-space:normal;min-width:130px;font-size:12px;line-height:1.45">'+escapeHtml(description)+'</td>').join("");
-  table.innerHTML='<tr><th style="text-align:left">İşlem sayısı</th>'+countRow+'</tr>'+
-   '<tr><th style="text-align:left">Oturum sayısı</th>'+sessionRow+'</tr>'+
-   '<tr><th style="text-align:left">Açıklama</th>'+descriptionRow+'</tr>';
-  message.className="message success";message.textContent="Son 30 günlük yatay takip çizelgesi güncellendi.";
+  table.innerHTML='<tr><th style="text-align:left">İşlem</th>'+countRow+'</tr>'+
+   '<tr><th style="text-align:left">Oturum</th>'+sessionRow+'</tr>';
+  message.className="message success";message.textContent="Son 30 günlük başvuru hareketleri güncellendi.";
  }catch(error){
   table.innerHTML='<tr><td colspan="11">Takip verileri yüklenemedi.</td></tr>';
   message.className="message error";message.textContent=error.message;
