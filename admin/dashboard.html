@@ -567,6 +567,21 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
 
   <section id="reports" class="hidden" data-superadmin>
    <div class="section-head"><div><h2>Site Raporları</h2><p>Son 30 günlük sayfa görüntüleme, ziyaretçi oturumu ve kaydırma derinliği.</p></div><div class="actions"><button class="btn" id="refreshSiteReports">↻ Raporları Yenile</button><div class="report-export" id="applicationExport"><button class="primary" type="button" id="applicationExportToggle" aria-haspopup="true" aria-expanded="false">Başvuru Kayıtlarını Raporla <span aria-hidden="true">▾</span></button><div class="report-export-menu hidden" id="applicationExportMenu"><button type="button" data-export-applications="pdf">PDF olarak indir</button><button type="button" data-export-applications="doc">Word (.doc) olarak indir</button><button type="button" data-export-applications="xlsx">Excel (.xlsx) olarak indir</button></div></div></div></div>
+   <section class="analytics-wrap" id="cloudflareReports" style="margin:0 0 18px">
+    <div class="section-head"><div><h2>Cloudflare Trafik Raporu</h2><p>Cloudflare ağından geçen gerçek HTTP istekleri · Son 30 gün</p></div><button class="btn" type="button" id="refreshCloudflareReports">↻ Cloudflare verilerini yenile</button></div>
+    <div id="cloudflareReportsMessage" class="message">Cloudflare raporu yükleniyor...</div>
+    <div class="grid analytics-stats">
+     <div class="stat"><span>Toplam HTTP isteği</span><h2 id="reportCfRequests">—</h2><p>Sayfa, görsel, dosya ve diğer istekler</p></div>
+     <div class="stat"><span>Günlük tekil IP toplamı</span><h2 id="reportCfUnique">—</h2><p>Günlük tekil değerlerin toplamı; 30 günlük tekil kişi değildir</p></div>
+     <div class="stat"><span>Trafik alınan ülke/bölge</span><h2 id="reportCfCountries">—</h2><p>Cloudflare ülke kırılımı</p></div>
+    </div>
+    <div class="grid analytics-charts" style="grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);margin-top:16px">
+     <div class="panel"><h3>Günlük HTTP istekleri</h3><canvas id="reportCfDailyChart" height="230" style="width:100%;height:230px"></canvas></div>
+     <div class="panel"><h3>Ülkelere göre istekler</h3><div class="table-wrap"><table><thead><tr><th>Ülke</th><th>İstek</th></tr></thead><tbody id="reportCfCountryTable"><tr><td colspan="2">Veriler bekleniyor...</td></tr></tbody></table></div></div>
+    </div>
+    <div class="panel" style="margin-top:16px"><h3>En çok istek alan sayfalar</h3><div class="table-wrap"><table><thead><tr><th>Sayfa yolu</th><th>İstek</th></tr></thead><tbody id="reportCfPagesTable"><tr><td colspan="2">Veriler bekleniyor...</td></tr></tbody></table></div></div>
+    <p class="muted">Cloudflare HTTP istekleri, analiz izni veren ziyaretçilerden toplanan sayfa görüntüleme ve oturum kayıtlarıyla aynı ölçüm değildir. İki kaynak ayrı raporlanır, birbirine eklenmez.</p>
+   </section>
    <div id="siteReportsMessage" class="message">Raporlar yükleniyor...</div>
    <div class="report-pair-grid">
     <div class="panel"><h3>Sayfa İnceleme Raporu</h3><div class="table-wrap"><table class="fit-report-table"><thead><tr><th>Sayfa</th><th>Görüntülenme</th><th>Ziyaretçi oturumu</th><th>%25</th><th>%50</th><th>%75</th><th>%90</th></tr></thead><tbody id="siteReportsTable"><tr><td colspan="7">Veriler bekleniyor...</td></tr></tbody></table></div></div>
@@ -1191,7 +1206,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
  if(name==="audit")loadAudit();
  if(name==="history")loadActivityHistory();
   if(name==="archive")loadArchive();
- if(name==="reports"){loadSiteReports();loadApplications();}
+ if(name==="reports"){loadSiteReports();loadApplications();loadCloudflareReports();}
  if(name==="applications"){loadApplications();loadApplicationFunnel();}
  if(name==="designcenter")loadThemeSettings();
  if(name==="sitesettings")loadSiteSettings();
@@ -1622,6 +1637,35 @@ function renderAnalytics(data){
  $("analyticsPagesTable").innerHTML=(cf.pages||[]).map(x=>'<tr><td>'+escapeHtml(x.path)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="2">'+(cf.pathWarning?escapeHtml(cf.pathWarning):"Sayfa verisi bulunamadı.")+'</td></tr>';
 }
 function countryBadge(code){const value=String(code||"").toUpperCase();if(!/^[A-Z]{2}$/.test(value))return '<span title="Ülke bilgisi bulunamadı">—</span>';const flag=String.fromCodePoint(...[...value].map(ch=>127397+ch.charCodeAt(0)));const names=new Intl.DisplayNames(["tr"],{type:"region"});const name=names.of(value)||value;return '<span title="'+escapeHtml(name)+'" aria-label="'+escapeHtml(name)+'">'+flag+' '+escapeHtml(value)+'</span>';}
+function renderCloudflareReport(data){
+ const cf=data.cloudflare||{},t=cf.totals||{},fmt=analyticsNumber;
+ $("reportCfRequests").textContent=cf.configured?fmt(t.requests):"—";
+ $("reportCfUnique").textContent=cf.configured?fmt(t.dailyUniqueIpTotal):"—";
+ $("reportCfCountries").textContent=cf.configured?fmt((cf.countries||[]).length):"—";
+ $("cloudflareReportsMessage").className="message "+(cf.error?"error":"success");
+ $("cloudflareReportsMessage").textContent=cf.error||("Cloudflare verileri alındı. Dönem: "+data.period.startDate+" – "+data.period.endDate)+(cf.pathWarning?" Sayfa yolu raporu: "+cf.pathWarning:"");
+ $("reportCfCountryTable").innerHTML=(cf.countries||[]).map(x=>"<tr><td>"+escapeHtml(x.country)+"</td><td>"+fmt(x.requests)+"</td></tr>").join("")||'<tr><td colspan="2">Ülke verisi bulunamadı.</td></tr>';
+ $("reportCfPagesTable").innerHTML=(cf.pages||[]).map(x=>"<tr><td>"+escapeHtml(x.path)+"</td><td>"+fmt(x.requests)+"</td></tr>").join("")||'<tr><td colspan="2">Sayfa yolu verisi bulunamadı.</td></tr>';
+ drawReportCloudflareBars(cf.daily||[]);
+}
+function drawReportCloudflareBars(rows){
+ const canvas=$("reportCfDailyChart");if(!canvas)return;
+ const width=Math.max(320,canvas.clientWidth||600),height=230,dpr=window.devicePixelRatio||1;
+ canvas.width=width*dpr;canvas.height=height*dpr;
+ const ctx=canvas.getContext("2d");ctx.scale(dpr,dpr);ctx.clearRect(0,0,width,height);
+ const left=44,right=12,top=12,bottom=34,plotW=width-left-right,plotH=height-top-bottom,max=Math.max(1,...rows.map(r=>Number(r.requests)||0));
+ ctx.font="10px Arial";ctx.fillStyle="#aaa7c0";ctx.strokeStyle="#39364c";
+ for(let i=0;i<5;i++){const y=top+plotH*i/4;ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(width-right,y);ctx.stroke();ctx.fillText(Math.round(max*(1-i/4)).toLocaleString("tr-TR"),3,y+3);}
+ const step=plotW/Math.max(rows.length,1),barW=Math.max(2,Math.min(12,step*.32));
+ rows.forEach((r,i)=>{const x=left+i*step+step/2,v=Number(r.requests)||0,a=v/max*plotH;ctx.fillStyle="#8055ed";ctx.fillRect(x-barW/2,top+plotH-a,barW,a);if(i%Math.max(1,Math.ceil(rows.length/7))===0){ctx.fillStyle="#aaa7c0";ctx.fillText(String(r.date||"").slice(5).replace("-","/"),x-15,height-11);}});
+}
+async function loadCloudflareReports(){
+ const msg=$("cloudflareReportsMessage");if(!msg)return;
+ msg.className="message";msg.textContent="Cloudflare verileri getiriliyor...";
+ try{const response=await fetch("/api/analytics",{credentials:"same-origin",cache:"no-store"});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||"Cloudflare verileri alınamadı.");renderCloudflareReport(data);}
+ catch(error){msg.className="message error";msg.textContent=error.message||"Cloudflare raporu yüklenemedi.";}
+}
+$("refreshCloudflareReports")?.addEventListener("click",loadCloudflareReports);
 async function loadSiteReports(){
  const message=$("siteReportsMessage"),table=$("siteReportsTable");
  if(!table)return;
