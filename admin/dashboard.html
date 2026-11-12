@@ -300,6 +300,41 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
  body.printing-applications #reports .application-print-header .application-print-brand{display:block!important;grid-column:2;justify-self:center;text-align:center;font-size:11pt!important;font-weight:700!important;color:#291447!important;white-space:nowrap}
  body.printing-applications #reports .application-print-header .application-print-date{display:block!important;grid-column:3;justify-self:end;text-align:right;font-size:10pt!important;font-weight:800!important;color:#111!important;white-space:nowrap}
 }
+
+/* Final override: başvuru panelleri dikey, dönüşüm tablosu yatay */
+#reports .report-pair-grid.application-pair-grid{
+ display:flex!important;
+ flex-direction:column!important;
+ flex-wrap:nowrap!important;
+ align-items:stretch!important;
+ gap:14px!important;
+ width:100%!important;
+}
+#reports .report-pair-grid.application-pair-grid>.panel{
+ display:block!important;
+ flex:0 0 auto!important;
+ width:100%!important;
+ min-width:0!important;
+ max-width:100%!important;
+}
+#reports .application-pair-grid .table-wrap{
+ display:block!important;
+ width:100%!important;
+ max-width:100%!important;
+ overflow-x:auto!important;
+ overflow-y:hidden!important;
+}
+#reports .application-pair-grid .compact-report .fit-report-table{
+ width:100%!important;
+ min-width:720px!important;
+ table-layout:auto!important;
+}
+#reports .application-pair-grid .compact-report .fit-report-table th,
+#reports .application-pair-grid .compact-report .fit-report-table td{
+ white-space:nowrap!important;
+ overflow-wrap:normal!important;
+ word-break:normal!important;
+}
 </style>
 </head>
 <body>
