@@ -723,6 +723,11 @@ td{color:#39334b!important;border-color:#eeebf4!important}
  <button class="logo" id="dashboardHomeLogo" type="button" title="Genel Bakış" aria-label="EDWISE — Genel Bakış"><img src="/assets/images/logo.png" alt="EDWISE" onerror="this.style.display='none'"><span>EDWISE</span><small>CONTENT MANAGEMENT SYSTEM</small></button>
  <div class="menu-label">GENEL</div>
  <button class="nav active" data-page="overview"><span class="ico">⌂</span><span>Genel Bakış</span></button>
+ <button class="nav" data-page="panelhome"><span class="ico">⌂</span><span>Ana Sayfa</span></button>
+ <div class="nav-submenu" aria-label="Ana Sayfa alt menüsü">
+  <button class="nav nav-sub" data-page="classrooms"><span class="ico">▦</span><span>Derslikler</span></button>
+ </div>
+
  <div class="menu-label">SABİT SİTE SAYFALARI</div>
  <div class="menu-label">İÇERİK STÜDYOSU</div>
  <button class="nav" data-page="pages"><span class="ico">▤</span><span>Diğer Sayfalar</span></button>
@@ -751,6 +756,8 @@ td{color:#39334b!important;border-color:#eeebf4!important}
 </header>
 
  <div class="content">
+  <section id="panelhome" class="hidden" aria-label="Ana Sayfa"></section>
+  <section id="classrooms" class="hidden" aria-label="Derslikler"></section>
   <section id="overview">
    <div class="welcome welcome-logo-only" aria-label="EDWISE">
     <img class="welcome-logo" src="/assets/images/logo.png" alt="EDWISE">
@@ -1318,7 +1325,7 @@ const $=id=>document.getElementById(id);
 let pages=[];
 let currentRole=null;
 
-const editorAllowed=["overview","pages","services","media","profile","messages"];
+const editorAllowed=["overview","panelhome","classrooms","pages","services","media","profile","messages"];
 
 function canAccess(page){
  if(currentRole==="superadmin") return true;
@@ -1402,7 +1409,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
   n.classList.toggle("active",n.dataset.page===name);
  });
 
- $("breadcrumb").textContent=name==="overview"?"Ana Sayfa":name==="designcenter"?"Site Tasarım Merkezi":name==="sitesettings"?"Site Ayarları":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="audit"?"Güvenlik ve İşlem Geçmişi":name==="profile"?"Profilim":name==="history"?"Geçmiş":name==="archive"?"Arşiv":name==="reports"?"Raporlar":name==="messages"?"Mesaj Kutusu":otherModules[name]?.[0]||"";
+ $("breadcrumb").textContent=name==="panelhome"?"Ana Sayfa":name==="classrooms"?"Ana Sayfa / Derslikler":name==="overview"?"Genel Bakış":name==="designcenter"?"Site Tasarım Merkezi":name==="sitesettings"?"Site Ayarları":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="audit"?"Güvenlik ve İşlem Geçmişi":name==="profile"?"Profilim":name==="history"?"Geçmiş":name==="archive"?"Arşiv":name==="reports"?"Raporlar":name==="messages"?"Mesaj Kutusu":otherModules[name]?.[0]||"";
 
  if(name==="designcenter")loadDesignRecords();
  if(name==="pages")loadPages();
