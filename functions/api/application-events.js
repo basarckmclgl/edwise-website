@@ -6,7 +6,7 @@ const json = (data, status = 200) => Response.json(data, {
 const allowedEvents = new Set([
   "apply_click", "form_view", "form_start", "submit_attempt",
   "form_abandon", "application_saved", "email_sent", "email_failed",
-  "whatsapp_redirect", "site_return"
+  "whatsapp_redirect", "site_return", "page_view", "scroll_25", "scroll_50", "scroll_75", "scroll_90"
 ]);
 function validOrigin(request) {
   const origin = request.headers.get("Origin");
@@ -64,7 +64,25 @@ export async function onRequestGet(context) {
         count:Number(row.event_count)||0, sessions:Number(row.sessions)||0
       };
     }
-    return json({ success:true, periodDays:30, totals });
+    const pageResult = await DB.prepare(`
+      SELECT page_path,
+       SUM(CASE WHEN event_name='page_view' THEN 1 ELSE 0 END) AS views,
+       COUNT(DISTINCT CASE WHEN event_name='page_view' THEN session_id END) AS visitors,
+       SUM(CASE WHEN event_name='scroll_25' THEN 1 ELSE 0 END) AS scroll_25,
+       SUM(CASE WHEN event_name='scroll_50' THEN 1 ELSE 0 END) AS scroll_50,
+       SUM(CASE WHEN event_name='scroll_75' THEN 1 ELSE 0 END) AS scroll_75,
+       SUM(CASE WHEN event_name='scroll_90' THEN 1 ELSE 0 END) AS scroll_90
+      FROM application_events
+      WHERE datetime(created_at) >= datetime('now','-30 days')
+       AND event_name IN ('page_view','scroll_25','scroll_50','scroll_75','scroll_90')
+      GROUP BY page_path ORDER BY views DESC LIMIT 100
+    `).all();
+    const pageReports=(pageResult.results||[]).map(row=>({
+      path:row.page_path||"/",views:Number(row.views)||0,visitors:Number(row.visitors)||0,
+      scroll25:Number(row.scroll_25)||0,scroll50:Number(row.scroll_50)||0,
+      scroll75:Number(row.scroll_75)||0,scroll90:Number(row.scroll_90)||0
+    }));
+    return json({ success:true, periodDays:30, totals, pageReports });
   } catch {
     return json({ success:false, message:"Başvuru hunisi verileri alınamadı." },500);
   }
