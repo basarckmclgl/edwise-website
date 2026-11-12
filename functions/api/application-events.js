@@ -19,14 +19,16 @@ async function ensureTable(DB) {
     session_id TEXT NOT NULL,
     event_name TEXT NOT NULL,
     page_path TEXT,
+    country_code TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   )`).run();
+  try { await DB.prepare("ALTER TABLE application_events ADD COLUMN country_code TEXT").run(); } catch (error) { /* column already exists */ }
   await DB.prepare("CREATE INDEX IF NOT EXISTS idx_application_events_created ON application_events(created_at)").run();
   await DB.prepare("CREATE INDEX IF NOT EXISTS idx_application_events_session ON application_events(session_id)").run();
 }
-async function recordEvent(DB, sessionId, eventName, pagePath) {
-  await DB.prepare("INSERT INTO application_events (session_id,event_name,page_path) VALUES (?,?,?)")
-    .bind(sessionId,eventName,pagePath).run();
+async function recordEvent(DB, sessionId, eventName, pagePath, countryCode) {
+  await DB.prepare("INSERT INTO application_events (session_id,event_name,page_path,country_code) VALUES (?,?,?,?)")
+    .bind(sessionId,eventName,pagePath,countryCode).run();
 }
 export async function onRequestPost({ request, env }) {
   if (!validOrigin(request)) return json({ success:false, message:"İstek kaynağı doğrulanamadı." },403);
@@ -39,7 +41,8 @@ export async function onRequestPost({ request, env }) {
       return json({ success:false, message:"Analiz kaydı geçersiz." },400);
     }
     await ensureTable(env.DB);
-    await recordEvent(env.DB,sessionId,eventName,pagePath);
+    const countryCode = clean(request.cf?.country || request.headers.get("CF-IPCountry") || "",2).toUpperCase().replace(/[^A-Z]/g,"");
+    await recordEvent(env.DB,sessionId,eventName,pagePath,countryCode || null);
     return json({ success:true });
   } catch {
     return json({ success:false, message:"Analiz kaydı alınamadı." },500);
@@ -65,7 +68,7 @@ export async function onRequestGet(context) {
       };
     }
     const pageResult = await DB.prepare(`
-      SELECT page_path,
+      SELECT page_path, country_code,
        SUM(CASE WHEN event_name='page_view' THEN 1 ELSE 0 END) AS views,
        COUNT(DISTINCT CASE WHEN event_name='page_view' THEN session_id END) AS visitors,
        SUM(CASE WHEN event_name='scroll_25' THEN 1 ELSE 0 END) AS scroll_25,
@@ -75,16 +78,16 @@ export async function onRequestGet(context) {
       FROM application_events
       WHERE datetime(created_at) >= datetime('now','-30 days')
        AND event_name IN ('page_view','scroll_25','scroll_50','scroll_75','scroll_90')
-      GROUP BY page_path ORDER BY views DESC LIMIT 100
+      GROUP BY page_path, country_code ORDER BY views DESC LIMIT 200
     `).all();
     const pageReports=(pageResult.results||[]).map(row=>({
-      path:row.page_path||"/",views:Number(row.views)||0,visitors:Number(row.visitors)||0,
+      path:row.page_path||"/",country:row.country_code||"",views:Number(row.views)||0,visitors:Number(row.visitors)||0,
       scroll25:Number(row.scroll_25)||0,scroll50:Number(row.scroll_50)||0,
       scroll75:Number(row.scroll_75)||0,scroll90:Number(row.scroll_90)||0
     }));
     const detailResult = await DB.prepare(`
       SELECT substr(session_id,1,7) || '…' AS session_label,
-             event_name, page_path, created_at
+             event_name, page_path, created_at, country_code
       FROM application_events
       WHERE datetime(created_at) >= datetime('now','-30 days')
         AND event_name IN ('page_view','scroll_25','scroll_50','scroll_75','scroll_90')
@@ -93,6 +96,7 @@ export async function onRequestGet(context) {
     `).all();
     const pageRecords = (detailResult.results || []).map(row => ({
       session: row.session_label || '—',
+      country: row.country_code || '',
       event: row.event_name,
       path: row.page_path || '/',
       date: row.created_at || ''
