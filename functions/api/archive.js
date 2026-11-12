@@ -1,4 +1,5 @@
 import { requireSuperAdmin } from "./_auth.js";
+import { ensureAuditTable } from "./_audit.js";
 
 const json=(data,status=200)=>Response.json(data,{status,headers:{"Cache-Control":"no-store"}});
 const safe=(value,max=180)=>String(value??"").replace(/[\u0000-\u001f\u007f]/g," ").slice(0,max).trim();
@@ -47,6 +48,11 @@ export async function onRequestPost(context){
  const db=context.env.DB;
  try{
   await ensureArchive(db);
+  await db.exec(`
+   CREATE TABLE IF NOT EXISTS application_events(id INTEGER PRIMARY KEY AUTOINCREMENT,session_id TEXT NOT NULL,event_name TEXT NOT NULL,page_path TEXT,country_code TEXT,created_at TEXT NOT NULL DEFAULT (datetime('now')));
+   CREATE TABLE IF NOT EXISTS applications(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,phone TEXT NOT NULL,email TEXT,program TEXT NOT NULL,format TEXT NOT NULL,availability TEXT,note TEXT,status TEXT NOT NULL DEFAULT 'new',created_at TEXT NOT NULL DEFAULT (datetime('now')));
+  `);
+  await ensureAuditTable(db);
   const job=await db.prepare("INSERT INTO archive_jobs(status,message) VALUES('running','Arşivleme başlatıldı')").run();
   let archived=0,skipped=0;
   const eventRows=await db.prepare(`SELECT date(created_at) AS record_date,event_name,page_path,country_code,COUNT(*) AS event_count,COUNT(DISTINCT session_id) AS sessions
