@@ -43,6 +43,18 @@ export async function onRequestPost({ request, env }) {
       (name,phone,email,program,format,availability,note)
       VALUES (?,?,?,?,?,?,?)`).bind(data.name,data.phone,data.email,data.program,data.format,data.availability,data.note).run();
 
+    const trackingSessionId = clean(body.trackingSessionId,64);
+    if (/^[a-zA-Z0-9_-]{12,64}$/.test(trackingSessionId)) {
+      await env.DB.prepare(`CREATE TABLE IF NOT EXISTS application_events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        session_id TEXT NOT NULL,
+        event_name TEXT NOT NULL,
+        page_path TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      )`).run();
+      await env.DB.prepare("INSERT INTO application_events (session_id,event_name,page_path) VALUES (?,?,?)")
+        .bind(trackingSessionId,"application_saved","/pages/basvuru.html").run();
+    }
     let emailSent = false;
     if (env.RESEND_API_KEY && env.RESEND_FROM_EMAIL) {
       const lines = [
@@ -58,6 +70,10 @@ export async function onRequestPost({ request, env }) {
         body:JSON.stringify({ from:env.RESEND_FROM_EMAIL, to:[recipient], subject:"EDWISE Yeni Başvuru #" + result.meta.last_row_id, text:lines.join("\n") })
       });
       emailSent = mail.ok;
+      if (/^[a-zA-Z0-9_-]{12,64}$/.test(trackingSessionId)) {
+        await env.DB.prepare("INSERT INTO application_events (session_id,event_name,page_path) VALUES (?,?,?)")
+          .bind(trackingSessionId,emailSent?"email_sent":"email_failed","/pages/basvuru.html").run();
+      }
     }
     return json({ success:true, applicationId:result.meta.last_row_id, emailSent });
   } catch (error) {
