@@ -485,6 +485,7 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
 
  <div class="menu-label">AYARLAR</div>
  <button class="nav" data-page="sitesettings" data-superadmin><span class="ico">⚙</span><span>Site Ayarları</span></button>
+ <button class="nav" data-page="profile"><span class="ico">♙</span><span>Profilim</span></button>
  
  <div class="menu-label" data-superadmin>SİSTEM</div>
  <button class="nav" data-page="users" data-superadmin><span class="ico">♙</span><span>Kullanıcı ve Yetkiler</span></button>
@@ -1027,6 +1028,24 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
  <div class="panel"><h3>Güvenlik sınırları</h3><p>Bu merkez sunucu tarafındaki yönetici işlemlerini, oturumları ve içerik değişikliklerini denetler. CTRL+U, F12, ekran görüntüsü veya tarayıcı geliştirici araçları teknik olarak tamamen engellenemez; tarayıcıya gönderilen HTML/CSS/JavaScript kullanıcı tarafından görüntülenebilir. Gerçek koruma, gizli anahtarları sunucuda tutmak, API yetkilerini doğrulamak, girişleri sınırlamak ve veritabanını yedeklemektir.</p></div>
 </section>
 
+<section id="profile" class="hidden">
+  <div class="section-head"><div><h2>Profilim</h2><p class="muted">Yönetici hesabınızı görüntüleyin ve giriş şifrenizi güvenli şekilde değiştirin.</p></div></div>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+   <div class="panel"><h3>Hesap Bilgileri</h3><div class="form-grid">
+    <div class="field"><label>Kullanıcı adı</label><input id="profileUsername" readonly></div>
+    <div class="field"><label>E-posta adresi</label><input id="profileEmail" readonly></div>
+    <div class="field"><label>Yetki seviyesi</label><input id="profileRole" readonly></div>
+    <div class="field"><label>Yönetici numarası</label><input id="profileId" readonly></div>
+   </div><p class="muted" style="margin-top:12px">Hesap adı, e-posta ve yetki değişiklikleri güvenlik amacıyla bu ekrandan düzenlenemez. Gerekirse ana yönetici Kullanıcı ve Yetkiler bölümünden işlem yapabilir.</p></div>
+   <div class="panel"><h3>Şifre Değiştir</h3><form id="profilePasswordForm" class="form-grid">
+    <div class="field"><label for="profileCurrentPassword">Mevcut şifre</label><input id="profileCurrentPassword" type="password" autocomplete="current-password" required maxlength="128"></div>
+    <div class="field"><label for="profileNewPassword">Yeni şifre</label><input id="profileNewPassword" type="password" autocomplete="new-password" minlength="8" required maxlength="128"><small class="muted">En az 8 karakter.</small></div>
+    <div class="field"><label for="profileConfirmPassword">Yeni şifre (tekrar)</label><input id="profileConfirmPassword" type="password" autocomplete="new-password" minlength="8" required maxlength="128"></div>
+    <div><button class="primary" type="submit" id="profilePasswordSave">Şifremi Güncelle</button></div><div id="profilePasswordMessage" class="message" aria-live="polite"></div>
+   </form></div>
+  </div>
+ </section>
+
 <section id="history" class="hidden" data-superadmin>
  <div class="section-head">
   <div><h2>Başvuru ve İletişim Geçmişi</h2><p class="muted">Ziyaretçi hareketleri günlük, haftalık ve son 30 günlük dönemlerde raporlanır. Kayıtlar 30 gün saklanır.</p></div>
@@ -1200,6 +1219,7 @@ function showPage(name){
  $("posts").classList.toggle("hidden",name!=="posts");
  $("users").classList.toggle("hidden",name!=="users");
  $("audit").classList.toggle("hidden",name!=="audit");
+ $("profile").classList.toggle("hidden",name!=="profile");
  $("history").classList.toggle("hidden",name!=="history");
 $("archive").classList.toggle("hidden",name!=="archive");
 $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
@@ -1208,7 +1228,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
   n.classList.toggle("active",n.dataset.page===name);
  });
 
- $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="designcenter"?"Site Tasarım Merkezi":name==="sitesettings"?"Site Ayarları":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":name==="audit"?"Güvenlik ve İşlem Geçmişi":name==="history"?"Geçmiş":name==="archive"?"Arşiv":name==="reports"?"Raporlar":otherModules[name]?.[0]||"";
+ $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="designcenter"?"Site Tasarım Merkezi":name==="sitesettings"?"Site Ayarları":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":name==="audit"?"Güvenlik ve İşlem Geçmişi":name==="profile"?"Profilim":name==="history"?"Geçmiş":name==="archive"?"Arşiv":name==="reports"?"Raporlar":otherModules[name]?.[0]||"";
 
  if(name==="designcenter")loadDesignRecords();
  if(name==="pages")loadPages();
@@ -1580,6 +1600,19 @@ $("saveMenu").addEventListener("click",async()=>{
  catch(error){$("menuMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}
 });
 
+$("profilePasswordForm")?.addEventListener("submit",async event=>{
+ event.preventDefault();
+ const currentPassword=$("profileCurrentPassword").value,newPassword=$("profileNewPassword").value,confirmPassword=$("profileConfirmPassword").value;
+ const message=$("profilePasswordMessage"),button=$("profilePasswordSave");message.className="message";
+ if(newPassword.length<8){message.className="message error";message.textContent="Yeni şifre en az 8 karakter olmalıdır.";return;}
+ if(newPassword!==confirmPassword){message.className="message error";message.textContent="Yeni şifreler birbiriyle eşleşmiyor.";return;}
+ if(currentPassword===newPassword){message.className="message error";message.textContent="Yeni şifreniz mevcut şifrenizden farklı olmalıdır.";return;}
+ button.disabled=true;button.textContent="Güncelleniyor...";
+ try{const result=await api("/api/change-password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({currentPassword,newPassword})});message.className="message success";message.textContent=result.message||"Şifreniz güncellendi.";$("profilePasswordForm").reset();}
+ catch(error){message.className="message error";message.textContent=error.message||"Şifre güncellenemedi.";}
+ finally{button.disabled=false;button.textContent="Şifremi Güncelle";}
+});
+
 async function checkSession(){
  try{
   const response=await fetch("/api/me",{credentials:"same-origin"});
@@ -1605,6 +1638,11 @@ async function checkSession(){
   }
 
   $("username").textContent=name;
+   $("profileUsername").value=data.admin.username||"";
+   $("profileEmail").value=data.admin.email||"";
+   $("profileRole").value=data.admin.role==="superadmin"?"Ana Yönetici":"İçerik Editörü";
+   $("profileId").value="#"+data.admin.id;
+
   $("welcomeName").textContent=name;
 
   applyRolePermissions();
