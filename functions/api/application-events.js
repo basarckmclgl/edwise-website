@@ -54,6 +54,10 @@ export async function onRequestGet(context) {
   try {
     const DB = context.env.DB;
     await ensureTable(DB);
+    // Analiz kayıtları en fazla 30 gün saklanır.
+    await DB.prepare("DELETE FROM application_events WHERE datetime(created_at) < datetime('now','-30 days')").run();
+    const range = new URL(context.request.url).searchParams.get("range") || "30days";
+    const rangeDays = range === "day" ? 1 : range === "week" ? 7 : 30;
     const { results } = await DB.prepare(`
       SELECT event_name, COUNT(*) AS event_count, COUNT(DISTINCT session_id) AS sessions
       FROM application_events
@@ -117,7 +121,34 @@ export async function onRequestGet(context) {
       path: row.page_path || '/',
       date: row.created_at || ''
     }));
-    return json({ success:true, periodDays:30, totals, pageReports, pageRecords, funnelRecords });
+    const historyResult = await DB.prepare(`
+      SELECT date(created_at) AS report_date,
+        COUNT(*) AS total_events,
+        COUNT(DISTINCT session_id) AS sessions,
+        SUM(CASE WHEN event_name='apply_click' THEN 1 ELSE 0 END) AS apply_click,
+        SUM(CASE WHEN event_name='form_view' THEN 1 ELSE 0 END) AS form_view,
+        SUM(CASE WHEN event_name='form_start' THEN 1 ELSE 0 END) AS form_start,
+        SUM(CASE WHEN event_name='application_saved' THEN 1 ELSE 0 END) AS application_saved,
+        SUM(CASE WHEN event_name='email_sent' THEN 1 ELSE 0 END) AS email_sent,
+        SUM(CASE WHEN event_name='whatsapp_redirect' THEN 1 ELSE 0 END) AS whatsapp_redirect,
+        SUM(CASE WHEN event_name='page_view' THEN 1 ELSE 0 END) AS page_views
+      FROM application_events
+      WHERE datetime(created_at) >= datetime('now', ?)
+      GROUP BY date(created_at)
+      ORDER BY report_date DESC
+    `).bind(`-${rangeDays} days`).all();
+    const historyRows = (historyResult.results || []).map(row => ({
+      date:row.report_date || "", total:Number(row.total_events)||0, sessions:Number(row.sessions)||0,
+      applyClick:Number(row.apply_click)||0, formView:Number(row.form_view)||0,
+      formStart:Number(row.form_start)||0, applications:Number(row.application_saved)||0,
+      emails:Number(row.email_sent)||0, whatsapp:Number(row.whatsapp_redirect)||0,
+      pageViews:Number(row.page_views)||0
+    }));
+    const historyTotals = historyRows.reduce((sum,row) => {
+      for (const key of ["total","sessions","applyClick","formView","formStart","applications","emails","whatsapp","pageViews"]) sum[key]+=row[key];
+      return sum;
+    },{total:0,sessions:0,applyClick:0,formView:0,formStart:0,applications:0,emails:0,whatsapp:0,pageViews:0});
+    return json({ success:true, periodDays:30, totals, pageReports, pageRecords, funnelRecords, historyRange:range, historyRows, historyTotals });
   } catch {
     return json({ success:false, message:"Başvuru hunisi verileri alınamadı." },500);
   }
