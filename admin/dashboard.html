@@ -355,7 +355,7 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
     <div class="panel"><div class="section-head"><div><h3>Sayfa Ziyaret Kayıtları</h3><p class="muted">Son 30 gün · Anonim oturum kayıtları</p></div></div><div class="table-wrap"><table class="fit-report-table"><thead><tr><th>Tarih</th><th>Sayfa</th><th>Ülke</th><th>Oturum</th><th>İşlem</th></tr></thead><tbody id="pageVisitRecords"><tr><td colspan="5">Kayıtlar bekleniyor...</td></tr></tbody></table></div></div>
    </div>
    <div class="report-pair-grid application-pair-grid">
-    <div class="panel"><div class="section-head"><div><h3>Başvuru Kayıtları</h3><p class="muted">Kişisel veriler yetkili yöneticiye açıktır. İletişim bilgileri varsayılan olarak maskelidir.</p></div><div class="actions"><button class="btn" id="refreshApplications">↻ Yenile</button><span id="applicationsMessage" class="muted"></span></div></div><div class="table-wrap"><table class="fit-report-table application-fit-table"><thead><tr><th>Tarih</th><th>Ad soyad</th><th>Telefon</th><th>E-posta</th><th>Program</th><th>Eğitim tercihi</th><th>Uygun zaman</th><th>Açıklama</th><th>Durum</th></tr></thead><tbody id="applicationsTable"><tr><td colspan="9">Başvurular yükleniyor...</td></tr></tbody></table></div></div>
+    <div class="panel"><div class="section-head"><div><h3>Başvuru Kayıtları</h3><p class="muted">Kişisel veriler yetkili yöneticiye açıktır. İletişim bilgileri varsayılan olarak maskelidir.</p></div><div class="actions"><button class="btn" type="button" id="toggleAllApplicationContacts" aria-pressed="false">Tüm iletişim bilgilerini göster</button><button class="btn" id="refreshApplications">↻ Yenile</button><span id="applicationsMessage" class="muted"></span></div></div><div class="table-wrap"><table class="fit-report-table application-fit-table"><thead><tr><th>Tarih</th><th>Ad soyad</th><th>Telefon</th><th>E-posta</th><th>Program</th><th>Eğitim tercihi</th><th>Uygun zaman</th><th>Açıklama</th><th>Durum</th></tr></thead><tbody id="applicationsTable"><tr><td colspan="9">Başvurular yükleniyor...</td></tr></tbody></table></div></div>
     <div class="panel compact-report"><div class="section-head"><div><h3>Başvuru Dönüşüm Kayıtları</h3><p class="muted">Son 30 gün · Her hareket ayrı kayıt edilir.</p></div><span id="funnelRecordCount" class="muted"></span></div><div class="table-wrap"><table class="fit-report-table"><thead><tr><th>Tarih</th><th>Ülke</th><th>Oturum</th><th>İşlem</th></tr></thead><tbody id="funnelEventRecords"><tr><td colspan="4">Kayıtlar bekleniyor...</td></tr></tbody></table></div></div>
    </div>
    <p class="muted">Not: Analiz verileri yalnızca analiz çerezlerine izin veren ziyaretçilerden toplanır. Kaydırma oranları aynı oturumdaki olay sayılarını gösterir; kişileri kesin olarak tanımlamaz.</p>
@@ -945,7 +945,7 @@ document.querySelectorAll("[data-open]").forEach(n=>{
 
 
 function maskPhone(value){
- const digits=String(value||"").replace(/\D/g,"");
+ const digits=String(value||"").replace(/\\D/g,"");
  if(!digits)return "—";
  return "••••••"+digits.slice(-2);
 }
@@ -955,12 +955,37 @@ function maskEmail(value){
  if(at<1)return email?"••••":"—";
  return email.slice(0,1)+"••••"+email.slice(at);
 }
+let revealedApplicationContacts=new Set();
+let applicationRowsCache=[];
+function renderApplicationContact(index){
+ const body=$("applicationsTable"),item=applicationRowsCache[index];
+ if(!item)return;
+ const phone=body.querySelector('[data-app-phone="'+index+'"]');
+ const email=body.querySelector('[data-app-email="'+index+'"]');
+ const button=body.querySelector('[data-app-contact="'+index+'"]');
+ const visible=revealedApplicationContacts.has(index);
+ if(phone)phone.textContent=visible?(item.phone||"—"):maskPhone(item.phone);
+ if(email)email.textContent=visible?(item.email||"—"):maskEmail(item.email);
+ if(button){
+  button.textContent=visible?"İletişim bilgilerini gizle":"İletişim bilgilerini göster";
+  button.setAttribute("aria-expanded",String(visible));
+ }
+}
+function updateBulkApplicationContactButton(){
+ const button=$("toggleAllApplicationContacts");
+ if(!button)return;
+ const allVisible=applicationRowsCache.length>0&&applicationRowsCache.every((_,index)=>revealedApplicationContacts.has(index));
+ button.textContent=allVisible?"Tüm iletişim bilgilerini gizle":"Tüm iletişim bilgilerini göster";
+ button.setAttribute("aria-pressed",String(allVisible));
+}
 async function loadApplications(){
  const body=$("applicationsTable");
  body.innerHTML='<tr><td colspan="9">Başvurular yükleniyor...</td></tr>';
  try{
   const data=await api("/api/applications");
   const rows=data.applications||[];
+  applicationRowsCache=rows;
+  revealedApplicationContacts=new Set();
   $("countApplications").textContent=rows.length;
   $("applicationsMessage").textContent=rows.length+" başvuru";
   body.innerHTML=rows.map((x,index)=>'<tr>'+
@@ -975,18 +1000,13 @@ async function loadApplications(){
    '<td><select aria-label="Başvuru durumu" data-app-status="'+escapeHtml(x.id)+'"><option value="new" '+(x.status==="new"?"selected":"")+'>Yeni</option><option value="contacted" '+(x.status==="contacted"?"selected":"")+'>İletişime geçildi</option><option value="completed" '+(x.status==="completed"?"selected":"")+'>Tamamlandı</option></select><br><button type="button" class="btn" style="margin-top:6px" data-app-contact="'+index+'" aria-expanded="false">İletişim bilgilerini göster</button></td>'+
    '</tr>').join("")||'<tr><td colspan="9">Henüz başvuru yok.</td></tr>';
   body.querySelectorAll("[data-app-contact]").forEach(button=>button.addEventListener("click",()=>{
-   const index=Number(button.dataset.appContact),item=rows[index];
-   const phone=body.querySelector('[data-app-phone="'+index+'"]');
-   const email=body.querySelector('[data-app-email="'+index+'"]');
-   const revealed=button.getAttribute("aria-expanded")==="true";
-   if(revealed){
-    phone.textContent=maskPhone(item.phone);email.textContent=maskEmail(item.email);
-    button.textContent="İletişim bilgilerini göster";button.setAttribute("aria-expanded","false");
-   }else{
-    phone.textContent=item.phone||"—";email.textContent=item.email||"—";
-    button.textContent="İletişim bilgilerini gizle";button.setAttribute("aria-expanded","true");
-   }
+   const index=Number(button.dataset.appContact);
+   if(revealedApplicationContacts.has(index))revealedApplicationContacts.delete(index);
+   else revealedApplicationContacts.add(index);
+   renderApplicationContact(index);
+   updateBulkApplicationContactButton();
   }));
+  updateBulkApplicationContactButton();
   body.querySelectorAll("[data-app-status]").forEach(select=>select.addEventListener("change",async()=>{
    try{await api("/api/applications",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:select.dataset.appStatus,status:select.value})});}
    catch(e){alert("Durum kaydedilemedi: "+e.message);loadApplications();}
@@ -994,8 +1014,17 @@ async function loadApplications(){
  }catch(error){
   body.innerHTML='<tr><td colspan="9">Başvurular yüklenemedi: '+escapeHtml(error.message)+'</td></tr>';
   $("applicationsMessage").textContent="Bağlantı hatası";
+  applicationRowsCache=[];
+  revealedApplicationContacts=new Set();
+  updateBulkApplicationContactButton();
  }
 }
+$("toggleAllApplicationContacts")?.addEventListener("click",()=>{
+ const allVisible=applicationRowsCache.length>0&&applicationRowsCache.every((_,index)=>revealedApplicationContacts.has(index));
+ revealedApplicationContacts=allVisible?new Set():new Set(applicationRowsCache.map((_,index)=>index));
+ applicationRowsCache.forEach((_,index)=>renderApplicationContact(index));
+ updateBulkApplicationContactButton();
+});
 $("refreshApplications")?.addEventListener("click",loadApplications);
 
 async function loadAudit(){
