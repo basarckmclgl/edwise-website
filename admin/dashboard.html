@@ -552,6 +552,21 @@ html.panel-light .menu-toggle span{background:#7650d8!important}
  html.panel-light .main>.content{padding:14px!important}
  html.panel-light .grid{grid-template-columns:1fr!important}
 }
+
+/* FINAL SHELL SAFETY OVERRIDE — keep admin navigation and header in normal view */
+html.panel-light body:not(.sidebar-collapsed) > aside.sidebar,
+body:not(.sidebar-collapsed) > aside.sidebar{display:block!important;visibility:visible!important;opacity:1!important;position:fixed!important;left:0!important;top:0!important;bottom:0!important;right:auto!important;width:245px!important;height:100vh!important;transform:translateX(0)!important;z-index:999!important;overflow-y:auto!important}
+html.panel-light body:not(.sidebar-collapsed) > main.main,
+body:not(.sidebar-collapsed) > main.main{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;margin-left:245px!important;width:calc(100% - 245px)!important;min-height:100vh!important;transform:none!important}
+html.panel-light body > main.main > header.topbar,
+body > main.main > header.topbar{display:flex!important;visibility:visible!important;opacity:1!important;position:sticky!important;top:0!important;width:100%!important;height:68px!important;min-height:68px!important;z-index:500!important}
+html.panel-light body > main.main > .content,
+body > main.main > .content{display:block!important;visibility:visible!important;width:100%!important;max-width:1450px!important;margin:0 auto!important;padding:28px!important}
+@media(max-width:760px){
+ html.panel-light body:not(.sidebar-collapsed) > aside.sidebar,body:not(.sidebar-collapsed) > aside.sidebar{width:74px!important;padding:18px 9px!important}
+ html.panel-light body:not(.sidebar-collapsed) > main.main,body:not(.sidebar-collapsed) > main.main{margin-left:74px!important;width:calc(100% - 74px)!important}
+ html.panel-light body > main.main > .content,body > main.main > .content{padding:18px!important}
+}
 </style>
 </head>
 <body>
