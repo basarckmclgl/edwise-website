@@ -231,26 +231,7 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
      <div class="panel"><h3>Ülkelere göre trafik</h3><p class="muted">Cloudflare istek sayıları</p><div class="table-wrap"><table style="min-width:360px"><thead><tr><th>Ülke</th><th>İstek</th></tr></thead><tbody id="analyticsCountryTable"><tr><td colspan="2">Veriler bekleniyor...</td></tr></tbody></table></div></div>
      <div class="panel"><h3>En çok istek alan sayfalar</h3><p class="muted">Cloudflare sayfa yolu raporu</p><div class="table-wrap"><table style="min-width:280px"><thead><tr><th>Sayfa</th><th>İstek</th></tr></thead><tbody id="analyticsPagesTable"><tr><td colspan="2">Veriler bekleniyor...</td></tr></tbody></table></div></div>
     </div>
-    <div class="panel" style="margin-top:16px">
-     <div class="section-head" style="margin:0 0 14px">
-      <div><h3>Başvuru Hunisi ve Terk Analizi</h3><p class="muted">Son 30 gün · anonim oturum bazlı ölçüm</p></div>
-      <button class="btn" id="refreshApplicationFunnel">↻ Huniyi Yenile</button>
-     </div>
-     <div id="applicationFunnelMessage" class="message">Başvuru hareketleri yükleniyor...</div>
-     <div class="grid analytics-stats">
-      <div class="stat"><span>Başvur butonuna tıklayan</span><h2 id="funnelApplyClick">—</h2><p id="funnelApplyClickSessions">Oturum: —</p></div>
-      <div class="stat"><span>Formu açan</span><h2 id="funnelFormView">—</h2><p id="funnelFormViewSessions">Oturum: —</p></div>
-      <div class="stat"><span>Formu doldurmaya başlayan</span><h2 id="funnelFormStart">—</h2><p id="funnelFormStartSessions">Oturum: —</p></div>
-      <div class="stat"><span>Gönder'e basan</span><h2 id="funnelSubmitAttempt">—</h2><p id="funnelSubmitAttemptSessions">Oturum: —</p></div>
-      <div class="stat"><span>Başarılı kaydedilen</span><h2 id="funnelSaved">—</h2><p id="funnelSavedSessions">Oturum: —</p></div>
-      <div class="stat"><span>E-posta gönderilen</span><h2 id="funnelEmailSent">—</h2><p id="funnelEmailSentSessions">Oturum: —</p></div>
-      <div class="stat"><span>E-posta gönderilemeyen</span><h2 id="funnelEmailFailed">—</h2><p id="funnelEmailFailedSessions">Oturum: —</p></div>
-      <div class="stat"><span>WhatsApp yönlendirmesi</span><h2 id="funnelWhatsapp">—</h2><p id="funnelWhatsappSessions">Oturum: —</p></div>
-      <div class="stat"><span>Formu yarım bırakıp ayrılan</span><h2 id="funnelAbandon">—</h2><p id="funnelAbandonSessions">Oturum: —</p></div>
-      <div class="stat"><span>Siteye geri dönen</span><h2 id="funnelReturn">—</h2><p id="funnelReturnSessions">Oturum: —</p></div>
-     </div>
-     <p class="muted" style="margin-top:14px">Not: WhatsApp yönlendirmesi, mesajın gönderildiğini kanıtlamaz. E-posta sayısı, EDWISE bildirim e-postasının gönderim sonucudur. Oturum sayıları aynı kişinin farklı oturumlarda tekrar sayılmasını engellemez.</p>
-    </div>
+
    </section>
 
    <div class="section-head">
@@ -697,7 +678,23 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
      <a href="/admin/media.html" class="primary" style="display:inline-block;text-decoration:none">Medya Kütüphanesini Aç →</a>
     </div>
     <div id="applicationsModule" class="hidden">
-  <div class="actions"><button class="btn" id="refreshApplications">↻ Yenile</button><span id="applicationsMessage" class="muted"></span></div>
+  <div class="panel" style="margin:16px 0">
+   <div class="section-head" style="margin:0 0 12px">
+    <div><h3>Başvuru Takip Çizelgesi</h3><p class="muted">Son 30 gün · ziyaretçilerin başvuru sürecindeki hareketleri</p></div>
+    <button class="btn" id="refreshApplicationFunnel">↻ Takip Çizelgesini Yenile</button>
+   </div>
+   <div id="applicationFunnelMessage" class="message">Takip verileri yükleniyor...</div>
+   <div class="table-wrap">
+    <table style="min-width:720px">
+     <thead><tr><th>İşlem aşaması</th><th>İşlem sayısı</th><th>Oturum sayısı</th><th>Açıklama</th></tr></thead>
+     <tbody id="applicationFunnelTable">
+      <tr><td colspan="4">Takip verileri bekleniyor...</td></tr>
+     </tbody>
+    </table>
+   </div>
+   <p class="muted" style="margin-top:12px">WhatsApp ekranının açılması mesajın gönderildiğini kanıtlamaz. Sayfadan ayrılma sayısı, analiz izni veren ve formu doldurmaya başlayan oturumlarla sınırlıdır.</p>
+  </div>
+  <div class="actions"><button class="btn" id="refreshApplications">↻ Başvuruları Yenile</button><span id="applicationsMessage" class="muted"></span></div>
   <div class="table-wrap"><table><thead><tr><th>Tarih</th><th>Ad soyad</th><th>Telefon</th><th>E-posta</th><th>Program</th><th>Eğitim tercihi</th><th>Uygun zaman</th><th>Açıklama</th><th>Durum</th></tr></thead><tbody id="applicationsTable"><tr><td colspan="9">Başvurular yükleniyor...</td></tr></tbody></table></div>
  </div>
  <div class="message" id="otherModuleMessage">Bu modül henüz geliştirme aşamasında. Gerçek işlemler, güvenli API bağlantıları tamamlandığında açılacak.</div>
@@ -797,7 +794,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
  if(name==="posts")loadPosts();
     if(name==="users")loadUsers();
  if(name==="audit")loadAudit();
- if(name==="applications")loadApplications();
+ if(name==="applications"){loadApplications();loadApplicationFunnel();}
  if(name==="designcenter")loadThemeSettings();
  if(name==="sitesettings")loadSiteSettings();
 
@@ -1171,26 +1168,35 @@ function renderAnalytics(data){
  $("analyticsPagesTable").innerHTML=(cf.pages||[]).map(x=>'<tr><td>'+escapeHtml(x.path)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="2">'+(cf.pathWarning?escapeHtml(cf.pathWarning):"Sayfa verisi bulunamadı.")+'</td></tr>';
 }
 async function loadApplicationFunnel(){
- const message=$("applicationFunnelMessage");if(!message)return;
+ const message=$("applicationFunnelMessage"),table=$("applicationFunnelTable");
+ if(!message||!table)return;
  message.className="message";message.textContent="Başvuru hareketleri getiriliyor...";
+ table.innerHTML='<tr><td colspan="4">Takip verileri yükleniyor...</td></tr>';
  try{
   const response=await fetch("/api/application-events",{credentials:"same-origin",cache:"no-store"});
   const data=await response.json();
-  if(!response.ok||!data.success)throw new Error(data.message||"Başvuru hunisi alınamadı.");
-  const map=[
-   ["apply_click","funnelApplyClick"],["form_view","funnelFormView"],["form_start","funnelFormStart"],
-   ["submit_attempt","funnelSubmitAttempt"],["application_saved","funnelSaved"],
-   ["email_sent","funnelEmailSent"],["email_failed","funnelEmailFailed"],
-   ["whatsapp_redirect","funnelWhatsapp"],["form_abandon","funnelAbandon"],["site_return","funnelReturn"]
+  if(!response.ok||!data.success)throw new Error(data.message||"Başvuru takip verileri alınamadı.");
+  const rows=[
+   ["apply_click","Başvur butonuna tıklama","Ziyaretçi başvuru bağlantısına tıkladı."],
+   ["form_view","Başvuru formunu açma","Başvuru sayfası görüntülendi."],
+   ["form_start","Formu doldurmaya başlama","Form alanlarından en az biri dolduruldu."],
+   ["submit_attempt","Gönderim girişimi","Ziyaretçi başvuruyu göndermeyi denedi."],
+   ["application_saved","Başvurunun panele kaydedilmesi","Başvuru veritabanına başarıyla kaydedildi."],
+   ["email_sent","E-posta bildiriminin gönderilmesi","EDWISE bildirim e-postası başarıyla gönderildi."],
+   ["email_failed","E-posta bildiriminin başarısız olması","E-posta gönderilemedi veya servis etkin değildi."],
+   ["whatsapp_redirect","WhatsApp ekranına yönlendirme","WhatsApp bağlantısı açılmaya çalışıldı; mesajın gönderildiği anlamına gelmez."],
+   ["form_abandon","Formu yarım bırakıp ayrılma","Formu doldurmaya başlayan ziyaretçi göndermeden sayfadan ayrıldı."],
+   ["site_return","Siteye geri dönüş","WhatsApp yönlendirmesinden sonra ziyaretçi siteye geri döndü."]
   ];
-  for(const [key,id] of map){
+  table.innerHTML=rows.map(([key,label,description])=>{
    const item=data.totals?.[key]||{count:0,sessions:0};
-   $(id).textContent=Number(item.count||0).toLocaleString("tr-TR");
-   const sessionsId=id+"Sessions";
-   if($(sessionsId))$(sessionsId).textContent="Oturum: "+Number(item.sessions||0).toLocaleString("tr-TR");
-  }
-  message.className="message success";message.textContent="Son 30 günlük başvuru hareketleri güncellendi.";
- }catch(error){message.className="message error";message.textContent=error.message;}
+   return '<tr><td>'+escapeHtml(label)+'</td><td>'+Number(item.count||0).toLocaleString("tr-TR")+'</td><td>'+Number(item.sessions||0).toLocaleString("tr-TR")+'</td><td style="white-space:normal;min-width:280px">'+escapeHtml(description)+'</td></tr>';
+  }).join("");
+  message.className="message success";message.textContent="Son 30 günlük takip çizelgesi güncellendi.";
+ }catch(error){
+  table.innerHTML='<tr><td colspan="4">Takip verileri yüklenemedi.</td></tr>';
+  message.className="message error";message.textContent=error.message;
+ }
 }
 $("refreshApplicationFunnel")?.addEventListener("click",loadApplicationFunnel);
 
