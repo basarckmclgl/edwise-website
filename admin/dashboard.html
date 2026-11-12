@@ -1477,6 +1477,11 @@ function showPage(name){
  if(!canAccess(name)) name="overview";
  if(name==="overview"){loadPublishedContentCounts();if(currentRole==="superadmin"){loadApplicationFunnel();loadSiteReports();}}
 
+ // Her ana menü sekmesi yalnızca kendi içeriğini gösterir; diğer sekmelerin panelleri görünmez.
+ document.querySelectorAll(".content > section").forEach(section=>{
+  section.classList.toggle("hidden",section.id!==name);
+ });
+
  $("overview").classList.toggle("hidden",name!=="overview");
  $("reports").classList.toggle("hidden",name!=="reports");
  $("designcenter").classList.toggle("hidden",name!=="designcenter");
