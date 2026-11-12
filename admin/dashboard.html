@@ -688,6 +688,10 @@ td{color:#39334b!important;border-color:#eeebf4!important}
 .profile-social-intro h1{font-size:23px;margin:0 0 6px;color:#302744}.profile-social-intro p{margin:0 0 4px;color:#655d76;font-size:13px}.profile-social-intro small{color:#8a8398;font-size:12px}
 .profile-social-tabs{display:flex;gap:25px;padding:0 28px;background:#fff;border:1px solid #e9e5f0;border-top:0;border-radius:0 0 12px 12px;margin-bottom:18px}
 .profile-social-tabs span{padding:15px 2px;color:#79718a;font-size:12px;font-weight:650}.profile-social-tabs span.active{color:#6338cf;border-bottom:3px solid #7044cf}
+.admin-global-search{position:relative;width:min(390px,38vw);margin:0 auto}.admin-global-search input{height:36px;border-radius:22px!important;padding:0 16px!important;background:#f7f5fc!important;border:1px solid #e8e2f4!important;color:#302a45!important}
+.admin-search-results{position:absolute;z-index:100;top:43px;left:0;right:0;max-height:360px;overflow:auto;background:#fff;border:1px solid #e7e1f1;border-radius:12px;box-shadow:0 16px 38px #30204a20;padding:6px}
+.admin-search-result{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:11px;border:0;border-radius:8px;background:#fff;color:#332b49;cursor:pointer}.admin-search-result:hover{background:#f5f0ff}.admin-search-result small{color:#8a829b}.admin-search-empty{padding:16px;color:#817990;font-size:13px}
+@media(max-width:600px){.admin-global-search{width:34vw}.admin-global-search input{font-size:10px!important;padding:0 8px!important}}
 </style>
 </head>
 <body>
@@ -724,6 +728,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
 <main class="main">
  <header class="topbar">
 <div style="display:flex;align-items:center;gap:16px"><button type="button" class="menu-toggle" id="menuToggle" aria-label="Menüyü aç veya kapat" aria-expanded="true" title="Menüyü aç/kapat"><span></span><span></span><span></span></button><span>EDWISE / <strong id="breadcrumb">Ana Sayfa</strong></span></div>
+<div class="admin-global-search"><input id="adminGlobalSearch" type="search" placeholder="Panelde ara: sayfa, hizmet, blog..." autocomplete="off" aria-label="Panel genelinde ara"><div id="adminGlobalSearchResults" class="admin-search-results hidden"></div></div>
 <div class="topbar-account"><button type="button" class="account-trigger" id="accountMenuToggle" aria-expanded="false" aria-controls="accountMenu"><img class="account-avatar" id="topbarAvatar" alt="Profil fotoğrafı"><span><span class="account-name" id="username">Yönetici</span><span class="account-role" id="topbarRole">Yönetici</span></span>▾</button><div class="account-menu" id="accountMenu" hidden><div class="account-menu-role" id="accountMenuIdentity">Yönetici hesabı</div><button type="button" id="accountProfileLink">◉ &nbsp; Profilim</button><button type="button" id="accountLogout">↗ &nbsp; Güvenli Çıkış Yap</button></div><button class="logout" id="logout">Güvenli Çıkış ↗</button></div>
 </header>
 
@@ -3066,6 +3071,31 @@ loadAdminProfile();
 checkSession();
 </script>
 <script src="/admin/assets/js/static-page-imports.js"></script>
-<script src="/admin/assets/js/page-builder.js?v=wps-ribbon-20261111"></script>
+<script src="/admin/assets/js/page-builder.js?v=wps-ribbon-20261111">
+const globalAdminSearch=document.getElementById("adminGlobalSearch");
+const globalAdminResults=document.getElementById("adminGlobalSearchResults");
+globalAdminSearch?.addEventListener("input",()=>{
+ const q=globalAdminSearch.value.trim().toLocaleLowerCase("tr-TR");
+ if(!globalAdminResults)return;
+ if(q.length<2){globalAdminResults.classList.add("hidden");globalAdminResults.innerHTML="";return;}
+ const rows=[];
+ document.querySelectorAll(".nav[data-page]").forEach(n=>rows.push({title:n.innerText.trim(),type:"Menü",page:n.dataset.page}));
+ (pages||[]).forEach(x=>rows.push({title:x.title,type:"Sayfa",page:"pages",id:x.id}));
+ (services||[]).forEach(x=>rows.push({title:x.title,type:"Hizmet",page:"services",id:x.id}));
+ (posts||[]).forEach(x=>rows.push({title:x.title,type:"Blog",page:"posts",id:x.id}));
+ const found=rows.filter((x,i,a)=>x.title&&x.title.toLocaleLowerCase("tr-TR").includes(q)&&a.findIndex(y=>y.title===x.title&&y.page===x.page&&y.id===x.id)===i).slice(0,12);
+ globalAdminResults.innerHTML=found.length?found.map((x,i)=>'<button type="button" class="admin-search-result" data-global-result="'+i+'"><b>'+escapeHtml(x.title)+'</b><small>'+escapeHtml(x.type)+'</small></button>').join(""):'<div class="admin-search-empty">Eşleşen kayıt bulunamadı.</div>';
+ globalAdminResults.classList.remove("hidden");
+ globalAdminResults.querySelectorAll("[data-global-result]").forEach(b=>b.addEventListener("click",()=>{
+  const x=found[Number(b.dataset.globalResult)];showPage(x.page);
+  if(x.page==="pages"&&x.id)editPage(Number(x.id));
+  if(x.page==="services"&&x.id)editService(x.id);
+  if(x.page==="posts"&&x.id)editPost(x.id);
+  globalAdminResults.classList.add("hidden");globalAdminSearch.value="";
+ }));
+});
+document.addEventListener("click",e=>{if(!e.target.closest(".admin-global-search"))globalAdminResults?.classList.add("hidden");});
+
+</script>
 </body>
 </html>
