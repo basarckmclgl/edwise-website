@@ -231,6 +231,26 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
      <div class="panel"><h3>Ülkelere göre trafik</h3><p class="muted">Cloudflare istek sayıları</p><div class="table-wrap"><table style="min-width:360px"><thead><tr><th>Ülke</th><th>İstek</th></tr></thead><tbody id="analyticsCountryTable"><tr><td colspan="2">Veriler bekleniyor...</td></tr></tbody></table></div></div>
      <div class="panel"><h3>En çok istek alan sayfalar</h3><p class="muted">Cloudflare sayfa yolu raporu</p><div class="table-wrap"><table style="min-width:280px"><thead><tr><th>Sayfa</th><th>İstek</th></tr></thead><tbody id="analyticsPagesTable"><tr><td colspan="2">Veriler bekleniyor...</td></tr></tbody></table></div></div>
     </div>
+    <div class="panel" style="margin-top:16px">
+     <div class="section-head" style="margin:0 0 14px">
+      <div><h3>Başvuru Hunisi ve Terk Analizi</h3><p class="muted">Son 30 gün · anonim oturum bazlı ölçüm</p></div>
+      <button class="btn" id="refreshApplicationFunnel">↻ Huniyi Yenile</button>
+     </div>
+     <div id="applicationFunnelMessage" class="message">Başvuru hareketleri yükleniyor...</div>
+     <div class="grid analytics-stats">
+      <div class="stat"><span>Başvur butonuna tıklayan</span><h2 id="funnelApplyClick">—</h2><p id="funnelApplyClickSessions">Oturum: —</p></div>
+      <div class="stat"><span>Formu açan</span><h2 id="funnelFormView">—</h2><p id="funnelFormViewSessions">Oturum: —</p></div>
+      <div class="stat"><span>Formu doldurmaya başlayan</span><h2 id="funnelFormStart">—</h2><p id="funnelFormStartSessions">Oturum: —</p></div>
+      <div class="stat"><span>Gönder'e basan</span><h2 id="funnelSubmitAttempt">—</h2><p id="funnelSubmitAttemptSessions">Oturum: —</p></div>
+      <div class="stat"><span>Başarılı kaydedilen</span><h2 id="funnelSaved">—</h2><p id="funnelSavedSessions">Oturum: —</p></div>
+      <div class="stat"><span>E-posta gönderilen</span><h2 id="funnelEmailSent">—</h2><p id="funnelEmailSentSessions">Oturum: —</p></div>
+      <div class="stat"><span>E-posta gönderilemeyen</span><h2 id="funnelEmailFailed">—</h2><p id="funnelEmailFailedSessions">Oturum: —</p></div>
+      <div class="stat"><span>WhatsApp yönlendirmesi</span><h2 id="funnelWhatsapp">—</h2><p id="funnelWhatsappSessions">Oturum: —</p></div>
+      <div class="stat"><span>Formu yarım bırakıp ayrılan</span><h2 id="funnelAbandon">—</h2><p id="funnelAbandonSessions">Oturum: —</p></div>
+      <div class="stat"><span>Siteye geri dönen</span><h2 id="funnelReturn">—</h2><p id="funnelReturnSessions">Oturum: —</p></div>
+     </div>
+     <p class="muted" style="margin-top:14px">Not: WhatsApp yönlendirmesi, mesajın gönderildiğini kanıtlamaz. E-posta sayısı, EDWISE bildirim e-postasının gönderim sonucudur. Oturum sayıları aynı kişinin farklı oturumlarda tekrar sayılmasını engellemez.</p>
+    </div>
    </section>
 
    <div class="section-head">
@@ -753,7 +773,7 @@ async function loadPublishedContentCounts(){
 
 function showPage(name){
  if(!canAccess(name)) name="overview";
- if(name==="overview")loadPublishedContentCounts();
+ if(name==="overview"){loadPublishedContentCounts();if(currentRole==="superadmin")loadApplicationFunnel();}
 
  $("overview").classList.toggle("hidden",name!=="overview");
  $("designcenter").classList.toggle("hidden",name!=="designcenter");
@@ -1150,6 +1170,30 @@ function renderAnalytics(data){
  $("analyticsCountryTable").innerHTML=countries.map(x=>'<tr><td>'+escapeHtml(x.country)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="2">Henüz ülke verisi yok.</td></tr>';
  $("analyticsPagesTable").innerHTML=(cf.pages||[]).map(x=>'<tr><td>'+escapeHtml(x.path)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="2">'+(cf.pathWarning?escapeHtml(cf.pathWarning):"Sayfa verisi bulunamadı.")+'</td></tr>';
 }
+async function loadApplicationFunnel(){
+ const message=$("applicationFunnelMessage");if(!message)return;
+ message.className="message";message.textContent="Başvuru hareketleri getiriliyor...";
+ try{
+  const response=await fetch("/api/application-events",{credentials:"same-origin",cache:"no-store"});
+  const data=await response.json();
+  if(!response.ok||!data.success)throw new Error(data.message||"Başvuru hunisi alınamadı.");
+  const map=[
+   ["apply_click","funnelApplyClick"],["form_view","funnelFormView"],["form_start","funnelFormStart"],
+   ["submit_attempt","funnelSubmitAttempt"],["application_saved","funnelSaved"],
+   ["email_sent","funnelEmailSent"],["email_failed","funnelEmailFailed"],
+   ["whatsapp_redirect","funnelWhatsapp"],["form_abandon","funnelAbandon"],["site_return","funnelReturn"]
+  ];
+  for(const [key,id] of map){
+   const item=data.totals?.[key]||{count:0,sessions:0};
+   $(id).textContent=Number(item.count||0).toLocaleString("tr-TR");
+   const sessionsId=id+"Sessions";
+   if($(sessionsId))$(sessionsId).textContent="Oturum: "+Number(item.sessions||0).toLocaleString("tr-TR");
+  }
+  message.className="message success";message.textContent="Son 30 günlük başvuru hareketleri güncellendi.";
+ }catch(error){message.className="message error";message.textContent=error.message;}
+}
+$("refreshApplicationFunnel")?.addEventListener("click",loadApplicationFunnel);
+
 async function loadAnalytics(){
  if(!$("analyticsMessage"))return;$("analyticsMessage").className="message";$("analyticsMessage").textContent="Cloudflare verileri getiriliyor...";
  try{const response=await fetch("/api/analytics",{credentials:"same-origin",cache:"no-store"});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||"Cloudflare analiz verileri alınamadı.");renderAnalytics(data);}
