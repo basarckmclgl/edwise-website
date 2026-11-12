@@ -195,7 +195,7 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
  <button class="nav" data-page="reports" data-superadmin><span class="ico">▤</span><span>Raporlar</span></button>
  <div class="menu-label">AYARLAR</div>
  <button class="nav" data-page="sitesettings" data-superadmin><span class="ico">⚙</span><span>Site Ayarları</span></button>
- <button class="nav nav-sub" data-page="designcenter"><span class="ico">▣</span><span>Site Tasarım Merkezi</span></button>
+ 
 
  <div class="menu-label">İÇERİK YÖNETİMİ</div>
  <button class="nav" data-page="pages"><span class="ico">▤</span><span>Sayfa Yönetimi</span></button>
@@ -586,7 +586,8 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
     
 
 <section id="sitesettings" class="hidden" data-superadmin>
- <div class="section-head"><div><h2>Panel Ayarları</h2><p>Yalnızca yönetim panelinin görünümünü ve kullanım tercihlerini düzenleyin. Ziyaretçilerin gördüğü site etkilenmez.</p></div></div>
+ <div class="section-head"><div><h2>Site Ayarları</h2><p>Panel tercihlerini ve web sitesinin tasarım önizlemesini buradan yönetin.</p></div></div>
+ <div class="panel" style="margin-bottom:18px"><div class="section-head"><div><h3>Site Tasarım Merkezi</h3><p>Web sitenizin sayfalarını yönetim paneli içinden görüntüleyin ve tasarım önizlemesini açın.</p></div><button class="primary" type="button" id="openDesignCenterFromSettings">Site Tasarım Merkezini Aç</button></div></div>
  <div id="siteSettingsMessage"></div>
  <div class="settings-search-wrap">
   <span>⌕</span><input id="settingsSearch" type="search" placeholder="Ayarlarda arayın" autocomplete="off">
@@ -812,6 +813,8 @@ async function loadPublishedContentCounts(){
   ids.forEach(id=>{const el=$(id);if(el)el.textContent="—";});
  }
 }
+
+$("openDesignCenterFromSettings")?.addEventListener("click",()=>showPage("designcenter"));
 
 const menuToggle=$("menuToggle");
 menuToggle?.addEventListener("click",()=>{
