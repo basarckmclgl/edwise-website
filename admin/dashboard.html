@@ -570,6 +570,20 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
 
   <section id="reports" class="hidden" data-superadmin>
    <div class="section-head"><div><h2>Site Raporları</h2><p>Son 30 günlük sayfa görüntüleme, ziyaretçi oturumu ve kaydırma derinliği.</p></div><div class="actions"><button class="btn" id="refreshSiteReports">↻ Raporları Yenile</button><div class="report-export" id="applicationExport"><button class="primary" type="button" id="applicationExportToggle" aria-haspopup="true" aria-expanded="false">Başvuru Kayıtlarını Raporla <span aria-hidden="true">▾</span></button><div class="report-export-menu hidden" id="applicationExportMenu"><button type="button" data-export-applications="pdf">PDF olarak indir</button><button type="button" data-export-applications="doc">Word (.doc) olarak indir</button><button type="button" data-export-applications="xlsx">Excel (.xlsx) olarak indir</button></div></div></div></div>
+   <section class="panel" id="ga4Reports" style="margin:0 0 18px">
+    <div class="section-head"><div><h2>Google Analytics 4 · EDWISE</h2><p>Google Analytics üzerinden ölçülen gerçek ziyaretçi ve trafik verileri · Son 30 gün</p></div><span class="badge">GA4</span></div>
+    <div id="ga4Message" class="message">Google Analytics verileri yükleniyor...</div>
+    <div class="grid analytics-stats">
+     <div class="stat"><span>Aktif kullanıcı</span><h2 id="ga4ActiveUsers">—</h2><p>Son 30 günlük aktif kullanıcı</p></div>
+     <div class="stat"><span>Oturum</span><h2 id="ga4Sessions">—</h2><p>Toplam ziyaret oturumu</p></div>
+     <div class="stat"><span>Sayfa görüntüleme</span><h2 id="ga4PageViews">—</h2><p>Görüntülenen sayfalar</p></div>
+     <div class="stat"><span>Etkinlik</span><h2 id="ga4Events">—</h2><p>Kaydedilen toplam etkinlik</p></div>
+    </div>
+    <div class="report-pair-grid" style="margin-top:16px">
+     <div class="panel"><h3>En çok görüntülenen sayfalar</h3><div class="table-wrap"><table><thead><tr><th>Sayfa</th><th>Görüntüleme</th><th>Kullanıcı</th></tr></thead><tbody id="ga4Pages"><tr><td colspan="3">Veriler bekleniyor...</td></tr></tbody></table></div></div>
+     <div class="panel"><h3>Trafik kaynakları</h3><div class="table-wrap"><table><thead><tr><th>Kaynak</th><th>Oturum</th><th>Kullanıcı</th></tr></thead><tbody id="ga4Sources"><tr><td colspan="3">Veriler bekleniyor...</td></tr></tbody></table></div></div>
+    </div>
+   </section>
    <section class="analytics-wrap" id="cloudflareReports" style="margin:0 0 18px">
     <div class="section-head"><div><h2>Cloudflare Trafik Raporu</h2><p>Cloudflare ağından geçen gerçek HTTP istekleri · Son 30 gün</p></div><button class="btn" type="button" id="refreshCloudflareReports">↻ Cloudflare verilerini yenile</button></div>
     <div class="panel" style="margin-bottom:16px">
@@ -1678,8 +1692,20 @@ function drawAnalyticsBars(rows){
  const step=plotW/Math.max(rows.length,1),barW=Math.max(2,Math.min(12,step*.32));
  rows.forEach((r,i)=>{const x=left+i*step+step/2,a=(r.requests||0)/max*plotH;ctx.fillStyle="#8055ed";ctx.fillRect(x-barW/2,top+plotH-a,barW,a);if(i%Math.max(1,Math.ceil(rows.length/7))===0){ctx.fillStyle="#aaa7c0";ctx.fillText(String(r.date||"").slice(5).replace("-","/"),x-15,height-12);}});
 }
+function renderGoogleAnalytics(data){
+ const ga=data.googleAnalytics||{},msg=$("ga4Message"),fmt=analyticsNumber;
+ if(!ga.configured){
+  msg.className="message error";msg.textContent=ga.error||"Google Analytics henüz yapılandırılmadı.";
+  ["ga4ActiveUsers","ga4Sessions","ga4PageViews","ga4Events"].forEach(id=>$(id).textContent="—");
+  return;
+ }
+ const t=ga.totals||{};msg.className="message success";msg.textContent="Google Analytics verileri alındı. Dönem: "+data.period.startDate+" – "+data.period.endDate;
+ $("ga4ActiveUsers").textContent=fmt(t.activeUsers);$("ga4Sessions").textContent=fmt(t.sessions);$("ga4PageViews").textContent=fmt(t.pageViews);$("ga4Events").textContent=fmt(t.eventCount);
+ $("ga4Pages").innerHTML=(ga.pages||[]).map(x=>"<tr><td>"+escapeHtml(x.path)+"</td><td>"+fmt(x.pageViews)+"</td><td>"+fmt(x.activeUsers)+"</td></tr>").join("")||'<tr><td colspan="3">Henüz veri yok.</td></tr>';
+ $("ga4Sources").innerHTML=(ga.sources||[]).map(x=>"<tr><td>"+escapeHtml(x.source)+"</td><td>"+fmt(x.sessions)+"</td><td>"+fmt(x.activeUsers)+"</td></tr>").join("")||'<tr><td colspan="3">Henüz veri yok.</td></tr>';
+}
 function renderAnalytics(data){
- window._edwiseAnalyticsData=data;const cf=data.cloudflare||{},t=cf.totals||{};
+ window._edwiseAnalyticsData=data;renderGoogleAnalytics(data);const cf=data.cloudflare||{},t=cf.totals||{};
  $("cfUnique").textContent=cf.configured?analyticsNumber(t.dailyUniqueIpTotal):"—";
  $("cfRequests").textContent=cf.configured?analyticsNumber(t.requests):"—";
  $("cfCountryCount").textContent=cf.configured?analyticsNumber((cf.countries||[]).length):"—";
