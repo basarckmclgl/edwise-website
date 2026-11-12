@@ -64,16 +64,20 @@ export async function onRequestPost({ request, env }) {
         "Eğitim tercihi: " + data.format, "Uygun zaman: " + (data.availability || "-"),
         "Not: " + (data.note || "-"), "Başvuru No: " + result.meta.last_row_id
       ];
-      const mail = await fetch("https://api.resend.com/emails", {
-        method:"POST",
-        headers:{ Authorization:"Bearer " + env.RESEND_API_KEY, "Content-Type":"application/json" },
-        body:JSON.stringify({ from:env.RESEND_FROM_EMAIL, to:[recipient], subject:"EDWISE Yeni Başvuru #" + result.meta.last_row_id, text:lines.join("\n") })
-      });
-      emailSent = mail.ok;
-      if (/^[a-zA-Z0-9_-]{12,64}$/.test(trackingSessionId)) {
-        await env.DB.prepare("INSERT INTO application_events (session_id,event_name,page_path) VALUES (?,?,?)")
-          .bind(trackingSessionId,emailSent?"email_sent":"email_failed","/pages/basvuru.html").run();
+      try {
+        const mail = await fetch("https://api.resend.com/emails", {
+          method:"POST",
+          headers:{ Authorization:"Bearer " + env.RESEND_API_KEY, "Content-Type":"application/json" },
+          body:JSON.stringify({ from:env.RESEND_FROM_EMAIL, to:[recipient], subject:"EDWISE Yeni Başvuru #" + result.meta.last_row_id, text:lines.join("\n") })
+        });
+        emailSent = mail.ok;
+      } catch {
+        emailSent = false;
       }
+    }
+    if (/^[a-zA-Z0-9_-]{12,64}$/.test(trackingSessionId)) {
+      await env.DB.prepare("INSERT INTO application_events (session_id,event_name,page_path) VALUES (?,?,?)")
+        .bind(trackingSessionId,emailSent?"email_sent":"email_failed","/pages/basvuru.html").run();
     }
     return json({ success:true, applicationId:result.meta.last_row_id, emailSent });
   } catch (error) {
