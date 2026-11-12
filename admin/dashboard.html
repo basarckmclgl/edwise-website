@@ -336,28 +336,6 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
  word-break:normal!important;
 }
 
-/* Dönüşüm kayıtları: her kayıt ayrı sütun, kayıtlar yatay */
-#reports .application-pair-grid .compact-report .funnel-horizontal-table{
- width:max-content!important;
- min-width:100%!important;
- table-layout:auto!important;
- border-collapse:collapse!important;
-}
-#reports .application-pair-grid .compact-report .funnel-horizontal-table th,
-#reports .application-pair-grid .compact-report .funnel-horizontal-table td{
- min-width:150px!important;
- max-width:240px!important;
- padding:9px 12px!important;
- white-space:nowrap!important;
- vertical-align:top!important;
-}
-#reports .application-pair-grid .compact-report .funnel-horizontal-table th:first-child{
- position:sticky;
- left:0;
- z-index:1;
- min-width:90px!important;
- background:#211c35!important;
-}
 </style>
 </head>
 <body>
@@ -1476,23 +1454,7 @@ async function loadSiteReports(){
   const funnelRows=data.funnelRecords||[];
   const funnelTable=$("funnelEventRecords");
   if($("funnelRecordCount"))$("funnelRecordCount").textContent=funnelRows.length+" kayıt";
-  if(funnelTable){
-   const funnelTableElement=funnelTable.closest("table");
-   if(funnelRows.length){
-    const recordHeaders=funnelRows.map((item,index)=>'<th scope="col">Kayıt '+(index+1)+'</th>').join("");
-    const recordCells=field=>funnelRows.map(item=>'<td>'+field(item)+'</td>').join("");
-    funnelTableElement.classList.add("funnel-horizontal-table");
-    funnelTableElement.innerHTML='<thead><tr><th scope="col">Bilgi</th>'+recordHeaders+'</tr></thead><tbody>'+
-     '<tr><th scope="row">Tarih</th>'+recordCells(item=>escapeHtml(item.date))+'</tr>'+
-     '<tr><th scope="row">Ülke</th>'+recordCells(item=>countryBadge(item.country))+'</tr>'+
-     '<tr><th scope="row">Oturum</th>'+recordCells(item=>escapeHtml(item.session))+'</tr>'+
-     '<tr><th scope="row">İşlem</th>'+recordCells(item=>escapeHtml(funnelLabels[item.event]||item.event))+'</tr>'+
-     '</tbody>';
-   }else{
-    funnelTableElement.classList.add("funnel-horizontal-table");
-    funnelTableElement.innerHTML='<tbody><tr><td>Henüz başvuru hareketi kaydı yok.</td></tr></tbody>';
-   }
-  }
+  if(funnelTable)funnelTable.innerHTML=funnelRows.map(item=>'<tr><td>'+escapeHtml(item.date)+'</td><td>'+countryBadge(item.country)+'</td><td>'+escapeHtml(item.session)+'</td><td>'+escapeHtml(funnelLabels[item.event]||item.event)+'</td></tr>').join("")||'<tr><td colspan="4">Henüz başvuru hareketi kaydı yok.</td></tr>';
   if(message){message.className="message success";message.textContent="Son 30 günlük raporlar güncellendi.";}
  }catch(error){if(message){message.className="message error";message.textContent=error.message;}table.innerHTML='<tr><td colspan="7">Raporlar yüklenemedi.</td></tr>';}
 }
