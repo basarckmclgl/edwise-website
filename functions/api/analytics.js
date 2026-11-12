@@ -46,16 +46,17 @@ async function onGoogleAnalytics(env,startDate,endDate){
   const data=await fetchJson("https://analyticsdata.googleapis.com/v1beta/properties/"+propertyId+":runReport",{method:"POST",headers:{Authorization:"Bearer "+token,"Content-Type":"application/json"},body:JSON.stringify({dateRanges:[{startDate,endDate}],dimensions:dimensions.map(name=>({name})),metrics:metrics.map(name=>({name})),limit})},12000);
   return data.rows||[];
  }
- const [summary,daily,countries,pages,sources]=await Promise.all([
+ const [summary,daily,countries,pages,sources,realtime]=await Promise.all([
   report([],["activeUsers","sessions","screenPageViews","eventCount"],1),
   report(["date"],["activeUsers","sessions","screenPageViews"],100),
   report(["country"],["activeUsers","sessions"],20),
   report(["pagePath"],["screenPageViews","activeUsers"],20),
-  report(["sessionSourceMedium"],["sessions","activeUsers"],20)
+  report(["sessionSourceMedium"],["sessions","activeUsers"],20),
+  fetchJson("https://analyticsdata.googleapis.com/v1beta/properties/"+propertyId+":runRealtimeReport",{method:"POST",headers:{Authorization:"Bearer "+token,"Content-Type":"application/json"},body:JSON.stringify({metrics:[{name:"activeUsers"},{name:"eventCount"},{name:"screenPageViews"}]})},10000)
  ]);
  const vals=summary[0]?.metricValues||[];
  const number=(row,index)=>Number(row?.metricValues?.[index]?.value||0);
- return {configured:true,propertyId,totals:{activeUsers:number(summary[0],0),sessions:number(summary[0],1),pageViews:number(summary[0],2),eventCount:number(summary[0],3)},daily:daily.map(r=>({date:(r.dimensionValues?.[0]?.value||"").replace(/^(\d{4})(\d{2})(\d{2})$/,"$1-$2-$3"),activeUsers:number(r,0),sessions:number(r,1),pageViews:number(r,2)})),countries:countries.map(r=>({country:r.dimensionValues?.[0]?.value||"Bilinmiyor",activeUsers:number(r,0),sessions:number(r,1)})),pages:pages.map(r=>({path:r.dimensionValues?.[0]?.value||"/",pageViews:number(r,0),activeUsers:number(r,1)})),sources:sources.map(r=>({source:r.dimensionValues?.[0]?.value||"Bilinmiyor",sessions:number(r,0),activeUsers:number(r,1)}))};
+ return {configured:true,propertyId,totals:{activeUsers:number(summary[0],0),sessions:number(summary[0],1),pageViews:number(summary[0],2),eventCount:number(summary[0],3)},realtime:{activeUsers:Number(realtime.rows?.[0]?.metricValues?.[0]?.value||0),eventCount:Number(realtime.rows?.[0]?.metricValues?.[1]?.value||0),pageViews:Number(realtime.rows?.[0]?.metricValues?.[2]?.value||0)},daily:daily.map(r=>({date:(r.dimensionValues?.[0]?.value||"").replace(/^(\d{4})(\d{2})(\d{2})$/,"$1-$2-$3"),activeUsers:number(r,0),sessions:number(r,1),pageViews:number(r,2)})),countries:countries.map(r=>({country:r.dimensionValues?.[0]?.value||"Bilinmiyor",activeUsers:number(r,0),sessions:number(r,1)})),pages:pages.map(r=>({path:r.dimensionValues?.[0]?.value||"/",pageViews:number(r,0),activeUsers:number(r,1)})),sources:sources.map(r=>({source:r.dimensionValues?.[0]?.value||"Bilinmiyor",sessions:number(r,0),activeUsers:number(r,1)}))};
 }
 
 async function onCloudflare(env,startDate,endDate){
