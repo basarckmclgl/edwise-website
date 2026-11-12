@@ -83,29 +83,12 @@ td{color:#e8e5f3}
 @media(max-width:650px){.sidebar{width:65px;padding:15px 7px}.logo{font-size:14px;padding:5px}.logo small,.menu-label,.nav span:last-child{display:none}.nav{justify-content:center;padding:13px 4px}.main{margin-left:65px;width:calc(100% - 65px)}.content{padding:16px 12px}.topbar{padding:0 12px}.grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
 
 /* Word benzeri blog editörü */
-.word-toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:#11111e;border:1px solid var(--border);border-bottom:0;border-radius:9px 9px 0 0}
-.toolbar-group{display:flex;flex-wrap:wrap;gap:5px;padding-right:9px;margin-right:2px;border-right:1px solid var(--border)}
-.toolbar-group:last-child{border-right:0}
 .editor-tool{background:#242039;color:#eee8ff;border:1px solid #45405f;border-radius:6px;padding:8px 10px;cursor:pointer;font-size:12px}
 .editor-tool:hover,.editor-tool:focus{border-color:var(--light);background:#352953}
 .danger-tool{color:#ff9da8;border-color:#64333f}
-.post-canvas{background:#fff;color:#24212b;border:1px solid #c9c5d5;border-radius:0 0 9px 9px;min-height:420px;padding:30px 34px;font:17px/1.8 Arial,sans-serif;outline:none}
-.post-canvas:focus{border-color:var(--light);box-shadow:0 0 0 2px #8055ed22}
-.post-canvas>*{margin:0 0 18px;padding:5px 8px;border:1px solid transparent;border-radius:5px}
-.post-canvas>*.active-block{border-color:#b9a5f5;background:#faf8ff}
-.post-canvas p{font-size:17px;line-height:1.85}
-.post-canvas h2{font-size:29px;line-height:1.3;color:#242039}
-.post-canvas h3{font-size:23px;line-height:1.4;color:#352953}
-.post-canvas blockquote{border-left:4px solid #8055ed;background:#f4f0ff;padding:14px 18px;color:#51446d}
-.post-canvas img{max-width:100%;height:auto;border-radius:8px;display:block}
-.post-canvas figure{margin:18px 0;text-align:center}
-.post-canvas figcaption{font-size:13px;color:#777;margin-top:7px}
-.post-canvas ul,.post-canvas ol{padding-left:32px}
 .editor-help{font-size:12px;color:var(--muted);line-height:1.6;margin:9px 0 0}
 
 .analytics-wrap{margin:28px 0 32px}.analytics-wrap .section-head{margin-top:25px}.analytics-wrap .panel{min-width:0;margin:0}.analytics-wrap .panel h3{font-size:14px;margin:0 0 8px}.analytics-wrap .stat h2{font-size:24px}.analytics-donut{width:190px;height:190px;border-radius:50%;margin:18px auto;display:grid;place-items:center;background:conic-gradient(#8055ed 0 100%);position:relative}.analytics-donut:before{content:"";position:absolute;width:118px;height:118px;border-radius:50%;background:var(--panel)}.analytics-donut-center{position:relative;z-index:1;text-align:center;display:flex;flex-direction:column;gap:4px}.analytics-donut-center strong{font-size:22px}.analytics-donut-center small{font-size:11px;color:var(--muted)}.analytics-legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:var(--muted)}.analytics-legend span{display:flex;align-items:center;gap:6px;min-width:0}.analytics-legend i{width:9px;height:9px;border-radius:2px;flex:0 0 9px}.analytics-wrap canvas{display:block;max-width:100%}@media(max-width:950px){.analytics-charts{grid-template-columns:1fr!important}}@media(max-width:650px){.analytics-wrap .section-head{align-items:flex-start;flex-direction:column}.analytics-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.analytics-stats .stat{padding:13px}.analytics-stats .stat h2{font-size:20px}.analytics-legend{grid-template-columns:1fr}}
-@media(max-width:650px){.post-canvas{padding:18px 14px;min-height:350px}.word-toolbar{gap:6px}.toolbar-group{border-right:0;padding-right:0}}
-.image-drop-zone {
     margin-top: 12px;
     padding: 25px;
     border: 2px dashed #8055ed;
@@ -120,18 +103,14 @@ td{color:#e8e5f3}
     transition: .2s;
 }
 
-.image-drop-zone span,
-.image-drop-zone small {
     color: #aaa7c0;
     font-size: 12px;
 }
 
-.image-drop-zone.drag-over {
     background: #292044;
     border-color: #a78bfa;
 }
 
-.image-drop-zone.uploading {
     opacity: .6;
     pointer-events: none;
 }
@@ -671,9 +650,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
 .message.error{background:#fff0f2!important;color:#a52f45!important}
 .message.success{background:#e9f8f2!important;color:#176b4d!important}
 .table-wrap{border:1px solid #eeebf4!important;border-radius:10px!important}
-.word-toolbar{background:#f6f2ff!important;border-color:#e7def7!important}
 .editor-tool{background:#fff!important;color:#51436e!important;border-color:#e4dcef!important}
-.image-drop-zone{background:#faf8ff!important;color:#51436e!important}
 .settings-search-wrap input{background:#fff!important}
 .account-menu{background:#fff!important;border-color:#e8e3f0!important}
 .account-menu button{color:#49435a!important}
@@ -729,7 +706,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
 <main class="main">
  <header class="topbar">
 <div style="display:flex;align-items:center;gap:16px"><button type="button" class="menu-toggle" id="menuToggle" aria-label="Menüyü aç veya kapat" aria-expanded="true" title="Menüyü aç/kapat"><span></span><span></span><span></span></button><span>EDWISE / <strong id="breadcrumb">Ana Sayfa</strong></span></div>
-<div class="admin-global-search"><input id="adminGlobalSearch" type="search" placeholder="Panelde ara: sayfa, hizmet, blog..." autocomplete="off" aria-label="Panel genelinde ara"><div id="adminGlobalSearchResults" class="admin-search-results hidden"></div></div>
+<div class="admin-global-search"><input id="adminGlobalSearch" type="search" placeholder="Panelde ara: sayfa, hizmet..." autocomplete="off" aria-label="Panel genelinde ara"><div id="adminGlobalSearchResults" class="admin-search-results hidden"></div></div>
 <div class="topbar-account"><button type="button" class="account-trigger" id="accountMenuToggle" aria-expanded="false" aria-controls="accountMenu"><img class="account-avatar" id="topbarAvatar" alt="Profil fotoğrafı"><span><span class="account-name" id="username">Yönetici</span><span class="account-role" id="topbarRole">Yönetici</span></span>▾</button><div class="account-menu" id="accountMenu" hidden><div class="account-menu-role" id="accountMenuIdentity">Yönetici hesabı</div><button type="button" id="accountProfileLink">◉ &nbsp; Profilim</button><button type="button" id="accountLogout">↗ &nbsp; Güvenli Çıkış Yap</button></div><button class="logout" id="logout">Güvenli Çıkış ↗</button></div>
 </header>
 
@@ -864,7 +841,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
    </div>
    <div class="panel">
     <div class="form-grid">
-     <div class="field"><label for="designPageSelect">Önizlenecek sayfa</label><select id="designPageSelect"><option value="/">Ana Sayfa</option><option value="/pages/hizmetlerimiz.html">Hizmetlerimiz</option><option value="/pages/hakkimizda.html">Hakkımızda</option><option value="/pages/basvuru.html">Başvuru</option><option value="/pages/iletisim.html">İletişim ve Konum</option><option value="/edwise-rehber.html">EDWISE Rehber</option><option value="/pages/egitim-danismanligi.html">Eğitim Danışmanlığı</option><option value="/pages/coaching-mentoring.html">Coaching &amp; Mentoring</option><option value="/pages/ielts.html">IELTS</option><option value="/pages/toefl.html">TOEFL</option><option value="/pages/yds.html">YDS</option><option value="/pages/yokdil.html">YÖKDİL</option><option value="/pages/speaking-club.html">Speaking Club</option><option value="/pages/yasal-bilgilendirme.html">Yasal Bilgilendirme</option></select></div>
+     <div class="field"><label for="designPageSelect">Önizlenecek sayfa</label><select id="designPageSelect"><option value="/">Ana Sayfa</option><option value="/pages/hizmetlerimiz.html">Hizmetlerimiz</option><option value="/pages/hakkimizda.html">Hakkımızda</option><option value="/pages/basvuru.html">Başvuru</option><option value="/pages/iletisim.html">İletişim ve Konum</option><option value="/pages/egitim-danismanligi.html">Eğitim Danışmanlığı</option><option value="/pages/coaching-mentoring.html">Coaching &amp; Mentoring</option><option value="/pages/ielts.html">IELTS</option><option value="/pages/toefl.html">TOEFL</option><option value="/pages/yds.html">YDS</option><option value="/pages/yokdil.html">YÖKDİL</option><option value="/pages/speaking-club.html">Speaking Club</option><option value="/pages/yasal-bilgilendirme.html">Yasal Bilgilendirme</option></select></div>
      <div class="field"><label for="designRecordSelect">Düzenlenecek içerik</label><select id="designRecordSelect"><option value="">Sayfa seçimine göre içerik bulunacak</option></select></div>
     </div>
     <div class="actions">
@@ -1036,119 +1013,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
     </div>
    </div>
   </section>
-    <section id="posts" class="hidden">
-   <div class="section-head">
-    <div>
-     <h2>Blog Yönetimi</h2>
-     <p>Blog yazılarınızı oluşturun, düzenleyin ve yayımlayın.</p>
-    </div>
-    <button class="primary" id="newPost">+ Yeni Blog Yazısı</button>
-   </div>
-
-   <div id="postMessage"></div>
-
-   <div id="postEditor" class="panel hidden">
-    <h2 id="postEditorTitle">Yeni Blog Yazısı</h2>
-    <form id="postForm">
-     <input type="hidden" id="postId">
-     <div class="form-grid">
-      <div class="field">
-       <label for="postTitle">Blog başlığı *</label>
-       <input id="postTitle" required maxlength="200" placeholder="Örn. Yurt Dışında Eğitim Rehberi">
-      </div>
-      <div class="field">
-       <label for="postSlug">URL adresi *</label>
-       <input id="postSlug" required placeholder="yurt-disinda-egitim-rehberi">
-      </div>
-      <div class="field full">
-       <label for="postExcerpt">Kısa açıklama</label>
-       <textarea id="postExcerpt" placeholder="Blog yazısının kısa tanıtım metni..."></textarea>
-          <div class="field">
-    <label for="postMetaTitle">SEO Başlığı</label>
-    <input id="postMetaTitle" maxlength="70" placeholder="Google'da görünecek başlık">
-</div>
-
-<div class="field">
-    <label for="postMetaDescription">SEO Açıklaması</label>
-    <textarea id="postMetaDescription" maxlength="160" placeholder="Google arama sonuçlarında görünecek açıklama..."></textarea>
-</div>
-      </div>
-      <div class="field full">
-       <label>Blog içeriği *</label>
-       <div class="word-toolbar" id="postToolbar">
-        <div class="toolbar-group">
-         <button type="button" class="editor-tool" data-command="bold"><b>B</b></button>
-         <button type="button" class="editor-tool" data-command="italic"><i>İ</i></button>
-         <button type="button" class="editor-tool" data-command="underline"><u>A</u></button>
-        </div>
-        <div class="toolbar-group">
-         <button type="button" class="editor-tool" data-block="p">Paragraf</button>
-         <button type="button" class="editor-tool" data-block="h2">Başlık</button>
-         <button type="button" class="editor-tool" data-block="h3">Alt başlık</button>
-         <button type="button" class="editor-tool" data-block="blockquote">Alıntı</button>
-        </div>
-        <div class="toolbar-group">
-         <button type="button" class="editor-tool" data-insert="ul">• Liste</button>
-         <button type="button" class="editor-tool" data-insert="ol">1. Liste</button>
-         <button type="button" class="editor-tool" id="insertImageBlock">📁 Görsel Yükle</button>
-         <button type="button" class="editor-tool" id="insertImageUrl">🔗 URL ile Ekle</button>
-         <input type="file" id="postImageFile" accept="image/*" hidden>
-        </div>
-        <div class="toolbar-group">
-         <button type="button" class="editor-tool" id="addParagraph">＋ Paragraf bloğu</button>
-         <button type="button" class="editor-tool" id="addHeading">＋ Başlık bloğu</button>
-        </div>
-        <div class="toolbar-group">
-         <button type="button" class="editor-tool" id="moveBlockUp">↑ Yukarı</button>
-         <button type="button" class="editor-tool" id="moveBlockDown">↓ Aşağı</button>
-         <button type="button" class="editor-tool danger-tool" id="deleteBlock">Bloğu sil</button>
-        </div>
-       </div>
-       <div id="postCanvas" class="post-canvas" contenteditable="true" spellcheck="true"></div>
-          <div id="imageDropZone" class="image-drop-zone" role="button" tabindex="0" aria-label="Görsel yüklemek için tıklayın veya sürükleyip bırakın">
-            <strong>Görseli buraya sürükleyip bırakın</strong>
-            <span>veya bilgisayarınızdan seçmek için tıklayın.</span>
-            <small>JPG, PNG, WEBP — Maksimum 8 MB</small>
-            </div>
-       
-        <p>Yazınızı buraya yazmaya başlayın...</p></div>
-       <textarea id="postContent" class="hidden" required></textarea>
-       <p class="editor-help">Bir bloğa tıklayarak seçin. Araçlarla biçimlendirin, blok ekleyin, taşıyın veya silin. Görsel eklemek için https:// ile başlayan görsel URL adresini girin.</p>
-      </div>
-      <div class="field full">
-       <label for="postImage">Kapak görseli URL adresi</label>
-       <input id="postImage" placeholder="https://...">
-      </div>
-      <div class="field">
-       <label for="postStatus">Yayın durumu</label>
-       <select id="postStatus">
-        <option value="draft">Taslak</option>
-        <option value="published">Yayında</option>
-       </select>
-      </div>
-     </div>
-     <div class="actions">
-      <button class="primary" type="submit" id="savePost">Blog Yazısını Kaydet</button>
-      <button class="btn" type="button" id="cancelPost">Vazgeç</button>
-     </div>
-    </form>
-   </div>
-
-   <div class="panel">
-    <h2>Blog Yazıları</h2>
-    <p class="muted">Kayıtlı yazıları görüntüleyin, düzenleyin veya silin.</p>
-    <div class="table-wrap">
-     <table>
-      <thead>
-       <tr><th>Başlık</th><th>URL</th><th>Durum</th><th>İşlemler</th></tr>
-      </thead>
-      <tbody id="postsTable">
-       <tr><td colspan="4">Blog yazıları yükleniyor...</td></tr>
-      </tbody>
-     </table>
-    </div>
-   </div>
-  </section>
+    
     
 
 <section id="sitesettings" class="hidden" data-superadmin>
@@ -1264,7 +1129,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
  <div class="section-head"><div><h2>Güvenlik ve İşlem Geçmişi</h2><p>Editörlerin ve yöneticilerin yaptığı içerik işlemlerini inceleyin. Gerektiğinde önceki sürümleri geri yükleyin veya editör erişimini kesin.</p></div><button class="primary" id="refreshAudit">↻ Yenile</button></div>
  <div class="grid">
   <div class="stat"><span>Denetim kaydı</span><h2 id="auditCount">—</h2><p>Son 200 işlem</p></div>
-  <div class="stat"><span>Takip edilen alanlar</span><h2>3</h2><p>Sayfa · Blog · Medya</p></div>
+  <div class="stat"><span>Takip edilen alanlar</span><h2>3</h2><p>Sayfa · Medya</p></div>
   <div class="stat"><span>Müdahale</span><h2>Aktif</h2><p>Editör oturumunu sonlandırma</p></div>
  </div>
  <div class="panel">
@@ -1407,15 +1272,11 @@ const otherModules={
 
 const $=id=>document.getElementById(id);
 
-// Blog Yönetimi panelini sekmeler arasında taşımak için kalıcı DOM referansı.
-const blogPanelElement=$("posts");
-const blogPanelSlot=document.createComment("Blog Yönetimi panelinin konumu");
-if(blogPanelElement?.parentNode) blogPanelElement.parentNode.insertBefore(blogPanelSlot,blogPanelElement);
 
 let pages=[];
 let currentRole=null;
 
-const editorAllowed=["overview","pages","services","posts","media","profile","messages"];
+const editorAllowed=["overview","pages","services","media","profile","messages"];
 
 function canAccess(page){
  if(currentRole==="superadmin") return true;
@@ -1451,25 +1312,18 @@ function escapeHtml(value){
 }
 
 async function loadPublishedContentCounts(){
- const ids=currentRole==="superadmin"
-  ?["countPages","countServices","countPosts","countApplications"]
-  :["countPages","countServices","countPosts"];
+ const ids=currentRole==="superadmin"?["countPages","countServices","countApplications"]:["countPages","countServices"];
  ids.forEach(id=>{const el=$(id);if(el)el.textContent="…";});
  try{
-  const [pageData,serviceData,postData]=await Promise.all([
-   api("/api/pages"),api("/api/services"),api("/api/posts")
-  ]);
-  const count=(items)=>(items||[]).filter(item=>item.status==="published").length;
+  const [pageData,serviceData]=await Promise.all([api("/api/pages"),api("/api/services")]);
+  const count=items=>(items||[]).filter(item=>item.status==="published").length;
   $("countPages").textContent=count(pageData.pages);
   $("countServices").textContent=count(serviceData.services);
-  $("countPosts").textContent=count(postData.posts);
   if(currentRole==="superadmin"){
    const applicationData=await api("/api/applications");
    $("countApplications").textContent=(applicationData.applications||[]).length;
   }
- }catch(error){
-  ids.forEach(id=>{const el=$(id);if(el)el.textContent="—";});
- }
+ }catch(error){ids.forEach(id=>{const el=$(id);if(el)el.textContent="—";});}
 }
 
 $("openDesignCenterFromSettings")?.addEventListener("click",()=>showPage("designcenter"));
@@ -1484,16 +1338,8 @@ function showPage(name){
  document.body.dataset.activePage=name;
  if(name==="overview"){loadPublishedContentCounts();if(currentRole==="superadmin"){loadApplicationFunnel();loadSiteReports();}}
 
- // Blog listesi yalnızca Blog Yönetimi seçiliyken DOM içinde bulunur.
- if(name==="posts"){
-  if(!blogPanelElement.isConnected) blogPanelSlot.parentNode.insertBefore(blogPanelElement,blogPanelSlot.nextSibling);
-  blogPanelElement.classList.remove("hidden");
- }else{
-  blogPanelElement.remove();
- }
-
  document.querySelectorAll(".content > section").forEach(section=>{
-  if(section.id!=="posts") section.classList.toggle("hidden",section.id!==name);
+  section.classList.toggle("hidden",section.id!==name);
  });
 
  $("overview").classList.toggle("hidden",name!=="overview");
@@ -1514,12 +1360,11 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
   n.classList.toggle("active",n.dataset.page===name);
  });
 
- $("breadcrumb").textContent=name==="overview"?"Ana Sayfa":name==="designcenter"?"Site Tasarım Merkezi":name==="sitesettings"?"Site Ayarları":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":name==="audit"?"Güvenlik ve İşlem Geçmişi":name==="profile"?"Profilim":name==="history"?"Geçmiş":name==="archive"?"Arşiv":name==="reports"?"Raporlar":name==="messages"?"Mesaj Kutusu":otherModules[name]?.[0]||"";
+ $("breadcrumb").textContent=name==="overview"?"Ana Sayfa":name==="designcenter"?"Site Tasarım Merkezi":name==="sitesettings"?"Site Ayarları":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="audit"?"Güvenlik ve İşlem Geçmişi":name==="profile"?"Profilim":name==="history"?"Geçmiş":name==="archive"?"Arşiv":name==="reports"?"Raporlar":name==="messages"?"Mesaj Kutusu":otherModules[name]?.[0]||"";
 
  if(name==="designcenter")loadDesignRecords();
  if(name==="pages")loadPages();
  if(name==="services")loadServices();
- if(name==="posts")loadPosts();
     if(name==="users")loadUsers();
  if(name==="audit")loadAudit();
  if(name==="history")loadActivityHistory();
@@ -1868,10 +1713,10 @@ async function loadMenuSettings(){
    {key:"contact-cta",label:"Bize Ulaşın · WhatsApp",url:"/pages/iletisim.html",visible:true}
   ];
   (pageData.pages||[]).filter(p=>p.status==="published"&&!["hakkimizda","iletisim","hizmetlerimiz","anasayfa"].includes(p.slug)).forEach(p=>defaults.push({key:"page-"+p.id,label:p.title,url:"/pages/sayfa.html?slug="+encodeURIComponent(p.slug),visible:true}));
-  let items=saved&&saved.length?saved:defaults;
+  let items=(saved&&saved.length?saved:defaults).filter(item=>!["services","about","guide","apply"].includes(item.key)&&!["/pages/hizmetlerimiz.html","/pages/hakkimizda.html","/pages/basvuru.html","/edwise-rehber.html"].includes(item.url));
   const existing=new Set(items.map(x=>x.key));
   defaults.forEach(item=>{if(!existing.has(item.key))items.push(item);});
-  const pinnedMenuOrder=["home","services","about","apply","contact"];
+  const pinnedMenuOrder=["home","contact"];
   items.sort((a,b)=>{
    const ai=pinnedMenuOrder.indexOf(a.key),bi=pinnedMenuOrder.indexOf(b.key);
    return (ai<0?99:ai)-(bi<0?99:bi);
@@ -2468,372 +2313,6 @@ async function deleteService(id){
  }
 }
 
-let posts=[];
-
-// Word benzeri blok editörü
-let activePostBlock=null;
-function getPostBlock(node){
- const canvas=$("postCanvas");
- let element=node&&node.nodeType===Node.TEXT_NODE?node.parentElement:node;
- while(element&&element.parentElement!==canvas) element=element.parentElement;
- return element&&element.parentElement===canvas?element:null;
-}
-function selectPostBlock(block){
- if(!block)return;
- document.querySelectorAll("#postCanvas > .active-block").forEach(item=>item.classList.remove("active-block"));
- activePostBlock=block;
- block.classList.add("active-block");
-}
-function insertPostBlock(tag,html){
- const canvas=$("postCanvas");
- const block=document.createElement(tag);
- block.innerHTML=html||"<br>";
- if(activePostBlock&&activePostBlock.parentElement===canvas) activePostBlock.after(block);
- else canvas.appendChild(block);
- selectPostBlock(block);
- const range=document.createRange();
- range.selectNodeContents(block); range.collapse(false);
- const selection=window.getSelection(); selection.removeAllRanges(); selection.addRange(range);
- canvas.focus();
- $("postContent").value=canvas.innerHTML;
-}
-function normalizePostContent(content){
- const value=String(content||"").trim();
- if(!value)return "<p><br></p>";
- if(/<\/?(p|h[1-6]|div|ul|ol|li|blockquote|figure|img|table|hr)\b/i.test(value))return value;
- return value.split(/\n+/).map(line=>line.trim()?`<p>${escapeHtml(line)}</p>`:"").join("")||"<p><br></p>";
-}
-$("postCanvas").addEventListener("click",event=>selectPostBlock(getPostBlock(event.target)));
-$("postCanvas").addEventListener("keyup",()=>{
- const selection=window.getSelection();
- if(selection.rangeCount){const block=getPostBlock(selection.anchorNode);if(block)selectPostBlock(block);}
-});
-$("postCanvas").addEventListener("input",()=>$("postContent").value=$("postCanvas").innerHTML);
-$("postToolbar").querySelectorAll("button").forEach(button=>button.addEventListener("mousedown",event=>event.preventDefault()));
-$("postToolbar").querySelectorAll("[data-command]").forEach(button=>button.addEventListener("click",()=>{
- $("postCanvas").focus(); document.execCommand(button.dataset.command,false,null);
- $("postContent").value=$("postCanvas").innerHTML;
-}));
-$("postToolbar").querySelectorAll("[data-block]").forEach(button=>button.addEventListener("click",()=>{
- $("postCanvas").focus(); document.execCommand("formatBlock",false,button.dataset.block);
- const selection=window.getSelection(); if(selection.rangeCount)selectPostBlock(getPostBlock(selection.anchorNode));
- $("postContent").value=$("postCanvas").innerHTML;
-}));
-$("postToolbar").querySelectorAll("[data-insert]").forEach(button=>button.addEventListener("click",()=>insertPostBlock(button.dataset.insert,"<li>Liste öğesi</li>")));
-$("addParagraph").addEventListener("click",()=>insertPostBlock("p","<br>"));
-$("addHeading").addEventListener("click",()=>insertPostBlock("h2","Başlık yazın"));
-function insertPostImage(url,altText="Blog görseli"){
-    const figure=document.createElement("figure");
-    const img=document.createElement("img");
-    const caption=document.createElement("figcaption");
-
-    img.src=url;
-    img.alt=altText;
-    img.loading="lazy";
-
-    caption.contentEditable="true";
-    caption.textContent="Görsel açıklaması (isteğe bağlı)";
-
-    figure.append(img,caption);
-
-    if(activePostBlock && activePostBlock.parentElement===$("postCanvas")){
-        activePostBlock.after(figure);
-    }else{
-        $("postCanvas").appendChild(figure);
-    }
-
-    selectPostBlock(figure);
-    $("postContent").value=$("postCanvas").innerHTML;
-}
-
-async function uploadPostImage(file){
-    if(!file)return;
-
-    if(!file.type.startsWith("image/")){
-        alert("Lütfen bir görsel dosyası seçin.");
-        return;
-    }
-
-    if(file.size>8*1024*1024){
-        alert("Görsel en fazla 8 MB olabilir.");
-        return;
-    }
-
-    const zone=$("imageDropZone");
-
-    try{
-        if(!zone) throw new Error("Görsel yükleme alanı bulunamadı. Sayfayı yenileyip tekrar deneyin.");
-        zone.classList.add("uploading");
-        zone.querySelector("strong").textContent="Görsel yükleniyor...";
-        const formData=new FormData();
-        formData.append("file",file);
-
-        const response=await fetch("/api/media-upload",{
-            method:"POST",
-            credentials:"same-origin",
-            body:formData
-        });
-
-        const data=await response.json();
-
-        if(!response.ok || data.success===false){
-            throw new Error(data.message||"Görsel yüklenemedi.");
-        }
-
-        const imageUrl=
-            data.file_url ||
-            data.url ||
-            data.media?.file_url ||
-            data.media?.url ||
-            data.file?.url;
-
-        if(!imageUrl){
-            throw new Error("Sunucu görsel adresi döndürmedi.");
-        }
-
-        insertPostImage(imageUrl,file.name);
-
-    }catch(error){
-        alert(error.message);
-    }finally{
-    if(zone){
-        zone.classList.remove("uploading");
-        const label=zone.querySelector("strong");
-        if(label) label.textContent="Görseli buraya sürükleyip bırakın";
-    }$("postImageFile").value="";
-    }
-}
-
-$("insertImageBlock").addEventListener("click",()=>{
-    $("postImageFile").click();
-});
-
-$("postImageFile").addEventListener("change",event=>{
-    uploadPostImage(event.target.files[0]);
-});
-
-$("insertImageUrl").addEventListener("click",()=>{
-    const url=prompt("Görsel URL adresini girin:");
-    if(!url)return;
-
-    try{
-        const parsed=new URL(url);
-        if(!["http:","https:"].includes(parsed.protocol)){
-            throw new Error();
-        }
-    }catch{
-        alert("Geçerli bir görsel URL adresi girin.");
-        return;
-    }
-
-    insertPostImage(url);
-});
-
-const imageDropZone=$("imageDropZone");
-
-imageDropZone.addEventListener("click",()=>{
-    $("postImageFile").click();
-});
-
-[imageDropZone,$("postCanvas")].forEach(target=>{
-
-    target.addEventListener("dragover",event=>{
-        event.preventDefault();
-        imageDropZone.classList.add("drag-over");
-    });
-
-    target.addEventListener("dragleave",event=>{
-        if(!target.contains(event.relatedTarget)){
-            imageDropZone.classList.remove("drag-over");
-        }
-    });
-
-    target.addEventListener("drop",event=>{
-        event.preventDefault();
-        imageDropZone.classList.remove("drag-over");
-
-        const file=event.dataTransfer.files[0];
-
-        if(file){
-            uploadPostImage(file);
-        }
-    });
-
-});
-$("moveBlockUp").addEventListener("click",()=>{
- if(!activePostBlock||!activePostBlock.previousElementSibling)return;
- activePostBlock.parentElement.insertBefore(activePostBlock,activePostBlock.previousElementSibling);
- $("postContent").value=$("postCanvas").innerHTML;
-});
-$("moveBlockDown").addEventListener("click",()=>{
- if(!activePostBlock||!activePostBlock.nextElementSibling)return;
- activePostBlock.parentElement.insertBefore(activePostBlock.nextElementSibling,activePostBlock);
- $("postContent").value=$("postCanvas").innerHTML;
-});
-$("deleteBlock").addEventListener("click",()=>{
- if(!activePostBlock)return;
- if(!confirm("Seçili bloğu silmek istiyor musunuz?"))return;
- const next=activePostBlock.nextElementSibling||activePostBlock.previousElementSibling;
- activePostBlock.remove();activePostBlock=null;if(next)selectPostBlock(next);
- $("postContent").value=$("postCanvas").innerHTML;
-});
-
-
-async function loadPosts(){
- const table=$("postsTable");
- if(!table)return;
-
- table.innerHTML='<tr><td colspan="4">Blog yazıları yükleniyor...</td></tr>';
-
- try{
-  const data=await api("/api/posts");
-  posts=data.posts||[];
-
-  const count=$("countPosts");
-  if(count)count.textContent=posts.length;
-
-  if(!posts.length){
-   table.innerHTML='<tr><td colspan="4" class="empty">Henüz blog yazısı yok.</td></tr>';
-   return;
-  }
-
-  table.innerHTML=posts.map(post=>`
-   <tr>
-    <td>${escapeHtml(post.title)}</td>
-    <td>/${escapeHtml(post.slug)}</td>
-    <td><span class="status ${post.status==="published"?"published":""}">${post.status==="published"?"Yayında":"Taslak"}</span></td>
-    <td>
-     <button class="btn" data-post-edit="${escapeHtml(post.id)}">Düzenle</button>
-     <button class="btn btn-danger" data-post-delete="${escapeHtml(post.id)}">Sil</button>
-    </td>
-   </tr>
-  `).join("");
-
-  document.querySelectorAll("[data-post-edit]").forEach(button=>{
-   button.addEventListener("click",()=>editPost(button.dataset.postEdit));
-  });
-
-  document.querySelectorAll("[data-post-delete]").forEach(button=>{
-   button.addEventListener("click",()=>deletePost(button.dataset.postDelete));
-  });
-
- }catch(error){
-  table.innerHTML=`<tr><td colspan="4" class="empty">${escapeHtml(error.message)}</td></tr>`;
- }
-}
-
-function resetPostEditor(){
- $("postForm").reset();
- $("postId").value="";
- $("postSlug").dataset.edited="";
- $("postCanvas").innerHTML="<p>Yazınızı buraya yazmaya başlayın...</p>";
- $("postContent").value="";
- activePostBlock=null;
- $("postEditorTitle").textContent="Yeni Blog Yazısı";
- $("postEditor").classList.add("hidden");
-}
-
-$("newPost").addEventListener("click",()=>{
- resetPostEditor();
- $("postEditor").classList.remove("hidden");
- $("postEditorTitle").textContent="Yeni Blog Yazısı";
- $("postEditor").scrollIntoView({behavior:"smooth"});
- $("postTitle").focus();
-});
-
-$("cancelPost").addEventListener("click",resetPostEditor);
-
-$("postTitle").addEventListener("input",()=>{
- if(!$("postId").value&&!$("postSlug").dataset.edited){
-  $("postSlug").value=$("postTitle").value.toLocaleLowerCase("tr-TR")
-   .replace(/ı/g,"i").replace(/ğ/g,"g").replace(/ü/g,"u")
-   .replace(/ş/g,"s").replace(/ö/g,"o").replace(/ç/g,"c")
-   .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
- }
-});
-
-$("postSlug").addEventListener("input",()=>{
- $("postSlug").dataset.edited="1";
-});
-
-function editPost(id){
- const post=posts.find(item=>String(item.id)===String(id));
- if(!post)return;
-
- $("postId").value=post.id;
- $("postTitle").value=post.title||"";
- $("postSlug").value=post.slug||"";
- $("postSlug").dataset.edited="1";
- $("postExcerpt").value=post.excerpt||"";
-$("postMetaTitle").value=post.meta_title||"";
-$("postMetaDescription").value=post.meta_description||"";
- $("postCanvas").innerHTML=normalizePostContent(post.content||"");
- $("postContent").value=$("postCanvas").innerHTML;
- activePostBlock=null;
- $("postImage").value=post.image_url||"";
- $("postStatus").value=post.status||"draft";
-
- $("postEditorTitle").textContent="Blog Yazısını Düzenle";
- $("postEditor").classList.remove("hidden");
- $("postEditor").scrollIntoView({behavior:"smooth"});
-}
-
-$("postForm").addEventListener("submit",async event=>{
- event.preventDefault();
-
- const id=$("postId").value;
- $("postContent").value=$("postCanvas").innerHTML;
- const post={
-  title:$("postTitle").value.trim(),
-  slug:$("postSlug").value.trim(),
-  excerpt:$("postExcerpt").value.trim(),
-  content:$("postContent").value.trim(),
-  image_url:$("postImage").value.trim(),
-meta_title:$("postMetaTitle").value.trim(),
-meta_description:$("postMetaDescription").value.trim(),
-  status:$("postStatus").value
- };
-
- if(!post.title||!post.slug||!post.content){
-  $("postMessage").innerHTML='<div class="message error">Başlık, URL adresi ve içerik zorunludur.</div>';
-  return;
- }
-
- $("savePost").disabled=true;
- $("savePost").textContent="Kaydediliyor...";
-
- try{
-  const result=await api(id?`/api/posts?id=${encodeURIComponent(id)}`:"/api/posts",{
-   method:id?"PUT":"POST",
-   headers:{"Content-Type":"application/json"},
-   body:JSON.stringify(post)
-  });
-
-  resetPostEditor();
-  $("postMessage").innerHTML='<div class="message success">'+escapeHtml(result.message||"Blog yazısı kaydedildi.")+'</div>';
-  await loadPosts();
-
- }catch(error){
-  $("postMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';
- }finally{
-  $("savePost").disabled=false;
-  $("savePost").textContent="Blog Yazısını Kaydet";
- }
-});
-
-async function deletePost(id){
- const post=posts.find(item=>String(item.id)===String(id));
- if(!post||!confirm('"'+post.title+'" blog yazısını silmek istediğinizden emin misiniz?'))return;
-
- try{
-  const result=await api(`/api/posts?id=${encodeURIComponent(id)}`,{method:"DELETE"});
-  $("postMessage").innerHTML='<div class="message success">'+escapeHtml(result.message||"Blog yazısı silindi.")+'</div>';
-  await loadPosts();
- }catch(error){
-  $("postMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';
- }
-}
-
 let adminUsers=[];
 let editingUserActive=1;
 
@@ -3048,9 +2527,6 @@ async function loadDesignRecords(){
   if(path==="/pages/hizmetlerimiz.html"){
    const data=await api("/api/services");
    designRecordSelect.innerHTML='<option value="">Bir hizmet seçin</option>'+data.services.map(x=>'<option value="service:'+escapeHtml(x.id)+'">'+escapeHtml(x.title)+(x.status==="published"?"":" (Taslak)")+'</option>').join("");
-  }else if(path==="/edwise-rehber.html"){
-   const data=await api("/api/posts");
-   designRecordSelect.innerHTML='<option value="">Bir blog yazısı seçin</option>'+data.posts.map(x=>'<option value="post:'+escapeHtml(x.id)+'">'+escapeHtml(x.title)+(x.status==="published"?"":" (Taslak)")+'</option>').join("");
   }else{
    const dynamicSlug=new URL(path,location.origin).searchParams.get("slug");
    const slug=dynamicSlug||(path==="/pages/hakkimizda.html"?"hakkimizda":path==="/pages/basvuru.html"?"basvuru":path==="/pages/iletisim.html"?"iletisim":null);
@@ -3069,7 +2545,7 @@ $("editDesignRecord").addEventListener("click",()=>{
  const [type,id]=value.split(":");
  if(type==="page"){showPage("pages");editPage(Number(id))}
  if(type==="service"){showPage("services");editService(id)}
- if(type==="post"){showPage("posts");editPost(id)}
+ 
 });
 
 
@@ -3115,7 +2591,7 @@ globalAdminSearch?.addEventListener("input",()=>{
  document.querySelectorAll(".nav[data-page]").forEach(n=>rows.push({title:n.innerText.trim(),type:"Menü",page:n.dataset.page}));
  (pages||[]).forEach(x=>rows.push({title:x.title,type:"Sayfa",page:"pages",id:x.id}));
  (services||[]).forEach(x=>rows.push({title:x.title,type:"Hizmet",page:"services",id:x.id}));
- (posts||[]).forEach(x=>rows.push({title:x.title,type:"Blog",page:"posts",id:x.id}));
+ 
  const found=rows.filter((x,i,a)=>x.title&&x.title.toLocaleLowerCase("tr-TR").includes(q)&&a.findIndex(y=>y.title===x.title&&y.page===x.page&&y.id===x.id)===i).slice(0,12);
  globalAdminResults.innerHTML=found.length?found.map((x,i)=>'<button type="button" class="admin-search-result" data-global-result="'+i+'"><b>'+escapeHtml(x.title)+'</b><small>'+escapeHtml(x.type)+'</small></button>').join(""):'<div class="admin-search-empty">Eşleşen kayıt bulunamadı.</div>';
  globalAdminResults.classList.remove("hidden");
@@ -3123,7 +2599,7 @@ globalAdminSearch?.addEventListener("input",()=>{
   const x=found[Number(b.dataset.globalResult)];showPage(x.page);
   if(x.page==="pages"&&x.id)editPage(Number(x.id));
   if(x.page==="services"&&x.id)editService(x.id);
-  if(x.page==="posts"&&x.id)editPost(x.id);
+
   globalAdminResults.classList.add("hidden");globalAdminSearch.value="";
  }));
 });
