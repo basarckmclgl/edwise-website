@@ -184,6 +184,14 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
 .report-export-menu button{display:block;width:100%;padding:10px 12px;text-align:left;color:var(--text);background:transparent;border:0;border-radius:6px;cursor:pointer}
 .report-export-menu button:hover{background:#34294f}
 @media print{body.printing-applications *{visibility:hidden!important}body.printing-applications #reports,body.printing-applications #reports *{visibility:visible!important}body.printing-applications #reports{display:block!important;position:absolute;left:0;top:0;width:100%;margin:0;padding:0}body.printing-applications #reports>.section-head,body.printing-applications #reports>#siteReportsMessage,body.printing-applications #reports>.panel:not(:has(#applicationsTable)),body.printing-applications #reports>p{display:none!important}body.printing-applications #reports .panel:has(#applicationsTable){display:block!important;position:static!important;break-inside:auto;background:#fff!important;color:#111!important;border:0!important;box-shadow:none!important}body.printing-applications #reports table{width:100%!important;min-width:0!important;font-size:8pt!important}body.printing-applications #reports th,body.printing-applications #reports td{color:#111!important;background:#fff!important;border:1px solid #999!important;padding:4px!important}body.printing-applications #reports .table-wrap{overflow:visible!important}}
+
+.compact-report{padding:12px 14px!important;margin-top:12px!important}
+.compact-report .section-head{margin-bottom:8px!important}
+.compact-report h3{font-size:14px!important;margin:0!important}
+.compact-report .muted{font-size:11px!important;margin:3px 0 0!important}
+.compact-table{min-width:0!important;width:100%;font-size:11px!important}
+.compact-table th,.compact-table td{padding:7px 9px!important;white-space:nowrap}
+.compact-table th:last-child,.compact-table td:last-child{white-space:normal}
 </style>
 </head>
 <body>
@@ -286,7 +294,7 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
    <div id="siteReportsMessage" class="message">Raporlar yükleniyor...</div>
    <div class="panel"><h3>Sayfa İnceleme Raporu</h3><div class="table-wrap"><table style="min-width:760px"><thead><tr><th>Sayfa</th><th>Görüntülenme</th><th>Ziyaretçi oturumu</th><th>%25 kaydırma</th><th>%50 kaydırma</th><th>%75 kaydırma</th><th>%90 kaydırma</th></tr></thead><tbody id="siteReportsTable"><tr><td colspan="8">Veriler bekleniyor...</td></tr></tbody></table></div></div>
    <div class="panel"><div class="section-head"><div><h3>Sayfa Ziyaret Kayıtları</h3><p class="muted">Analiz izni veren ziyaretçilerin son 30 gündeki sayfa görüntüleme ve kaydırma kayıtları. Oturum kodları kısaltılmıştır.</p></div></div><div class="table-wrap"><table style="min-width:650px"><thead><tr><th>Tarih</th><th>Sayfa</th><th>Ülke</th><th>Anonim oturum</th><th>İşlem</th></tr></thead><tbody id="pageVisitRecords"><tr><td colspan="5">Kayıtlar bekleniyor...</td></tr></tbody></table></div></div>
-   <div class="panel"><h3>Başvuru Dönüşüm Raporu</h3><p class="muted">Başvuru hunisi ve e-posta / WhatsApp hareketleri.</p><div class="table-wrap"><table style="min-width:1100px;table-layout:fixed"><thead id="reportFunnelHead"><tr><th>Ölçüm</th></tr></thead><tbody id="reportFunnelTable"><tr><td colspan="3">Veriler bekleniyor...</td></tr></tbody></table></div></div>
+   <div class="panel compact-report"><div class="section-head"><div><h3>Başvuru Dönüşüm Kayıtları</h3><p class="muted">Son 30 gün · Her hareket ayrı kayıt edilir.</p></div><span id="funnelRecordCount" class="muted"></span></div><div class="table-wrap"><table class="compact-table"><thead><tr><th>Tarih</th><th>Ülke</th><th>Oturum</th><th>İşlem</th></tr></thead><tbody id="funnelEventRecords"><tr><td colspan="4">Kayıtlar bekleniyor...</td></tr></tbody></table></div></div>
    <div class="panel">
     <div class="section-head"><div><h3>Başvuru Kayıtları</h3><p class="muted">Kişisel veriler yalnızca yetkili yönetici tarafından görüntülenebilir. Telefon ve e-posta varsayılan olarak maskelidir.</p></div><div class="actions"><button class="btn" id="refreshApplications">↻ Başvuruları Yenile</button><span id="applicationsMessage" class="muted"></span></div></div>
     <div class="table-wrap"><table><thead><tr><th>Tarih</th><th>Ad soyad</th><th>Telefon</th><th>E-posta</th><th>Program</th><th>Eğitim tercihi</th><th>Uygun zaman</th><th>Açıklama</th><th>Durum</th></tr></thead><tbody id="applicationsTable"><tr><td colspan="9">Başvurular yükleniyor...</td></tr></tbody></table></div>
@@ -1268,17 +1276,11 @@ async function loadSiteReports(){
   const visitLabels={page_view:"Sayfa görüntülendi",scroll_25:"%25 kaydırma",scroll_50:"%50 kaydırma",scroll_75:"%75 kaydırma",scroll_90:"%90 kaydırma"};
   const visitTable=$("pageVisitRecords");
   if(visitTable)visitTable.innerHTML=visitRows.map(item=>'<tr><td>'+escapeHtml(item.date)+'</td><td>'+escapeHtml(item.path)+'</td><td>'+countryBadge(item.country)+'</td><td>'+escapeHtml(item.session)+'</td><td>'+escapeHtml(visitLabels[item.event]||item.event)+'</td></tr>').join("")||'<tr><td colspan="5">Henüz sayfa ziyaret kaydı yok. Analiz izni veren ziyaretçiler geldikçe kayıt oluşacak.</td></tr>';
-  const funnelLabels={apply_click:"Başvur butonuna tıklama",form_view:"Başvuru formu açıldı",form_start:"Form doldurulmaya başlandı",submit_attempt:"Gönderim denendi",application_saved:"Başvuru kaydedildi",email_sent:"E-posta gönderildi",email_failed:"E-posta gönderilemedi",whatsapp_redirect:"WhatsApp açıldı",form_abandon:"Form yarım bırakıldı",site_return:"Siteye geri dönüldü"};
-  const funnelStages=Object.entries(funnelLabels);
-  ["report","overview"].forEach(prefix=>{
-   const head=$(prefix+"FunnelHead"),body=$(prefix+"FunnelTable");
-   if(head)head.innerHTML='<tr><th style="min-width:145px">Ölçüm</th>'+funnelStages.map(([,label])=>'<th style="min-width:105px;white-space:normal">'+label+'</th>').join("")+'</tr>';
-   if(body){
-    const counts=funnelStages.map(([key])=>{const item=data.totals?.[key]||{count:0,sessions:0};return '<td style="text-align:center;font-weight:700">'+item.count.toLocaleString("tr-TR")+'</td>';}).join("");
-    const sessions=funnelStages.map(([key])=>{const item=data.totals?.[key]||{count:0,sessions:0};return '<td style="text-align:center">'+item.sessions.toLocaleString("tr-TR")+'</td>';}).join("");
-    body.innerHTML='<tr><th style="text-align:left">İşlem sayısı</th>'+counts+'</tr><tr><th style="text-align:left">Oturum sayısı</th>'+sessions+'</tr>';
-   }
-  });
+  const funnelLabels={apply_click:"Başvur butonuna tıklandı",form_view:"Başvuru formu açıldı",form_start:"Form doldurulmaya başlandı",submit_attempt:"Gönderim denendi",application_saved:"Başvuru kaydedildi",email_sent:"E-posta gönderildi",email_failed:"E-posta gönderilemedi",whatsapp_redirect:"WhatsApp açılmaya çalışıldı",form_abandon:"Form yarım bırakıldı",site_return:"Siteye geri dönüldü"};
+  const funnelRows=data.funnelRecords||[];
+  const funnelTable=$("funnelEventRecords");
+  if($("funnelRecordCount"))$("funnelRecordCount").textContent=funnelRows.length+" kayıt";
+  if(funnelTable)funnelTable.innerHTML=funnelRows.map(item=>'<tr><td>'+escapeHtml(item.date)+'</td><td>'+countryBadge(item.country)+'</td><td>'+escapeHtml(item.session)+'</td><td>'+escapeHtml(funnelLabels[item.event]||item.event)+'</td></tr>').join("")||'<tr><td colspan="4">Henüz başvuru hareketi kaydı yok.</td></tr>';
   if(message){message.className="message success";message.textContent="Son 30 günlük raporlar güncellendi.";}
  }catch(error){if(message){message.className="message error";message.textContent=error.message;}table.innerHTML='<tr><td colspan="7">Raporlar yüklenemedi.</td></tr>';}
 }
