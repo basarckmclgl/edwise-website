@@ -42,6 +42,23 @@ const EDWISE_TRACKING = (() => {
  };
  return {get sessionId(){return consentAllowed()?sessionId:"";},send};
 })();
+// Site genelinde sayfa görüntüleme ve kaydırma derinliği (yalnızca analiz izni varsa).
+if(EDWISE_TRACKING.sessionId){
+ EDWISE_TRACKING.send("page_view");
+ const scrollMarks=new Set();
+ const measureScroll=()=>{
+  const doc=document.documentElement;
+  const max=Math.max(1,doc.scrollHeight-window.innerHeight);
+  const depth=Math.min(100,Math.round((window.scrollY/max)*100));
+  [25,50,75,90].forEach(mark=>{
+   if(depth>=mark&&!scrollMarks.has(mark)){
+    scrollMarks.add(mark);EDWISE_TRACKING.send("scroll_"+mark);
+   }
+  });
+ };
+ window.addEventListener("scroll",measureScroll,{passive:true});
+ window.addEventListener("load",measureScroll,{once:true});
+}
 let edwiseFormStarted=false;
 let edwiseSubmitSucceeded=false;
 let edwiseAbandonSent=false;
