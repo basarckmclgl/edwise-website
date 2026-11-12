@@ -444,6 +444,17 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
  }
 }
 
+ 
+/* Genel Bakış: başvuru ve iletişim hareketleri raporu */
+.overview-funnel-wrap{width:100%;max-width:100%;overflow-x:auto!important}
+.overview-funnel-table{width:100%;min-width:1120px!important;table-layout:fixed;border-collapse:collapse}
+.overview-funnel-table th,.overview-funnel-table td{border:1px solid #45405c!important;padding:11px 9px!important;font-size:12px!important;line-height:1.4!important;text-align:center;vertical-align:middle;white-space:normal!important;overflow-wrap:anywhere}
+.overview-funnel-table thead th{background:#211c35!important;font-weight:700!important}
+.overview-funnel-table th:first-child{width:125px;text-align:left!important}
+.overview-funnel-table tbody th{background:#211c35!important;font-weight:700!important}
+.overview-funnel-table .funnel-number{font-size:14px!important;font-weight:700!important;font-variant-numeric:tabular-nums}
+#overviewFunnelMessage{margin:8px 0 10px!important;font-size:12px!important}
+
 </style>
 </head>
 <body>
@@ -521,8 +532,12 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
    <div class="panel" data-superadmin style="margin-top:18px">
     <div class="section-head"><div><h2>EDWISE Site İnceleme Raporu</h2><p class="muted">Son 30 gün · tüm sayfaların görüntülenme ve kaydırılma verileri</p></div><button class="btn" type="button" id="refreshOverviewReports">↻ Raporları Yenile</button></div>
     <div class="table-wrap"><table style="min-width:760px"><thead><tr><th>Sayfa</th><th>Ülke</th><th>Görüntülenme</th><th>Ziyaretçi oturumu</th><th>%25 kaydırma</th><th>%50 kaydırma</th><th>%75 kaydırma</th><th>%90 kaydırma</th></tr></thead><tbody id="overviewPageReports"><tr><td colspan="7">Rapor yükleniyor...</td></tr></tbody></table></div>
-    <div class="section-head" style="margin-top:22px"><div><h3>Başvuru ve İletişim Hareketleri</h3><p class="muted">Başvurular, e-posta ve WhatsApp hareketleri · kişisel iletişim bilgileri bu rapora eklenmez.</p></div></div>
-    <div class="table-wrap"><table style="min-width:1100px;table-layout:fixed"><thead id="overviewFunnelHead"><tr><th>Ölçüm</th></tr></thead><tbody id="overviewFunnelTable"><tr><td colspan="3">Rapor yükleniyor...</td></tr></tbody></table></div>
+    <div class="section-head" style="margin-top:22px">
+     <div><h3>Başvuru ve İletişim Hareketleri</h3><p class="muted">Son 30 gün · Başvuru, form, e-posta ve WhatsApp hareketleri. Kişisel iletişim bilgileri bu rapora dahil edilmez.</p></div>
+     <button class="btn" type="button" id="refreshOverviewFunnel">↻ Raporu Yenile</button>
+    </div>
+    <p class="muted" id="overviewFunnelMessage" aria-live="polite">Takip verileri yükleniyor...</p>
+    <div class="table-wrap overview-funnel-wrap"><table class="overview-funnel-table"><thead id="overviewFunnelHead"><tr><th>Ölçüm</th></tr></thead><tbody id="overviewFunnelTable"><tr><td colspan="11">Rapor yükleniyor...</td></tr></tbody></table></div>
     <p class="muted" style="margin-top:12px">Görüntüleme ve kaydırma raporları yalnızca analiz çerezlerine izin veren ziyaretçilerden alınır. Telefon ve e-posta gibi başvuru bilgileri ayrı Başvurular bölümünde maskeli tutulur.</p>
    </div>
    <div class="section-head">
@@ -1636,9 +1651,11 @@ $("refreshOverviewReports")?.addEventListener("click",loadSiteReports);
 
 async function loadApplicationFunnel(){
  const message=$("applicationFunnelMessage"),table=$("applicationFunnelTable");
- if(!message||!table)return;
- message.className="message";message.textContent="Başvuru hareketleri getiriliyor...";
- table.innerHTML='<tr><td colspan="11">Takip verileri yükleniyor...</td></tr>';
+ const overviewMessage=$("overviewFunnelMessage"),overviewTable=$("overviewFunnelTable"),overviewHead=$("overviewFunnelHead");
+ if(message){message.className="message";message.textContent="Başvuru hareketleri getiriliyor...";}
+ if(overviewMessage)overviewMessage.textContent="Başvuru ve iletişim hareketleri getiriliyor...";
+ if(table)table.innerHTML='<tr><td colspan="11">Takip verileri yükleniyor...</td></tr>';
+ if(overviewTable)overviewTable.innerHTML='<tr><td colspan="11">Rapor yükleniyor...</td></tr>';
  try{
   const response=await fetch("/api/application-events",{credentials:"same-origin",cache:"no-store"});
   const data=await response.json();
@@ -1655,23 +1672,32 @@ async function loadApplicationFunnel(){
    ["form_abandon","Form terk edildi"],
    ["site_return","Siteye dönüldü"]
   ];
-  const countRow=stages.map(([key])=>{
-   const item=data.totals?.[key]||{count:0,sessions:0};
-   return '<td style="text-align:center;font-weight:700;overflow-wrap:anywhere">'+Number(item.count||0).toLocaleString("tr-TR")+'</td>';
-  }).join("");
-  const sessionRow=stages.map(([key])=>{
-   const item=data.totals?.[key]||{count:0,sessions:0};
-   return '<td style="text-align:center;overflow-wrap:anywhere">'+Number(item.sessions||0).toLocaleString("tr-TR")+'</td>';
-  }).join("");
-  table.innerHTML='<tr><th style="text-align:left">İşlem</th>'+countRow+'</tr>'+
-   '<tr><th style="text-align:left">Oturum</th>'+sessionRow+'</tr>';
-  message.className="message success";message.textContent="Son 30 günlük başvuru hareketleri güncellendi.";
+  const makeRows=()=> {
+   const countRow=stages.map(([key])=>{
+    const item=data.totals?.[key]||{count:0,sessions:0};
+    return '<td class="funnel-number">'+Number(item.count||0).toLocaleString("tr-TR")+'</td>';
+   }).join("");
+   const sessionRow=stages.map(([key])=>{
+    const item=data.totals?.[key]||{count:0,sessions:0};
+    return '<td class="funnel-number">'+Number(item.sessions||0).toLocaleString("tr-TR")+'</td>';
+   }).join("");
+   return '<tr><th scope="row">İşlem sayısı</th>'+countRow+'</tr><tr><th scope="row">Oturum sayısı</th>'+sessionRow+'</tr>';
+  };
+  const head='<tr><th scope="col">Ölçüm</th>'+stages.map(([,label])=>'<th scope="col">'+label+'</th>').join("")+'</tr>';
+  if(table)table.innerHTML=makeRows();
+  if(overviewHead)overviewHead.innerHTML=head;
+  if(overviewTable)overviewTable.innerHTML=makeRows();
+  if(message){message.className="message success";message.textContent="Son 30 günlük başvuru hareketleri güncellendi.";}
+  if(overviewMessage)overviewMessage.textContent="Son 30 günlük veriler güncellendi.";
  }catch(error){
-  table.innerHTML='<tr><td colspan="11">Takip verileri yüklenemedi.</td></tr>';
-  message.className="message error";message.textContent=error.message;
+  if(table)table.innerHTML='<tr><td colspan="11">Takip verileri yüklenemedi.</td></tr>';
+  if(overviewTable)overviewTable.innerHTML='<tr><td colspan="11">Takip verileri yüklenemedi.</td></tr>';
+  if(message){message.className="message error";message.textContent=error.message;}
+  if(overviewMessage)overviewMessage.textContent=error.message||"Başvuru ve iletişim hareketleri yüklenemedi.";
  }
 }
 $("refreshApplicationFunnel")?.addEventListener("click",loadApplicationFunnel);
+$("refreshOverviewFunnel")?.addEventListener("click",loadApplicationFunnel);
 
 async function loadAnalytics(){
  const message=$("analyticsMessage");if(!message)return;message.className="message";message.textContent="Cloudflare verileri getiriliyor...";
