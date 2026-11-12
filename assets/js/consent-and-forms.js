@@ -31,14 +31,16 @@ const EDWISE_TRACKING = (() => {
  } catch {
   sessionId = Math.random().toString(36).slice(2)+Date.now().toString(36);
  }
+ const consentAllowed = () => {try{return localStorage.getItem("edwise_cookie_choice")==="allowed";}catch(e){return false;}};
  const send = (event, keepalive=false) => {
+  if(!consentAllowed())return Promise.resolve(false);
   const payload=JSON.stringify({event,sessionId,path:location.pathname});
   if(keepalive && navigator.sendBeacon){
    try{return navigator.sendBeacon("/api/application-events",new Blob([payload],{type:"application/json"}));}catch(e){}
   }
   return fetch("/api/application-events",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:payload,keepalive}).catch(()=>{});
  };
- return {sessionId,send};
+ return {get sessionId(){return consentAllowed()?sessionId:"";},send};
 })();
 let edwiseFormStarted=false;
 let edwiseSubmitSucceeded=false;
