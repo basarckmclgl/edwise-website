@@ -759,9 +759,13 @@ td{color:#39334b!important;border-color:#eeebf4!important}
     </div>
     <div id="analyticsMessage" class="message">Cloudflare verileri yükleniyor...</div>
     <div class="grid analytics-stats">
-     <div class="stat"><span>Günlük Tekil IP Toplamı</span><h2 id="cfUnique">—</h2><p>Günlük tekil IP değerleri toplamı; 30 günlük tekil kişi değildir</p></div>
-     <div class="stat"><span>Toplam İstek</span><h2 id="cfRequests">—</h2><p>Cloudflare üzerinden geçen HTTP istekleri</p></div>
-     <div class="stat"><span>Ülke Sayısı</span><h2 id="cfCountryCount">—</h2><p>Trafik alınan ülke ve bölgeler</p></div>
+     <div class="stat"><span>GA4 · Aktif Kullanıcı</span><h2 id="homeGaUsers">—</h2><p>Google Analytics 4</p></div>
+     <div class="stat"><span>GA4 · Oturum</span><h2 id="homeGaSessions">—</h2><p>Google Analytics 4</p></div>
+     <div class="stat"><span>GA4 · Sayfa Görüntüleme</span><h2 id="homeGaViews">—</h2><p>Google Analytics 4</p></div>
+     <div class="stat"><span>Cloudflare · HTTP İstek</span><h2 id="cfRequests">—</h2><p>Altyapı trafiği · Cloudflare</p></div>
+     <div class="stat"><span>Cloudflare · Günlük Tekil IP Toplamı</span><h2 id="cfUnique">—</h2><p>Günlük tekil IP değerleri toplamı; 30 günlük tekil kişi değildir</p></div>
+     <div class="stat"><span>Cloudflare · Ülke Sayısı</span><h2 id="cfCountryCount">—</h2><p>Trafik alınan ülke ve bölgeler</p></div>
+     <div class="stat"><span>Toplam İstek</span><h2 id="cfUnique">—</h2><p>Günlük tekil IP değerleri toplamı; 30 günlük tekil kişi değildir</p></div>
     </div>
     <div class="grid analytics-charts" style="grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);margin-top:16px">
      <div class="panel"><h3>Günlük trafik</h3><p class="muted">Cloudflare üzerinden geçen günlük HTTP istekleri</p><canvas id="analyticsDailyChart" height="260" style="width:100%;height:260px"></canvas></div>
@@ -1948,7 +1952,8 @@ function renderGoogleAnalytics(data){
  $("ga4Sources").innerHTML=(ga.sources||[]).map(x=>"<tr><td>"+escapeHtml(x.source)+"</td><td>"+fmt(x.sessions)+"</td><td>"+fmt(x.activeUsers)+"</td></tr>").join("")||'<tr><td colspan="3">Henüz veri yok.</td></tr>';
 }
 function renderAnalytics(data){
- window._edwiseAnalyticsData=data;renderGoogleAnalytics(data);const cf=data.cloudflare||{},t=cf.totals||{};
+ window._edwiseAnalyticsData=data;renderGoogleAnalytics(data);const ga=data.googleAnalytics||{},gt=ga.totals||{};const cf=data.cloudflare||{},t=cf.totals||{};
+ $("homeGaUsers").textContent=ga.configured?analyticsNumber(gt.activeUsers):"—";$("homeGaSessions").textContent=ga.configured?analyticsNumber(gt.sessions):"—";$("homeGaViews").textContent=ga.configured?analyticsNumber(gt.pageViews):"—";
  $("cfUnique").textContent=cf.configured?analyticsNumber(t.dailyUniqueIpTotal):"—";
  $("cfRequests").textContent=cf.configured?analyticsNumber(t.requests):"—";
  $("cfCountryCount").textContent=cf.configured?analyticsNumber((cf.countries||[]).length):"—";
