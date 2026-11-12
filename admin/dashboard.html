@@ -669,6 +669,21 @@ td{color:#39334b!important;border-color:#eeebf4!important}
 .admin-search-result{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:11px;border:0;border-radius:8px;background:#fff;color:#332b49;cursor:pointer}.admin-search-result:hover{background:#f5f0ff}.admin-search-result small{color:#8a829b}.admin-search-empty{padding:16px;color:#817990;font-size:13px}
 @media(max-width:600px){.admin-global-search{width:34vw}.admin-global-search input{font-size:10px!important;padding:0 8px!important}}
 
+/* EDWISE requested dashboard refinements — scoped additions only */
+.welcome.welcome-logo-only{min-height:144px;display:flex;align-items:center;justify-content:flex-start;padding:28px 34px!important;background:linear-gradient(110deg,#6036c4 0%,#8052e7 100%)!important;border:0!important;box-shadow:0 8px 22px rgba(68,45,110,.16)!important}
+.welcome-logo{display:block;width:clamp(190px,24vw,290px);height:82px;object-fit:contain;object-position:left center;filter:brightness(0) invert(1)}
+.welcome.welcome-logo-only:after{content:none!important;display:none!important}
+.topbar-account{position:relative}
+.admin-notification-button{position:relative;width:38px;height:38px;border:1px solid var(--border);border-radius:50%;background:var(--panel);color:var(--text);font-size:20px;display:grid;place-items:center;cursor:pointer}
+.admin-notification-button:hover{border-color:var(--purple)}
+.admin-notification-dot{position:absolute;right:5px;top:5px;width:8px;height:8px;border-radius:50%;background:#e53945;display:none}
+.admin-notification-button.has-unread .admin-notification-dot{display:block}
+.floating-admin-chat{position:fixed;right:24px;bottom:24px;z-index:9998;width:62px;height:62px;border:0;border-radius:50%;display:grid;place-items:center;background:#20b968;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.24);cursor:pointer}
+.floating-admin-chat:hover{transform:translateY(-2px);filter:brightness(.97)}
+.floating-admin-chat svg{width:29px;height:29px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.floating-chat-badge{position:absolute;right:-3px;top:-4px;min-width:23px;height:23px;padding:0 5px;border:2px solid #fff;border-radius:20px;background:#e53945;color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;line-height:1}
+.floating-chat-badge[hidden]{display:none!important}
+@media(max-width:760px){.welcome.welcome-logo-only{min-height:112px;padding:18px 20px!important}.welcome-logo{width:190px;height:68px}.floating-admin-chat{right:16px;bottom:16px;width:56px;height:56px}}
 </style>
 </head>
 <body>
@@ -1920,21 +1935,6 @@ function applicationExportName(){return "EDWISE-Basvuru-Kayitlari";}
 function exportApplicationsDoc(){
  const table=applicationExportTable();if(!table){alert("Başvuru tablosu bulunamadı.");return;}
   const html='<!doctype html><html><head><meta charset="utf-8"><title>EDWISE Başvuru Kayıtları</title><style>body{font-family:Arial,sans-serif;color:#222}h1{color:#291447}table{border-collapse:collapse;width:100%;font-size:9pt}th,td{border:1px solid #aaa;padding:6px;text-align:left}th{background:#eee}
-/* EDWISE requested dashboard refinements — scoped additions only */
-.welcome.welcome-logo-only{min-height:144px;display:flex;align-items:center;justify-content:flex-start;padding:28px 34px!important;background:linear-gradient(110deg,#6036c4 0%,#8052e7 100%)!important;border:0!important;box-shadow:0 8px 22px rgba(68,45,110,.16)!important}
-.welcome-logo{display:block;width:clamp(190px,24vw,290px);height:82px;object-fit:contain;object-position:left center;filter:brightness(0) invert(1)}
-.welcome.welcome-logo-only:after{content:none!important;display:none!important}
-.topbar-account{position:relative}
-.admin-notification-button{position:relative;width:38px;height:38px;border:1px solid var(--border);border-radius:50%;background:var(--panel);color:var(--text);font-size:20px;display:grid;place-items:center;cursor:pointer}
-.admin-notification-button:hover{border-color:var(--purple)}
-.admin-notification-dot{position:absolute;right:5px;top:5px;width:8px;height:8px;border-radius:50%;background:#e53945;display:none}
-.admin-notification-button.has-unread .admin-notification-dot{display:block}
-.floating-admin-chat{position:fixed;right:24px;bottom:24px;z-index:9998;width:62px;height:62px;border:0;border-radius:50%;display:grid;place-items:center;background:#20b968;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.24);cursor:pointer}
-.floating-admin-chat:hover{transform:translateY(-2px);filter:brightness(.97)}
-.floating-admin-chat svg{width:29px;height:29px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.floating-chat-badge{position:absolute;right:-3px;top:-4px;min-width:23px;height:23px;padding:0 5px;border:2px solid #fff;border-radius:20px;background:#e53945;color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;line-height:1}
-.floating-chat-badge[hidden]{display:none!important}
-@media(max-width:760px){.welcome.welcome-logo-only{min-height:112px;padding:18px 20px!important}.welcome-logo{width:190px;height:68px}.floating-admin-chat{right:16px;bottom:16px;width:56px;height:56px}}
 </style></head><body><h1>EDWISE Başvuru Kayıtları</h1><p>Rapor tarihi: '+new Date().toLocaleDateString("tr-TR")+'</p>'+table.outerHTML+'</body></html>';
   const blob=new Blob(["\ufeff",html],{type:"application/msword"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=applicationExportName()+".doc";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
