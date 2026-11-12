@@ -1372,14 +1372,14 @@ async function exportApplicationsPdf(){
  clonedTable.querySelectorAll("select").forEach(select=>{const label=document.createElement("span");label.textContent=select.options[select.selectedIndex]?.text||"";select.replaceWith(label)});
  clonedTable.querySelectorAll("a").forEach(link=>{const label=document.createElement("span");label.textContent=link.textContent;link.replaceWith(label)});
  report.append(header,title,clonedTable);document.body.appendChild(report);
- try{await window.html2pdf().set({margin:[8,8,8,8],filename:applicationExportName()+".pdf",image:{type:"jpeg",quality:0.98},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff",scrollX:0,scrollY:0},jsPDF:{unit:"mm",format:"a4",orientation:"landscape"}}).from(report).save();}
+ try{if(!logo.complete)await new Promise((resolve,reject)=>{logo.onload=resolve;logo.onerror=()=>reject(new Error("EDWISE logosu yüklenemedi."));});await window.html2pdf().set({margin:[8,8,8,8],filename:applicationExportName()+".pdf",image:{type:"jpeg",quality:0.98},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff",scrollX:0,scrollY:0},jsPDF:{unit:"mm",format:"a4",orientation:"landscape"}}).from(report).save();}
  finally{report.remove();}
 }
 const exportToggle=$("applicationExportToggle"),exportMenu=$("applicationExportMenu");
 exportToggle?.addEventListener("click",()=>{const open=exportMenu.classList.toggle("hidden")===false;exportToggle.setAttribute("aria-expanded",String(open));});
 document.querySelectorAll("[data-export-applications]").forEach(button=>button.addEventListener("click",async()=>{
  const type=button.dataset.exportApplications;exportMenu?.classList.add("hidden");exportToggle?.setAttribute("aria-expanded","false");
- try{if(type==="pdf")exportApplicationsPdf();if(type==="doc")exportApplicationsDoc();if(type==="xlsx")await exportApplicationsXlsx();}
+ try{if(type==="pdf")await exportApplicationsPdf();if(type==="doc")exportApplicationsDoc();if(type==="xlsx")await exportApplicationsXlsx();}
  catch(error){alert(error.message||"Dosya oluşturulamadı.");}
 }));
 document.addEventListener("click",event=>{if(!event.target.closest("#applicationExport")){exportMenu?.classList.add("hidden");exportToggle?.setAttribute("aria-expanded","false");}});
