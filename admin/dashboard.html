@@ -576,34 +576,65 @@ body.sidebar-collapsed .main{margin-left:78px!important;width:calc(100% - 78px)!
  .welcome{padding:20px!important}
 }
 
+
+/* EDWISE Yönetim Merkezi — düzenlenmiş gezinme ve sosyal panel hiyerarşisi */
+.sidebar{width:264px!important;padding:22px 15px 28px!important;background:#fff!important}
+.main{margin-left:264px!important;width:calc(100% - 264px)!important}
+.sidebar .menu-label{margin-top:17px!important;padding:12px 12px 7px!important;color:#8a8499!important;font-size:9px!important;letter-spacing:1.35px!important}
+.sidebar .nav{min-height:43px!important;margin:2px 0!important;padding:10px 12px!important;border-radius:10px!important;font-size:13px!important}
+.sidebar .nav.active{background:#f1edfa!important;box-shadow:inset 3px 0 #7650d8!important}
+.sidebar .nav-sub{margin-left:10px!important}
+.content{max-width:1580px!important;padding:30px 34px 48px!important}
+.welcome{position:relative!important;overflow:hidden!important;padding:30px 32px!important;border-radius:18px!important;background:linear-gradient(110deg,#fff 0%,#faf8ff 68%,#f3effc 100%)!important}
+.welcome:after{content:"EDWISE";position:absolute;right:30px;bottom:-24px;font-size:92px;font-weight:900;letter-spacing:5px;color:#7650d8;opacity:.045;pointer-events:none}
+.welcome h1{font-size:28px!important;letter-spacing:-.5px!important}
+.grid{gap:16px!important}
+.stat,.panel,.module{border-radius:15px!important}
+.stat{min-height:125px!important;padding:21px!important}
+.stat h2{font-size:29px!important;letter-spacing:-.5px!important;margin:13px 0 5px!important}
+.analytics-wrap{margin-top:30px!important}
+.analytics-wrap .section-head{margin-bottom:16px!important}
+.analytics-wrap .panel{padding:20px!important}
+.section-head{margin:30px 0 16px!important}
+.module{min-height:145px!important;padding:21px!important}
+.module-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;background:#f2edfc;font-size:19px!important}
+.table-wrap{border:1px solid #ebe8f1;border-radius:11px}
+.table-wrap table{border:0}
+.table-wrap th{font-weight:700!important;font-size:11px!important;white-space:nowrap}
+.table-wrap td{font-size:12px!important}
+.primary,.btn{min-height:38px!important;border-radius:9px!important}
+.primary{box-shadow:0 3px 9px rgba(91,62,151,.14)}
+input,select,textarea{border-radius:9px!important;min-height:40px}
+@media(max-width:900px){.sidebar{width:78px!important;padding:18px 8px!important}.main{margin-left:78px!important;width:calc(100% - 78px)!important}.sidebar .logo small,.sidebar .menu-label,.sidebar .nav span:not(.ico){display:none!important}.sidebar .nav{justify-content:center!important;padding:12px 5px!important}.sidebar .nav .ico{width:auto!important}.content{padding:20px 16px 34px!important}}
+@media(max-width:600px){.content{padding:16px 11px 28px!important}.welcome h1{font-size:22px!important}.welcome:after{display:none}.grid{grid-template-columns:1fr!important}}
+
 </style>
 </head>
 <body>
 
 <aside class="sidebar">
  <button class="logo" id="dashboardHomeLogo" type="button" title="Genel Bakış" aria-label="EDWISE — Genel Bakış"><img src="/assets/images/logo.png" alt="EDWISE" onerror="this.style.display='none'"><span>EDWISE</span><small>CONTENT MANAGEMENT SYSTEM</small></button>
- <div class="menu-label">ANA MENÜ</div>
- <button class="nav active" data-page="overview"><span class="ico">▦</span><span>Ana Sayfa</span></button>
- <button class="nav" data-page="messages"><span class="ico">✉</span><span>Mesaj Kutusu <b id="chatUnreadBadge" class="role-label">0</b></span></button>
- <button class="nav" data-page="reports" data-superadmin><span class="ico">▤</span><span>Raporlar</span></button>
- <button class="nav" data-page="history" data-superadmin><span class="ico">◷</span><span>Geçmiş</span></button>
-  <button class="nav" data-page="archive" data-superadmin><span class="ico">▣</span><span>Arşiv</span></button>
- <div class="menu-label">İÇERİK YÖNETİMİ</div>
- <button class="nav" data-page="pages"><span class="ico">▤</span><span>Sayfa Yönetimi</span></button>
- <button class="nav" data-page="services"><span class="ico">✧</span><span>Hizmet Yönetimi</span></button>
- <button class="nav" data-page="posts"><span class="ico">▧</span><span>Blog Yönetimi</span></button>
-
- <div class="menu-label">İŞLETME YÖNETİMİ</div>
- <button class="nav" data-page="applications" data-superadmin><span class="ico">▣</span><span>Başvurular</span></button>
+ <div class="menu-label">GENEL</div>
+ <button class="nav active" data-page="overview"><span class="ico">⌂</span><span>Genel Bakış</span></button>
+ <div class="menu-label">İÇERİK STÜDYOSU</div>
+ <button class="nav" data-page="pages"><span class="ico">▤</span><span>Sayfalar</span></button>
+ <button class="nav" data-page="services"><span class="ico">✧</span><span>Hizmetler</span></button>
+ <button class="nav" data-page="posts"><span class="ico">▧</span><span>Blog ve Yayınlar</span></button>
  <button class="nav" data-page="media"><span class="ico">▧</span><span>Medya Kütüphanesi</span></button>
-
- <div class="menu-label">AYARLAR</div>
+ <div class="menu-label">TOPLULUK VE ETKİLEŞİM</div>
+ <button class="nav" data-page="messages"><span class="ico">✉</span><span>Mesaj Kutusu <b id="chatUnreadBadge" class="role-label">0</b></span></button>
+ <button class="nav" data-page="applications" data-superadmin><span class="ico">▣</span><span>Başvurular</span></button>
+ <div class="menu-label" data-superadmin>ANALİZ VE RAPORLAR</div>
+ <button class="nav" data-page="reports" data-superadmin><span class="ico">▥</span><span>İstatistikler ve Raporlar</span></button>
+ <button class="nav" data-page="history" data-superadmin><span class="ico">◷</span><span>İçerik Hareketleri</span></button>
+ <button class="nav" data-page="archive" data-superadmin><span class="ico">▣</span><span>Arşiv</span></button>
+ <div class="menu-label">YÖNETİM</div>
+ <button class="nav" data-page="designcenter"><span class="ico">◈</span><span>Site Tasarımı ve Menü</span></button>
  <button class="nav" data-page="sitesettings" data-superadmin><span class="ico">⚙</span><span>Site Ayarları</span></button>
  <button class="nav" data-page="profile"><span class="ico">♙</span><span>Profilim</span></button>
- 
- <div class="menu-label" data-superadmin>SİSTEM</div>
+ <div class="menu-label" data-superadmin>SİSTEM VE GÜVENLİK</div>
  <button class="nav" data-page="users" data-superadmin><span class="ico">♙</span><span>Kullanıcı ve Yetkiler</span></button>
- <button class="nav" data-page="audit" data-superadmin><span class="ico">◉</span><span>Güvenlik ve İşlem Geçmişi</span></button>
+ <button class="nav" data-page="audit" data-superadmin><span class="ico">◉</span><span>Güvenlik Kayıtları</span></button>
 </aside>
 
 <main class="main">
@@ -617,7 +648,7 @@ body.sidebar-collapsed .main{margin-left:78px!important;width:calc(100% - 78px)!
    <div class="welcome">
     <small>EDWISE YÖNETİM MERKEZİ</small>
     <h1>Hoş geldiniz, <span id="welcomeName">Yönetici</span> 👋</h1>
-    <p>İçeriklerinizi, başvurularınızı ve ziyaretçilerden gelen mesajları tek merkezden yönetin.</p>
+    <p>EDWISE’ın içeriklerini yayınlayın, ziyaretçilerle iletişim kurun ve performansını tek merkezden takip edin.</p>
     <div class="actions" style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
      <button class="primary" type="button" onclick="showPage('messages')">✉ Mesaj Kutusuna Git</button>
      <button class="btn" type="button" onclick="showPage('pages')">＋ Sayfa Yönetimi</button>
@@ -666,7 +697,7 @@ body.sidebar-collapsed .main{margin-left:78px!important;width:calc(100% - 78px)!
     <p class="muted" style="margin-top:12px">Görüntüleme ve kaydırma raporları yalnızca analiz çerezlerine izin veren ziyaretçilerden alınır. Telefon ve e-posta gibi başvuru bilgileri ayrı Başvurular bölümünde maskeli tutulur.</p>
    </div>
    <div class="section-head">
-    <div><h2>Yönetim Modülleri</h2><p>İşlem yapmak istediğiniz alanı seçin.</p></div>
+    <div><h2>Çalışma Alanları</h2><p>İçerik üretimi, ziyaretçi iletişimi ve site yönetimi için hızlı erişim.</p></div>
    </div>
 
    <div class="grid">
@@ -1046,7 +1077,7 @@ body.sidebar-collapsed .main{margin-left:78px!important;width:calc(100% - 78px)!
   <div class="settings-main">
    <form id="siteSettingsForm">
   <div class="panel" data-settings-panel="appearance"><h2>Görünüm</h2><p class="muted">Yönetim panelinin renk ve yerleşim seçenekleri.</p><div class="form-grid">
-   <div class="field"><label for="panelTheme">Tema</label><select id="panelTheme"><option value="dark">Koyu tema</option><option value="light">Açık tema</option><option value="system">Cihaz tercihini kullan</option></select></div>
+   <div class="field"><label for="panelTheme">Tema</label><select id="panelTheme"><option value="light">Açık tema</option><option value="dark">Koyu tema</option><option value="system">Cihaz tercihini kullan</option></select></div>
    <div class="field"><label for="panelAccent">Vurgu rengi</label><select id="panelAccent"><option value="purple">Mor</option><option value="blue">Mavi</option><option value="green">Yeşil</option><option value="orange">Turuncu</option></select></div>
    <div class="field"><label for="panelDensity">Menü ve içerik yoğunluğu</label><select id="panelDensity"><option value="comfortable">Rahat</option><option value="compact">Kompakt</option></select></div>
   </div></div>
@@ -2919,7 +2950,7 @@ let activeSettingsTab="appearance";
 function showSettingsTab(tab){activeSettingsTab=tab;document.querySelectorAll("[data-settings-panel]").forEach(p=>p.classList.toggle("hidden",p.dataset.settingsPanel!==tab));document.querySelectorAll("[data-settings-tab]").forEach(b=>b.classList.toggle("active",b.dataset.settingsTab===tab));const search=$("settingsSearch");if(search)search.value="";}
 document.querySelectorAll("[data-settings-tab]").forEach(b=>b.addEventListener("click",()=>showSettingsTab(b.dataset.settingsTab)));
 $("settingsSearch").addEventListener("input",event=>{const query=event.target.value.trim().toLocaleLowerCase("tr-TR");const panels=[...document.querySelectorAll("[data-settings-panel]")];if(!query){showSettingsTab(activeSettingsTab);return;}let first=null;panels.forEach(panel=>{let matched=0;panel.querySelectorAll(".field").forEach(field=>{const label=field.querySelector("label")?.textContent||"";const input=field.querySelector("input,select,textarea");const hay=(label+" "+(input?.placeholder||"")+" "+(input?.id||"")).toLocaleLowerCase("tr-TR");const hit=hay.includes(query);field.classList.toggle("hidden",!hit);if(hit)matched++;});const hit=matched>0;panel.classList.toggle("hidden",!hit);if(hit&&!first)first=panel.dataset.settingsPanel;});if(first){activeSettingsTab=first;document.querySelectorAll("[data-settings-tab]").forEach(b=>b.classList.toggle("active",b.dataset.settingsTab===first));}let empty=$("settingsSearchEmpty");if(!first){if(!empty){empty=document.createElement("div");empty.id="settingsSearchEmpty";empty.className="settings-empty";$("siteSettingsForm").prepend(empty);}empty.textContent="Aramanızla eşleşen bir panel tercihi bulunamadı.";}else $("settingsSearchEmpty")?.remove();});
-async function loadSiteSettings(){try{const data=await api("/api/settings");const values=data.panelPreferences||{};Object.entries(panelSettingFields).forEach(([key,id])=>{if($(id))$(id).value=values[key]||({theme:"dark",accent:"purple",density:"comfortable",fontScale:"normal",contrast:"normal",motion:"full",links:"normal",timezone:"Europe/Istanbul",dateFormat:"dd.mm.yyyy"}[key]);});applyPanelPreferences(values);showSettingsTab(activeSettingsTab);$("siteSettingsMessage").innerHTML="";}catch(error){$("siteSettingsMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}}
+async function loadSiteSettings(){try{const data=await api("/api/settings");const values=data.panelPreferences||{};Object.entries(panelSettingFields).forEach(([key,id])=>{if($(id))$(id).value=values[key]||({theme:"light",accent:"purple",density:"comfortable",fontScale:"normal",contrast:"normal",motion:"full",links:"normal",timezone:"Europe/Istanbul",dateFormat:"dd.mm.yyyy"}[key]);});applyPanelPreferences(values);showSettingsTab(activeSettingsTab);$("siteSettingsMessage").innerHTML="";}catch(error){$("siteSettingsMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}}
 function applyPanelPreferences(values){const root=document.documentElement;root.classList.toggle("panel-light",values.theme==="light"||(values.theme==="system"&&window.matchMedia("(prefers-color-scheme: light)").matches));root.style.fontSize=values.fontScale==="large"?"112.5%":values.fontScale==="larger"?"125%":"";root.classList.toggle("panel-compact",values.density==="compact");root.classList.toggle("panel-high-contrast",values.contrast==="high");root.classList.toggle("panel-reduced-motion",values.motion==="reduced");root.classList.toggle("panel-underlined-links",values.links==="underlined");const accents={purple:"#8055ed",blue:"#2878db",green:"#15966b",orange:"#d97706"};root.style.setProperty("--purple",accents[values.accent]||accents.purple);root.style.setProperty("--light",accents[values.accent]||"#a78bfa");}
 $("reloadSiteSettings").addEventListener("click",()=>{document.querySelectorAll("[data-settings-panel] select").forEach(el=>el.selectedIndex=0);$("panelTimezone").value="Europe/Istanbul";$("panelDateFormat").value="dd.mm.yyyy";});
 $("siteSettingsForm").addEventListener("submit",async event=>{event.preventDefault();const preferences={};Object.entries(panelSettingFields).forEach(([key,id])=>preferences[key]=$(id).value);const button=$("saveSiteSettings");button.disabled=true;button.textContent="Kaydediliyor...";try{const result=await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"save_panel_preferences",preferences})});applyPanelPreferences(preferences);$("siteSettingsMessage").innerHTML='<div class="message success">'+escapeHtml(result.message||"Panel tercihleri kaydedildi.")+'</div>';}catch(error){$("siteSettingsMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}finally{button.disabled=false;button.textContent="Panel Tercihlerini Kaydet";}});
