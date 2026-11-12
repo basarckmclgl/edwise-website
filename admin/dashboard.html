@@ -1261,7 +1261,7 @@ async function loadSiteReports(){
   if(!response.ok||!data.success)throw new Error(data.message||"Raporlar alınamadı.");
   const rows=data.pageReports||[];
   const html=rows.map(row=>'<tr><td>'+escapeHtml(row.path)+'</td><td>'+countryBadge(row.country)+'</td><td>'+row.views.toLocaleString("tr-TR")+'</td><td>'+row.visitors.toLocaleString("tr-TR")+'</td><td>'+row.scroll25.toLocaleString("tr-TR")+'</td><td>'+row.scroll50.toLocaleString("tr-TR")+'</td><td>'+row.scroll75.toLocaleString("tr-TR")+'</td><td>'+row.scroll90.toLocaleString("tr-TR")+'</td></tr>').join("");
-  table.innerHTML=html||'<tr><td colspan="7">Henüz analiz verisi yok. Analiz izni veren ziyaretçiler geldikçe burada görünecek.</td></tr>';
+  table.innerHTML=html||'<tr><td colspan="8">Henüz analiz verisi yok. Analiz izni veren ziyaretçiler geldikçe burada görünecek.</td></tr>';
   const overview=$("overviewPageReports");
   if(overview)overview.innerHTML=rows.map(row=>'<tr><td>'+escapeHtml(row.path)+'</td><td>'+row.views.toLocaleString("tr-TR")+'</td><td>'+row.visitors.toLocaleString("tr-TR")+'</td><td>'+row.scroll25.toLocaleString("tr-TR")+'</td><td>'+row.scroll50.toLocaleString("tr-TR")+'</td><td>'+row.scroll75.toLocaleString("tr-TR")+'</td><td>'+row.scroll90.toLocaleString("tr-TR")+'</td></tr>').join("")||'<tr><td colspan="7">Henüz analiz verisi yok. Analiz izni veren ziyaretçiler geldikçe burada görünecek.</td></tr>';
   const visitRows=data.pageRecords||[];
