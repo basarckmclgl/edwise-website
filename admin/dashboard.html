@@ -1027,7 +1027,15 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
    </table>
   </div>
  </div>
- <p class="muted" style="margin-top:12px">Bu rapor kişisel telefon ve e-posta bilgilerini içermez. 30 günden eski analiz hareketleri otomatik olarak temizlenir.</p>
+ <p class="muted" style="margin-top:12px">Ziyaretçi analizlerinde kişisel telefon ve e-posta bilgileri gösterilmez. Analiz hareketleri 30 gün saklanır.</p>
+ <div class="panel" style="margin-top:18px">
+  <div class="section-head"><div><h3>Yönetici İşlem Geçmişi</h3><p class="muted">Kim, ne zaman, hangi içerikte işlem yaptı? Bu alan yalnızca süper admin tarafından görüntülenebilir.</p></div><button class="btn" type="button" id="refreshHistoryAudit">↻ İşlem Kayıtlarını Yenile</button></div>
+  <div id="historyAuditMessage" class="message" aria-live="polite">Yönetici işlem kayıtları yükleniyor...</div>
+  <div class="table-wrap"><table class="history-table">
+   <thead><tr><th>Tarih ve saat</th><th>Kullanıcı</th><th>Rol</th><th>İşlem</th><th>İçerik / Kayıt</th><th>IP adresi</th><th>Detay</th></tr></thead>
+   <tbody id="historyAuditTable"><tr><td colspan="7">İşlem kayıtları yükleniyor...</td></tr></tbody>
+  </table></div>
+ </div>
 </section>
 
 <section id="other" class="hidden">
@@ -1741,6 +1749,29 @@ async function loadApplicationFunnel(){
 $("refreshApplicationFunnel")?.addEventListener("click",loadApplicationFunnel);
 $("refreshOverviewFunnel")?.addEventListener("click",loadApplicationFunnel);
 
+async function loadHistoryAudit(){
+ const message=$("historyAuditMessage"),table=$("historyAuditTable");
+ if(!message||!table)return;
+ message.className="message";message.textContent="Yönetici işlem kayıtları getiriliyor...";
+ table.innerHTML='<tr><td colspan="7">Kayıtlar yükleniyor...</td></tr>';
+ try{
+  const data=await api("/api/audit?limit=200");
+  const events=data.events||[];
+  const labels={page_created:"Sayfa oluşturuldu",page_updated:"Sayfa düzenlendi",page_deleted:"Sayfa silindi",page_published:"Sayfa yayımlandı",page_unpublished:"Sayfa yayından kaldırıldı",post_published:"Blog yazısı yayımlandı",post_unpublished:"Blog yazısı yayından kaldırıldı",post_deleted:"Blog yazısı silindi",media_uploaded:"Medya yüklendi",media_deleted:"Medya silindi",login_failed:"Başarısız giriş",access_revoked:"Kullanıcı erişimi kapatıldı",version_restored:"Önceki sürüm geri yüklendi"};
+  if(!events.length)table.innerHTML='<tr><td colspan="7">Henüz yönetici işlem kaydı bulunmuyor.</td></tr>';
+  else table.innerHTML=events.map(e=>'<tr><td>'+escapeHtml(e.created_at||"—")+'</td><td>'+escapeHtml(e.actor_username||("Kullanıcı #"+(e.actor_id||"—")))+'</td><td>'+escapeHtml(e.actor_role||"—")+'</td><td>'+escapeHtml(labels[e.action]||e.action||"—")+'</td><td>'+escapeHtml(e.entity_title||e.entity_type||"—")+'</td><td>'+escapeHtml(e.ip_address||"—")+'</td><td><button class="btn" type="button" data-history-audit-detail="'+Number(e.id)+'">Detay</button></td></tr>').join("");
+  table.querySelectorAll("[data-history-audit-detail]").forEach(button=>button.addEventListener("click",()=>{
+   const event=events.find(item=>Number(item.id)===Number(button.dataset.historyAuditDetail));
+   if(event)alert("İşlem ayrıntısı\n\n"+JSON.stringify(event.details||{},null,2));
+  }));
+  message.className="message success";message.textContent=events.length+" yönetici işlem kaydı gösteriliyor (en fazla 200 kayıt).";
+ }catch(error){
+  table.innerHTML='<tr><td colspan="7">Yönetici işlem kayıtları alınamadı.</td></tr>';
+  message.className="message error";message.textContent=error.message||"İşlem kayıtları yüklenemedi.";
+ }
+}
+$("refreshHistoryAudit")?.addEventListener("click",loadHistoryAudit);
+
 async function loadActivityHistory(){
  const message=$("historyMessage"),table=$("historyTable");
  if(!message||!table)return;
@@ -1771,6 +1802,7 @@ async function loadActivityHistory(){
   }
   message.className="message success";
   message.textContent=range==="day"?"Son 24 saatlik geçmiş yüklendi.":range==="week"?"Son 7 günlük geçmiş yüklendi.":"Son 30 günlük geçmiş yüklendi.";
+  await loadHistoryAudit();
  }catch(error){
   table.innerHTML='<tr><td colspan="10">Geçmiş kayıtları yüklenemedi.</td></tr>';
   message.className="message error";message.textContent=error.message||"Geçmiş kayıtları yüklenemedi.";
