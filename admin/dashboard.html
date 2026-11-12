@@ -1775,7 +1775,7 @@ $("profilePasswordForm")?.addEventListener("submit",async event=>{
  finally{button.disabled=false;button.textContent="Şifremi Güncelle";}
 });
 
-async function checkSession(){
+async async function checkSession(){
  try{
   const response=await fetch("/api/me",{credentials:"same-origin",cache:"no-store"});
   if(response.status===401){location.replace("/admin/");return;}
