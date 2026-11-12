@@ -1,6 +1,52 @@
 import { requireSuperAdmin } from "./_auth.js";
 const json=(data,status=200)=>Response.json(data,{status,headers:{"Cache-Control":"no-store"}});
-async function onCloudflare(env,startDate,endDate){
+
+function b64url(value){
+ const bytes=new TextEncoder().encode(value);
+ let binary="";for(const byte of bytes)binary+=String.fromCharCode(byte);
+ return btoa(binary).replace(/=/g,"").replace(/\\+/g,"-").replace(/\\//g,"_");
+}
+function decodePem(value){
+ const raw=value.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\\s/g,"");
+ const binary=atob(raw);return Uint8Array.from(binary,c=>c.charCodeAt(0));
+}
+async function getGoogleAccessToken(secret){
+ const account=JSON.parse(secret);
+ if(!account.client_email||!account.private_key)throw new Error("GA4 servis hesabı JSON içeriği geçersiz.");
+ const now=Math.floor(Date.now()/1000);
+ const header=b64url(JSON.stringify({alg:"RS256",typ:"JWT"}));
+ const claim=b64url(JSON.stringify({iss:account.client_email,scope:"https://www.googleapis.com/auth/analytics.readonly",aud:"https://oauth2.googleapis.com/token",iat:now,exp:now+3600}));
+ const unsigned=header+"."+claim;
+ const key=await crypto.subtle.importKey("pkcs8",decodePem(account.private_key),{name:"RSASSA-PKCS1-v1_5",hash:"SHA-256"},false,["sign"]);
+ const signature=await crypto.subtle.sign("RSASSA-PKCS1-v1_5",key,new TextEncoder().encode(unsigned));
+ const jwt=unsigned+"."+b64url(String.fromCharCode(...new Uint8Array(signature)));
+ const response=await fetch("https://oauth2.googleapis.com/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({grant_type:"urn:ietf:params:oauth:grant-type:jwt-bearer",assertion:jwt})});
+ const data=await response.json();
+ if(!response.ok||!data.access_token)throw new Error(data.error_description||data.error||"Google erişim anahtarı alınamadı.");
+ return data.access_token;
+}
+async function onGoogleAnalytics(env,startDate,endDate){
+ if(!env.GA4_SERVICE_ACCOUNT_JSON)return {configured:false,error:"GA4_SERVICE_ACCOUNT_JSON gizli değişkeni bulunamadı."};
+ const propertyId=env.GA4_PROPERTY_ID||"563996837";
+ const token=await getGoogleAccessToken(env.GA4_SERVICE_ACCOUNT_JSON);
+ async function report(dimensions,metrics,limit=100){
+  const response=await fetch("https://analyticsdata.googleapis.com/v1beta/properties/"+propertyId+":runReport",{method:"POST",headers:{Authorization:"Bearer "+token,"Content-Type":"application/json"},body:JSON.stringify({dateRanges:[{startDate,endDate}],dimensions:dimensions.map(name=>({name})),metrics:metrics.map(name=>({name})),limit})});
+  const data=await response.json();
+  if(!response.ok)throw new Error(data.error?.message||"Google Analytics raporu alınamadı.");
+  return data.rows||[];
+ }
+ const [summary,daily,countries,pages,sources]=await Promise.all([
+  report([],["activeUsers","sessions","screenPageViews","eventCount"],1),
+  report(["date"],["activeUsers","sessions","screenPageViews"],100),
+  report(["country"],["activeUsers","sessions"],20),
+  report(["pagePath"],["screenPageViews","activeUsers"],20),
+  report(["sessionSourceMedium"],["sessions","activeUsers"],20)
+ ]);
+ const vals=summary[0]?.metricValues||[];
+ const number=(row,index)=>Number(row?.metricValues?.[index]?.value||0);
+ return {configured:true,propertyId,totals:{activeUsers:number(summary[0],0),sessions:number(summary[0],1),pageViews:number(summary[0],2),eventCount:number(summary[0],3)},daily:daily.map(r=>({date:(r.dimensionValues?.[0]?.value||"").replace(/^(\\d{4})(\\d{2})(\\d{2})$/,"$1-$2-$3"),activeUsers:number(r,0),sessions:number(r,1),pageViews:number(r,2)})),countries:countries.map(r=>({country:r.dimensionValues?.[0]?.value||"Bilinmiyor",activeUsers:number(r,0),sessions:number(r,1)})),pages:pages.map(r=>({path:r.dimensionValues?.[0]?.value||"/",pageViews:number(r,0),activeUsers:number(r,1)})),sources:sources.map(r=>({source:r.dimensionValues?.[0]?.value||"Bilinmiyor",sessions:number(r,0),activeUsers:number(r,1)}))};
+}
+\nasync function onCloudflare(env,startDate,endDate){
  if(!env.CF_ZONE_TAG||!env.CF_ANALYTICS_API_TOKEN)return {configured:false,error:"Cloudflare için CF_ZONE_TAG ve CF_ANALYTICS_API_TOKEN ayarlanmalı."};
  const headers={Authorization:"Bearer "+env.CF_ANALYTICS_API_TOKEN,"Content-Type":"application/json"};
  const query=`query($zone:String!,$from:Date!,$to:Date!){viewer{zones(filter:{zoneTag:$zone}){httpRequests1dGroups(limit:100,filter:{date_geq:$from,date_leq:$to},orderBy:[date_ASC]){dimensions{date} sum{requests countryMap{clientCountryName requests}} uniq{uniques}}}}}`;
@@ -24,6 +70,6 @@ async function onCloudflare(env,startDate,endDate){
 }
 export async function onRequestGet(context){
  const auth=await requireSuperAdmin(context);if(auth.response)return auth.response;
- try{const end=new Date(),start=new Date(end);start.setDate(start.getDate()-29);const iso=d=>d.toISOString().slice(0,10);const cloudflare=await onCloudflare(context.env,iso(start),iso(end));return json({success:true,period:{startDate:iso(start),endDate:iso(end)},cloudflare});}
+ try{const end=new Date(),start=new Date(end);start.setDate(start.getDate()-29);const iso=d=>d.toISOString().slice(0,10);const [cloudflare,googleAnalytics]=await Promise.all([onCloudflare(context.env,iso(start),iso(end)),onGoogleAnalytics(context.env,iso(start),iso(end)).catch(e=>({configured:false,error:e.message||"Google Analytics verisi alınamadı."}))]);return json({success:true,period:{startDate:iso(start),endDate:iso(end)},cloudflare,googleAnalytics});}
  catch(e){return json({success:false,message:e.message||"Cloudflare analizleri alınamadı."},500);}
 }
