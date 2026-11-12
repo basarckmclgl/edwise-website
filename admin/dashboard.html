@@ -176,6 +176,7 @@ html.panel-high-contrast :focus-visible{outline:3px solid currentColor!important
 html.panel-reduced-motion *,html.panel-reduced-motion *::before,html.panel-reduced-motion *::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 html.panel-underlined-links a{text-decoration:underline!important;text-underline-offset:3px}
 
+@media print{body.printing-reports *{visibility:hidden!important}body.printing-reports #reports,body.printing-reports #reports *{visibility:visible!important}body.printing-reports #reports{display:block!important;position:absolute;left:0;top:0;width:100%;padding:0;margin:0}body.printing-reports #reports .section-head .actions,body.printing-reports #reports #siteReportsMessage{display:none!important}body.printing-reports #reports .panel{break-inside:avoid;background:#fff!important;color:#111!important;box-shadow:none!important;border:0!important}body.printing-reports #reports table{width:100%!important;min-width:0!important;font-size:8pt!important}body.printing-reports #reports th,body.printing-reports #reports td{color:#111!important;border:1px solid #999!important;padding:4px!important}body.printing-reports #reports .table-wrap{overflow:visible!important}}
 </style>
 </head>
 <body>
@@ -274,7 +275,7 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
   </section>
 
   <section id="reports" class="hidden" data-superadmin>
-   <div class="section-head"><div><h2>Site Raporları</h2><p>Son 30 günlük sayfa görüntüleme, ziyaretçi oturumu ve kaydırma derinliği.</p></div><button class="btn" id="refreshSiteReports">↻ Raporları Yenile</button></div>
+   <div class="section-head"><div><h2>Site Raporları</h2><p>Son 30 günlük sayfa görüntüleme, ziyaretçi oturumu ve kaydırma derinliği.</p></div><div class="actions"><button class="btn" id="refreshSiteReports">↻ Raporları Yenile</button><button class="btn" type="button" id="exportReportsXlsx">Excel (.xlsx)</button><button class="btn" type="button" id="exportReportsDoc">Word (.doc)</button><button class="primary" type="button" id="exportReportsPdf">PDF</button></div></div>
    <div id="siteReportsMessage" class="message">Raporlar yükleniyor...</div>
    <div class="panel"><h3>Sayfa İnceleme Raporu</h3><div class="table-wrap"><table style="min-width:760px"><thead><tr><th>Sayfa</th><th>Görüntülenme</th><th>Ziyaretçi oturumu</th><th>%25 kaydırma</th><th>%50 kaydırma</th><th>%75 kaydırma</th><th>%90 kaydırma</th></tr></thead><tbody id="siteReportsTable"><tr><td colspan="7">Veriler bekleniyor...</td></tr></tbody></table></div></div>
    <div class="panel"><h3>Başvuru Dönüşüm Raporu</h3><p class="muted">Başvuru hunisi ve e-posta / WhatsApp hareketleri.</p><div class="table-wrap"><table style="min-width:1100px;table-layout:fixed"><thead id="reportFunnelHead"><tr><th>Ölçüm</th></tr></thead><tbody id="reportFunnelTable"><tr><td colspan="3">Veriler bekleniyor...</td></tr></tbody></table></div></div>
@@ -1238,7 +1239,7 @@ function renderAnalytics(data){
  $("analyticsCountryTable").innerHTML=countries.map(x=>'<tr><td>'+escapeHtml(x.country)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="2">Henüz ülke verisi yok.</td></tr>';
  $("analyticsPagesTable").innerHTML=(cf.pages||[]).map(x=>'<tr><td>'+escapeHtml(x.path)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="2">'+(cf.pathWarning?escapeHtml(cf.pathWarning):"Sayfa verisi bulunamadı.")+'</td></tr>';
 }
-async function loadSiteReports(){
+async async function loadSiteReports(){
  const message=$("siteReportsMessage"),table=$("siteReportsTable");
  if(!table)return;
  if(message){message.className="message";message.textContent="Site raporları getiriliyor...";}
@@ -1265,6 +1266,37 @@ async function loadSiteReports(){
   if(message){message.className="message success";message.textContent="Son 30 günlük raporlar güncellendi.";}
  }catch(error){if(message){message.className="message error";message.textContent=error.message;}table.innerHTML='<tr><td colspan="7">Raporlar yüklenemedi.</td></tr>';}
 }
+
+function reportExportTables(){
+ const ids=["siteReportsTable","reportFunnelTable","applicationsTable"];
+ return ids.map(id=>{const body=$(id);return body?.closest("table")||null;}).filter(Boolean);
+}
+function exportReportsDoc(){
+ const tables=reportExportTables();
+ const html='<!doctype html><html><head><meta charset="utf-8"><title>EDWISE Site Raporları</title><style>body{font-family:Arial,sans-serif;color:#222}h1,h2{color:#291447}table{border-collapse:collapse;width:100%;margin:12px 0 28px;font-size:10pt}th,td{border:1px solid #aaa;padding:6px;text-align:left}th{background:#eee}</style></head><body><h1>EDWISE Site Raporları</h1><p>Rapor tarihi: '+new Date().toLocaleString("tr-TR")+'</p>'+tables.map((table,i)=>'<h2>'+["Sayfa İnceleme Raporu","Başvuru Dönüşüm Raporu","Başvuru Kayıtları"][i]+'</h2>'+table.outerHTML).join("")+'</body></html>';
+ const blob=new Blob(["\ufeff",html],{type:"application/msword"});
+ const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="EDWISE-Site-Raporlari.doc";a.click();URL.revokeObjectURL(url);
+}
+async function exportReportsXlsx(){
+ const tables=reportExportTables();
+ if(!tables.length)throw new Error("Dışa aktarılacak rapor tablosu bulunamadı.");
+ if(!window.XLSX){
+  await new Promise((resolve,reject)=>{const script=document.createElement("script");script.src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";script.onload=resolve;script.onerror=()=>reject(new Error("Excel dışa aktarma kütüphanesi yüklenemedi."));document.head.appendChild(script);});
+ }
+ const workbook=XLSX.utils.book_new();
+ tables.forEach((table,i)=>{const sheet=XLSX.utils.table_to_sheet(table);XLSX.utils.book_append_sheet(workbook,sheet,["Sayfa İnceleme","Başvuru Dönüşüm","Başvuru Kayıtları"][i]);});
+ XLSX.writeFile(workbook,"EDWISE-Site-Raporlari.xlsx");
+}
+function exportReportsPdf(){
+ const section=$("reports");if(!section)return;
+ document.body.classList.add("printing-reports");
+ window.print();
+ setTimeout(()=>document.body.classList.remove("printing-reports"),1000);
+}
+$("exportReportsDoc")?.addEventListener("click",exportReportsDoc);
+$("exportReportsXlsx")?.addEventListener("click",()=>exportReportsXlsx().catch(error=>alert(error.message)));
+$("exportReportsPdf")?.addEventListener("click",exportReportsPdf);
+
 $("refreshSiteReports")?.addEventListener("click",loadSiteReports);
 $("refreshOverviewReports")?.addEventListener("click",loadSiteReports);
 
