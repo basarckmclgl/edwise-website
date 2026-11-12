@@ -759,13 +759,14 @@ td{color:#39334b!important;border-color:#eeebf4!important}
     </div>
     <div id="analyticsMessage" class="message">Cloudflare verileri yükleniyor...</div>
     <div class="grid analytics-stats">
-     <div class="stat"><span>GA4 · Aktif Kullanıcı</span><h2 id="homeGaUsers">—</h2><p>Google Analytics 4</p></div>
-     <div class="stat"><span>GA4 · Oturum</span><h2 id="homeGaSessions">—</h2><p>Google Analytics 4</p></div>
-     <div class="stat"><span>GA4 · Sayfa Görüntüleme</span><h2 id="homeGaViews">—</h2><p>Google Analytics 4</p></div>
+     <div class="stat"><span>GA4 · Son 30 Gün Aktif</span><h2 id="homeGaUsers">—</h2><p>Google Analytics 4</p></div>
+     <div class="stat"><span>GA4 · Son 30 Gün Oturum</span><h2 id="homeGaSessions">—</h2><p>Google Analytics 4</p></div>
+     <div class="stat"><span>GA4 · Son 30 Gün Görüntüleme</span><h2 id="homeGaViews">—</h2><p>Google Analytics 4</p></div>
+     <div class="stat"><span>GA4 · Şu An Aktif</span><h2 id="homeGaRealtime">—</h2><p>Son 30 dakikadaki aktif kullanıcı</p></div>
      <div class="stat"><span>Cloudflare · HTTP İstek</span><h2 id="cfRequests">—</h2><p>Altyapı trafiği · Cloudflare</p></div>
      <div class="stat"><span>Cloudflare · Günlük Tekil IP Toplamı</span><h2 id="cfUnique">—</h2><p>Günlük tekil IP değerleri toplamı; 30 günlük tekil kişi değildir</p></div>
      <div class="stat"><span>Cloudflare · Ülke Sayısı</span><h2 id="cfCountryCount">—</h2><p>Trafik alınan ülke ve bölgeler</p></div>
-     <div class="stat"><span>Toplam İstek</span><h2 id="cfUnique">—</h2><p>Günlük tekil IP değerleri toplamı; 30 günlük tekil kişi değildir</p></div>
+     
     </div>
     <div class="grid analytics-charts" style="grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);margin-top:16px">
      <div class="panel"><h3>Günlük trafik</h3><p class="muted">Cloudflare üzerinden geçen günlük HTTP istekleri</p><canvas id="analyticsDailyChart" height="260" style="width:100%;height:260px"></canvas></div>
@@ -1953,7 +1954,7 @@ function renderGoogleAnalytics(data){
 }
 function renderAnalytics(data){
  window._edwiseAnalyticsData=data;renderGoogleAnalytics(data);const ga=data.googleAnalytics||{},gt=ga.totals||{};const cf=data.cloudflare||{},t=cf.totals||{};
- $("homeGaUsers").textContent=ga.configured?analyticsNumber(gt.activeUsers):"—";$("homeGaSessions").textContent=ga.configured?analyticsNumber(gt.sessions):"—";$("homeGaViews").textContent=ga.configured?analyticsNumber(gt.pageViews):"—";
+ $("homeGaUsers").textContent=ga.configured?analyticsNumber(gt.activeUsers):"—";$("homeGaSessions").textContent=ga.configured?analyticsNumber(gt.sessions):"—";$("homeGaViews").textContent=ga.configured?analyticsNumber(gt.pageViews):"—";$("homeGaRealtime").textContent=ga.configured?analyticsNumber(ga.realtime?.activeUsers):"—";
  $("cfUnique").textContent=cf.configured?analyticsNumber(t.dailyUniqueIpTotal):"—";
  $("cfRequests").textContent=cf.configured?analyticsNumber(t.requests):"—";
  $("cfCountryCount").textContent=cf.configured?analyticsNumber((cf.countries||[]).length):"—";
@@ -2262,11 +2263,15 @@ $("runArchive")?.addEventListener("click",async()=>{
 });
 
 async function loadAnalytics(){
- const message=$("analyticsMessage");if(!message)return;message.className="message";message.textContent="Cloudflare verileri getiriliyor...";
+ const message=$("analyticsMessage");if(!message)return;message.className="message";message.textContent="Google Analytics ve Cloudflare verileri otomatik olarak alınıyor...";
  try{const response=await fetch("/api/analytics",{credentials:"same-origin",cache:"no-store",signal:AbortSignal.timeout(15000)});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||"Cloudflare analiz verileri alınamadı.");renderAnalytics(data);}
  catch(error){message.className="message error";message.textContent=error.name==="TimeoutError"||error.name==="AbortError"?"Cloudflare analiz isteği zaman aşımına uğradı. Diğer yönetim menülerini kullanmaya devam edebilirsiniz.":(error.message||"Cloudflare analizleri yüklenemedi.");}
 }
 $("refreshAnalytics")?.addEventListener("click",loadAnalytics);
+let analyticsAutoRefresh=null;
+function startAnalyticsAutoRefresh(){if(analyticsAutoRefresh)clearInterval(analyticsAutoRefresh);analyticsAutoRefresh=setInterval(()=>{if(!document.hidden&&$("overview")&&!$("overview").classList.contains("hidden"))loadAnalytics();},60000);}
+startAnalyticsAutoRefresh();
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&$("overview")&&!$("overview").classList.contains("hidden"))loadAnalytics();});
 window.addEventListener("resize",()=>{if(window._edwiseAnalyticsData?.cloudflare?.daily)drawAnalyticsBars(window._edwiseAnalyticsData.cloudflare.daily);});
 
 async function performAdminLogout(){try{await fetch("/api/logout",{method:"POST",credentials:"same-origin"});}finally{location.replace("/admin/");}}
