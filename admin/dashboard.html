@@ -166,9 +166,10 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
 <body>
 
 <aside class="sidebar">
- <div class="logo">EDWISE<small>CONTENT MANAGEMENT SYSTEM</small></div>
+ <div class="logo" id="dashboardHomeLogo" role="button" tabindex="0" title="Genel Bakış">EDWISE<small>CONTENT MANAGEMENT SYSTEM</small></div>
  <div class="menu-label">ANA MENÜ</div>
  <button class="nav active" data-page="overview"><span class="ico">▦</span><span>Genel Bakış</span></button>
+ <button class="nav" data-page="reports" data-superadmin><span class="ico">▤</span><span>Raporlar</span></button>
  <button class="nav" data-page="designcenter"><span class="ico">▣</span><span>Site Tasarım Merkezi</span></button>
  <button class="nav" data-page="sitesettings" data-superadmin><span class="ico">⚙</span><span>Site Ayarları</span></button>
 
@@ -234,6 +235,10 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
 
    </section>
 
+   <div class="panel" data-superadmin style="margin-top:18px">
+    <div class="section-head"><div><h2>Site İnceleme Özeti</h2><p class="muted">Son 30 gün · sayfa görüntüleme ve kaydırma hareketleri</p></div><button class="btn" type="button" data-open="reports">Tüm Raporlar</button></div>
+    <div class="table-wrap"><table style="min-width:650px"><thead><tr><th>Sayfa</th><th>Görüntülenme</th><th>Ziyaretçi oturumu</th><th>%50 kaydırma</th><th>%90 kaydırma</th></tr></thead><tbody id="overviewPageReports"><tr><td colspan="5">Rapor yükleniyor...</td></tr></tbody></table></div>
+   </div>
    <div class="section-head">
     <div><h2>Yönetim Modülleri</h2><p>İşlem yapmak istediğiniz alanı seçin.</p></div>
    </div>
@@ -249,6 +254,13 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
    </div>
   </section>
 
+  <section id="reports" class="hidden" data-superadmin>
+   <div class="section-head"><div><h2>Site Raporları</h2><p>Son 30 günlük sayfa görüntüleme, ziyaretçi oturumu ve kaydırma derinliği.</p></div><button class="btn" id="refreshSiteReports">↻ Raporları Yenile</button></div>
+   <div id="siteReportsMessage" class="message">Raporlar yükleniyor...</div>
+   <div class="panel"><h3>Sayfa İnceleme Raporu</h3><div class="table-wrap"><table style="min-width:760px"><thead><tr><th>Sayfa</th><th>Görüntülenme</th><th>Ziyaretçi oturumu</th><th>%25 kaydırma</th><th>%50 kaydırma</th><th>%75 kaydırma</th><th>%90 kaydırma</th></tr></thead><tbody id="siteReportsTable"><tr><td colspan="7">Veriler bekleniyor...</td></tr></tbody></table></div></div>
+   <div class="panel"><h3>Başvuru Dönüşüm Raporu</h3><p class="muted">Başvuru hunisi ve e-posta / WhatsApp hareketleri.</p><div class="table-wrap"><table style="min-width:700px"><thead><tr><th>İşlem</th><th>Toplam işlem</th><th>Oturum</th></tr></thead><tbody id="reportFunnelTable"><tr><td colspan="3">Veriler bekleniyor...</td></tr></tbody></table></div></div>
+   <p class="muted">Not: Analiz verileri yalnızca analiz çerezlerine izin veren ziyaretçilerden toplanır. Kaydırma oranları aynı oturumdaki olay sayılarını gösterir; kişileri kesin olarak tanımlamaz.</p>
+  </section>
   <section id="designcenter" class="hidden">
    <div class="section-head">
     <div><h2>Site Tasarım Merkezi</h2><p>Önizlemek istediğiniz site sayfasını seçin. Gerçek site görünümü aşağıda açılır.</p></div>
@@ -773,9 +785,10 @@ async function loadPublishedContentCounts(){
 
 function showPage(name){
  if(!canAccess(name)) name="overview";
- if(name==="overview"){loadPublishedContentCounts();if(currentRole==="superadmin")loadApplicationFunnel();}
+ if(name==="overview"){loadPublishedContentCounts();if(currentRole==="superadmin"){loadApplicationFunnel();loadSiteReports();}}
 
  $("overview").classList.toggle("hidden",name!=="overview");
+ $("reports").classList.toggle("hidden",name!=="reports");
  $("designcenter").classList.toggle("hidden",name!=="designcenter");
  $("sitesettings").classList.toggle("hidden",name!=="sitesettings");
  $("pages").classList.toggle("hidden",name!=="pages");
@@ -789,7 +802,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
   n.classList.toggle("active",n.dataset.page===name);
  });
 
- $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="designcenter"?"Site Tasarım Merkezi":name==="sitesettings"?"Site Ayarları":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":name==="audit"?"Güvenlik ve İşlem Geçmişi":otherModules[name]?.[0]||"";
+ $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="designcenter"?"Site Tasarım Merkezi":name==="sitesettings"?"Site Ayarları":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":name==="audit"?"Güvenlik ve İşlem Geçmişi":name==="reports"?"Raporlar":otherModules[name]?.[0]||"";
 
  if(name==="designcenter")loadDesignRecords();
  if(name==="pages")loadPages();
@@ -797,6 +810,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
  if(name==="posts")loadPosts();
     if(name==="users")loadUsers();
  if(name==="audit")loadAudit();
+ if(name==="reports")loadSiteReports();
  if(name==="applications"){loadApplications();loadApplicationFunnel();}
  if(name==="designcenter")loadThemeSettings();
  if(name==="sitesettings")loadSiteSettings();
@@ -812,6 +826,9 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
  }
 }
 
+const homeLogo=$("dashboardHomeLogo");
+homeLogo?.addEventListener("click",()=>showPage("overview"));
+homeLogo?.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();showPage("overview");}});
 document.querySelectorAll("[data-page]").forEach(n=>{
  n.addEventListener("click",()=>showPage(n.dataset.page));
 });
@@ -1194,6 +1211,29 @@ function renderAnalytics(data){
  $("analyticsCountryTable").innerHTML=countries.map(x=>'<tr><td>'+escapeHtml(x.country)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="2">Henüz ülke verisi yok.</td></tr>';
  $("analyticsPagesTable").innerHTML=(cf.pages||[]).map(x=>'<tr><td>'+escapeHtml(x.path)+'</td><td>'+analyticsNumber(x.requests)+'</td></tr>').join("")||'<tr><td colspan="2">'+(cf.pathWarning?escapeHtml(cf.pathWarning):"Sayfa verisi bulunamadı.")+'</td></tr>';
 }
+async function loadSiteReports(){
+ const message=$("siteReportsMessage"),table=$("siteReportsTable");
+ if(!table)return;
+ if(message){message.className="message";message.textContent="Site raporları getiriliyor...";}
+ try{
+  const response=await fetch("/api/application-events",{credentials:"same-origin",cache:"no-store"});
+  const data=await response.json();
+  if(!response.ok||!data.success)throw new Error(data.message||"Raporlar alınamadı.");
+  const rows=data.pageReports||[];
+  const html=rows.map(row=>'<tr><td>'+escapeHtml(row.path)+'</td><td>'+row.views.toLocaleString("tr-TR")+'</td><td>'+row.visitors.toLocaleString("tr-TR")+'</td><td>'+row.scroll25.toLocaleString("tr-TR")+'</td><td>'+row.scroll50.toLocaleString("tr-TR")+'</td><td>'+row.scroll75.toLocaleString("tr-TR")+'</td><td>'+row.scroll90.toLocaleString("tr-TR")+'</td></tr>').join("");
+  table.innerHTML=html||'<tr><td colspan="7">Henüz analiz verisi yok. Analiz izni veren ziyaretçiler geldikçe burada görünecek.</td></tr>';
+  const overview=$("overviewPageReports");
+  if(overview)overview.innerHTML=rows.slice(0,8).map(row=>'<tr><td>'+escapeHtml(row.path)+'</td><td>'+row.views.toLocaleString("tr-TR")+'</td><td>'+row.visitors.toLocaleString("tr-TR")+'</td><td>'+row.scroll50.toLocaleString("tr-TR")+'</td><td>'+row.scroll90.toLocaleString("tr-TR")+'</td></tr>').join("")||'<tr><td colspan="5">Henüz analiz verisi yok.</td></tr>';
+  const funnel=$("reportFunnelTable");
+  if(funnel){
+   const labels={apply_click:"Başvur butonuna tıklama",form_view:"Başvuru formu açıldı",form_start:"Form doldurmaya başlandı",submit_attempt:"Gönderim denendi",application_saved:"Başvuru kaydedildi",email_sent:"E-posta gönderildi",email_failed:"E-posta gönderilemedi",whatsapp_redirect:"WhatsApp açıldı",form_abandon:"Form yarım bırakıldı",site_return:"Siteye geri dönüldü"};
+   funnel.innerHTML=Object.entries(labels).map(([key,label])=>{const item=data.totals?.[key]||{count:0,sessions:0};return '<tr><td>'+label+'</td><td>'+item.count.toLocaleString("tr-TR")+'</td><td>'+item.sessions.toLocaleString("tr-TR")+'</td></tr>';}).join("");
+  }
+  if(message){message.className="message success";message.textContent="Son 30 günlük raporlar güncellendi.";}
+ }catch(error){if(message){message.className="message error";message.textContent=error.message;}table.innerHTML='<tr><td colspan="7">Raporlar yüklenemedi.</td></tr>';}
+}
+$("refreshSiteReports")?.addEventListener("click",loadSiteReports);
+
 async function loadApplicationFunnel(){
  const message=$("applicationFunnelMessage"),table=$("applicationFunnelTable");
  if(!message||!table)return;
