@@ -473,6 +473,7 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
  <button class="nav active" data-page="overview"><span class="ico">▦</span><span>Genel Bakış</span></button>
  <button class="nav" data-page="reports" data-superadmin><span class="ico">▤</span><span>Raporlar</span></button>
  <button class="nav" data-page="history" data-superadmin><span class="ico">◷</span><span>Geçmiş</span></button>
+  <button class="nav" data-page="archive" data-superadmin><span class="ico">▣</span><span>Arşiv</span></button>
  <div class="menu-label">İÇERİK YÖNETİMİ</div>
  <button class="nav" data-page="pages"><span class="ico">▤</span><span>Sayfa Yönetimi</span></button>
  <button class="nav" data-page="services"><span class="ico">✧</span><span>Hizmet Yönetimi</span></button>
@@ -1038,6 +1039,20 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
  </div>
 </section>
 
+<section id="archive" class="hidden" data-superadmin>
+ <div class="section-head"><div><h2>Arşiv Yönetimi</h2><p class="muted">Operasyonel kayıtların kişisel veri minimizasyonuyla saklanan kopyaları. Arşivleme kaynak kayıtları silmez.</p></div><button class="primary" type="button" id="runArchive">Şimdi Arşivle</button></div>
+ <div id="archiveMessage" class="message" aria-live="polite">Arşiv bilgileri yükleniyor...</div>
+ <div class="grid analytics-stats">
+  <div class="stat"><span>Toplam arşiv kaydı</span><h2 id="archiveTotal">—</h2><p>Tekil arşiv girdisi</p></div>
+  <div class="stat"><span>Analiz kayıt grubu</span><h2 id="archiveAnalytics">—</h2><p>Gün / olay / sayfa kırılımı</p></div>
+  <div class="stat"><span>Başvuru özeti</span><h2 id="archiveApplications">—</h2><p>İletişim bilgileri hariç</p></div>
+  <div class="stat"><span>Yönetici işlemi</span><h2 id="archiveAudit">—</h2><p>IP ve tarayıcı bilgileri hariç</p></div>
+ </div>
+ <div class="panel" style="margin-top:16px"><h3>Arşiv güvenliği</h3><ul><li>Arşiv yalnızca süper yönetici tarafından görüntülenebilir.</li><li>Başvuru adı, telefon, e-posta ve serbest metin notları arşiv kopyasına alınmaz.</li><li>Analiz oturum kimlikleri, yönetici IP adresleri ve tarayıcı bilgileri arşivlenmez.</li><li>Kaynak veriler bu aşamada otomatik silinmez.</li><li>Aynı kaynak kayıt ikinci kez arşivlenmez.</li></ul></div>
+ <div class="panel table-wrap"><div class="section-head"><div><h3>Son arşivlenen kayıtlar</h3><p class="muted">En son oluşturulan 100 arşiv kaydı</p></div><button class="btn" type="button" id="refreshArchive">↻ Yenile</button></div><table><thead><tr><th>Arşiv tarihi</th><th>Kayıt tarihi</th><th>Kategori</th><th>Kaynak no</th><th>Özet</th></tr></thead><tbody id="archiveTable"><tr><td colspan="5">Kayıtlar yükleniyor...</td></tr></tbody></table></div>
+ <div class="panel"><h3>Arşivleme geçmişi</h3><div class="table-wrap"><table><thead><tr><th>İşlem tarihi</th><th>Durum</th><th>Eklenen kayıt</th><th>Atlanan kayıt</th><th>Açıklama</th></tr></thead><tbody id="archiveJobs"><tr><td colspan="5">İşlemler yükleniyor...</td></tr></tbody></table></div></div>
+</section>
+
 <section id="other" class="hidden">
    <div class="panel">
     <h2 id="otherTitle"></h2>
@@ -1159,13 +1174,14 @@ function showPage(name){
  $("users").classList.toggle("hidden",name!=="users");
  $("audit").classList.toggle("hidden",name!=="audit");
  $("history").classList.toggle("hidden",name!=="history");
+$("archive").classList.toggle("hidden",name!=="archive");
 $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
 
  document.querySelectorAll(".nav").forEach(n=>{
   n.classList.toggle("active",n.dataset.page===name);
  });
 
- $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="designcenter"?"Site Tasarım Merkezi":name==="sitesettings"?"Site Ayarları":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":name==="audit"?"Güvenlik ve İşlem Geçmişi":name==="history"?"Geçmiş":name==="reports"?"Raporlar":otherModules[name]?.[0]||"";
+ $("breadcrumb").textContent=name==="overview"?"Genel Bakış":name==="designcenter"?"Site Tasarım Merkezi":name==="sitesettings"?"Site Ayarları":name==="pages"?"Sayfa Yönetimi":name==="services"?"Hizmet Yönetimi":name==="posts"?"Blog Yönetimi":name==="audit"?"Güvenlik ve İşlem Geçmişi":name==="history"?"Geçmiş":name==="archive"?"Arşiv":name==="reports"?"Raporlar":otherModules[name]?.[0]||"";
 
  if(name==="designcenter")loadDesignRecords();
  if(name==="pages")loadPages();
@@ -1174,6 +1190,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
     if(name==="users")loadUsers();
  if(name==="audit")loadAudit();
  if(name==="history")loadActivityHistory();
+  if(name==="archive")loadArchive();
  if(name==="reports"){loadSiteReports();loadApplications();}
  if(name==="applications"){loadApplications();loadApplicationFunnel();}
  if(name==="designcenter")loadThemeSettings();
@@ -1810,6 +1827,44 @@ async function loadActivityHistory(){
 }
 $("refreshHistory")?.addEventListener("click",loadActivityHistory);
 $("historyRange")?.addEventListener("change",loadActivityHistory);
+
+async function loadArchive(){
+ const message=$("archiveMessage"),table=$("archiveTable"),jobs=$("archiveJobs");
+ if(!message||!table||!jobs)return;
+ message.className="message";message.textContent="Arşiv kayıtları yükleniyor...";
+ try{
+  const data=await api("/api/archive");
+  if(!data.success)throw new Error(data.message||"Arşiv bilgileri alınamadı.");
+  const fmt=v=>Number(v||0).toLocaleString("tr-TR");
+  const counts=Object.fromEntries((data.counts||[]).map(x=>[x.source_type,Number(x.total)||0]));
+  $("archiveTotal").textContent=fmt(data.total);
+  $("archiveAnalytics").textContent=fmt(counts.analytics);
+  $("archiveApplications").textContent=fmt(counts.application);
+  $("archiveAudit").textContent=fmt(counts.admin_audit);
+  const labels={analytics:"Ziyaret ve analiz",application:"Başvuru özeti",admin_audit:"Yönetici işlemi"};
+  const records=data.records||[];
+  table.innerHTML=records.length?records.map(r=>{
+   const s=r.summary||{};
+   const summary=r.source_type==="analytics"?(s.event+" · "+(s.page||"/")+" · "+fmt(s.count)+" olay"):r.source_type==="application"?(s.program+" · "+s.status):((s.action||"İşlem")+" · "+(s.title||s.entityType||"Kayıt"));
+   return "<tr><td>"+escapeHtml(r.archived_at||"—")+"</td><td>"+escapeHtml(r.record_date||"—")+"</td><td>"+escapeHtml(labels[r.source_type]||r.source_type)+"</td><td>"+escapeHtml(r.source_id||"—")+"</td><td>"+escapeHtml(summary||"—")+"</td></tr>";
+  }).join(""):'<tr><td colspan="5">Henüz arşiv kaydı bulunmuyor.</td></tr>';
+  const history=data.jobs||[];
+  jobs.innerHTML=history.length?history.map(j=>"<tr><td>"+escapeHtml(j.created_at||"—")+"</td><td>"+escapeHtml(j.status||"—")+"</td><td>"+fmt(j.archived_count)+"</td><td>"+fmt(j.skipped_count)+"</td><td>"+escapeHtml(j.message||"—")+"</td></tr>").join(""):'<tr><td colspan="5">Henüz arşivleme işlemi yapılmadı.</td></tr>';
+  message.className="message success";message.textContent="Arşiv bilgileri güncel. Kaynak kayıtlar korunuyor.";
+ }catch(error){message.className="message error";message.textContent=error.message||"Arşiv bilgileri alınamadı.";}
+}
+$("refreshArchive")?.addEventListener("click",loadArchive);
+$("runArchive")?.addEventListener("click",async()=>{
+ if(!confirm("Mevcut analiz, başvuru ve yönetici işlem kayıtlarının kişisel veri içermeyen özetleri arşive kopyalansın mı? Kaynak kayıtlar silinmeyecek."))return;
+ const button=$("runArchive"),message=$("archiveMessage");button.disabled=true;button.textContent="Arşivleniyor...";
+ try{
+  const data=await api("/api/archive",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({})});
+  if(!data.success)throw new Error(data.message||"Arşivleme başarısız.");
+  message.className="message success";message.textContent=Number(data.archived||0).toLocaleString("tr-TR")+" yeni kayıt arşivlendi; "+Number(data.skipped||0).toLocaleString("tr-TR")+" kayıt zaten arşivdeydi. "+data.message;
+  await loadArchive();
+ }catch(error){message.className="message error";message.textContent=error.message||"Arşivleme başarısız oldu.";}
+ finally{button.disabled=false;button.textContent="Şimdi Arşivle";}
+});
 
 async function loadAnalytics(){
  const message=$("analyticsMessage");if(!message)return;message.className="message";message.textContent="Cloudflare verileri getiriliyor...";
