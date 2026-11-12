@@ -12,8 +12,15 @@ function decodePem(value){
  const binary=atob(raw);return Uint8Array.from(binary,c=>c.charCodeAt(0));
 }
 async function getGoogleAccessToken(secret){
- const account=JSON.parse(secret);
- if(!account.client_email||!account.private_key)throw new Error("GA4 servis hesabı JSON içeriği geçersiz.");
+ let account=JSON.parse(String(secret).replace(/^\\uFEFF/,"").trim());
+ if(typeof account==="string")account=JSON.parse(account.trim());
+ if(account?.credentials&&typeof account.credentials==="object")account=account.credentials;
+ if(account?.service_account&&typeof account.service_account==="object")account=account.service_account;
+ if(!account||typeof account!=="object")throw new Error("GA4 anahtarının JSON yapısı servis hesabı nesnesi değil.");
+ const missing=[];
+ if(!account.client_email)missing.push("client_email");
+ if(!account.private_key)missing.push("private_key");
+ if(missing.length)throw new Error("GA4 JSON içinde "+missing.join(" ve ")+" alanı bulunamadı. Dosyada görülen alanlar: "+Object.keys(account).join(", "));
  const now=Math.floor(Date.now()/1000);
  const header=b64url(JSON.stringify({alg:"RS256",typ:"JWT"}));
  const claim=b64url(JSON.stringify({iss:account.client_email,scope:"https://www.googleapis.com/auth/analytics.readonly",aud:"https://oauth2.googleapis.com/token",iat:now,exp:now+3600}));
