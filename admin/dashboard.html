@@ -1811,7 +1811,74 @@ function applicationExportTable(){return $("applicationsTable")?.closest("table"
 function applicationExportName(){return "EDWISE-Basvuru-Kayitlari";}
 function exportApplicationsDoc(){
  const table=applicationExportTable();if(!table){alert("Başvuru tablosu bulunamadı.");return;}
-  const html='<!doctype html><html><head><meta charset="utf-8"><title>EDWISE Başvuru Kayıtları</title><style>body{font-family:Arial,sans-serif;color:#222}h1{color:#291447}table{border-collapse:collapse;width:100%;font-size:9pt}th,td{border:1px solid #aaa;padding:6px;text-align:left}th{background:#eee}</style></head><body><h1>EDWISE Başvuru Kayıtları</h1><p>Rapor tarihi: '+new Date().toLocaleDateString("tr-TR")+'</p>'+table.outerHTML+'</body></html>';
+  const html='<!doctype html><html><head><meta charset="utf-8"><title>EDWISE Başvuru Kayıtları</title><style>body{font-family:Arial,sans-serif;color:#222}h1{color:#291447}table{border-collapse:collapse;width:100%;font-size:9pt}th,td{border:1px solid #aaa;padding:6px;text-align:left}th{background:#eee}
+/* EDWISE LIGHT ADMIN THEME — balanced density, purple accent */
+html.panel-light{--bg:#f5f6fa;--panel:#fff;--border:#e2e5ee;--purple:#7650d8;--light:#7650d8;--text:#242338;--muted:#66677c;--green:#16845f;--red:#c7475c;color-scheme:light}
+html.panel-light body{background:var(--bg)!important;color:var(--text)!important}
+html.panel-light .sidebar{background:#fff!important;border-right:1px solid var(--border)!important;box-shadow:4px 0 18px #20243a08;scrollbar-color:#c5b5ed #f4f1fb}
+html.panel-light .sidebar::-webkit-scrollbar-track{background:#f4f1fb}html.panel-light .sidebar::-webkit-scrollbar-thumb{background:#c5b5ed}
+html.panel-light .logo span{color:#29233d!important}html.panel-light .logo img{filter:none!important}html.panel-light .logo small{color:#858398!important}
+html.panel-light .menu-label{color:#89869c!important}html.panel-light .nav{color:#55566d!important}
+html.panel-light .nav:hover,html.panel-light .nav.active{background:#f0ebfb!important;color:#3d286b!important}html.panel-light .nav.active{border-left-color:var(--purple)!important}
+html.panel-light .nav-sub{border-left-color:#d6c9f3!important}
+html.panel-light .topbar{background:#fff!important;border-bottom:1px solid var(--border)!important;box-shadow:0 2px 10px #20243a05}
+html.panel-light .topbar span{color:#626278}html.panel-light .account-trigger{color:var(--text)!important}html.panel-light .account-trigger:hover{background:#f3effb!important}
+html.panel-light .account-menu{background:#fff!important;border-color:var(--border)!important;box-shadow:0 14px 34px #20243a18!important}
+html.panel-light .account-menu button{color:var(--text)!important}html.panel-light .account-menu button:hover{background:#f3effb!important}
+html.panel-light .account-menu-role{border-color:var(--border)!important;color:var(--muted)!important}
+html.panel-light .welcome{background:linear-gradient(115deg,#f0eafd,#fff 78%)!important;border:1px solid #ded3f7!important}
+html.panel-light .welcome small{color:#7650d8!important}html.panel-light .welcome h1{color:#29233d!important}
+html.panel-light .welcome p,html.panel-light .muted{color:#66677c!important}
+html.panel-light .stat,html.panel-light .module,html.panel-light .panel{background:#fff!important;border-color:var(--border)!important;color:var(--text)!important;box-shadow:0 3px 14px #20243a08}
+html.panel-light .stat span,html.panel-light .stat p,html.panel-light .module p{color:#66677c!important}
+html.panel-light .stat h2,html.panel-light .module h3,html.panel-light .panel h2,html.panel-light .panel h3{color:#29283d!important}
+html.panel-light .module:hover{border-color:#b8a2eb!important;box-shadow:0 8px 22px #7650d81a}html.panel-light .module-icon{color:var(--purple)!important}
+html.panel-light .section-head h2{color:#28263b!important}html.panel-light .section-head p{color:#6c6b80!important}
+html.panel-light .btn{background:#fff!important;border-color:#d9d5e6!important;color:#4b3a70!important}
+html.panel-light .btn:hover{background:#f5f1fc!important;border-color:#bba9e8!important}
+html.panel-light .primary,html.panel-light .logout{background:var(--purple)!important;color:#fff!important}
+html.panel-light .menu-toggle{background:#fff!important;border-color:var(--border)!important}html.panel-light .menu-toggle span{background:var(--purple)!important}
+html.panel-light input,html.panel-light select,html.panel-light textarea{background:#fff!important;color:#29283d!important;border-color:#d8dbe6!important}
+html.panel-light input::placeholder,html.panel-light textarea::placeholder{color:#9292a3!important}html.panel-light label{color:#55556b!important}
+html.panel-light th{background:#f5f3fa!important;color:#55536c!important}html.panel-light td{color:#38374c!important;border-color:#e8e9f0!important}
+html.panel-light table{background:#fff!important}
+html.panel-light .status{background:#f0ebfb!important;color:#6546a8!important}
+html.panel-light .status.published,html.panel-light .success{background:#e7f6ef!important;color:#176b4d!important}
+html.panel-light .error{background:#fff0f1!important;color:#a52f45!important}html.panel-light .message{border:1px solid #e6e2ed}
+html.panel-light .role-label{background:#f0ebfb!important;color:#6546a8!important}
+html.panel-light .word-toolbar{background:#f4f2f8!important;border-color:var(--border)!important}
+html.panel-light .editor-tool{background:#fff!important;color:#43365f!important;border-color:#d9d5e6!important}
+html.panel-light .editor-tool:hover,html.panel-light .editor-tool:focus{background:#f1ecfb!important}
+html.panel-light .image-drop-zone{background:#faf8ff!important;color:#40345d!important;border-color:#b9a5e9!important}
+html.panel-light .image-drop-zone span,html.panel-light .image-drop-zone small{color:#77738b!important}
+html.panel-light .settings-nav-item{color:#55536b!important}
+html.panel-light .settings-nav-item:hover,html.panel-light .settings-nav-item.active{background:#f0ebfb!important;color:#422b70!important}
+html.panel-light .settings-nav-item.active{box-shadow:inset 3px 0 var(--purple)!important}
+html.panel-light .settings-search-wrap input{background:#fff!important;border-color:#d9dce8!important}
+html.panel-light .settings-main .actions{background:#ffffffed!important;border-color:var(--border)!important}
+html.panel-light .settings-empty{border-color:#d9dce8!important;color:#66677c!important}
+html.panel-light .report-export-menu{background:#fff!important;border-color:var(--border)!important;box-shadow:0 12px 30px #20243a18!important}
+html.panel-light .report-export-menu button{color:#343247!important}html.panel-light .report-export-menu button:hover{background:#f2eef9!important}
+html.panel-light .analytics-donut:before{background:#fff!important}html.panel-light .analytics-legend{color:#626278!important}
+html.panel-light .overview-funnel-table th,html.panel-light .history-table th{background:#f0edf6!important;border-color:#dedbe7!important;color:#454258!important}
+html.panel-light .overview-funnel-table td,html.panel-light .history-table td{border-color:#e2e2eb!important;color:#333247!important}
+html.panel-light .overview-funnel-table tbody th{background:#f5f2fa!important;color:#454258!important}
+html.panel-light .analytics-wrap .panel h3{color:#29283d!important}
+html.panel-light #reports>.section-head{padding:8px 0 18px;border-bottom:1px solid var(--border);margin-bottom:22px}
+html.panel-light #reports>.section-head h2{font-size:27px!important;font-weight:750;letter-spacing:-.5px}
+html.panel-light #reports .section-head h2{font-size:20px;font-weight:700}
+html.panel-light #reports .panel{border-radius:14px}
+html.panel-light #reports .analytics-stats .stat{padding:20px}
+html.panel-light #reports .analytics-stats .stat span{font-size:13px;font-weight:600;color:#57566c!important}
+html.panel-light #reports .analytics-stats .stat h2{font-size:29px!important;color:#29233d!important;font-weight:750}
+html.panel-light #reports .analytics-stats .stat p{font-size:12px;color:#77768a!important;line-height:1.5}
+html.panel-light #reports .report-pair-grid>.panel,html.panel-light #reports .analytics-charts>.panel{padding:20px}
+html.panel-light #reports .badge{background:#f0ebfb!important;color:#6846ad!important;border:1px solid #e0d5f6}
+html.panel-light .post-canvas{background:#fff!important;color:#24212b!important}
+html.panel-light .post-canvas h2,html.panel-light .post-canvas h3{color:#242039!important}
+@media(max-width:650px){html.panel-light .content{padding:18px 14px}html.panel-light #reports>.section-head{align-items:flex-start}html.panel-light #reports>.section-head h2{font-size:23px!important}html.panel-light #reports .analytics-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+</style></head><body><h1>EDWISE Başvuru Kayıtları</h1><p>Rapor tarihi: '+new Date().toLocaleDateString("tr-TR")+'</p>'+table.outerHTML+'</body></html>';
   const blob=new Blob(["\ufeff",html],{type:"application/msword"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=applicationExportName()+".doc";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 async function exportApplicationsXlsx(){
@@ -2807,7 +2874,7 @@ let activeSettingsTab="appearance";
 function showSettingsTab(tab){activeSettingsTab=tab;document.querySelectorAll("[data-settings-panel]").forEach(p=>p.classList.toggle("hidden",p.dataset.settingsPanel!==tab));document.querySelectorAll("[data-settings-tab]").forEach(b=>b.classList.toggle("active",b.dataset.settingsTab===tab));const search=$("settingsSearch");if(search)search.value="";}
 document.querySelectorAll("[data-settings-tab]").forEach(b=>b.addEventListener("click",()=>showSettingsTab(b.dataset.settingsTab)));
 $("settingsSearch").addEventListener("input",event=>{const query=event.target.value.trim().toLocaleLowerCase("tr-TR");const panels=[...document.querySelectorAll("[data-settings-panel]")];if(!query){showSettingsTab(activeSettingsTab);return;}let first=null;panels.forEach(panel=>{let matched=0;panel.querySelectorAll(".field").forEach(field=>{const label=field.querySelector("label")?.textContent||"";const input=field.querySelector("input,select,textarea");const hay=(label+" "+(input?.placeholder||"")+" "+(input?.id||"")).toLocaleLowerCase("tr-TR");const hit=hay.includes(query);field.classList.toggle("hidden",!hit);if(hit)matched++;});const hit=matched>0;panel.classList.toggle("hidden",!hit);if(hit&&!first)first=panel.dataset.settingsPanel;});if(first){activeSettingsTab=first;document.querySelectorAll("[data-settings-tab]").forEach(b=>b.classList.toggle("active",b.dataset.settingsTab===first));}let empty=$("settingsSearchEmpty");if(!first){if(!empty){empty=document.createElement("div");empty.id="settingsSearchEmpty";empty.className="settings-empty";$("siteSettingsForm").prepend(empty);}empty.textContent="Aramanızla eşleşen bir panel tercihi bulunamadı.";}else $("settingsSearchEmpty")?.remove();});
-async function loadSiteSettings(){try{const data=await api("/api/settings");const values=data.panelPreferences||{};Object.entries(panelSettingFields).forEach(([key,id])=>{if($(id))$(id).value=values[key]||({theme:"dark",accent:"purple",density:"comfortable",fontScale:"normal",contrast:"normal",motion:"full",links:"normal",timezone:"Europe/Istanbul",dateFormat:"dd.mm.yyyy"}[key]);});applyPanelPreferences(values);showSettingsTab(activeSettingsTab);$("siteSettingsMessage").innerHTML="";}catch(error){$("siteSettingsMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}}
+async function loadSiteSettings(){try{const data=await api("/api/settings");const values=data.panelPreferences||{};Object.entries(panelSettingFields).forEach(([key,id])=>{if($(id))$(id).value=values[key]||({theme:"light",accent:"purple",density:"comfortable",fontScale:"normal",contrast:"normal",motion:"full",links:"normal",timezone:"Europe/Istanbul",dateFormat:"dd.mm.yyyy"}[key]);});applyPanelPreferences(values);showSettingsTab(activeSettingsTab);$("siteSettingsMessage").innerHTML="";}catch(error){$("siteSettingsMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}}
 function applyPanelPreferences(values){const root=document.documentElement;root.classList.toggle("panel-light",values.theme==="light"||(values.theme==="system"&&window.matchMedia("(prefers-color-scheme: light)").matches));root.style.fontSize=values.fontScale==="large"?"112.5%":values.fontScale==="larger"?"125%":"";root.classList.toggle("panel-compact",values.density==="compact");root.classList.toggle("panel-high-contrast",values.contrast==="high");root.classList.toggle("panel-reduced-motion",values.motion==="reduced");root.classList.toggle("panel-underlined-links",values.links==="underlined");const accents={purple:"#8055ed",blue:"#2878db",green:"#15966b",orange:"#d97706"};root.style.setProperty("--purple",accents[values.accent]||accents.purple);root.style.setProperty("--light",accents[values.accent]||"#a78bfa");}
 $("reloadSiteSettings").addEventListener("click",()=>{document.querySelectorAll("[data-settings-panel] select").forEach(el=>el.selectedIndex=0);$("panelTimezone").value="Europe/Istanbul";$("panelDateFormat").value="dd.mm.yyyy";});
 $("siteSettingsForm").addEventListener("submit",async event=>{event.preventDefault();const preferences={};Object.entries(panelSettingFields).forEach(([key,id])=>preferences[key]=$(id).value);const button=$("saveSiteSettings");button.disabled=true;button.textContent="Kaydediliyor...";try{const result=await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"save_panel_preferences",preferences})});applyPanelPreferences(preferences);$("siteSettingsMessage").innerHTML='<div class="message success">'+escapeHtml(result.message||"Panel tercihleri kaydedildi.")+'</div>';}catch(error){$("siteSettingsMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}finally{button.disabled=false;button.textContent="Panel Tercihlerini Kaydet";}});
