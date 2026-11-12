@@ -1,4 +1,4 @@
-const AUDIT_SCHEMA = `
+const CREATE_AUDIT_TABLE = `
 CREATE TABLE IF NOT EXISTS admin_audit_log (
  id INTEGER PRIMARY KEY AUTOINCREMENT,
  actor_id INTEGER,
@@ -12,13 +12,12 @@ CREATE TABLE IF NOT EXISTS admin_audit_log (
  ip_address TEXT,
  user_agent TEXT,
  created_at TEXT NOT NULL DEFAULT (datetime('now'))
-);
-CREATE INDEX IF NOT EXISTS idx_admin_audit_created ON admin_audit_log(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_admin_audit_actor ON admin_audit_log(actor_id, created_at DESC);
-`;
+)`;
 
 export async function ensureAuditTable(db) {
- await db.exec(AUDIT_SCHEMA);
+ await db.prepare(CREATE_AUDIT_TABLE).run();
+ await db.prepare("CREATE INDEX IF NOT EXISTS idx_admin_audit_created ON admin_audit_log(created_at DESC)").run();
+ await db.prepare("CREATE INDEX IF NOT EXISTS idx_admin_audit_actor ON admin_audit_log(actor_id, created_at DESC)").run();
 }
 
 export async function logAudit(db, request, admin, event) {
