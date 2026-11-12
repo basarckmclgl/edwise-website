@@ -1340,9 +1340,9 @@ async function loadApplicationFunnel(){
 $("refreshApplicationFunnel")?.addEventListener("click",loadApplicationFunnel);
 
 async function loadAnalytics(){
- if(!$("analyticsMessage"))return;$("analyticsMessage").className="message";$("analyticsMessage").textContent="Cloudflare verileri getiriliyor...";
- try{const response=await fetch("/api/analytics",{credentials:"same-origin",cache:"no-store"});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||"Cloudflare analiz verileri alınamadı.");renderAnalytics(data);}
- catch(error){$("analyticsMessage").className="message error";$("analyticsMessage").textContent=error.message;}
+ const message=$("analyticsMessage");if(!message)return;message.className="message";message.textContent="Cloudflare verileri getiriliyor...";
+ try{const response=await fetch("/api/analytics",{credentials:"same-origin",cache:"no-store",signal:AbortSignal.timeout(15000)});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||"Cloudflare analiz verileri alınamadı.");renderAnalytics(data);}
+ catch(error){message.className="message error";message.textContent=error.name==="TimeoutError"||error.name==="AbortError"?"Cloudflare analiz isteği zaman aşımına uğradı. Diğer yönetim menülerini kullanmaya devam edebilirsiniz.":(error.message||"Cloudflare analizleri yüklenemedi.");}
 }
 $("refreshAnalytics")?.addEventListener("click",loadAnalytics);
 window.addEventListener("resize",()=>{if(window._edwiseAnalyticsData?.cloudflare?.daily)drawAnalyticsBars(window._edwiseAnalyticsData.cloudflare.daily);});
