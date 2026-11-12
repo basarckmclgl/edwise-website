@@ -701,7 +701,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
  <header class="topbar">
 <div style="display:flex;align-items:center;gap:16px"><button type="button" class="menu-toggle" id="menuToggle" aria-label="Menüyü aç veya kapat" aria-expanded="true" title="Menüyü aç/kapat"><span></span><span></span><span></span></button><span>EDWISE / <strong id="breadcrumb">Ana Sayfa</strong></span></div>
 <div class="admin-global-search"><input id="adminGlobalSearch" type="search" placeholder="Panelde ara: sayfa, hizmet..." autocomplete="off" aria-label="Panel genelinde ara"><div id="adminGlobalSearchResults" class="admin-search-results hidden"></div></div>
-<div class="topbar-account"><button type="button" class="admin-notification-button" id="adminNotificationButton" title="Bildirimleri etkinleştir" aria-label="Bildirimleri etkinleştir">♧<span id="adminNotificationDot" class="admin-notification-dot"></span></button><button type="button" class="account-trigger" id="accountMenuToggle" aria-expanded="false" aria-controls="accountMenu"><img class="account-avatar" id="topbarAvatar" alt="Profil fotoğrafı"><span><span class="account-name" id="username">Yönetici</span><span class="account-role" id="topbarRole">Yönetici</span></span>▾</button><div class="account-menu" id="accountMenu" hidden><div class="account-menu-role" id="accountMenuIdentity">Yönetici hesabı</div><button type="button" id="accountProfileLink">◉ &nbsp; Profilim</button><button type="button" id="accountLogout">↗ &nbsp; Güvenli Çıkış Yap</button></div><button class="logout" id="logout">Güvenli Çıkış ↗</button></div>
+<div class="topbar-account"><button type="button" class="admin-notification-button" id="adminNotificationButton" title="Bildirimleri etkinleştir" aria-label="Bildirimleri etkinleştir"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span id="adminNotificationDot" class="admin-notification-dot"></span></button><button type="button" class="account-trigger" id="accountMenuToggle" aria-expanded="false" aria-controls="accountMenu"><img class="account-avatar" id="topbarAvatar" alt="Profil fotoğrafı"><span><span class="account-name" id="username">Yönetici</span><span class="account-role" id="topbarRole">Yönetici</span></span>▾</button><div class="account-menu" id="accountMenu" hidden><div class="account-menu-role" id="accountMenuIdentity">Yönetici hesabı</div><button type="button" id="accountProfileLink">◉ &nbsp; Profilim</button><button type="button" id="accountLogout">↗ &nbsp; Güvenli Çıkış Yap</button></div><button class="logout" id="logout">Güvenli Çıkış ↗</button></div>
 </header>
 
  <div class="content">
@@ -2600,8 +2600,8 @@ async function refreshAdminChatStatus(){
     const title="EDWISE — Yeni ziyaretçi mesajı";
     const options={body:(fresh?.visitor_name||"Ziyaretçi")+" yeni bir mesaj gönderdi.",tag:"edwise-chat-"+latestId,renotify:false};
     try{
-     if("serviceWorker" in navigator){const reg=await navigator.serviceWorker.getRegistration("/admin/");if(reg?.showNotification)await reg.showNotification(title,options);else new Notification(title,options);}
-     else new Notification(title,options);
+     if("serviceWorker" in navigator){const reg=await navigator.serviceWorker.getRegistration("/admin/");if(reg?.showNotification)await reg.showNotification(title,options);else{const notice=new Notification(title,options);notice.onclick=()=>{window.focus();showPage("messages");};}}
+     else{const notice=new Notification(title,options);notice.onclick=()=>{window.focus();showPage("messages");};}
     }catch(e){console.warn("EDWISE notification:",e);}
    }
    lastNotifiedVisitorMessageId=latestId;
