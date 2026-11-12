@@ -681,6 +681,13 @@ td{color:#39334b!important;border-color:#eeebf4!important}
 @media(max-width:760px){.sidebar{width:74px!important}.main{margin-left:74px!important;width:calc(100% - 74px)!important}.content{padding:17px 13px 30px!important}.welcome{padding:20px!important}.welcome:after{font-size:56px;right:8px}.topbar{padding:0 12px!important}}
 @media(max-width:650px){#overview>.grid:first-of-type{grid-template-columns:repeat(2,minmax(0,1fr))!important}.welcome h1{font-size:21px!important}}
 
+.profile-social-cover{height:190px;border-radius:16px 16px 0 0;background:linear-gradient(120deg,#49268f,#8257dc 58%,#c6a6fa);position:relative}
+.profile-social-avatar{position:absolute;left:28px;bottom:-48px;width:112px;height:112px;border-radius:50%;background:#fff;padding:5px;box-shadow:0 3px 15px #24134425}
+.profile-social-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;background:#eee}
+.profile-social-intro{background:#fff;border:1px solid #e9e5f0;border-top:0;border-radius:0 0 14px 14px;padding:58px 25px 20px 28px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.profile-social-intro h1{font-size:23px;margin:0 0 6px;color:#302744}.profile-social-intro p{margin:0 0 4px;color:#655d76;font-size:13px}.profile-social-intro small{color:#8a8398;font-size:12px}
+.profile-social-tabs{display:flex;gap:25px;padding:0 28px;background:#fff;border:1px solid #e9e5f0;border-top:0;border-radius:0 0 12px 12px;margin-bottom:18px}
+.profile-social-tabs span{padding:15px 2px;color:#79718a;font-size:12px;font-weight:650}.profile-social-tabs span.active{color:#6338cf;border-bottom:3px solid #7044cf}
 </style>
 </head>
 <body>
@@ -689,11 +696,15 @@ td{color:#39334b!important;border-color:#eeebf4!important}
  <button class="logo" id="dashboardHomeLogo" type="button" title="Genel Bakış" aria-label="EDWISE — Genel Bakış"><img src="/assets/images/logo.png" alt="EDWISE" onerror="this.style.display='none'"><span>EDWISE</span><small>CONTENT MANAGEMENT SYSTEM</small></button>
  <div class="menu-label">GENEL</div>
  <button class="nav active" data-page="overview"><span class="ico">⌂</span><span>Genel Bakış</span></button>
+ <div class="menu-label">SABİT SİTE SAYFALARI</div>
+ <button class="nav" data-page="services"><span class="ico">✧</span><span>Hizmetlerimiz</span></button>
+ <button class="nav" data-page="pages" data-fixed-page="about"><span class="ico">▤</span><span>Hakkımızda</span></button>
+ <button class="nav" data-page="applications" data-superadmin><span class="ico">▣</span><span>Başvur</span></button>
+ <button class="nav" data-page="messages"><span class="ico">✉</span><span>İletişim ve Konum / Mesajlar <b id="chatUnreadBadge" class="role-label">0</b></span></button>
  <div class="menu-label">İÇERİK STÜDYOSU</div>
- <button class="nav" data-page="pages"><span class="ico">▤</span><span>Sayfalar</span></button>
- <button class="nav" data-page="services"><span class="ico">✧</span><span>Hizmetler</span></button>
- <button class="nav" data-page="posts"><span class="ico">▧</span><span>Blog ve Yayınlar</span></button>
+ <button class="nav" data-page="pages"><span class="ico">▤</span><span>Diğer Sayfalar</span></button>
  <button class="nav" data-page="media"><span class="ico">▧</span><span>Medya Kütüphanesi</span></button>
+ <button class="nav" data-page="posts"><span class="ico">▧</span><span>Blog Yönetimi</span></button>
  <div class="menu-label">TOPLULUK VE ETKİLEŞİM</div>
  <button class="nav" data-page="messages"><span class="ico">✉</span><span>Mesaj Kutusu <b id="chatUnreadBadge" class="role-label">0</b></span></button>
  <button class="nav" data-page="applications" data-superadmin><span class="ico">▣</span><span>Başvurular</span></button>
@@ -738,7 +749,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
 
    <section class="analytics-wrap" id="analyticsOverview" data-superadmin>
     <div class="section-head">
-     <div><h2>Cloudflare Site Analizleri</h2><p>Son 30 günlük trafik ve ziyaretçi verileri</p></div>
+     <div><h2>Birleşik Ziyaretçi Analizi</h2><p>Son 30 günlük trafik ve ziyaretçi verileri</p></div>
      <div class="actions" style="margin:0"><button class="btn" id="refreshAnalytics">↻ Verileri Yenile</button><span id="analyticsUpdated" class="muted">Henüz yüklenmedi</span></div>
     </div>
     <div id="analyticsMessage" class="message">Cloudflare verileri yükleniyor...</div>
@@ -776,7 +787,6 @@ td{color:#39334b!important;border-color:#eeebf4!important}
    <div class="grid">
     <div class="module" data-open="pages"><div class="module-icon">▤</div><h3>Sayfa Yönetimi ↗</h3><p>Web sayfalarını oluşturun ve düzenleyin.</p></div>
     <div class="module" data-open="services"><div class="module-icon">✧</div><h3>Hizmet Yönetimi ↗</h3><p>Eğitim ve danışmanlık hizmetlerinizi yönetin.</p></div>
-    <div class="module" data-open="posts"><div class="module-icon">▧</div><h3>Blog Yönetimi ↗</h3><p>Blog yazıları oluşturun ve yayımlayın.</p></div>
     <div class="module" data-open="applications" data-superadmin><div class="module-icon">▣</div><h3>Başvurular ↗</h3><p>Gelen başvuruları takip edin.</p></div>
     <div class="module" data-open="media"><div class="module-icon">▧</div><h3>Medya Kütüphanesi ↗</h3><p>Fotoğraf ve dosyalarınızı yönetin.</p></div>
     <div class="module" data-open="designcenter"><div class="module-icon">⚙</div><h3>Site Tasarımı ve Menü ↗</h3><p>Genel görünümü, renkleri ve menü yapısını yönetin.</p></div>
@@ -787,7 +797,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
   <section id="reports" class="hidden" data-superadmin>
    <div class="section-head"><div><h2>Site Raporları</h2><p>Son 30 günlük sayfa görüntüleme, ziyaretçi oturumu ve kaydırma derinliği.</p></div><div class="actions"><button class="btn" id="refreshSiteReports">↻ Raporları Yenile</button><div class="report-export" id="applicationExport"><button class="primary" type="button" id="applicationExportToggle" aria-haspopup="true" aria-expanded="false">Başvuru Kayıtlarını Raporla <span aria-hidden="true">▾</span></button><div class="report-export-menu hidden" id="applicationExportMenu"><button type="button" data-export-applications="pdf">PDF olarak indir</button><button type="button" data-export-applications="doc">Word (.doc) olarak indir</button><button type="button" data-export-applications="xlsx">Excel (.xlsx) olarak indir</button></div></div></div></div>
    <section class="panel" id="ga4Reports" style="margin:0 0 18px">
-    <div class="section-head"><div><h2>Google Analytics 4 · EDWISE</h2><p>Google Analytics üzerinden ölçülen gerçek ziyaretçi ve trafik verileri · Son 30 gün</p></div><span class="badge">GA4</span></div>
+    <div class="section-head"><div><h2>Birleşik Analiz · Ziyaretçi ve Trafik Kaynakları</h2><p>GA4 ziyaretçi ölçümleri ve Cloudflare ağ trafiği · Aynı 30 günlük dönem</p></div><span class="badge">GA4</span></div>
     <div id="ga4Message" class="message">Google Analytics verileri yükleniyor...</div>
     <div class="grid analytics-stats">
      <div class="stat"><span>Aktif kullanıcı</span><h2 id="ga4ActiveUsers">—</h2><p>Son 30 günlük aktif kullanıcı</p></div>
@@ -1261,6 +1271,9 @@ td{color:#39334b!important;border-color:#eeebf4!important}
 </section>
 
 <section id="profile" class="hidden">
+  <div class="profile-social-cover"><div class="profile-social-avatar"><img id="profileSocialAvatar" alt="Profil fotoğrafı"></div></div>
+  <div class="profile-social-intro"><div><h1 id="profileSocialName">Yönetici Profili</h1><p id="profileSocialRole">EDWISE Yönetim Merkezi · Yönetici</p><small id="profileSocialEmail"></small></div><button type="button" class="btn" id="editSocialProfile">Profili Düzenle</button></div>
+  <div class="profile-social-tabs"><span class="active">Genel Bakış</span><span>Hesap Bilgileri</span><span>Güvenlik</span></div>
   <div class="section-head"><div><h2>Profilim</h2><p class="muted">Yönetici hesabınızı görüntüleyin ve giriş şifrenizi güvenli şekilde değiştirin.</p></div></div>
   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
    <div class="panel"><h3>Hesap Bilgileri</h3><div class="form-grid">
@@ -1846,6 +1859,7 @@ $("saveMenu").addEventListener("click",async()=>{
  catch(error){$("menuMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}
 });
 
+$("editSocialProfile")?.addEventListener("click",()=>{ $("profileFirstName").focus(); });
 $("profilePasswordForm")?.addEventListener("submit",async event=>{
  event.preventDefault();
  const currentPassword=$("profileCurrentPassword").value,newPassword=$("profileNewPassword").value,confirmPassword=$("profileConfirmPassword").value;
@@ -1880,6 +1894,9 @@ async function checkSession(){
   setValue("profileRole",roleName);
   setValue("profileId","#"+data.admin.id);
   setText("welcomeName",name);
+  setText("profileSocialName",((data.admin.first_name||"")+" "+(data.admin.last_name||"")).trim()||name);
+  setText("profileSocialRole",roleName+" · EDWISE");
+  setText("profileSocialEmail",data.admin.email||"");
   applyRolePermissions();
   if(currentRole==="superadmin")await loadSiteSettings();
   showPage("overview");
