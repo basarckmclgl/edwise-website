@@ -521,6 +521,37 @@ html.panel-light #reports .analytics-stats .stat h2{font-size:29px!important;col
 html.panel-light #reports .analytics-stats .stat p{font-size:12px;color:#747286!important;line-height:1.5}
 html.panel-light #reports .badge{border:1px solid #e5def3}
 @media(max-width:700px){html.panel-light .content{padding:18px 14px}html.panel-light #reports>.section-head h2{font-size:23px!important}}
+
+/* LAYOUT RESTORE: keep the navigation shell visible and align content beside it */
+html.panel-light body{display:flex!important;min-height:100vh!important;margin:0!important;overflow-x:hidden!important;background:#f7f7fb!important;color:#292638!important}
+html.panel-light body>.sidebar{display:block!important;position:fixed!important;visibility:visible!important;opacity:1!important;left:0!important;top:0!important;bottom:0!important;width:245px!important;height:100vh!important;transform:none!important;z-index:100!important;overflow-y:auto!important;background:#fff!important;border-right:1px solid #e6e4ed!important;padding:23px 15px!important}
+html.panel-light body.sidebar-collapsed>.sidebar{width:74px!important;padding:18px 9px!important}
+html.panel-light body>.main{display:block!important;position:relative!important;visibility:visible!important;opacity:1!important;flex:1 1 auto!important;min-width:0!important;width:calc(100% - 245px)!important;margin:0 0 0 245px!important;padding:0!important}
+html.panel-light body.sidebar-collapsed>.main{width:calc(100% - 74px)!important;margin-left:74px!important}
+html.panel-light .main>.topbar{display:flex!important;position:sticky!important;top:0!important;z-index:50!important;width:100%!important;height:68px!important;min-height:68px!important;visibility:visible!important;opacity:1!important;background:#fff!important;color:#555267!important;border-bottom:1px solid #e6e4ed!important;padding:0 26px!important}
+html.panel-light .main>.content{display:block!important;width:100%!important;max-width:1450px!important;margin:0 auto!important;padding:28px!important}
+html.panel-light .welcome{background:#fff!important;border:1px solid #e7e2f1!important;box-shadow:0 2px 10px rgba(35,25,60,.035)!important}
+html.panel-light .welcome h1{font-size:25px!important;color:#292638!important}
+html.panel-light .welcome p{font-size:13px!important;color:#747286!important}
+html.panel-light .grid{gap:14px!important}
+html.panel-light .stat,html.panel-light .module,html.panel-light .panel{background:#fff!important;border:1px solid #e6e4ed!important;box-shadow:0 2px 9px rgba(35,25,60,.035)!important}
+html.panel-light .stat span,html.panel-light .module h3{color:#514d62!important}
+html.panel-light .stat p,html.panel-light .module p{color:#747286!important}
+html.panel-light .primary,html.panel-light .logout{background:#7650d8!important;color:#fff!important}
+html.panel-light .menu-toggle{background:#fff!important;border:1px solid #e6e4ed!important}
+html.panel-light .menu-toggle span{background:#7650d8!important}
+@media(max-width:760px){
+ html.panel-light body>.sidebar{width:74px!important;padding:18px 9px!important}
+ html.panel-light body>.main{width:calc(100% - 74px)!important;margin-left:74px!important}
+ html.panel-light .main>.content{padding:18px!important}
+ html.panel-light .main>.topbar{padding:0 14px!important}
+}
+@media(max-width:650px){
+ html.panel-light body>.sidebar{width:65px!important;padding:15px 7px!important}
+ html.panel-light body>.main{width:calc(100% - 65px)!important;margin-left:65px!important}
+ html.panel-light .main>.content{padding:14px!important}
+ html.panel-light .grid{grid-template-columns:1fr!important}
+}
 </style>
 </head>
 <body>
