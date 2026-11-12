@@ -215,6 +215,56 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
 .report-pair-grid td:last-child{white-space:normal}
 .application-pair-grid table{min-width:650px!important}
 
+
+/* Başvuru raporları: paneller alt alta, tablolar yatay */
+#reports .application-pair-grid{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ gap:14px!important;
+ align-items:start!important;
+}
+#reports .application-pair-grid>.panel{
+ width:100%!important;
+ min-width:0!important;
+}
+#reports .application-pair-grid .table-wrap{
+ display:block!important;
+ width:100%!important;
+ max-width:100%!important;
+ overflow-x:auto!important;
+ overflow-y:hidden!important;
+}
+#reports .application-pair-grid .application-fit-table{
+ width:100%!important;
+ min-width:1100px!important;
+ table-layout:auto!important;
+ border-collapse:collapse!important;
+}
+#reports .application-pair-grid .application-fit-table th,
+#reports .application-pair-grid .application-fit-table td{
+ white-space:nowrap!important;
+ overflow-wrap:normal!important;
+ word-break:normal!important;
+ padding:8px 10px!important;
+ font-size:11px!important;
+}
+#reports .application-pair-grid #funnelEventRecords{
+ white-space:nowrap!important;
+}
+#reports .application-pair-grid .panel.compact-report .fit-report-table{
+ width:100%!important;
+ min-width:720px!important;
+ table-layout:auto!important;
+}
+#reports .application-pair-grid .panel.compact-report th,
+#reports .application-pair-grid .panel.compact-report td{
+ white-space:nowrap!important;
+ overflow-wrap:normal!important;
+ word-break:normal!important;
+ padding:8px 10px!important;
+ font-size:11px!important;
+}
+
 /* Reports: fixed two-column dashboard, no inner horizontal scroll */
 #reports{width:100%;max-width:100%;min-width:0}
 #reports .report-pair-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;width:100%;max-width:100%;margin:10px 0;align-items:stretch}
