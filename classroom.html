@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex,nofollow">
+  <title>EDWISE | Canlı Sınıf</title>
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#0d0d18;color:#f5f3ff;font-family:Arial,sans-serif}
+    body{padding:18px}.shell{max-width:1440px;margin:0 auto}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 4px 18px}
+    .brand{font-weight:800;letter-spacing:3px;font-size:22px}.subtitle{color:#aaa7c0;font-size:13px;margin-top:5px}
+    .state{padding:9px 12px;border:1px solid #38334f;border-radius:9px;background:#171727;color:#c4b5fd;font-size:12px}
+    .stage{min-height:70vh;border:1px solid #34304b;border-radius:14px;background:#141421;overflow:hidden}
+    rtk-meeting{display:block;width:100%;height:calc(100vh - 130px);min-height:620px}
+    .notice{max-width:650px;margin:12vh auto;padding:30px;border:1px solid #39334f;border-radius:14px;background:#171727;text-align:center}
+    .notice h1{font-size:22px}.notice p{color:#c0bbd1;line-height:1.6}.notice button{background:#8055ed;border:0;border-radius:8px;padding:11px 18px;color:#fff;font-weight:700;cursor:pointer}
+    @media(max-width:650px){body{padding:8px}.top{align-items:flex-start;flex-direction:column}.stage{min-height:78vh}rtk-meeting{height:78vh;min-height:560px}}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit@latest/dist/browser.js"></script>
+  <script type="module">
+    import { defineCustomElements } from "https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit-ui@latest/loader/index.es2017.js";
+    defineCustomElements();
+  </script>
+</head>
+<body>
+  <main class="shell">
+    <header class="top">
+      <div><div class="brand">EDWISE</div><div class="subtitle">Canlı Ders Sınıfı</div></div>
+      <div class="state" id="connectionState" role="status">Bağlantı hazırlanıyor…</div>
+    </header>
+    <div id="meetingStage" class="stage" hidden>
+      <rtk-meeting id="edwiseMeeting" show-setup-screen="true"></rtk-meeting>
+    </div>
+    <section id="notice" class="notice" role="alert">
+      <h1>Canlı sınıf hazırlanıyor</h1>
+      <p id="noticeText">Güvenli bağlantı kontrol ediliyor.</p>
+      <button id="backButton" type="button" hidden>Geri dön</button>
+    </section>
+  </main>
+  <script>
+    (async function () {
+      const state = document.getElementById("connectionState");
+      const notice = document.getElementById("notice");
+      const noticeText = document.getElementById("noticeText");
+      const stage = document.getElementById("meetingStage");
+      const back = document.getElementById("backButton");
+      let meeting = null;
+
+      function fail(message) {
+        state.textContent = "Bağlantı kurulamadı";
+        noticeText.textContent = message;
+        back.hidden = false;
+      }
+
+      back.addEventListener("click", () => {
+        if (history.length > 1) history.back();
+        else location.href = "/admin/";
+      });
+
+      const params = new URLSearchParams(location.hash.slice(1));
+      const authToken = params.get("token");
+      history.replaceState(null, "", location.pathname + location.search);
+
+      if (!authToken) {
+        fail("Bu canlı sınıfa katılmak için EDWISE tarafından oluşturulmuş geçerli bir davet bağlantısı gerekir.");
+        return;
+      }
+
+      try {
+        if (!window.RealtimeKitClient || typeof window.RealtimeKitClient.init !== "function") {
+          throw new Error("Canlı ders bileşeni yüklenemedi. Sayfayı yenileyip tekrar deneyin.");
+        }
+        await customElements.whenDefined("rtk-meeting");
+        meeting = await window.RealtimeKitClient.init({
+          authToken,
+          defaults: { audio: false, video: false }
+        });
+        const component = document.getElementById("edwiseMeeting");
+        component.meeting = meeting;
+        stage.hidden = false;
+        notice.hidden = true;
+        state.textContent = "Canlı sınıf hazır";
+      } catch (error) {
+        fail(error && error.message ? error.message : "Canlı sınıfa bağlanırken hata oluştu.");
+      }
+
+      window.addEventListener("beforeunload", () => {
+        try { meeting?.leave?.(); } catch (_) {}
+      });
+    })();
+  </script>
+</body>
+</html>
