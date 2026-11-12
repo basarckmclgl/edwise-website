@@ -101,7 +101,23 @@ export async function onRequestGet(context) {
       path: row.page_path || '/',
       date: row.created_at || ''
     }));
-    return json({ success:true, periodDays:30, totals, pageReports, pageRecords });
+    const funnelResult = await DB.prepare(`
+      SELECT substr(session_id,1,7) || '…' AS session_label,
+             event_name, page_path, created_at, country_code
+      FROM application_events
+      WHERE datetime(created_at) >= datetime('now','-30 days')
+        AND event_name IN ('apply_click','form_view','form_start','submit_attempt','form_abandon','application_saved','email_sent','email_failed','whatsapp_redirect','site_return')
+      ORDER BY datetime(created_at) DESC
+      LIMIT 300
+    `).all();
+    const funnelRecords = (funnelResult.results || []).map(row => ({
+      session: row.session_label || '—',
+      country: row.country_code || '',
+      event: row.event_name,
+      path: row.page_path || '/',
+      date: row.created_at || ''
+    }));
+    return json({ success:true, periodDays:30, totals, pageReports, pageRecords, funnelRecords });
   } catch {
     return json({ success:false, message:"Başvuru hunisi verileri alınamadı." },500);
   }
