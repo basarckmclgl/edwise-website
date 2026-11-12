@@ -4,10 +4,11 @@ const json=(data,status=200)=>Response.json(data,{status,headers:{"Cache-Control
 function b64url(value){
  const bytes=new TextEncoder().encode(value);
  let binary="";for(const byte of bytes)binary+=String.fromCharCode(byte);
- return btoa(binary).replace(/=/g,"").replace(/\\+/g,"-").replace(/\\//g,"_");
+ return btoa(binary).replace(/=/g,"").replace(/\+/g,"-").replace(/\//g,"_");
 }
-function b64urlBytes(bytes){let binary="";for(const byte of bytes)binary+=String.fromCharCode(byte);return btoa(binary).replace(/=/g,"").replace(/\\+/g,"-").replace(/\\//g,"_");}\nfunction decodePem(value){
- const raw=value.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\\s/g,"");
+function b64urlBytes(bytes){let binary="";for(const byte of bytes)binary+=String.fromCharCode(byte);return btoa(binary).replace(/=/g,"").replace(/\+/g,"-").replace(/\//g,"_");}
+function decodePem(value){
+ const raw=value.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g,"");
  const binary=atob(raw);return Uint8Array.from(binary,c=>c.charCodeAt(0));
 }
 async function getGoogleAccessToken(secret){
@@ -44,9 +45,10 @@ async function onGoogleAnalytics(env,startDate,endDate){
  ]);
  const vals=summary[0]?.metricValues||[];
  const number=(row,index)=>Number(row?.metricValues?.[index]?.value||0);
- return {configured:true,propertyId,totals:{activeUsers:number(summary[0],0),sessions:number(summary[0],1),pageViews:number(summary[0],2),eventCount:number(summary[0],3)},daily:daily.map(r=>({date:(r.dimensionValues?.[0]?.value||"").replace(/^(\\d{4})(\\d{2})(\\d{2})$/,"$1-$2-$3"),activeUsers:number(r,0),sessions:number(r,1),pageViews:number(r,2)})),countries:countries.map(r=>({country:r.dimensionValues?.[0]?.value||"Bilinmiyor",activeUsers:number(r,0),sessions:number(r,1)})),pages:pages.map(r=>({path:r.dimensionValues?.[0]?.value||"/",pageViews:number(r,0),activeUsers:number(r,1)})),sources:sources.map(r=>({source:r.dimensionValues?.[0]?.value||"Bilinmiyor",sessions:number(r,0),activeUsers:number(r,1)}))};
+ return {configured:true,propertyId,totals:{activeUsers:number(summary[0],0),sessions:number(summary[0],1),pageViews:number(summary[0],2),eventCount:number(summary[0],3)},daily:daily.map(r=>({date:(r.dimensionValues?.[0]?.value||"").replace(/^(\d{4})(\d{2})(\d{2})$/,"$1-$2-$3"),activeUsers:number(r,0),sessions:number(r,1),pageViews:number(r,2)})),countries:countries.map(r=>({country:r.dimensionValues?.[0]?.value||"Bilinmiyor",activeUsers:number(r,0),sessions:number(r,1)})),pages:pages.map(r=>({path:r.dimensionValues?.[0]?.value||"/",pageViews:number(r,0),activeUsers:number(r,1)})),sources:sources.map(r=>({source:r.dimensionValues?.[0]?.value||"Bilinmiyor",sessions:number(r,0),activeUsers:number(r,1)}))};
 }
-\nasync function onCloudflare(env,startDate,endDate){
+
+async function onCloudflare(env,startDate,endDate){
  if(!env.CF_ZONE_TAG||!env.CF_ANALYTICS_API_TOKEN)return {configured:false,error:"Cloudflare için CF_ZONE_TAG ve CF_ANALYTICS_API_TOKEN ayarlanmalı."};
  const headers={Authorization:"Bearer "+env.CF_ANALYTICS_API_TOKEN,"Content-Type":"application/json"};
  const query=`query($zone:String!,$from:Date!,$to:Date!){viewer{zones(filter:{zoneTag:$zone}){httpRequests1dGroups(limit:100,filter:{date_geq:$from,date_leq:$to},orderBy:[date_ASC]){dimensions{date} sum{requests countryMap{clientCountryName requests}} uniq{uniques}}}}}`;
