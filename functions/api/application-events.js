@@ -144,10 +144,25 @@ export async function onRequestGet(context) {
       emails:Number(row.email_sent)||0, whatsapp:Number(row.whatsapp_redirect)||0,
       pageViews:Number(row.page_views)||0
     }));
-    const historyTotals = historyRows.reduce((sum,row) => {
-      for (const key of ["total","sessions","applyClick","formView","formStart","applications","emails","whatsapp","pageViews"]) sum[key]+=row[key];
-      return sum;
-    },{total:0,sessions:0,applyClick:0,formView:0,formStart:0,applications:0,emails:0,whatsapp:0,pageViews:0});
+    const historyTotalsResult = await DB.prepare(`
+      SELECT COUNT(*) AS total_events, COUNT(DISTINCT session_id) AS sessions,
+        SUM(CASE WHEN event_name='apply_click' THEN 1 ELSE 0 END) AS apply_click,
+        SUM(CASE WHEN event_name='form_view' THEN 1 ELSE 0 END) AS form_view,
+        SUM(CASE WHEN event_name='form_start' THEN 1 ELSE 0 END) AS form_start,
+        SUM(CASE WHEN event_name='application_saved' THEN 1 ELSE 0 END) AS applications,
+        SUM(CASE WHEN event_name='email_sent' THEN 1 ELSE 0 END) AS emails,
+        SUM(CASE WHEN event_name='whatsapp_redirect' THEN 1 ELSE 0 END) AS whatsapp,
+        SUM(CASE WHEN event_name='page_view' THEN 1 ELSE 0 END) AS page_views
+      FROM application_events
+      WHERE datetime(created_at) >= datetime('now', ?)
+    `).bind(`-${rangeDays} days`).first();
+    const historyTotals = {
+      total:Number(historyTotalsResult?.total_events)||0, sessions:Number(historyTotalsResult?.sessions)||0,
+      applyClick:Number(historyTotalsResult?.apply_click)||0, formView:Number(historyTotalsResult?.form_view)||0,
+      formStart:Number(historyTotalsResult?.form_start)||0, applications:Number(historyTotalsResult?.applications)||0,
+      emails:Number(historyTotalsResult?.emails)||0, whatsapp:Number(historyTotalsResult?.whatsapp)||0,
+      pageViews:Number(historyTotalsResult?.page_views)||0
+    };
     return json({ success:true, periodDays:30, totals, pageReports, pageRecords, funnelRecords, historyRange:range, historyRows, historyTotals });
   } catch {
     return json({ success:false, message:"Başvuru hunisi verileri alınamadı." },500);
