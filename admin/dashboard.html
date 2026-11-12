@@ -569,6 +569,18 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
    <div class="section-head"><div><h2>Site Raporları</h2><p>Son 30 günlük sayfa görüntüleme, ziyaretçi oturumu ve kaydırma derinliği.</p></div><div class="actions"><button class="btn" id="refreshSiteReports">↻ Raporları Yenile</button><div class="report-export" id="applicationExport"><button class="primary" type="button" id="applicationExportToggle" aria-haspopup="true" aria-expanded="false">Başvuru Kayıtlarını Raporla <span aria-hidden="true">▾</span></button><div class="report-export-menu hidden" id="applicationExportMenu"><button type="button" data-export-applications="pdf">PDF olarak indir</button><button type="button" data-export-applications="doc">Word (.doc) olarak indir</button><button type="button" data-export-applications="xlsx">Excel (.xlsx) olarak indir</button></div></div></div></div>
    <section class="analytics-wrap" id="cloudflareReports" style="margin:0 0 18px">
     <div class="section-head"><div><h2>Cloudflare Trafik Raporu</h2><p>Cloudflare ağından geçen gerçek HTTP istekleri · Son 30 gün</p></div><button class="btn" type="button" id="refreshCloudflareReports">↻ Cloudflare verilerini yenile</button></div>
+    <div class="panel" style="margin-bottom:16px">
+     <div class="section-head"><div><h3>EDWISE Birleşik Performans Özeti</h3><p class="muted">Cloudflare trafik ölçümü ve EDWISE'ın izinli ziyaretçi / başvuru olayları aynı rapor döneminde yan yana değerlendirilir.</p></div><span class="badge">Son 30 gün</span></div>
+     <div class="grid analytics-stats">
+      <div class="stat"><span>EDWISE ölçülen oturum</span><h2 id="combinedSessions">—</h2><p>Analiz izni veren oturumlar</p></div>
+      <div class="stat"><span>Sayfa görüntüleme</span><h2 id="combinedPageViews">—</h2><p>EDWISE page_view olayları</p></div>
+      <div class="stat"><span>Başvuru butonu oturumu</span><h2 id="combinedApplySessions">—</h2><p>Başvur'a tıklayan oturumlar</p></div>
+      <div class="stat"><span>Başarıyla kaydedilen başvuru</span><h2 id="combinedApplications">—</h2><p>EDWISE application_saved olayları</p></div>
+      <div class="stat"><span>WhatsApp açılışı</span><h2 id="combinedWhatsapp">—</h2><p>WhatsApp yönlendirme olayları</p></div>
+      <div class="stat"><span>Başvuru dönüşüm oranı</span><h2 id="combinedConversion">—</h2><p>Başvuru kaydı oturumu / ölçülen oturum</p></div>
+     </div>
+     <p class="muted" id="combinedReportNote" style="margin-top:12px">Cloudflare istekleri ile EDWISE oturumları farklı ölçümlerdir; toplanmaz ve tekil kişi sayısı olarak yorumlanmaz.</p>
+    </div>
     <div id="cloudflareReportsMessage" class="message">Cloudflare raporu yükleniyor...</div>
     <div class="grid analytics-stats">
      <div class="stat"><span>Toplam HTTP isteği</span><h2 id="reportCfRequests">—</h2><p>Sayfa, görsel, dosya ve diğer istekler</p></div>
@@ -1661,9 +1673,27 @@ function drawReportCloudflareBars(rows){
 }
 async function loadCloudflareReports(){
  const msg=$("cloudflareReportsMessage");if(!msg)return;
- msg.className="message";msg.textContent="Cloudflare verileri getiriliyor...";
- try{const response=await fetch("/api/analytics",{credentials:"same-origin",cache:"no-store"});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||"Cloudflare verileri alınamadı.");renderCloudflareReport(data);}
- catch(error){msg.className="message error";msg.textContent=error.message||"Cloudflare raporu yüklenemedi.";}
+ msg.className="message";msg.textContent="Cloudflare ve EDWISE ölçümleri birlikte getiriliyor...";
+ try{
+  const [cfResponse,eventResponse]=await Promise.all([
+   fetch("/api/analytics",{credentials:"same-origin",cache:"no-store"}),
+   fetch("/api/application-events",{credentials:"same-origin",cache:"no-store"})
+  ]);
+  const [cfData,eventData]=await Promise.all([cfResponse.json(),eventResponse.json()]);
+  if(!cfResponse.ok||!cfData.success)throw new Error(cfData.message||"Cloudflare verileri alınamadı.");
+  if(!eventResponse.ok||!eventData.success)throw new Error(eventData.message||"EDWISE olay verileri alınamadı.");
+  renderCloudflareReport(cfData);
+  const totals=eventData.totals||{},get=key=>totals[key]||{count:0,sessions:0},fmt=analyticsNumber;
+  const pageViews=get("page_view"),apply=get("apply_click"),saved=get("application_saved"),whatsapp=get("whatsapp_redirect");
+  const measuredSessions=Number(pageViews.sessions)||0,savedSessions=Number(saved.sessions)||0;
+  $("combinedSessions").textContent=fmt(measuredSessions);
+  $("combinedPageViews").textContent=fmt(pageViews.count);
+  $("combinedApplySessions").textContent=fmt(apply.sessions);
+  $("combinedApplications").textContent=fmt(saved.count);
+  $("combinedWhatsapp").textContent=fmt(whatsapp.count);
+  $("combinedConversion").textContent=measuredSessions?(savedSessions/measuredSessions*100).toLocaleString("tr-TR",{maximumFractionDigits:1})+"%":"—";
+  $("combinedReportNote").textContent="Cloudflare dönemi: "+cfData.period.startDate+" – "+cfData.period.endDate+". EDWISE oturum ve dönüşüm verileri analiz izni veren ziyaretçilerden gelir. Dönüşüm, başvuru kaydı yapan oturumların ölçülen sayfa görüntüleme oturumlarına oranıdır; Cloudflare HTTP istekleri bu hesaba katılmaz.";
+ }catch(error){msg.className="message error";msg.textContent=error.message||"Birleşik rapor verileri yüklenemedi.";}
 }
 $("refreshCloudflareReports")?.addEventListener("click",loadCloudflareReports);
 async function loadSiteReports(){
