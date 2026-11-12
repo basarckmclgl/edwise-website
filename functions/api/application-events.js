@@ -41,6 +41,7 @@ export async function onRequestPost({ request, env }) {
       return json({ success:false, message:"Analiz kaydı geçersiz." },400);
     }
     await ensureTable(env.DB);
+    await env.DB.prepare("DELETE FROM application_events WHERE datetime(created_at) < datetime('now','-30 days')").run();
     const countryCode = clean(request.cf?.country || request.headers.get("CF-IPCountry") || "",2).toUpperCase().replace(/[^A-Z]/g,"");
     await recordEvent(env.DB,sessionId,eventName,pagePath,countryCode || null);
     return json({ success:true });
