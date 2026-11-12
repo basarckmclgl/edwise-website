@@ -1492,6 +1492,7 @@ function showPage(name){
  $("pages").classList.toggle("hidden",name!=="pages");
  $("services").classList.toggle("hidden",name!=="services");
  $("posts").classList.toggle("hidden",name!=="posts");
+ $("posts").style.setProperty("display",name==="posts"?"block":"none","important");
  $("users").classList.toggle("hidden",name!=="users");
  $("audit").classList.toggle("hidden",name!=="audit");
  $("profile").classList.toggle("hidden",name!=="profile");
