@@ -692,6 +692,9 @@ td{color:#39334b!important;border-color:#eeebf4!important}
 .admin-search-results{position:absolute;z-index:100;top:43px;left:0;right:0;max-height:360px;overflow:auto;background:#fff;border:1px solid #e7e1f1;border-radius:12px;box-shadow:0 16px 38px #30204a20;padding:6px}
 .admin-search-result{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:11px;border:0;border-radius:8px;background:#fff;color:#332b49;cursor:pointer}.admin-search-result:hover{background:#f5f0ff}.admin-search-result small{color:#8a829b}.admin-search-empty{padding:16px;color:#817990;font-size:13px}
 @media(max-width:600px){.admin-global-search{width:34vw}.admin-global-search input{font-size:10px!important;padding:0 8px!important}}
+/* Blog listesi yalnızca Blog Yönetimi sekmesinde görünür; diğer tüm sekmelerde zorunlu olarak gizlidir. */
+#posts{display:none!important}
+body[data-active-page="posts"] #posts{display:block!important}
 </style>
 </head>
 <body>
@@ -1474,6 +1477,7 @@ menuToggle?.addEventListener("click",()=>{
 });
 function showPage(name){
  if(!canAccess(name)) name="overview";
+ document.body.dataset.activePage=name;
  if(name==="overview"){loadPublishedContentCounts();if(currentRole==="superadmin"){loadApplicationFunnel();loadSiteReports();}}
 
  // Her ana menü sekmesi yalnızca kendi içeriğini gösterir; diğer sekmelerin panelleri görünmez.
