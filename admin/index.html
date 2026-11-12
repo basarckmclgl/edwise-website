@@ -110,6 +110,9 @@
       <button id="loginButton" type="submit">Giriş Yap</button>
     </form>
 
+    <a href="#" id="forgotPasswordLink" style="display:block;margin-top:16px;color:#b9a7ff;text-align:center;font-size:14px">Şifremi Unuttum</a>
+    <form id="resetRequestForm" hidden><label for="resetEmail">Yönetici e-posta adresi</label><input id="resetEmail" type="email" autocomplete="email" required><button type="submit">Yenileme Bağlantısı Gönder</button></form>
+    <form id="resetPasswordForm" hidden><label for="resetNewPassword">Yeni şifre</label><input id="resetNewPassword" type="password" minlength="8" maxlength="128" required autocomplete="new-password"><button type="submit">Şifremi Yenile</button></form>
     <div id="message" role="status"></div>
     <a class="back" href="/">← Ana sayfaya dön</a>
   </main>
@@ -118,6 +121,15 @@
     const form = document.getElementById("loginForm");
     const button = document.getElementById("loginButton");
     const message = document.getElementById("message");
+
+    const forgot=document.getElementById("forgotPasswordLink");
+    const requestForm=document.getElementById("resetRequestForm");
+    const resetForm=document.getElementById("resetPasswordForm");
+    const resetToken=new URLSearchParams(location.search).get("reset");
+    if(resetToken){form.hidden=true;forgot.hidden=true;resetForm.hidden=false;}
+    forgot.addEventListener("click",e=>{e.preventDefault();form.hidden=true;forgot.hidden=true;requestForm.hidden=false;});
+    requestForm.addEventListener("submit",async e=>{e.preventDefault();message.textContent="İstek gönderiliyor...";try{const r=await fetch("/api/password-reset-request",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"same-origin",body:JSON.stringify({email:document.getElementById("resetEmail").value.trim()})});const d=await r.json();message.textContent=d.message||"İstek tamamlandı.";}catch{message.textContent="Sunucuya ulaşılamadı.";}});
+    resetForm.addEventListener("submit",async e=>{e.preventDefault();const password=document.getElementById("resetNewPassword").value;message.textContent="Şifre güncelleniyor...";try{const r=await fetch("/api/password-reset",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"same-origin",body:JSON.stringify({token:resetToken,password})});const d=await r.json();message.textContent=d.message||"İşlem tamamlandı.";if(r.ok&&d.success){resetForm.hidden=true;history.replaceState({},"","/admin/");form.hidden=false;}}catch{message.textContent="Sunucuya ulaşılamadı.";}});
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
