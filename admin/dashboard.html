@@ -214,6 +214,26 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
 .report-pair-grid th,.report-pair-grid td{padding:6px 7px!important;font-size:10px!important;white-space:nowrap}
 .report-pair-grid td:last-child{white-space:normal}
 .application-pair-grid table{min-width:650px!important}
+
+/* Reports: fixed two-column dashboard, no inner horizontal scroll */
+#reports{width:100%;max-width:100%;min-width:0}
+#reports .report-pair-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;width:100%;max-width:100%;margin:10px 0;align-items:stretch}
+#reports .report-pair-grid>.panel{min-width:0;width:100%;margin:0!important;padding:10px!important;overflow:hidden}
+#reports .report-pair-grid .section-head{margin-bottom:7px!important;gap:8px}
+#reports .report-pair-grid h3{font-size:12px!important;margin:0 0 4px!important}
+#reports .report-pair-grid .muted{font-size:9px!important;line-height:1.25}
+#reports .report-pair-grid .table-wrap{width:100%;max-width:100%;overflow:visible!important}
+#reports .fit-report-table{width:100%!important;min-width:0!important;table-layout:fixed;border-collapse:collapse;font-size:9px!important}
+#reports .fit-report-table th,#reports .fit-report-table td{padding:5px 4px!important;font-size:9px!important;white-space:normal!important;overflow-wrap:anywhere;word-break:break-word;line-height:1.2}
+#reports .fit-report-table th{font-weight:600}
+#reports .application-fit-table{font-size:8px!important}
+#reports .application-fit-table th,#reports .application-fit-table td{font-size:8px!important;padding:4px 2px!important}
+#reports .application-pair-grid{grid-template-columns:minmax(0,1.45fr) minmax(0,1fr)!important}
+#reports .compact-report{padding:10px!important}
+@media(max-width:700px){#reports .report-pair-grid,#reports .application-pair-grid{grid-template-columns:minmax(0,1fr)!important}}
+@media print{
+ body.printing-applications #reports .panel:has(#applicationsTable)::before{content:"EDWISE";display:block;font-family:Arial,sans-serif;font-size:22pt;font-weight:800;letter-spacing:3px;color:#291447!important;margin:0 0 14pt;padding:0 0 8pt;border-bottom:2px solid #291447}
+}
 </style>
 </head>
 <body>
@@ -315,17 +335,12 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
    <div class="section-head"><div><h2>Site Raporları</h2><p>Son 30 günlük sayfa görüntüleme, ziyaretçi oturumu ve kaydırma derinliği.</p></div><div class="actions"><button class="btn" id="refreshSiteReports">↻ Raporları Yenile</button><div class="report-export" id="applicationExport"><button class="primary" type="button" id="applicationExportToggle" aria-haspopup="true" aria-expanded="false">Başvuru Kayıtlarını Raporla <span aria-hidden="true">▾</span></button><div class="report-export-menu hidden" id="applicationExportMenu"><button type="button" data-export-applications="pdf">PDF olarak indir</button><button type="button" data-export-applications="doc">Word (.doc) olarak indir</button><button type="button" data-export-applications="xlsx">Excel (.xlsx) olarak indir</button></div></div></div></div>
    <div id="siteReportsMessage" class="message">Raporlar yükleniyor...</div>
    <div class="report-pair-grid">
-    <div class="panel"><h3>Sayfa İnceleme Raporu</h3><div class="table-wrap"><table style="min-width:760px"><thead><tr><th>Sayfa</th><th>Görüntülenme</th><th>Ziyaretçi oturumu</th><th>%25 kaydırma</th><th>%50 kaydırma</th><th>%75 kaydırma</th><th>%90 kaydırma</th></tr></thead><tbody id="siteReportsTable"><tr><td colspan="8">Veriler bekleniyor...</td></tr></tbody></table></div></div>
-    <div class="report-history-grid">
-           <div class="panel"><div class="section-head"><div><h3>Sayfa Ziyaret Kayıtları</h3><p class="muted">Analiz izni veren ziyaretçilerin son 30 gündeki sayfa görüntüleme ve kaydırma kayıtları. Oturum kodları kısaltılmıştır.</p></div></div><div class="table-wrap"><table style="min-width:650px"><thead><tr><th>Tarih</th><th>Sayfa</th><th>Ülke</th><th>Anonim oturum</th><th>İşlem</th></tr></thead><tbody id="pageVisitRecords"><tr><td colspan="5">Kayıtlar bekleniyor...</td></tr></tbody></table></div></div>
-       
+    <div class="panel"><h3>Sayfa İnceleme Raporu</h3><div class="table-wrap"><table class="fit-report-table"><thead><tr><th>Sayfa</th><th>Görüntülenme</th><th>Ziyaretçi oturumu</th><th>%25</th><th>%50</th><th>%75</th><th>%90</th></tr></thead><tbody id="siteReportsTable"><tr><td colspan="7">Veriler bekleniyor...</td></tr></tbody></table></div></div>
+    <div class="panel"><div class="section-head"><div><h3>Sayfa Ziyaret Kayıtları</h3><p class="muted">Son 30 gün · Anonim oturum kayıtları</p></div></div><div class="table-wrap"><table class="fit-report-table"><thead><tr><th>Tarih</th><th>Sayfa</th><th>Ülke</th><th>Oturum</th><th>İşlem</th></tr></thead><tbody id="pageVisitRecords"><tr><td colspan="5">Kayıtlar bekleniyor...</td></tr></tbody></table></div></div>
    </div>
    <div class="report-pair-grid application-pair-grid">
-    <div class="panel">
-        <div class="section-head"><div><h3>Başvuru Kayıtları</h3><p class="muted">Kişisel veriler yalnızca yetkili yönetici tarafından görüntülenebilir. Telefon ve e-posta varsayılan olarak maskelidir.</p></div><div class="actions"><button class="btn" id="refreshApplications">↻ Başvuruları Yenile</button><span id="applicationsMessage" class="muted"></span></div></div>
-        <div class="table-wrap"><table><thead><tr><th>Tarih</th><th>Ad soyad</th><th>Telefon</th><th>E-posta</th><th>Program</th><th>Eğitim tercihi</th><th>Uygun zaman</th><th>Açıklama</th><th>Durum</th></tr></thead><tbody id="applicationsTable"><tr><td colspan="9">Başvurular yükleniyor...</td></tr></tbody></table></div>
-       </div>
-    <div class="panel compact-report"><div class="section-head"><div><h3>Başvuru Dönüşüm Kayıtları</h3><p class="muted">Son 30 gün · Her hareket ayrı kayıt edilir.</p></div><span id="funnelRecordCount" class="muted"></span></div><div class="table-wrap"><table class="compact-table"><thead><tr><th>Tarih</th><th>Ülke</th><th>Oturum</th><th>İşlem</th></tr></thead><tbody id="funnelEventRecords"><tr><td colspan="4">Kayıtlar bekleniyor...</td></tr></tbody></table></div></div>
+    <div class="panel"><div class="section-head"><div><h3>Başvuru Kayıtları</h3><p class="muted">Kişisel veriler yetkili yöneticiye açıktır. İletişim bilgileri varsayılan olarak maskelidir.</p></div><div class="actions"><button class="btn" id="refreshApplications">↻ Yenile</button><span id="applicationsMessage" class="muted"></span></div></div><div class="table-wrap"><table class="fit-report-table application-fit-table"><thead><tr><th>Tarih</th><th>Ad soyad</th><th>Telefon</th><th>E-posta</th><th>Program</th><th>Eğitim tercihi</th><th>Uygun zaman</th><th>Açıklama</th><th>Durum</th></tr></thead><tbody id="applicationsTable"><tr><td colspan="9">Başvurular yükleniyor...</td></tr></tbody></table></div></div>
+    <div class="panel compact-report"><div class="section-head"><div><h3>Başvuru Dönüşüm Kayıtları</h3><p class="muted">Son 30 gün · Her hareket ayrı kayıt edilir.</p></div><span id="funnelRecordCount" class="muted"></span></div><div class="table-wrap"><table class="fit-report-table"><thead><tr><th>Tarih</th><th>Ülke</th><th>Oturum</th><th>İşlem</th></tr></thead><tbody id="funnelEventRecords"><tr><td colspan="4">Kayıtlar bekleniyor...</td></tr></tbody></table></div></div>
    </div>
    <p class="muted">Not: Analiz verileri yalnızca analiz çerezlerine izin veren ziyaretçilerden toplanır. Kaydırma oranları aynı oturumdaki olay sayılarını gösterir; kişileri kesin olarak tanımlamaz.</p>
   </section>
