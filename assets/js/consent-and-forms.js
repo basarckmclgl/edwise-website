@@ -13,7 +13,7 @@ document.addEventListener('click',function(event){
 // Çerez tercihleri: her yeni sayfa girişinde görünür; seçiminiz kaydedilir.
 (function(){
  const cookie=document.getElementById('cookie-banner');
- function chooseCookie(value){try{localStorage.setItem('edwise_cookie_choice',value);}catch(e){}if(cookie)cookie.hidden=true;}
+ function chooseCookie(value){try{localStorage.setItem('edwise_cookie_choice',value);}catch(e){}if(cookie)cookie.hidden=true;if(value==="allowed")window.edwiseStartPageTracking?.();}
  if(cookie)cookie.hidden=false;
  document.getElementById('cookie-accept')?.addEventListener('click',()=>chooseCookie('allowed'));
  document.getElementById('cookie-essential')?.addEventListener('click',()=>chooseCookie('essential'));
@@ -42,8 +42,11 @@ const EDWISE_TRACKING = (() => {
  };
  return {get sessionId(){return consentAllowed()?sessionId:"";},send};
 })();
-// Site genelinde sayfa görüntüleme ve kaydırma derinliği (yalnızca analiz izni varsa).
-if(EDWISE_TRACKING.sessionId){
+// Site genelinde sayfa görüntüleme ve kaydırma derinliği.
+let edwisePageTrackingStarted=false;
+window.edwiseStartPageTracking=()=>{
+ if(edwisePageTrackingStarted||!EDWISE_TRACKING.sessionId)return;
+ edwisePageTrackingStarted=true;
  EDWISE_TRACKING.send("page_view");
  const scrollMarks=new Set();
  const measureScroll=()=>{
@@ -58,7 +61,9 @@ if(EDWISE_TRACKING.sessionId){
  };
  window.addEventListener("scroll",measureScroll,{passive:true});
  window.addEventListener("load",measureScroll,{once:true});
-}
+ measureScroll();
+};
+if(EDWISE_TRACKING.sessionId)window.edwiseStartPageTracking();
 let edwiseFormStarted=false;
 let edwiseSubmitSucceeded=false;
 let edwiseAbandonSent=false;
