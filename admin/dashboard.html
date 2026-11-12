@@ -678,9 +678,6 @@ td{color:#39334b!important;border-color:#eeebf4!important}
  <div class="menu-label">GENEL</div>
  <button class="nav active" data-page="overview"><span class="ico">⌂</span><span>Genel Bakış</span></button>
  <div class="menu-label">SABİT SİTE SAYFALARI</div>
- <button class="nav" data-page="services"><span class="ico">✧</span><span>Hizmetlerimiz</span></button>
- <button class="nav" data-page="pages" data-fixed-page="about"><span class="ico">▤</span><span>Hakkımızda</span></button>
- <button class="nav" data-page="applications" data-superadmin><span class="ico">▣</span><span>Başvur</span></button>
  <button class="nav" data-page="messages"><span class="ico">✉</span><span>İletişim ve Konum / Mesajlar <b id="chatUnreadBadge" class="role-label">0</b></span></button>
  <div class="menu-label">İÇERİK STÜDYOSU</div>
  <button class="nav" data-page="pages"><span class="ico">▤</span><span>Diğer Sayfalar</span></button>
@@ -1703,14 +1700,17 @@ async function loadMenuSettings(){
   const saved=Array.isArray(settingsData.menu)?settingsData.menu:null;
   const defaults=[
    {key:"home",label:"Ana Sayfa",url:"/",visible:true},
+   {key:"services",label:"Hizmetlerimiz",url:"/pages/hizmetlerimiz.html",visible:true},
+   {key:"about",label:"Hakkımızda",url:"/pages/hakkimizda.html",visible:true},
+   {key:"apply",label:"Başvur",url:"/pages/basvuru.html",visible:true},
    {key:"contact",label:"İletişim ve Konum",url:"/pages/iletisim.html",visible:true},
    {key:"contact-cta",label:"Bize Ulaşın · WhatsApp",url:"/pages/iletisim.html",visible:true}
   ];
   (pageData.pages||[]).filter(p=>p.status==="published"&&!["hakkimizda","iletisim","hizmetlerimiz","anasayfa"].includes(p.slug)).forEach(p=>defaults.push({key:"page-"+p.id,label:p.title,url:"/pages/sayfa.html?slug="+encodeURIComponent(p.slug),visible:true}));
-  let items=(saved&&saved.length?saved:defaults).filter(item=>!["services","about","guide","apply"].includes(item.key)&&!["/pages/hizmetlerimiz.html","/pages/hakkimizda.html","/pages/basvuru.html","/edwise-rehber.html"].includes(item.url));
+  let items=(saved&&saved.length?saved:defaults).filter(item=>item.key!=="guide"&&item.url!=="/edwise-rehber.html");
   const existing=new Set(items.map(x=>x.key));
   defaults.forEach(item=>{if(!existing.has(item.key))items.push(item);});
-  const pinnedMenuOrder=["home","contact"];
+  const pinnedMenuOrder=["home","services","about","apply","contact"];
   items.sort((a,b)=>{
    const ai=pinnedMenuOrder.indexOf(a.key),bi=pinnedMenuOrder.indexOf(b.key);
    return (ai<0?99:ai)-(bi<0?99:bi);
