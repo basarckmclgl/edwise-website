@@ -683,7 +683,6 @@ td{color:#39334b!important;border-color:#eeebf4!important}
  <button class="nav" data-page="media"><span class="ico">▧</span><span>Medya Kütüphanesi</span></button>
  
  <div class="menu-label">TOPLULUK VE ETKİLEŞİM</div>
- <button class="nav" data-page="messages"><span class="ico">✉</span><span>Mesaj Kutusu <b id="chatUnreadBadge" class="role-label">0</b></span></button>
  <button class="nav" data-page="applications" data-superadmin><span class="ico">▣</span><span>Başvurular</span></button>
  <div class="menu-label" data-superadmin>ANALİZ VE RAPORLAR</div>
  <button class="nav" data-page="reports" data-superadmin><span class="ico">▥</span><span>İstatistikler ve Raporlar</span></button>
@@ -702,20 +701,14 @@ td{color:#39334b!important;border-color:#eeebf4!important}
  <header class="topbar">
 <div style="display:flex;align-items:center;gap:16px"><button type="button" class="menu-toggle" id="menuToggle" aria-label="Menüyü aç veya kapat" aria-expanded="true" title="Menüyü aç/kapat"><span></span><span></span><span></span></button><span>EDWISE / <strong id="breadcrumb">Ana Sayfa</strong></span></div>
 <div class="admin-global-search"><input id="adminGlobalSearch" type="search" placeholder="Panelde ara: sayfa, hizmet..." autocomplete="off" aria-label="Panel genelinde ara"><div id="adminGlobalSearchResults" class="admin-search-results hidden"></div></div>
-<div class="topbar-account"><button type="button" class="account-trigger" id="accountMenuToggle" aria-expanded="false" aria-controls="accountMenu"><img class="account-avatar" id="topbarAvatar" alt="Profil fotoğrafı"><span><span class="account-name" id="username">Yönetici</span><span class="account-role" id="topbarRole">Yönetici</span></span>▾</button><div class="account-menu" id="accountMenu" hidden><div class="account-menu-role" id="accountMenuIdentity">Yönetici hesabı</div><button type="button" id="accountProfileLink">◉ &nbsp; Profilim</button><button type="button" id="accountLogout">↗ &nbsp; Güvenli Çıkış Yap</button></div><button class="logout" id="logout">Güvenli Çıkış ↗</button></div>
+<div class="topbar-account"><button type="button" class="admin-notification-button" id="adminNotificationButton" title="Bildirimleri etkinleştir" aria-label="Bildirimleri etkinleştir">♧<span id="adminNotificationDot" class="admin-notification-dot"></span></button><button type="button" class="account-trigger" id="accountMenuToggle" aria-expanded="false" aria-controls="accountMenu"><img class="account-avatar" id="topbarAvatar" alt="Profil fotoğrafı"><span><span class="account-name" id="username">Yönetici</span><span class="account-role" id="topbarRole">Yönetici</span></span>▾</button><div class="account-menu" id="accountMenu" hidden><div class="account-menu-role" id="accountMenuIdentity">Yönetici hesabı</div><button type="button" id="accountProfileLink">◉ &nbsp; Profilim</button><button type="button" id="accountLogout">↗ &nbsp; Güvenli Çıkış Yap</button></div><button class="logout" id="logout">Güvenli Çıkış ↗</button></div>
 </header>
 
  <div class="content">
   <section id="overview">
-   <div class="welcome">
-    <small>EDWISE YÖNETİM MERKEZİ</small>
-    <h1>Hoş geldiniz, <span id="welcomeName">Yönetici</span> 👋</h1>
-    <p>EDWISE’ın içeriklerini yayınlayın, ziyaretçilerle iletişim kurun ve performansını tek merkezden takip edin.</p>
-    <div class="actions" style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
-     <button class="primary" type="button" onclick="showPage('messages')">✉ Mesaj Kutusuna Git</button>
-     <button class="btn" type="button" onclick="showPage('pages')">＋ Sayfa Yönetimi</button>
-     <button class="btn" type="button" onclick="showPage('profile')">♙ Profilimi Düzenle</button>
-    </div>
+   <div class="welcome welcome-logo-only" aria-label="EDWISE">
+    <img class="welcome-logo" src="/assets/images/logo.png" alt="EDWISE">
+   </div>
    </div>
 
    <div class="grid">
@@ -1257,6 +1250,11 @@ td{color:#39334b!important;border-color:#eeebf4!important}
   </section>
  </div>
 </main>
+
+<button type="button" class="floating-admin-chat" id="floatingAdminChat" aria-label="Mesaj kutusunu aç" title="Mesaj kutusu">
+ <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg>
+ <span id="floatingChatBadge" class="floating-chat-badge" hidden>+1</span>
+</button>
 
 <script>
 const otherModules={
@@ -1921,7 +1919,23 @@ function applicationExportTable(){return $("applicationsTable")?.closest("table"
 function applicationExportName(){return "EDWISE-Basvuru-Kayitlari";}
 function exportApplicationsDoc(){
  const table=applicationExportTable();if(!table){alert("Başvuru tablosu bulunamadı.");return;}
-  const html='<!doctype html><html><head><meta charset="utf-8"><title>EDWISE Başvuru Kayıtları</title><style>body{font-family:Arial,sans-serif;color:#222}h1{color:#291447}table{border-collapse:collapse;width:100%;font-size:9pt}th,td{border:1px solid #aaa;padding:6px;text-align:left}th{background:#eee}</style></head><body><h1>EDWISE Başvuru Kayıtları</h1><p>Rapor tarihi: '+new Date().toLocaleDateString("tr-TR")+'</p>'+table.outerHTML+'</body></html>';
+  const html='<!doctype html><html><head><meta charset="utf-8"><title>EDWISE Başvuru Kayıtları</title><style>body{font-family:Arial,sans-serif;color:#222}h1{color:#291447}table{border-collapse:collapse;width:100%;font-size:9pt}th,td{border:1px solid #aaa;padding:6px;text-align:left}th{background:#eee}
+/* EDWISE requested dashboard refinements — scoped additions only */
+.welcome.welcome-logo-only{min-height:144px;display:flex;align-items:center;justify-content:flex-start;padding:28px 34px!important;background:linear-gradient(110deg,#6036c4 0%,#8052e7 100%)!important;border:0!important;box-shadow:0 8px 22px rgba(68,45,110,.16)!important}
+.welcome-logo{display:block;width:clamp(190px,24vw,290px);height:82px;object-fit:contain;object-position:left center;filter:brightness(0) invert(1)}
+.welcome.welcome-logo-only:after{content:none!important;display:none!important}
+.topbar-account{position:relative}
+.admin-notification-button{position:relative;width:38px;height:38px;border:1px solid var(--border);border-radius:50%;background:var(--panel);color:var(--text);font-size:20px;display:grid;place-items:center;cursor:pointer}
+.admin-notification-button:hover{border-color:var(--purple)}
+.admin-notification-dot{position:absolute;right:5px;top:5px;width:8px;height:8px;border-radius:50%;background:#e53945;display:none}
+.admin-notification-button.has-unread .admin-notification-dot{display:block}
+.floating-admin-chat{position:fixed;right:24px;bottom:24px;z-index:9998;width:62px;height:62px;border:0;border-radius:50%;display:grid;place-items:center;background:#20b968;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.24);cursor:pointer}
+.floating-admin-chat:hover{transform:translateY(-2px);filter:brightness(.97)}
+.floating-admin-chat svg{width:29px;height:29px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.floating-chat-badge{position:absolute;right:-3px;top:-4px;min-width:23px;height:23px;padding:0 5px;border:2px solid #fff;border-radius:20px;background:#e53945;color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;line-height:1}
+.floating-chat-badge[hidden]{display:none!important}
+@media(max-width:760px){.welcome.welcome-logo-only{min-height:112px;padding:18px 20px!important}.welcome-logo{width:190px;height:68px}.floating-admin-chat{right:16px;bottom:16px;width:56px;height:56px}}
+</style></head><body><h1>EDWISE Başvuru Kayıtları</h1><p>Rapor tarihi: '+new Date().toLocaleDateString("tr-TR")+'</p>'+table.outerHTML+'</body></html>';
   const blob=new Blob(["\ufeff",html],{type:"application/msword"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=applicationExportName()+".doc";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 async function exportApplicationsXlsx(){
@@ -2568,7 +2582,43 @@ setInterval(()=>{if(!$("messages").classList.contains("hidden")){loadChatConvers
 
 $("profileCoverFile").addEventListener("change",e=>saveProfileImage("cover",e.target.files[0]));
 let activeChatId=null;
-async function loadChatConversations(){const list=$("chatConversationList");try{const r=await fetch("/api/chat?admin=1",{credentials:"same-origin"});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||"Mesajlar alınamadı.");const rows=d.conversations||[];$("chatUnreadBadge").textContent=rows.reduce((n,x)=>n+Number(x.unread||0),0);list.innerHTML=rows.length?rows.map(x=>'<button type="button" data-chat-id="'+Number(x.id)+'" style="display:block;width:100%;text-align:left;padding:12px;margin:6px 0;border:1px solid var(--border);border-radius:9px;background:var(--panel);color:var(--text);cursor:pointer"><b>#'+Number(x.id)+' · '+escapeHtml(x.visitor_name||"Ziyaretçi")+'</b><small style="display:block;color:var(--muted);margin-top:5px">'+escapeHtml(x.last_message||"Henüz mesaj yok").slice(0,90)+'</small><small>'+ (x.status==="open"?"Açık":"Kapalı")+' · Okunmamış: '+Number(x.unread||0)+'</small></button>').join(""):"Henüz mesaj yok.";list.querySelectorAll("[data-chat-id]").forEach(b=>b.addEventListener("click",()=>openAdminChat(Number(b.dataset.chatId))));}catch(e){list.textContent=e.message;}}
+let chatNotificationInitialized=false,lastNotifiedVisitorMessageId=0,lastUnreadTotal=0;
+async function refreshAdminChatStatus(){
+ try{
+  const r=await fetch("/api/chat?admin=1",{credentials:"same-origin",cache:"no-store"});
+  const d=await r.json();if(!r.ok||!d.success)return;
+  const rows=d.conversations||[];
+  const unread=rows.reduce((n,x)=>n+Number(x.unread||0),0);
+  const latestId=rows.reduce((n,x)=>Math.max(n,Number(x.last_unread_id||0)),0);
+  const badge=$("floatingChatBadge"),bell=$("adminNotificationButton");
+  if(badge){badge.textContent=unread>0?(unread>1?"+"+unread:"+1"):"+1";badge.hidden=unread===0;}
+  if(bell)bell.classList.toggle("has-unread",unread>0);
+  if(!chatNotificationInitialized){lastNotifiedVisitorMessageId=latestId;lastUnreadTotal=unread;chatNotificationInitialized=true;}
+  else if(latestId>lastNotifiedVisitorMessageId){
+   const fresh=rows.find(x=>Number(x.last_unread_id)===latestId);
+   if("Notification" in window&&Notification.permission==="granted"){
+    const title="EDWISE — Yeni ziyaretçi mesajı";
+    const options={body:(fresh?.visitor_name||"Ziyaretçi")+" yeni bir mesaj gönderdi.",tag:"edwise-chat-"+latestId,renotify:false};
+    try{
+     if("serviceWorker" in navigator){const reg=await navigator.serviceWorker.getRegistration("/admin/");if(reg?.showNotification)await reg.showNotification(title,options);else new Notification(title,options);}
+     else new Notification(title,options);
+    }catch(e){console.warn("EDWISE notification:",e);}
+   }
+   lastNotifiedVisitorMessageId=latestId;
+  }
+  lastUnreadTotal=unread;
+ }catch(e){console.warn("EDWISE message status:",e);}
+}
+$("floatingAdminChat")?.addEventListener("click",()=>{showPage("messages");loadChatConversations();});
+$("adminNotificationButton")?.addEventListener("click",async()=>{
+ if(!("Notification" in window)){alert("Bu tarayıcı masaüstü bildirimlerini desteklemiyor.");return;}
+ if(Notification.permission==="granted"){alert("Tarayıcı bildirimleri açık. Yeni ziyaretçi mesajları bu cihazda bildirilecek.");return;}
+ if(Notification.permission==="denied"){alert("Bildirim izni tarayıcı ayarlarından engellenmiş. Site izinlerinden EDWISE bildirimlerine izin ver.");return;}
+ const permission=await Notification.requestPermission();
+ $("adminNotificationButton").title=permission==="granted"?"Bildirimler açık":"Bildirim izni verilmedi";
+ if(permission==="granted")new Notification("EDWISE bildirimleri etkin",{body:"Yeni ziyaretçi mesajları bu cihazda bildirilecek."});
+});
+async function loadChatConversations(){const list=$("chatConversationList");try{const r=await fetch("/api/chat?admin=1",{credentials:"same-origin"});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||"Mesajlar alınamadı.");const rows=d.conversations||[];const total=rows.reduce((n,x)=>n+Number(x.unread||0),0);$("floatingChatBadge").textContent=total>1?"+"+total:"+1";$("floatingChatBadge").hidden=total===0;list.innerHTML=rows.length?rows.map(x=>'<button type="button" data-chat-id="'+Number(x.id)+'" style="display:block;width:100%;text-align:left;padding:12px;margin:6px 0;border:1px solid var(--border);border-radius:9px;background:var(--panel);color:var(--text);cursor:pointer"><b>#'+Number(x.id)+' · '+escapeHtml(x.visitor_name||"Ziyaretçi")+'</b><small style="display:block;color:var(--muted);margin-top:5px">'+escapeHtml(x.last_message||"Henüz mesaj yok").slice(0,90)+'</small><small>'+ (x.status==="open"?"Açık":"Kapalı")+' · Okunmamış: '+Number(x.unread||0)+'</small></button>').join(""):"Henüz mesaj yok.";list.querySelectorAll("[data-chat-id]").forEach(b=>b.addEventListener("click",()=>openAdminChat(Number(b.dataset.chatId))));refreshAdminChatStatus();}catch(e){list.textContent=e.message;}}
 async function openAdminChat(id){activeChatId=id;$("chatThreadTitle").textContent="Görüşme #"+id;try{const r=await fetch("/api/chat",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"admin_list",id})});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||"Mesajlar alınamadı.");$("chatThread").innerHTML=(d.messages||[]).map(m=>'<div style="margin:8px 0;padding:10px;border-radius:9px;background:'+(m.sender==="admin"?"#3b2b60":"var(--bg)")+'"><b>'+(m.sender==="admin"?"EDWISE":"Ziyaretçi")+'</b><p style="white-space:pre-wrap;margin:5px 0">'+escapeHtml(m.body)+'</p><small>'+escapeHtml(m.created_at)+'</small></div>').join("");$("chatThread").scrollTop=$("chatThread").scrollHeight;loadChatConversations();}catch(e){$("chatThread").textContent=e.message;}}
 $("chatReplyForm").addEventListener("submit",async e=>{e.preventDefault();if(!activeChatId)return;const input=$("chatReplyInput");try{const r=await fetch("/api/chat",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"admin_reply",id:activeChatId,body:input.value})});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||"Yanıt gönderilemedi.");input.value="";openAdminChat(activeChatId);}catch(e){alert(e.message);}});
 $("chatCloseConversation").addEventListener("click",async()=>{if(!activeChatId)return;const r=await fetch("/api/chat",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"admin_close",id:activeChatId})});const d=await r.json();if(d.success){activeChatId=null;$("chatThread").textContent="Görüşme kapatıldı.";$("chatThreadTitle").textContent="Bir görüşme seçin";loadChatConversations();}});
@@ -2576,6 +2626,8 @@ $("refreshChats").addEventListener("click",loadChatConversations);
 
 loadAdminProfile();
 checkSession();
+refreshAdminChatStatus();
+setInterval(refreshAdminChatStatus,12000);
 </script>
 <script src="/admin/assets/js/static-page-imports.js"></script>
 <script src="/admin/assets/js/page-builder.js?v=blog-removed-20261112">
