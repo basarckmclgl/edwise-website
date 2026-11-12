@@ -15,6 +15,20 @@
 <meta property="og:url" content="https://edwisedanismanlik.com/"/>
 <meta property="og:image" content="https://edwisedanismanlik.com/assets/images/logo.png"/>
 <meta name="twitter:card" content="summary"/>
+<style>
+.edwise-search{position:relative;z-index:4;padding:18px 22px;background:#f8f6ff;border-bottom:1px solid #e8e2f5}
+.edwise-search-inner{max-width:1120px;margin:auto;position:relative}
+.edwise-search label{display:block;font-weight:700;color:#39216f;margin:0 0 8px}
+.edwise-search-control{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #d8cdef;border-radius:13px;padding:0 14px;box-shadow:0 5px 18px #2d16500d}
+.edwise-search-control span{font-size:25px;color:#6841b5}
+.edwise-search-control input{width:100%;min-width:0;border:0;outline:0;padding:15px 0;background:transparent;color:#241b35;font:inherit}
+.edwise-search-control button{border:0;background:transparent;font-size:24px;color:#766b86;cursor:pointer}
+.edwise-search-results{position:absolute;top:100%;left:0;right:0;max-height:360px;overflow:auto;background:#fff;border:1px solid #e2d9f0;border-radius:0 0 13px 13px;box-shadow:0 14px 28px #24133a1a}
+.edwise-search-results a{display:block;padding:12px 16px;color:#33234d;text-decoration:none;border-bottom:1px solid #f0ebf6}
+.edwise-search-results a:hover{background:#f7f3ff}
+.edwise-search-results small{display:block;color:#827791;margin-top:3px}
+@media(max-width:640px){.edwise-search{padding:14px}}
+</style>
 <link href="assets/css/style.css" rel="stylesheet"/>
 
 <script type="application/ld+json">
@@ -74,6 +88,18 @@
 
 </nav>
 </header>
+
+<section class="edwise-search" aria-label="EDWISE site içi arama">
+ <div class="edwise-search-inner">
+  <label for="edwiseSearchInput">EDWISE Arama Motoru</label>
+  <div class="edwise-search-control">
+   <span aria-hidden="true">⌕</span>
+   <input id="edwiseSearchInput" type="search" placeholder="Hizmet, eğitim programı veya içerik ara..." autocomplete="off">
+   <button id="edwiseSearchClear" type="button" aria-label="Aramayı temizle">×</button>
+  </div>
+  <div id="edwiseSearchResults" class="edwise-search-results" hidden aria-live="polite"></div>
+ </div>
+</section>
 
 <main class="single-page-content" data-page="anasayfa">
 
@@ -162,6 +188,16 @@
 </div>
 
 
+<script>
+(()=> {
+ const input=document.getElementById("edwiseSearchInput"),box=document.getElementById("edwiseSearchResults"),clear=document.getElementById("edwiseSearchClear");
+ if(!input||!box)return;
+ const targets=[...document.querySelectorAll("main h1,main h2,main h3,main article,main section[id]")].filter(el=>!el.closest(".edwise-search"));
+ const entries=targets.map(el=>{const heading=el.matches("h1,h2,h3")?el:el.querySelector("h1,h2,h3");const title=(heading?.innerText||el.getAttribute("aria-label")||"EDWISE içeriği").trim();const text=(el.innerText||"").replace(/\\s+/g," ").trim();const link=el.querySelector('a[href]');let href=link?.getAttribute("href")|| (el.id?"#"+el.id:"#anasayfa");return {title,text,href};}).filter(x=>x.text.length>25);
+ function render(){const q=input.value.trim().toLocaleLowerCase("tr-TR");if(!q){box.hidden=true;box.innerHTML="";return;}const words=q.split(/\\s+/).filter(Boolean);const found=entries.map(x=>({...x,score:words.reduce((n,w)=>n+(x.title.toLocaleLowerCase("tr-TR").includes(w)?3:0)+(x.text.toLocaleLowerCase("tr-TR").includes(w)?1:0),0)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,8);box.innerHTML=found.length?found.map(x=>'<a href="'+x.href.replace(/"/g,"&quot;")+'">'+x.title.replace(/</g,"&lt;")+'<small>'+x.text.slice(0,135).replace(/</g,"&lt;")+'…</small></a>').join(""):'<a href="pages/iletisim.html">Aradığınız içerik bulunamadı.<small>EDWISE ekibiyle iletişime geçebilirsiniz.</small></a>';box.hidden=false;}
+ input.addEventListener("input",render);clear?.addEventListener("click",()=>{input.value="";render();input.focus();});document.addEventListener("click",e=>{if(!e.target.closest(".edwise-search-inner"))box.hidden=true;});
+})();
+</script>
 <script defer="True" src="assets/js/site.js?v=menu-cleanup-20261111"></script>
 <script defer="True" src="assets/js/consent-and-forms.js?v=page-analytics-20261112"></script>
 
