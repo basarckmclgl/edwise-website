@@ -6,8 +6,10 @@ function originOk(request){const origin=request.headers.get("Origin");try{return
 
 export async function onRequestGet(context){
  const auth=await requireSuperAdmin(context);if(auth.response)return auth.response;
+ let stage="audit_table_setup";
  try{
   await ensureAuditTable(context.env.DB);
+  stage="audit_query";
   const url=new URL(context.request.url);
   const limit=Math.min(200,Math.max(1,Number(url.searchParams.get("limit"))||100));
   const actor=url.searchParams.get("actor");
@@ -20,7 +22,7 @@ export async function onRequestGet(context){
   values.push(limit);
   const rows=await context.env.DB.prepare(sql).bind(...values).all();
   return json({success:true,events:(rows.results||[]).map(row=>({...row,details:(()=>{try{return JSON.parse(row.details_json||"{}")}catch{return {}}})()}))});
- }catch(error){console.error("Audit GET",error);return json({success:false,message:"İşlem geçmişi alınamadı."},500)}
+ }catch(error){console.error("Audit GET",stage,error);return json({success:false,message:"İşlem geçmişi alınamadı.",diagnostic:{stage,error:String(error?.message||error).slice(0,500)}},500)}
 }
 
 export async function onRequestPost(context){
