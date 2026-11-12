@@ -509,7 +509,12 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
    <div class="welcome">
     <small>EDWISE YÖNETİM MERKEZİ</small>
     <h1>Hoş geldiniz, <span id="welcomeName">Yönetici</span> 👋</h1>
-    <p>İçeriklerinizi ve web sitenizi tek merkezden yönetin.</p>
+    <p>İçeriklerinizi, başvurularınızı ve ziyaretçilerden gelen mesajları tek merkezden yönetin.</p>
+    <div class="actions" style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+     <button class="primary" type="button" onclick="showPage('messages')">✉ Mesaj Kutusuna Git</button>
+     <button class="btn" type="button" onclick="showPage('pages')">＋ Sayfa Yönetimi</button>
+     <button class="btn" type="button" onclick="showPage('profile')">♙ Profilimi Düzenle</button>
+    </div>
    </div>
 
    <div class="grid">
@@ -1044,6 +1049,7 @@ html.panel-underlined-links a{text-decoration:underline!important;text-underline
     <div class="field"><label for="profileNewPassword">Yeni şifre</label><input id="profileNewPassword" type="password" autocomplete="new-password" minlength="8" required maxlength="128"><small class="muted">En az 8 karakter.</small></div>
     <div class="field"><label for="profileConfirmPassword">Yeni şifre (tekrar)</label><input id="profileConfirmPassword" type="password" autocomplete="new-password" minlength="8" required maxlength="128"></div>
     <div><button class="primary" type="submit" id="profilePasswordSave">Şifremi Güncelle</button></div><div id="profilePasswordMessage" class="message" aria-live="polite"></div>
+    <div><button class="btn" type="button" id="profileForgotPassword">E-postama Şifre Yenileme Bağlantısı Gönder</button><div id="profileResetMessage" class="message" aria-live="polite"></div></div>
    </form></div>
   </div>
  </section>
@@ -2794,6 +2800,9 @@ $("siteSettingsForm").addEventListener("submit",async event=>{event.preventDefau
 async function loadAdminProfile(){try{const r=await fetch("/api/profile",{credentials:"same-origin"});if(!r.ok)return;const d=await r.json();if(d.profile?.avatar_data)$("profileAvatarPreview").src=d.profile.avatar_data;if(d.profile?.cover_data)$("profileCoverPreview").style.backgroundImage='url("'+d.profile.cover_data+'")';}catch{}}
 async function saveProfileImage(type,file){const msg=$("profileImageMessage");if(!file)return;if(file.size>1024*1024){msg.textContent="Dosya 1 MB sınırını aşıyor.";return;}const reader=new FileReader();reader.onload=async()=>{try{const r=await fetch("/api/profile",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({type,data:reader.result})});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||"Görsel kaydedilemedi.");if(type==="avatar")$("profileAvatarPreview").src=reader.result;else $("profileCoverPreview").style.backgroundImage='url("'+reader.result+'")';msg.textContent=d.message;}catch(e){msg.textContent=e.message;}};reader.readAsDataURL(file);}
 $("profileAvatarFile").addEventListener("change",e=>saveProfileImage("avatar",e.target.files[0]));
+$("profileForgotPassword").addEventListener("click",async()=>{const msg=$("profileResetMessage");msg.textContent="İstek gönderiliyor...";try{const r=await fetch("/api/password-reset-request",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:$("profileEmail").value.trim()})});const d=await r.json();msg.textContent=d.message||"İstek tamamlandı.";}catch{msg.textContent="Sunucuya ulaşılamadı.";}});
+setInterval(()=>{if(!$("messages").classList.contains("hidden")){loadChatConversations();if(activeChatId)openAdminChat(activeChatId);}},15000);
+
 $("profileCoverFile").addEventListener("change",e=>saveProfileImage("cover",e.target.files[0]));
 let activeChatId=null;
 async function loadChatConversations(){const list=$("chatConversationList");try{const r=await fetch("/api/chat?admin=1",{credentials:"same-origin"});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||"Mesajlar alınamadı.");const rows=d.conversations||[];$("chatUnreadBadge").textContent=rows.reduce((n,x)=>n+Number(x.unread||0),0);list.innerHTML=rows.length?rows.map(x=>'<button type="button" data-chat-id="'+Number(x.id)+'" style="display:block;width:100%;text-align:left;padding:12px;margin:6px 0;border:1px solid var(--border);border-radius:9px;background:var(--panel);color:var(--text);cursor:pointer"><b>#'+Number(x.id)+' · '+escapeHtml(x.visitor_name||"Ziyaretçi")+'</b><small style="display:block;color:var(--muted);margin-top:5px">'+escapeHtml(x.last_message||"Henüz mesaj yok").slice(0,90)+'</small><small>'+ (x.status==="open"?"Açık":"Kapalı")+' · Okunmamış: '+Number(x.unread||0)+'</small></button>').join(""):"Henüz mesaj yok.";list.querySelectorAll("[data-chat-id]").forEach(b=>b.addEventListener("click",()=>openAdminChat(Number(b.dataset.chatId))));}catch(e){list.textContent=e.message;}}
