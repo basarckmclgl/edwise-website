@@ -37,10 +37,10 @@ export async function onRequestGet({ request, env }) {
       FROM admin_sessions s
       INNER JOIN admins a ON a.id = s.admin_id
       WHERE s.token_hash = ?
-        AND s.expires_at > ?
-        AND a.is_active = 1
+        AND datetime(s.expires_at) > datetime('now')
+      AND a.is_active = 1
       LIMIT 1
-    `).bind(tokenHash, new Date().toISOString()).first();
+    `).bind(tokenHash).first();
 
     if (!admin) {
       return json({ success: false, authenticated: false }, 401);
