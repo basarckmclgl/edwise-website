@@ -1959,10 +1959,11 @@ function renderGoogleAnalytics(data){
 }
 function renderAnalytics(data){
  window._edwiseAnalyticsData=data;renderGoogleAnalytics(data);const ga=data.googleAnalytics||{},gt=ga.totals||{};const cf=data.cloudflare||{},t=cf.totals||{},cfUnavailable=!!cf.unavailable||(!cf.configured&&/CF_ZONE_TAG|CF_ANALYTICS_API_TOKEN/.test(cf.error||""));
- $("homeGaUsers").textContent=ga.configured?analyticsNumber(gt.activeUsers):"—";$("homeGaSessions").textContent=ga.configured?analyticsNumber(gt.sessions):"—";$("homeGaViews").textContent=ga.configured?analyticsNumber(gt.pageViews):"—";$("homeGaRealtime").textContent=ga.configured&&ga.realtime?analyticsNumber(ga.realtime.activeUsers):"—";
- $("cfUnique").textContent=cf.configured?analyticsNumber(t.dailyUniqueIpTotal):"—";
- $("cfRequests").textContent=cf.configured?analyticsNumber(t.requests):"—";
- $("cfCountryCount").textContent=cf.configured?analyticsNumber((cf.countries||[]).length):"—";
+ const gaFallback=ga.error?"Hata":"—",cfFallback=cf.unavailable?"Ayar eksik":(cf.error?"Hata":"—");
+ $("homeGaUsers").textContent=ga.configured?analyticsNumber(gt.activeUsers):gaFallback;$("homeGaSessions").textContent=ga.configured?analyticsNumber(gt.sessions):gaFallback;$("homeGaViews").textContent=ga.configured?analyticsNumber(gt.pageViews):gaFallback;$("homeGaRealtime").textContent=ga.configured&&ga.realtime?analyticsNumber(ga.realtime.activeUsers):(ga.realtimeError?"Hata":gaFallback);
+ $("cfUnique").textContent=cf.configured?analyticsNumber(t.dailyUniqueIpTotal):cfFallback;
+ $("cfRequests").textContent=cf.configured?analyticsNumber(t.requests):cfFallback;
+ $("cfCountryCount").textContent=cf.configured?analyticsNumber((cf.countries||[]).length):cfFallback;
  $("analyticsMessage").className="message "+(cfUnavailable?"":cf.error?"error":"success");
  $("analyticsMessage").textContent=cfUnavailable?"Cloudflare Analytics yapılandırılmadı; bu durum yönetim panelinin diğer özelliklerini etkilemez.":cf.error?cf.error:"Cloudflare verileri alındı. Dönem: "+data.period.startDate+" – "+data.period.endDate;
  if(cf.pathWarning)$("analyticsMessage").textContent+=" Sayfa yolu raporu: "+cf.pathWarning;
