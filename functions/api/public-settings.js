@@ -12,8 +12,7 @@ export async function onRequestGet(context){
   const menuRow=await context.env.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key='menu_theme' LIMIT 1").first();
   let menu=[];
   if(menuRow?.setting_value){try{menu=JSON.parse(menuRow.setting_value);}catch{}}
-  const removedKeys=new Set(["guide"]);
-  menu=Array.isArray(menu)?menu.filter(item=>!removedKeys.has(item?.key)&&item?.url!=="/edwise-rehber.html"):[];
-  return Response.json({success:true,theme,menu},{headers:{"Cache-Control":"public, max-age=60"}});
+  menu=Array.isArray(menu)?menu.filter(item=>item&&item.visible!==false).sort((a,b)=>(a.order??0)-(b.order??0)):[];
+  return Response.json({success:true,theme,menu},{headers:{"Cache-Control":"no-store, max-age=0"}});
  }catch(error){return Response.json({success:false,message:"Tasarım ayarları alınamadı."},{status:500});}
 }
