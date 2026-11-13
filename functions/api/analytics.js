@@ -61,7 +61,7 @@ async function onGoogleAnalytics(env,startDate,endDate){
 }
 
 async function onCloudflare(env,startDate,endDate){
- if(!env.CF_ZONE_TAG||!env.CF_ANALYTICS_API_TOKEN)return {configured:false,error:"Cloudflare için CF_ZONE_TAG ve CF_ANALYTICS_API_TOKEN ayarlanmalı."};
+ if(!env.CF_ZONE_TAG||!env.CF_ANALYTICS_API_TOKEN)return {configured:false,unavailable:true};
  const headers={Authorization:"Bearer "+env.CF_ANALYTICS_API_TOKEN,"Content-Type":"application/json"};
  const query=`query($zone:String!,$from:Date!,$to:Date!){viewer{zones(filter:{zoneTag:$zone}){httpRequests1dGroups(limit:100,filter:{date_geq:$from,date_leq:$to},orderBy:[date_ASC]){dimensions{date} sum{requests countryMap{clientCountryName requests}} uniq{uniques}}}}}`;
  const result=await fetchJson("https://api.cloudflare.com/client/v4/graphql",{method:"POST",headers,body:JSON.stringify({query,variables:{zone:env.CF_ZONE_TAG,from:startDate,to:endDate}})},12000);
