@@ -266,7 +266,7 @@
     fetch("/api/public-settings", { headers: { "Accept": "application/json" }, cache: "no-store" })
       .then(response => response.ok ? response.json() : null)
       .then(data => {
-        if (!data || !data.success || !Array.isArray(data.menu) || !data.menu.length) return;
+        if (!data || !data.success || data.menuConfigured !== true || !Array.isArray(data.menu)) return;
         const languagePicker = siteMenu.querySelector(".dropdown-languages");
         const firstDivider = languagePicker?.nextElementSibling?.classList.contains("dropdown-divider")
           ? languagePicker.nextElementSibling : null;
