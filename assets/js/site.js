@@ -260,32 +260,50 @@
 
   const siteMenu = document.querySelector('#site-menu');
 
-  // Ziyaretçi ana menüsünde yalnızca ana gezinme bağlantıları bulunur.
-  // CMS sayfaları otomatik olarak ana menüye eklenmez; ilgili içerik alanlarında
-  // (Hizmet Yönetimi, Sayfa Yönetimi ve footer yasal bağlantıları) yönetilir.
-  (function applyCoreMenuVisibility() {
+  // Menü bağlantıları yönetim panelinde yayımlanan D1 kaydından oluşturulur.
+  (function applyPublishedNavigation() {
     if (!siteMenu) return;
     fetch("/api/public-settings", { headers: { "Accept": "application/json" }, cache: "no-store" })
       .then(response => response.ok ? response.json() : null)
       .then(data => {
-        if (!data || !data.success || !Array.isArray(data.menu)) return;
-        const keyFor = link => {
-          const path = new URL(link.href, location.origin).pathname;
-          if (link.classList.contains("menu-contact")) return "contact-cta";
-          if (path === "/" || path.endsWith("/index.html")) return "home";
-          if (path.endsWith("/hizmetlerimiz.html")) return "services";
-          if (path.endsWith("/hakkimizda.html")) return "about";
-          if (path.endsWith("/basvuru.html")) return "apply";
-          if (path.endsWith("/iletisim.html")) return "contact";
-          return null;
-        };
-        siteMenu.querySelectorAll(":scope > a").forEach(link => {
-          const key = keyFor(link);
-          const setting = key && data.menu.find(item => item.key === key);
-          if (setting) link.style.display = setting.visible === false ? "none" : "";
+        if (!data || !data.success || !Array.isArray(data.menu) || !data.menu.length) return;
+        const languagePicker = siteMenu.querySelector(".dropdown-languages");
+        const firstDivider = languagePicker?.nextElementSibling?.classList.contains("dropdown-divider")
+          ? languagePicker.nextElementSibling : null;
+        [...siteMenu.children].forEach(child => {
+          if (child !== languagePicker && child !== firstDivider) child.remove();
         });
+        const lang = (localStorage.getItem("edwise-language") || "tr");
+        const dictionary = EDWISE_I18N[lang] || {};
+        const items = [...data.menu].sort((a,b)=>(a.order??0)-(b.order??0));
+        const mainItems = items.filter(item => item.group !== "contact");
+        const contactItems = items.filter(item => item.group === "contact");
+        const appendItem = item => {
+          const link = document.createElement("a");
+          link.href = item.url;
+          if (item.key === "apply") link.classList.add("menu-apply");
+          if (item.group === "contact") link.classList.add("menu-contact");
+          const icon = document.createElement("span");
+          icon.className = "menu-item-icon";
+          icon.setAttribute("aria-hidden","true");
+          icon.textContent = item.icon || "↗";
+          const label = document.createElement("span");
+          label.textContent = dictionary[item.label] || item.label;
+          link.append(icon,label);
+          const destination = new URL(item.url, location.origin);
+          if (destination.origin !== location.origin) { link.target="_blank"; link.rel="noopener noreferrer"; }
+          if (destination.pathname === location.pathname) link.setAttribute("aria-current","page");
+          siteMenu.appendChild(link);
+        };
+        mainItems.forEach(appendItem);
+        if (contactItems.length) {
+          const divider = document.createElement("div");
+          divider.className = "dropdown-divider";
+          siteMenu.appendChild(divider);
+          contactItems.forEach(appendItem);
+        }
       })
-      .catch(error => console.warn("Menü ayarları yüklenemedi:", error));
+      .catch(error => console.warn("Yayımlanan menü yüklenemedi:", error));
   })();
 
   function setMenuOpen(open) {
@@ -300,7 +318,7 @@
 
   menuButton.addEventListener('click', () => setMenuOpen(!siteMenu.classList.contains('open')));
 
-  siteMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenuOpen(false)));
+  siteMenu.addEventListener('click', event => { if (event.target.closest('a')) setMenuOpen(false); });
 
   document.addEventListener('click', event => {
 
