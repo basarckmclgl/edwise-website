@@ -25,21 +25,12 @@ export async function onRequestGet({ params, env }) {
   const match = filename.match(/^([a-f0-9-]{36})\.(jpg|png|webp|gif)$/i);
   if (!match) return response("Geçersiz görsel adresi.", 400);
 
-  const token = env.GITHUB_TOKEN;
-  const repo = env.GITHUB_REPO;
-  if (!token || !repo) return response("Görsel deposu yapılandırılmamış.", 500);
-
   try {
+    // Public repository media is fetched directly; preview deployments do not
+    // depend on optional GITHUB_TOKEN / GITHUB_REPO environment variables.
     const upstream = await fetch(
-      "https://api.github.com/repos/" + repo + "/contents/media/" + filename + "?ref=main",
-      {
-        headers: {
-          "Authorization": "Bearer " + token,
-          "Accept": "application/vnd.github.raw",
-          "X-GitHub-Api-Version": "2022-11-28",
-          "User-Agent": "EDWISE-CMS"
-        }
-      }
+      "https://raw.githubusercontent.com/basarckmclgl/edwise-website/main/media/" + encodeURIComponent(filename),
+      { headers: { "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8" } }
     );
 
     if (!upstream.ok) {
