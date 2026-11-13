@@ -98,7 +98,7 @@ export async function onRequestPost(context) {
     const auth = await authorized(context);
     if (auth.response) return auth.response;
 
-    await ensureTrashColumn(context.env.DB);
+    await ensureTrashTable(context.env.DB);
     const data = await context.request.json();
 
     if (data.action === "restore") {
@@ -130,7 +130,7 @@ export async function onRequestPost(context) {
         const content = String(page.content || "");
         const status = page.status === "published" ? "published" : "draft";
         if (!title || !slug || !content) continue;
-        const existing = await context.env.DB.prepare("SELECT * FROM pages WHERE slug = ? LIMIT 1").bind(slug).first();
+        const existing = await context.env.DB.prepare("SELECT p.* FROM pages p WHERE p.slug = ? AND NOT EXISTS (SELECT 1 FROM preview_page_trash t WHERE t.page_id = p.id) LIMIT 1").bind(slug).first();
         if (existing) {
           await context.env.DB.prepare(`UPDATE pages SET title=?, content=?, meta_title=?, meta_description=?, status=?, updated_at=datetime('now') WHERE id=?`)
             .bind(title, content, String(page.meta_title || "").slice(0, 200), String(page.meta_description || "").slice(0, 500), status, existing.id).run();
@@ -217,7 +217,7 @@ export async function onRequestPut(context) {
       return json({ success: false, message: "Geçersiz yayın durumu." }, 400);
     }
 
-    await ensureTrashColumn(context.env.DB);
+    await ensureTrashTable(context.env.DB);
     const before = await context.env.DB.prepare("SELECT p.* FROM pages p WHERE p.id = ? AND NOT EXISTS (SELECT 1 FROM preview_page_trash t WHERE t.page_id = p.id)").bind(id).first();
     if (!before) return json({ success: false, message: "Sayfa bulunamadı." }, 404);
 
@@ -261,15 +261,15 @@ export async function onRequestDelete(context) {
     const auth = await authorized(context);
     if (auth.response) return auth.response;
 
-    await ensureTrashColumn(context.env.DB);
+    await ensureTrashTable(context.env.DB);
     const id = Number(new URL(context.request.url).searchParams.get("id"));
 
     if (!Number.isInteger(id) || id < 1) {
       return json({ success: false, message: "Geçerli bir sayfa numarası belirtilmedi." }, 400);
     }
 
-    const before = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(id).first();
-    if (!before) return json({ success: false, message: "Sayfa bulunamadı." }, 404);
+    const before = await context.env.DB.prepare("SELECT p.* FROM pages p WHERE p.id = ? AND NOT EXISTS (SELECT 1 FROM preview_page_trash t WHERE t.page_id = p.id)").bind(id).first();
+    if (!before) return json({ success: false, message: "Sayfa bulunamadı veya zaten silinmiş." }, 404);
     const result = await context.env.DB.prepare(
       `INSERT INTO preview_page_trash (page_id) SELECT id FROM pages WHERE id = ? AND NOT EXISTS (SELECT 1 FROM preview_page_trash WHERE page_id = ?) ON CONFLICT(page_id) DO NOTHING`
     ).bind(id, id).run();
