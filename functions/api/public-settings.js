@@ -13,6 +13,6 @@ export async function onRequestGet(context){
   let menu=[];
   if(menuRow?.setting_value){try{menu=JSON.parse(menuRow.setting_value);}catch{}}
   menu=Array.isArray(menu)?menu.filter(item=>item&&item.visible!==false).sort((a,b)=>(a.order??0)-(b.order??0)):[];
-  return Response.json({success:true,theme,menu},{headers:{"Cache-Control":"no-store, max-age=0"}});
+  return Response.json({success:true,theme,menu,menuConfigured:!!menuRow},{headers:{"Cache-Control":"no-store, max-age=0"}});
  }catch(error){return Response.json({success:false,message:"Tasarım ayarları alınamadı."},{status:500});}
 }
