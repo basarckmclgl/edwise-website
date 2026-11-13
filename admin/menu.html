@@ -71,23 +71,25 @@ async function save(){
   const pageResponse=await fetch('/api/pages',{headers:{"Accept":"application/json"},credentials:'same-origin',cache:'no-store'});
   const pageData=await pageResponse.json();
   if(!pageResponse.ok||!pageData.success)throw new Error(pageData.message||'Sayfa kayıtları kontrol edilemedi.');
-  const existingSlugs=new Set((pageData.pages||[]).map(p=>p.slug));
+  const pageBySlug=new Map((pageData.pages||[]).map(p=>[p.slug,p]));
   for(const item of items){
    if(!String(item.id||'').startsWith('custom_')||/^https:\/\//i.test(item.url))continue;
    const slug=makeSlug(item.title);
    if(!slug)throw new Error('"'+item.title+'" başlığı geçerli bir sayfa adresi üretmiyor.');
-   if(!existingSlugs.has(slug)){
+   let page=pageBySlug.get(slug);
+   if(!page){
     const created=await fetch('/api/pages',{method:'POST',headers:apiHeaders,credentials:'same-origin',body:JSON.stringify({title:item.title,slug,content:'<p>Bu sayfa Menü Yönetimi üzerinden oluşturuldu.</p><p>İçeriğini Sayfa Yönetimi bölümünden düzenleyebilirsiniz.</p>',meta_title:item.title+' | EDWISE',meta_description:'EDWISE '+item.title+' sayfası.',status:'draft'})});
     const result=await created.json();
     if(!created.ok||!result.success)throw new Error('"'+item.title+'" için taslak sayfa oluşturulamadı: '+(result.message||'Bilinmeyen hata'));
-    existingSlugs.add(slug);
+    page={slug,status:'draft'};pageBySlug.set(slug,page);
    }
    item.url='/pages/sayfa.html?slug='+encodeURIComponent(slug);
+   if(page.status!=='published')item.visible=false;
   }
   const payload=items.map((x,i)=>({key:String(x.id||('menu_'+i)),label:String(x.title||'').trim(),url:normalizeUrl(x.url),icon:x.icon||'',group:x.group==='contact'?'contact':'main',visible:x.visible!==false}));
   const r=await fetch('/api/settings',{method:'POST',headers:apiHeaders,credentials:'same-origin',body:JSON.stringify({action:'save_menu',items:payload})});
   const d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||'Menü kaydedilemedi.');
-  show('Menü kaydedildi. Yayındaki site menüsü güncellendi.','ok');
+  show('Menü kaydedildi. Yeni yerel menü öğeleri için taslak sayfalar Sayfa Yönetimi’ne eklendi. Taslaklar yayımlanana kadar ziyaretçilere gösterilmez.','ok');
   await load();
  }catch(e){show(e.message||'Kaydetme sırasında hata oluştu.','err');}
  finally{saving=false;setBusy(false);}
