@@ -26,7 +26,7 @@ export async function onRequestGet(context) {
     `).all();
     const media = (result.results || []).map(item => ({
       ...item,
-      file_url: `https://raw.githubusercontent.com/basarckmclgl/edwise-website/main/media/${encodeURIComponent(item.file_name)}`
+      file_url: item.file_url || `/api/media/${encodeURIComponent(item.file_name)}`
     }));
     return Response.json({success:true,media,metadata_supported:true});
   } catch (error) {
