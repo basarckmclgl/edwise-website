@@ -54,14 +54,14 @@ let items=defaults.map(x=>({...x}));let selected=null;let saving=false;
 const apiHeaders={"Accept":"application/json","Content-Type":"application/json"};
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function show(t,type){const n=document.getElementById('notice');n.textContent=t;n.className='notice show '+type;}
-function normalizeUrl(value){const raw=String(value||'').trim();if(/^https:\/\//i.test(raw))return raw;if(/^http:\/\//i.test(raw))throw new Error('Güvenlik için dış bağlantılarda https:// kullanın.');if(raw.startsWith('//')||/^javascript:/i.test(raw))throw new Error('Geçersiz bağlantı adresi.');return '/'+raw.replace(/^\.\//,'').replace(/^\/+,'');}
+function normalizeUrl(value){const raw=String(value||'').trim();if(/^https:\/\//i.test(raw))return raw;if(/^http:\/\//i.test(raw))throw new Error('Güvenlik için dış bağlantılarda https:// kullanın.');if(raw.startsWith('//')||/^javascript:/i.test(raw))throw new Error('Geçersiz bağlantı adresi.');return '/'+raw.replace(/^\.\//,'').replace(/^\/+/, '');}
 async function load(){
  try{
   const r=await fetch('/api/settings',{headers:{"Accept":"application/json"},credentials:'same-origin',cache:'no-store'});
   const d=await r.json();
   if(r.status===401){location.replace('/admin/');return;}
   if(!r.ok||!d.success)throw new Error(d.message||'Menü ayarları alınamadı.');
-  if(Array.isArray(d.menu)&&d.menu.length)items=d.menu.map((x,i)=>({id:x.key||('menu_'+i),title:x.label||'',url:x.url||'/',icon:x.icon||'',group:x.group==='contact'?'contact':'main',visible:x.visible!==false}));
+  if(Array.isArray(d.menu))items=d.menu.map((x,i)=>({id:x.key||('menu_'+i),title:x.label||'',url:x.url||'/',icon:x.icon||'',group:x.group==='contact'?'contact':'main',visible:x.visible!==false}));
   render();
  }catch(e){show(e.message||'Menü verileri yüklenemedi.','err');render();}
 }
