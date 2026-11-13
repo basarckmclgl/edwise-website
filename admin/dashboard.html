@@ -1587,7 +1587,7 @@ function message(text,type="error"){
 }
 
 async function api(url,options={}){
- const response=await fetch(url,{credentials:"same-origin",...options});
+ const response=await fetch(url,{credentials:"same-origin",cache:"no-store",...options});
  let data;
 
  try{
@@ -1597,12 +1597,25 @@ async function api(url,options={}){
  }
 
  if(response.status===401){
-  location.replace("/admin/");
-  throw new Error("Oturumunuz sona erdi.");
+  // Bir modülün API yanıtı tek başına tarayıcı oturumunun bittiğini kanıtlamaz.
+  // Önce ana oturum uç noktasını doğrula; yalnızca gerçek oturum kaybında girişe dön.
+  let sessionValid=false;
+  try{
+   const sessionResponse=await fetch("/api/me",{credentials:"same-origin",cache:"no-store"});
+   if(sessionResponse.ok){
+    const sessionData=await sessionResponse.json();
+    sessionValid=!!(sessionData.success&&sessionData.admin);
+   }
+  }catch{}
+  if(!sessionValid){
+   location.replace("/admin/");
+   throw new Error("Yönetici oturumu sona erdi. Lütfen yeniden giriş yapın.");
+  }
+  throw new Error(data.message||"Bu modülün erişim doğrulaması başarısız oldu. Oturumunuz açık; sayfadan ayrılmadınız.");
  }
 
  if(response.status===403){
-  throw new Error("Bu işlem için yetkiniz bulunmuyor.");
+  throw new Error(data.message||"Bu işlem için yetkiniz bulunmuyor.");
  }
 
  if(!response.ok||!data.success){
