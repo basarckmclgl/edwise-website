@@ -617,6 +617,10 @@ html,body{background:#f4f6fc!important;color:#292541!important;font-family:Inter
 .welcome .btn{background:#ffffff20!important;border:1px solid #ffffff55!important;color:#fff!important}
 .grid{gap:14px!important}
 .stat,.panel,.module{background:#fff!important;border:1px solid #e9eaf3!important;border-radius:13px!important;box-shadow:0 3px 13px rgba(44,34,78,.045)!important;color:#302a45!important}
+#overview>.grid:first-of-type{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;align-items:stretch!important}
+#overview .analytics-stats{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;align-items:stretch!important}
+@media(max-width:900px){#overview>.grid:first-of-type{grid-template-columns:repeat(2,minmax(0,1fr))!important}#overview .analytics-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:520px){#overview>.grid:first-of-type,#overview .analytics-stats{grid-template-columns:1fr!important}}
 #overview>.grid:first-of-type .stat{position:relative;overflow:hidden;min-height:112px;padding:17px 18px!important;border:0!important;color:#fff!important}
 #overview>.grid:first-of-type .stat:nth-child(1){background:linear-gradient(130deg,#d64fb5,#b83db4)!important}
 #overview>.grid:first-of-type .stat:nth-child(2){background:linear-gradient(130deg,#8954d8,#6844c7)!important}
