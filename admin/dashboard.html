@@ -1831,7 +1831,8 @@ $("resetTheme").addEventListener("click",()=>{fillTheme(themeDefaults);themeMess
 $("saveThemeDraft").addEventListener("click",()=>saveTheme("draft"));$("publishTheme").addEventListener("click",()=>saveTheme("publish"));
 async function saveTheme(action){const btn=action==="publish"?$("publishTheme"):$("saveThemeDraft");btn.disabled=true;try{const d=await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action,theme:currentTheme()})});themeMessage(d.message,"success");}catch(e){themeMessage(e.message,"error");}finally{btn.disabled=false;}}
 Object.values(themeFields).forEach(id=>$(id).addEventListener("input",()=>applyThemePreview(currentTheme())));
-$("designPreviewFrame").addEventListener("load",()=>{applyThemePreview(currentTheme());enablePreviewTextEditing();});
+function applyPreviewOnlyMessageTabRemoval(){try{const frame=$("designPreviewFrame"),doc=frame&&frame.contentDocument;if(!doc||!doc.body)return;doc.querySelectorAll(".whatsapp-float,[aria-label*=\"Bize mesaj gönderin\" i],[title*=\"Bize mesaj gönderin\" i]").forEach(el=>el.remove());}catch(error){console.warn("Önizleme mesaj sekmesi gizlenemedi:",error);}}
+$("designPreviewFrame").addEventListener("load",()=>{applyThemePreview(currentTheme());enablePreviewTextEditing();applyPreviewOnlyMessageTabRemoval();});
 async function loadMenuSettings(){
  try{
   const [pageData,settingsData]=await Promise.all([api("/api/pages"),api("/api/settings")]);
