@@ -41,5 +41,9 @@ $("#slug").addEventListener("input",()=>$("#slug").dataset.touched="1");
 $("#previewBtn").onclick=()=>{updatePreview();note("Önizleme güncellendi. Henüz kaydedilmedi.");};
 $("#back").onclick=()=>location.href="/admin-v2/";
 $("#saveBtn").onclick=async()=>{const p=getPayload();if(!p.title||!p.slug){note("Sayfa başlığı ve URL adresi zorunludur.",true);return;}const btn=$("#saveBtn");btn.disabled=true;btn.textContent="Kaydediliyor…";try{if(pageId){await api("/api/pages",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:pageId,...p})});note("Sayfa güncellendi. Mevcut site API'si kullanıldı.");}else{const d=await api("/api/pages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});pageId=d.id;history.replaceState(null,"","?id="+pageId);$("#pageHeading").textContent="Sayfayı düzenle";note("Sayfa kaydedildi. Kayıt numarası: "+pageId);} }catch(e){note(e.message,true);}finally{btn.disabled=false;btn.textContent="Kaydet";}};
+// Güvenli test veritabanı bağlanana kadar canlı veriye yazmayı engelle.
+$("#saveBtn").disabled=true;
+$("#saveBtn").textContent="Test veritabanı bekleniyor";
+
 init();
 </script></body></html>
