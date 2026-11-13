@@ -1,5 +1,6 @@
 
 import { requireEditor } from "./_auth.js";
+import { logAudit } from "./_audit.js";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -248,12 +249,16 @@ export async function onRequestPost(context) {
       ) VALUES (${placeholders})`
     ).bind(...insertValues).run();
 
+    const createdId = integerId ? result.meta?.last_row_id : id;
+    const auditAuth = await requireEditor(context);
+    await logAudit(context.env.DB,context.request,auditAuth.admin,{
+      action:"service_created",entity_type:"service",entity_id:createdId,entity_title:values.title,
+      details:{before:null,after:{...values,id:createdId}}
+    });
     return json({
       success: true,
       message: "Hizmet oluşturuldu.",
-      id: integerId
-        ? result.meta?.last_row_id
-        : id
+      id: createdId
     }, 201);
 
   } catch (error) {
@@ -299,6 +304,8 @@ export async function onRequestPut(context) {
       }, 400);
     }
 
+    const before = await context.env.DB.prepare("SELECT * FROM services WHERE id=?").bind(id).first();
+    if (!before) return json({success:false,message:"Hizmet bulunamadı."},404);
     const values = prepareServiceValues(body);
     const now = new Date().toISOString();
 
@@ -333,6 +340,11 @@ export async function onRequestPut(context) {
       }, 404);
     }
 
+    const auditAuth = await requireEditor(context);
+    await logAudit(context.env.DB,context.request,auditAuth.admin,{
+      action:"service_updated",entity_type:"service",entity_id:id,entity_title:values.title,
+      details:{before,after:{...values,id}}
+    });
     return json({
       success: true,
       message: "Hizmet güncellendi."
@@ -380,6 +392,8 @@ export async function onRequestDelete(context) {
       }, 400);
     }
 
+    const before = await context.env.DB.prepare("SELECT * FROM services WHERE id=?").bind(id).first();
+    if (!before) return json({success:false,message:"Hizmet bulunamadı."},404);
     const result = await context.env.DB.prepare(
       "DELETE FROM services WHERE id = ?"
     ).bind(id).run();
@@ -391,6 +405,11 @@ export async function onRequestDelete(context) {
       }, 404);
     }
 
+    const auditAuth = await requireEditor(context);
+    await logAudit(context.env.DB,context.request,auditAuth.admin,{
+      action:"service_deleted",entity_type:"service",entity_id:id,entity_title:before.title,
+      details:{before,after:null}
+    });
     return json({
       success: true,
       message: "Hizmet silindi."
