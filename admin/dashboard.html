@@ -1085,7 +1085,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
 
 <section id="sitesettings" class="hidden" data-superadmin>
  <div class="section-head"><div><h2>Site Ayarları</h2><p>Panel tercihlerini ve web sitesinin tasarım önizlemesini buradan yönetin.</p></div></div>
- <div class="panel" style="margin-bottom:18px;border:1px solid #c89b42"><div class="section-head"><div><h3>Acil Site Kontrolü</h3><p class="muted" id="siteControlStatus">Site durumu kontrol ediliyor...</p></div><button class="btn" type="button" id="siteMaintenanceToggle">Durumu Yükle</button></div><p class="muted">Bakım modu ziyaretçilere geçici bakım ekranı gösterir. Yönetim paneli ve yönetici API erişimi açık kalır.</p></div>
+ <div class="panel" style="margin-bottom:18px;border:1px solid #c89b42"><div class="section-head"><div><h3>Acil Site Kontrolü</h3><p class="muted" id="siteControlStatus">Site durumu kontrol ediliyor...</p></div><button class="btn" type="button" id="siteMaintenanceToggle" disabled>Durumu Yükle</button></div><p class="muted">Bakım modu ziyaretçilere geçici bakım ekranı gösterir. Yönetim paneli ve yönetici API erişimi açık kalır.</p></div>
  <div class="panel" style="margin-bottom:18px"><div class="section-head"><div><h3>Site Tasarım Merkezi</h3><p>Web sitenizin sayfalarını yönetim paneli içinden görüntüleyin ve tasarım önizlemesini açın.</p></div><button class="primary" type="button" id="openDesignCenterFromSettings">Site Tasarım Merkezini Aç</button></div></div>
  <div id="siteSettingsMessage"></div>
  <div class="settings-search-wrap">
@@ -2750,8 +2750,8 @@ $("refreshChats").addEventListener("click",loadChatConversations);
 
 async function loadSiteControl(){
  const status=$("siteControlStatus"),button=$("siteMaintenanceToggle");if(!status||!button)return;
- try{const data=await api("/api/site-control");const maintenance=data.status==="maintenance";status.textContent=maintenance?"Site bakım modunda · Yönetim paneli açık":"Site yayında · Ziyaretçiler erişebiliyor";button.textContent=maintenance?"Siteyi Yeniden Yayına Aç":"Siteyi Bakım Moduna Al";button.dataset.maintenance=String(maintenance);button.classList.toggle("primary",maintenance);}
- catch(error){status.textContent="Site durumu alınamadı: "+error.message;button.textContent="Tekrar Dene";}
+ try{const data=await api("/api/site-control");const maintenance=data.status==="maintenance";status.textContent=maintenance?"Site bakım modunda · Yönetim paneli açık":"Site yayında · Ziyaretçiler erişebiliyor";button.textContent=maintenance?"Siteyi Yeniden Yayına Aç":"Siteyi Bakım Moduna Al";button.dataset.maintenance=String(maintenance);button.classList.toggle("primary",maintenance);button.disabled=false;}
+ catch(error){status.textContent="Site durumu alınamadı: "+error.message;button.textContent="Tekrar Dene";button.disabled=false;}
 }
 $("siteMaintenanceToggle")?.addEventListener("click",async()=>{
  const button=$("siteMaintenanceToggle"),maintenance=button.dataset.maintenance!=="true";
