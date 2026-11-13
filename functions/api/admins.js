@@ -1,5 +1,6 @@
 
 import { requireSuperAdmin } from "./_auth.js";
+import { logAudit } from "./_audit.js";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -141,11 +142,8 @@ export async function onRequestPost(context) {
       VALUES (?, ?, ?, 'content_admin', 1, datetime('now'), datetime('now'))
     `).bind(username, email, passwordHash).run();
 
-    return json({
-      success: true,
-      message: "Yeni kullanıcı oluşturuldu.",
-      id: result.meta?.last_row_id
-    }, 201);
+    await logAudit(context.env.DB,context.request,auth.admin,{action:"admin_created",entity_type:"admin",entity_id:result.meta?.last_row_id,entity_title:username,details:{email,role:"content_admin",is_active:true}});
+    return json({success:true,message:"Yeni kullanıcı oluşturuldu.",id:result.meta?.last_row_id},201);
 
   } catch (error) {
     const message = String(error?.message || error);
@@ -195,7 +193,7 @@ export async function onRequestPut(context) {
     }
 
     const target = await context.env.DB.prepare(
-      "SELECT id, role FROM admins WHERE id = ?"
+      "SELECT id, username, email, role, is_active FROM admins WHERE id = ?"
     ).bind(id).first();
 
     if (!target) {
@@ -283,10 +281,8 @@ WHERE id = ?
       ).bind(id).run();
     }
 
-    return json({
-      success: true,
-      message: "Kullanıcı bilgileri güncellendi."
-    });
+    await logAudit(context.env.DB,context.request,auth.admin,{action:"admin_updated",entity_type:"admin",entity_id:id,entity_title:username,details:{before:{username:target.username,email:target.email,is_active:Boolean(target.is_active)},after:{username,email,is_active:data.is_active},password_changed:Boolean(password)}});
+    return json({success:true,message:"Kullanıcı bilgileri güncellendi."});
 
   } catch (error) {
     const message = String(error?.message || error);
@@ -337,7 +333,7 @@ export async function onRequestDelete(context) {
     }
 
     const target = await context.env.DB.prepare(
-      "SELECT role FROM admins WHERE id = ?"
+      "SELECT username, role, is_active FROM admins WHERE id = ?"
     ).bind(id).first();
 
     if (!target) {
@@ -365,10 +361,8 @@ export async function onRequestDelete(context) {
       "DELETE FROM admin_sessions WHERE admin_id = ?"
     ).bind(id).run();
 
-    return json({
-      success: true,
-      message: "Kullanıcının erişimi kaldırıldı."
-    });
+    await logAudit(context.env.DB,context.request,auth.admin,{action:"admin_access_revoked",entity_type:"admin",entity_id:id,entity_title:target.username,details:{before:{is_active:Boolean(target.is_active)},after:{is_active:false},sessions_revoked:true}});
+    return json({success:true,message:"Kullanıcının erişimi kaldırıldı."});
 
   } catch (error) {
     return json({
