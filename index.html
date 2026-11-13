@@ -15,25 +15,7 @@
 <meta property="og:url" content="https://edwisedanismanlik.com/"/>
 <meta property="og:image" content="https://edwisedanismanlik.com/assets/images/logo.png"/>
 <meta name="twitter:card" content="summary"/>
-<style>
-.edwise-search{position:fixed;left:22px;bottom:22px;z-index:1100}
-.edwise-search-toggle{width:54px;height:54px;border:0;border-radius:50%;background:#39216f;color:#fff;display:grid;place-items:center;font-size:25px;box-shadow:0 7px 22px #24133a38;cursor:pointer}
-.edwise-search-toggle:hover{background:#523091;transform:translateY(-1px)}
-.edwise-search-panel{position:absolute;left:0;bottom:66px;width:min(350px,calc(100vw - 36px));padding:15px;background:#fff;border:1px solid #e2d9f0;border-radius:15px;box-shadow:0 14px 38px #24133a30;display:none}
-.edwise-search.open .edwise-search-panel{display:block}
-.edwise-search-inner{position:relative}
-.edwise-search-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;color:#39216f;font-weight:700;font-size:14px}
-.edwise-search-close{border:0;background:#f2eef8;color:#59477a;border-radius:50%;width:28px;height:28px;font-size:19px;cursor:pointer}
-.edwise-search-control{display:flex;align-items:center;gap:8px;background:#faf9fd;border:1px solid #d8cdef;border-radius:10px;padding:0 10px}
-.edwise-search-control span{font-size:21px;color:#6841b5}
-.edwise-search-control input{width:100%;min-width:0;border:0;outline:0;padding:11px 0;background:transparent;color:#241b35;font:inherit;font-size:14px}
-.edwise-search-control button{border:0;background:transparent;font-size:21px;color:#766b86;cursor:pointer}
-.edwise-search-results{position:absolute;left:0;right:0;bottom:calc(100% + 7px);max-height:280px;overflow:auto;background:#fff;border:1px solid #e2d9f0;border-radius:12px;box-shadow:0 12px 26px #24133a20}
-.edwise-search-results a{display:block;padding:10px 13px;color:#33234d;text-decoration:none;border-bottom:1px solid #f0ebf6;font-size:13px}
-.edwise-search-results a:hover{background:#f7f3ff}
-.edwise-search-results small{display:block;color:#827791;margin-top:3px;font-size:11px}
-@media(max-width:640px){.edwise-search{left:14px;bottom:18px}.edwise-search-toggle{width:50px;height:50px}.edwise-search-panel{width:min(320px,calc(100vw - 28px))}}
-</style>
+
 <link href="assets/css/style.css" rel="stylesheet"/>
 
 <script type="application/ld+json">
@@ -94,20 +76,7 @@
 </nav>
 </header>
 
-<section class="edwise-search" id="edwiseSearchWidget" aria-label="EDWISE site içi arama">
- <button class="edwise-search-toggle" id="edwiseSearchToggle" type="button" aria-label="EDWISE Arama Motorunu aç" aria-expanded="false" title="EDWISE Arama Motoru">⌕</button>
- <div class="edwise-search-panel">
-  <div class="edwise-search-heading"><span>EDWISE Arama Motoru</span><button class="edwise-search-close" id="edwiseSearchClose" type="button" aria-label="Aramayı kapat">×</button></div>
-  <div class="edwise-search-inner">
-   <div class="edwise-search-control">
-    <span aria-hidden="true">⌕</span>
-    <input id="edwiseSearchInput" type="search" placeholder="Ne aramıştınız?" autocomplete="off">
-    <button id="edwiseSearchClear" type="button" aria-label="Aramayı temizle">×</button>
-   </div>
-   <div id="edwiseSearchResults" class="edwise-search-results" hidden aria-live="polite"></div>
-  </div>
- </div>
-</section>
+
 
 <main class="single-page-content" data-page="anasayfa">
 
@@ -199,23 +168,7 @@
 </div>
 
 
-<script>
-(()=> {
- const input=document.getElementById("edwiseSearchInput"),box=document.getElementById("edwiseSearchResults"),clear=document.getElementById("edwiseSearchClear"),widget=document.getElementById("edwiseSearchWidget"),toggle=document.getElementById("edwiseSearchToggle"),close=document.getElementById("edwiseSearchClose");
- if(!input||!box||!widget||!toggle)return;
- const setOpen=open=>{widget.classList.toggle("open",open);toggle.setAttribute("aria-expanded",open?"true":"false");toggle.setAttribute("aria-label",open?"EDWISE Arama Motorunu kapat":"EDWISE Arama Motorunu aç");if(open)input.focus();else box.hidden=true;};
- toggle.addEventListener("click",()=>setOpen(!widget.classList.contains("open")));
- close?.addEventListener("click",()=>setOpen(false));
- document.addEventListener("keydown",event=>{if(event.key==="Escape")setOpen(false);});
- document.addEventListener("click",event=>{if(!widget.contains(event.target))setOpen(false);});
- const targets=[...document.querySelectorAll("main h1,main h2,main h3,main article,main section[id]")].filter(el=>!el.closest(".edwise-search"));
- const entries=targets.map(el=>{const heading=el.matches("h1,h2,h3")?el:el.querySelector("h1,h2,h3");const title=(heading?.innerText||el.getAttribute("aria-label")||"EDWISE içeriği").trim();const text=(el.innerText||"").replace(/\\s+/g," ").trim();const link=el.querySelector('a[href]');let href=link?.getAttribute("href")|| (el.id?"#"+el.id:"#anasayfa");return {title,text,href};}).filter(x=>x.text.length>25);
- let searchSequence=0;
- const escapeText=value=>String(value||"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
- async function render(){const q=input.value.trim();const sequence=++searchSequence;if(!q){box.hidden=true;box.innerHTML="";return;}let cms=[];try{const response=await fetch("/api/site-search?q="+encodeURIComponent(q));const data=await response.json();if(data.success)cms=data.results||[];}catch{}if(sequence!==searchSequence)return;const words=q.toLocaleLowerCase("tr-TR").split(/\s+/).filter(Boolean);const staticResults=entries.map(x=>({title:x.title,description:x.text,type:"static",href:x.href}));const dynamicResults=cms.map(x=>({title:x.title,description:x.description||"",type:x.type,href:x.type==="post"?"/edwise-rehber.html?slug="+encodeURIComponent(x.slug):x.type==="service"?"/#hizmetler":"/pages/"+encodeURIComponent(x.slug)+".html"}));const all=[...dynamicResults,...staticResults];const found=all.map(x=>({...x,score:words.reduce((n,w)=>n+(String(x.title).toLocaleLowerCase("tr-TR").includes(w)?4:0)+(String(x.description).toLocaleLowerCase("tr-TR").includes(w)?1:0),0)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,10);box.innerHTML=found.length?found.map(x=>'<a href="'+escapeText(x.href)+'">'+escapeText(x.title)+'<small>'+escapeText(String(x.description).slice(0,135))+'</small></a>').join(""):'<a href="pages/iletisim.html">Aradığınız içerik bulunamadı.<small>EDWISE ekibiyle iletişime geçebilirsiniz.</small></a>';box.hidden=false;}
- input.addEventListener("input",render);clear?.addEventListener("click",()=>{input.value="";render();input.focus();});document.addEventListener("click",e=>{if(!e.target.closest(".edwise-search-inner"))box.hidden=true;});
-})();
-</script>
+
 <script defer="True" src="assets/js/site.js?v=chat-widget-removed-20261113"></script>
 <script defer="True" src="assets/js/consent-and-forms.js?v=page-analytics-20261112"></script>
 
