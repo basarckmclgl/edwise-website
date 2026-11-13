@@ -54,7 +54,7 @@
 
   <script>
     // Existing authenticated administrators go straight to the new panel preview.
-    fetch("/api/me", {credentials:"same-origin", cache:"no-store"}).then(r=>{if(r.ok) location.replace("/admin/panel-concept-preview.html");}).catch(()=>{});
+    fetch("/api/me", {credentials:"same-origin", cache:"no-store"}).then(r=>{if(r.ok) location.replace("/admin/dashboard.html");}).catch(()=>{});
     const form = document.getElementById("loginForm");
     const button = document.getElementById("loginButton");
     const message = document.getElementById("message");
@@ -90,7 +90,7 @@
 
         if (response.ok && data.success) {
           message.textContent = "Giriş başarılı. Yönlendiriliyorsunuz...";
-          window.location.href = "/admin/panel-concept-preview.html";
+          window.location.href = "/admin/dashboard.html";
           return;
         }
 
