@@ -45,7 +45,9 @@ export async function onRequestPost(context) {
     const fileResponse = await fetch(apiUrl, { headers });
     if (fileResponse.status === 404) {
       // Depoda zaten yoksa bile yetim veritabanı kaydını temizle.
-      await env.DB.prepare("DELETE FROM media WHERE file_name = ?").bind(fileName).run();
+      await env.DB.prepare("DELETE FROM media_metadata WHERE media_id IN (SELECT id FROM media WHERE file_name = ?)").bind(fileName).run();
+      await env.DB.prepare("DELETE FROM media_metadata WHERE media_id IN (SELECT id FROM media WHERE file_name = ?)").bind(fileName).run();
+    await env.DB.prepare("DELETE FROM media WHERE file_name = ?").bind(fileName).run();
       await logAudit(env.DB,request,auth.admin,{action:"media_deleted",entity_type:"media",entity_id:fileName,entity_title:fileName,details:{before:before||{file_name:fileName},after:null,storage_state:"already_missing"}});
       return Response.json({ success: true, message: "Dosya depoda yoktu; medya kaydı temizlendi." });
     }
