@@ -1963,8 +1963,8 @@ function renderAnalytics(data){
  $("cfUnique").textContent=cf.configured?analyticsNumber(t.dailyUniqueIpTotal):"—";
  $("cfRequests").textContent=cf.configured?analyticsNumber(t.requests):"—";
  $("cfCountryCount").textContent=cf.configured?analyticsNumber((cf.countries||[]).length):"—";
- $("analyticsMessage").className="message "+(cf.error?"error":"success");
- $("analyticsMessage").textContent=cf.error?cf.error:"Cloudflare verileri alındı. Dönem: "+data.period.startDate+" – "+data.period.endDate;
+ $("analyticsMessage").className="message "+(cf.unavailable?"":cf.error?"error":"success");
+ $("analyticsMessage").textContent=cf.unavailable?"Cloudflare Analytics yapılandırılmadı; bu durum yönetim panelinin diğer özelliklerini etkilemez.":cf.error?cf.error:"Cloudflare verileri alındı. Dönem: "+data.period.startDate+" – "+data.period.endDate;
  if(cf.pathWarning)$("analyticsMessage").textContent+=" Sayfa yolu raporu: "+cf.pathWarning;
  $("analyticsUpdated").textContent="Son güncelleme: "+new Date().toLocaleTimeString("tr-TR");
  const countries=(cf.countries||[]).slice(0,7),total=countries.reduce((s,x)=>s+x.requests,0);$("analyticsCountryTotal").textContent=analyticsNumber(total);
@@ -1981,8 +1981,8 @@ function renderCloudflareReport(data){
  $("reportCfRequests").textContent=cf.configured?fmt(t.requests):"—";
  $("reportCfUnique").textContent=cf.configured?fmt(t.dailyUniqueIpTotal):"—";
  $("reportCfCountries").textContent=cf.configured?fmt((cf.countries||[]).length):"—";
- $("cloudflareReportsMessage").className="message "+(cf.error?"error":"success");
- $("cloudflareReportsMessage").textContent=cf.error||("Cloudflare verileri alındı. Dönem: "+data.period.startDate+" – "+data.period.endDate)+(cf.pathWarning?" Sayfa yolu raporu: "+cf.pathWarning:"");
+ $("cloudflareReportsMessage").className="message "+(cf.unavailable?"":cf.error?"error":"success");
+ $("cloudflareReportsMessage").textContent=cf.unavailable?"Cloudflare Analytics yapılandırılmadı; Cloudflare raporları şu anda gösterilmiyor.":cf.error||("Cloudflare verileri alındı. Dönem: "+data.period.startDate+" – "+data.period.endDate)+(cf.pathWarning?" Sayfa yolu raporu: "+cf.pathWarning:"");
  $("reportCfCountryTable").innerHTML=(cf.countries||[]).map(x=>"<tr><td>"+escapeHtml(x.country)+"</td><td>"+fmt(x.requests)+"</td></tr>").join("")||'<tr><td colspan="2">Ülke verisi bulunamadı.</td></tr>';
  $("reportCfPagesTable").innerHTML=(cf.pages||[]).map(x=>"<tr><td>"+escapeHtml(x.path)+"</td><td>"+fmt(x.requests)+"</td></tr>").join("")||'<tr><td colspan="2">Sayfa yolu verisi bulunamadı.</td></tr>';
  drawReportCloudflareBars(cf.daily||[]);
