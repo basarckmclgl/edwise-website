@@ -101,7 +101,8 @@ export async function onRequestGet(context) {
 }
 
 export async function onRequestPut(context) {
-  const auth = await requireSuperAdmin(context);
+  if (!validOrigin(context.request)) return json({ success:false, message:"İstek kaynağı doğrulanamadı." },403);
+  const auth = await requireEditor(context);
   if (auth.response) return auth.response;
   try {
     const body = await context.request.json();
