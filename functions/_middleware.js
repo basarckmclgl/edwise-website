@@ -18,6 +18,8 @@ export async function onRequest(context) {
   const response = await context.next();
   const headers = new Headers(response.headers);
   headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("X-Permitted-Cross-Domain-Policies", "none");
+  headers.set("X-DNS-Prefetch-Control", "off");
   headers.set("X-Frame-Options", "SAMEORIGIN");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
