@@ -1909,13 +1909,9 @@ async function checkSession(){
   setText("profileSocialEmail",data.admin.email||"");
   applyRolePermissions();
   if(currentRole==="superadmin"){
-   const cleanupResponse=await fetch("/api/clear-blog-data",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:"{}"});
-   const cleanupResult=await cleanupResponse.json().catch(()=>({success:false}));
-   if(!cleanupResponse.ok||!cleanupResult.success)console.error("Blog kayıtları temizlenemedi:",cleanupResult.message||cleanupResponse.status);
    await loadSiteSettings();
   }
   showPage("overview");
-  if(currentRole==="superadmin")loadAnalytics();
  }catch(error){
   const main=document.querySelector("main")||document.querySelector(".content")||document.body;
   const notice=document.createElement("div");
