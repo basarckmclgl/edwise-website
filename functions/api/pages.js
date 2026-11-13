@@ -23,13 +23,13 @@ function validStatus(status) {
   return status === "draft" || status === "published";
 }
 
-async function ensureTrashColumn(db) {
-  try {
-    await db.prepare("ALTER TABLE pages ADD COLUMN deleted_at TEXT").run();
-  } catch (error) {
-    const columns = await db.prepare("PRAGMA table_info(pages)").all();
-    if (!(columns.results || []).some(column => column.name === "deleted_at")) throw error;
-  }
+async function ensureTrashTable(db) {
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS preview_page_trash (
+      page_id INTEGER PRIMARY KEY,
+      deleted_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `).run();
 }
 
 async function authorized(context) {
@@ -55,15 +55,22 @@ export async function onRequestGet(context) {
     const auth = await authorized(context);
     if (auth.response) return auth.response;
 
-    await ensureTrashColumn(context.env.DB);
+    await ensureTrashTable(context.env.DB);
     const view = new URL(context.request.url).searchParams.get("view");
-    const result = await context.env.DB.prepare(`
-      SELECT id, title, slug, content, meta_title,
-             meta_description, status, created_at, updated_at, deleted_at
-      FROM pages
-      WHERE ${view === "trash" ? "deleted_at IS NOT NULL" : "deleted_at IS NULL"}
-      ORDER BY ${view === "trash" ? "deleted_at DESC" : "updated_at DESC"}
-    `).all();
+    const result = view === "trash"
+      ? await context.env.DB.prepare(`
+          SELECT p.id, p.title, p.slug, p.content, p.meta_title,
+                 p.meta_description, p.status, p.created_at, p.updated_at, t.deleted_at
+          FROM pages p JOIN preview_page_trash t ON t.page_id = p.id
+          ORDER BY t.deleted_at DESC
+        `).all()
+      : await context.env.DB.prepare(`
+          SELECT p.id, p.title, p.slug, p.content, p.meta_title,
+                 p.meta_description, p.status, p.created_at, p.updated_at
+          FROM pages p
+          WHERE NOT EXISTS (SELECT 1 FROM preview_page_trash t WHERE t.page_id = p.id)
+          ORDER BY p.updated_at DESC
+        `).all();
 
     const migration = await context.env.DB.prepare(
       "SELECT setting_value FROM site_settings WHERE setting_key = ? LIMIT 1"
@@ -97,11 +104,11 @@ export async function onRequestPost(context) {
     if (data.action === "restore") {
       const id = Number(data.id);
       if (!Number.isInteger(id) || id < 1) return json({ success: false, message: "Geçerli bir sayfa seçilmedi." }, 400);
-      const before = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ? AND deleted_at IS NOT NULL").bind(id).first();
+      const before = await context.env.DB.prepare("SELECT p.* FROM pages p JOIN preview_page_trash t ON t.page_id = p.id WHERE p.id = ?").bind(id).first();
       if (!before) return json({ success: false, message: "Silinen sayfa bulunamadı." }, 404);
-      const duplicate = await context.env.DB.prepare("SELECT id FROM pages WHERE slug = ? AND deleted_at IS NULL LIMIT 1").bind(before.slug).first();
+      const duplicate = await context.env.DB.prepare("SELECT p.id FROM pages p WHERE p.slug = ? AND NOT EXISTS (SELECT 1 FROM preview_page_trash t WHERE t.page_id = p.id) LIMIT 1").bind(before.slug).first();
       if (duplicate) return json({ success: false, message: "Bu URL başka bir aktif sayfada kullanılıyor. Önce o sayfanın URL'sini değiştirin." }, 409);
-      await context.env.DB.prepare("UPDATE pages SET deleted_at = NULL, updated_at = datetime('now') WHERE id = ?").bind(id).run();
+      await context.env.DB.prepare("DELETE FROM preview_page_trash WHERE page_id = ?").bind(id).run();
       const after = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(id).first();
       await logAudit(context.env.DB,context.request,auth.admin,{action:"page_restored",entity_type:"page",entity_id:id,entity_title:before.title,details:{before,after}});
       return json({ success: true, message: "Sayfa geri yüklendi." });
@@ -156,7 +163,7 @@ export async function onRequestPost(context) {
     }
 
     const existing = await context.env.DB.prepare(
-      "SELECT id FROM pages WHERE slug = ? AND deleted_at IS NULL LIMIT 1"
+      `SELECT p.id FROM pages p WHERE p.slug = ? AND NOT EXISTS (SELECT 1 FROM preview_page_trash t WHERE t.page_id = p.id) LIMIT 1`
     ).bind(slug).first();
 
     if (existing) {
@@ -211,11 +218,11 @@ export async function onRequestPut(context) {
     }
 
     await ensureTrashColumn(context.env.DB);
-    const before = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ? AND deleted_at IS NULL").bind(id).first();
+    const before = await context.env.DB.prepare("SELECT p.* FROM pages p WHERE p.id = ? AND NOT EXISTS (SELECT 1 FROM preview_page_trash t WHERE t.page_id = p.id)").bind(id).first();
     if (!before) return json({ success: false, message: "Sayfa bulunamadı." }, 404);
 
     const duplicate = await context.env.DB.prepare(
-      "SELECT id FROM pages WHERE slug = ? AND id != ? AND deleted_at IS NULL LIMIT 1"
+      "SELECT p.id FROM pages p WHERE p.slug = ? AND p.id != ? AND NOT EXISTS (SELECT 1 FROM preview_page_trash t WHERE t.page_id = p.id) LIMIT 1"
     ).bind(slug, id).first();
 
     if (duplicate) {
@@ -264,15 +271,15 @@ export async function onRequestDelete(context) {
     const before = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(id).first();
     if (!before) return json({ success: false, message: "Sayfa bulunamadı." }, 404);
     const result = await context.env.DB.prepare(
-      "UPDATE pages SET deleted_at = datetime('now'), updated_at = datetime('now') WHERE id = ? AND deleted_at IS NULL"
-    ).bind(id).run();
+      `INSERT INTO preview_page_trash (page_id) SELECT id FROM pages WHERE id = ? AND NOT EXISTS (SELECT 1 FROM preview_page_trash WHERE page_id = ?) ON CONFLICT(page_id) DO NOTHING`
+    ).bind(id, id).run();
 
     if (!result.meta.changes) {
       return json({ success: false, message: "Sayfa bulunamadı." }, 404);
     }
 
-    await logAudit(context.env.DB,context.request,auth.admin,{action:"page_moved_to_trash",entity_type:"page",entity_id:id,entity_title:before.title,details:{before,after:{...before,deleted_at:"now"}}});
-    return json({ success: true, message: "Sayfa silinen sayfalara taşındı." });
+    await logAudit(context.env.DB,context.request,auth.admin,{action:"page_moved_to_preview_trash",entity_type:"page",entity_id:id,entity_title:before.title,details:{before,after:{...before,preview_deleted:true}}});
+    return json({ success: true, message: "Sayfa ön izleme ortamındaki Silinen Sayfalar bölümüne taşındı." });
 
   } catch (error) {
     return json({ success: false, message: "Sayfa silinemedi." }, 500);
