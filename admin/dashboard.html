@@ -1723,7 +1723,9 @@ $("lessonSessionList")?.addEventListener("click",async e=>{
  if(b.dataset.lessonFinish&&!confirm("Dersi tamamlandı olarak işaretleyip öğrenci bağlantısını kapatmak istiyor musun?"))return;
  try{
   if(b.dataset.lessonStart||b.dataset.lessonFinish){
-   await api("/api/lessons",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,action:b.dataset.lessonStart?"start":"finish"})});
+   const lessonPayload={id,action:b.dataset.lessonStart?"start":"finish"};
+   if(b.dataset.lessonFinish)lessonPayload.notes=$("lesson-text-"+id).value;
+   await api("/api/lessons",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(lessonPayload)});
    await loadLessonSessions();
    if(b.dataset.lessonStart)alert("Ders kaydı açıldı. Şimdi “Canlı sınıfı aç” bağlantısına tıklayarak toplantıyı başlat ve öğrenci bağlantısını paylaş.");
    if(b.dataset.lessonFinish)alert("EDWISE ders kaydı tamamlandı. Açık Jitsi toplantı penceresinden de görüşmeyi sonlandır.");
