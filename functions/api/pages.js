@@ -19,6 +19,13 @@ function makeSlug(value) {
     .replace(/^-|-$/g, "");
 }
 
+async function ensureTrashSchema(db) {
+  try { await db.prepare("ALTER TABLE pages ADD COLUMN deleted_at TEXT").run(); }
+  catch (error) {
+    if (!/duplicate column|already exists/i.test(String(error?.message || error))) throw error;
+  }
+}
+
 function validStatus(status) {
   return status === "draft" || status === "published";
 }
@@ -45,12 +52,14 @@ export async function onRequestGet(context) {
   try {
     const auth = await authorized(context);
     if (auth.response) return auth.response;
-
+    await ensureTrashSchema(context.env.DB);
+    const trashView = new URL(context.request.url).searchParams.get("view") === "trash";
     const result = await context.env.DB.prepare(`
       SELECT id, title, slug, content, meta_title,
-             meta_description, status, created_at, updated_at
+             meta_description, status, created_at, updated_at, deleted_at
       FROM pages
-      ORDER BY updated_at DESC
+      WHERE ${trashView ? "deleted_at IS NOT NULL" : "deleted_at IS NULL"}
+      ORDER BY ${trashView ? "deleted_at" : "updated_at"} DESC
     `).all();
 
     const migration = await context.env.DB.prepare(
@@ -80,6 +89,20 @@ export async function onRequestPost(context) {
     if (auth.response) return auth.response;
 
     const data = await context.request.json();
+    await ensureTrashSchema(context.env.DB);
+
+    if (data.action === "restore") {
+      const id = Number(data.id);
+      if (!Number.isInteger(id) || id < 1) return json({ success: false, message: "Geçerli bir sayfa belirtilmedi." }, 400);
+      const before = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ? AND deleted_at IS NOT NULL").bind(id).first();
+      if (!before) return json({ success: false, message: "Silinen sayfa bulunamadı." }, 404);
+      const conflict = await context.env.DB.prepare("SELECT id FROM pages WHERE slug = ? AND deleted_at IS NULL LIMIT 1").bind(before.slug).first();
+      if (conflict) return json({ success: false, message: "Aynı URL başka bir aktif sayfada kullanılıyor. Önce URL çakışmasını çözün." }, 409);
+      await context.env.DB.prepare("UPDATE pages SET deleted_at = NULL, updated_at = datetime('now') WHERE id = ?").bind(id).run();
+      const after = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(id).first();
+      await logAudit(context.env.DB,context.request,auth.admin,{action:"page_restored",entity_type:"page",entity_id:id,entity_title:before.title,details:{before,after}});
+      return json({ success: true, message: "Sayfa geri yüklendi." });
+    }
 
     if (data.action === "import_static_pages") {
       const marker = await context.env.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key = ? LIMIT 1").bind("static_pages_migrated_v1").first();
@@ -233,10 +256,11 @@ export async function onRequestDelete(context) {
       return json({ success: false, message: "Geçerli bir sayfa numarası belirtilmedi." }, 400);
     }
 
-    const before = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(id).first();
+    await ensureTrashSchema(context.env.DB);
+    const before = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ? AND deleted_at IS NULL").bind(id).first();
     if (!before) return json({ success: false, message: "Sayfa bulunamadı." }, 404);
     const result = await context.env.DB.prepare(
-      "DELETE FROM pages WHERE id = ?"
+      "UPDATE pages SET deleted_at = datetime('now'), updated_at = datetime('now') WHERE id = ? AND deleted_at IS NULL"
     ).bind(id).run();
 
     if (!result.meta.changes) {
