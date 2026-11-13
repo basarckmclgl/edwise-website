@@ -1158,7 +1158,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
     <div class="field">
      <label for="userRole">Yetki</label>
      <select id="userRole">
-      <option value="content_admin">İçerik Editörü</option>
+      <option value="content_admin">Site Yöneticisi</option>
      </select>
     </div>
    </div>
@@ -2487,7 +2487,7 @@ async function loadUsers(){
     <tr>
      <td>${escapeHtml(user.username)}</td>
      <td>${escapeHtml(user.email)}</td>
-     <td>${isSuper?"Super Admin":"İçerik Editörü"}</td>
+     <td>${isSuper?"Süper Yönetici":"Site Yöneticisi"}</td>
      <td>
       <span class="status ${Number(user.is_active)===1?"published":""}">
        ${Number(user.is_active)===1?"Aktif":"Pasif"}
