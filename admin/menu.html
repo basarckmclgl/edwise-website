@@ -37,7 +37,7 @@ main{min-width:0}.topbar{height:76px;border-bottom:1px solid #282741;background:
 <div class="field"><label for="group">Menü grubu</label><select id="group"><option value="main">Ana navigasyon</option><option value="contact">İletişim bağlantısı</option></select></div>
 <div class="field"><label for="visibility">Görünürlük</label><select id="visibility"><option value="visible">Görünür</option><option value="hidden">Gizli</option></select></div>
 </div><div class="form-actions"><button class="btn primary" type="submit">Kaydet</button><button class="btn" type="button" id="cancel">Temizle</button></div></form>
-<div class="hint">Başlık yazıldıkça URL Türkçe karakterler sadeleştirilerek otomatik oluşturulur (ör. “Öğrenci Başvurusu” → /pages/ogrenci-basvurusu.html). İstersen URL'yi elle değiştirebilirsin. Bu işlem yalnızca bağlantıyı oluşturur; yeni sayfa dosyası oluşturmaz. Harici bağlantılarda https:// kullanın.</div>
+<div class="hint">Yeni bir menü öğesi eklediğinde başlığa göre URL oluşturulur ve Sayfa Yönetimi'nde otomatik taslak sayfa açılır. Örneğin “Öğrenci Başvurusu” → /pages/sayfa.html?slug=ogrenci-basvurusu. İçeriği Sayfa Yönetimi'nden düzenleyip yayımlayabilirsin. Harici bağlantılarda https:// kullanın.</div>
 <div style="height:1px;background:#292b49;margin:19px 0"></div><div class="panel-head"><div><h2>Site menüsü önizlemesi</h2><div class="sub">Gizli öğeler ziyaretçi görünümünde listelenmez.</div></div></div><div class="preview"><div class="preview-head"><div class="preview-brand">EDWISE</div><span class="sub">NAVIGATION</span></div><div id="preview"></div></div>
 </section></div></div></main></div>
 <script>
@@ -68,6 +68,22 @@ async function load(){
 async function save(){
  if(saving)return;saving=true;setBusy(true);
  try{
+  const pageResponse=await fetch('/api/pages',{headers:{"Accept":"application/json"},credentials:'same-origin',cache:'no-store'});
+  const pageData=await pageResponse.json();
+  if(!pageResponse.ok||!pageData.success)throw new Error(pageData.message||'Sayfa kayıtları kontrol edilemedi.');
+  const existingSlugs=new Set((pageData.pages||[]).map(p=>p.slug));
+  for(const item of items){
+   if(!String(item.id||'').startsWith('custom_')||/^https:\/\//i.test(item.url))continue;
+   const slug=makeSlug(item.title);
+   if(!slug)throw new Error('"'+item.title+'" başlığı geçerli bir sayfa adresi üretmiyor.');
+   if(!existingSlugs.has(slug)){
+    const created=await fetch('/api/pages',{method:'POST',headers:apiHeaders,credentials:'same-origin',body:JSON.stringify({title:item.title,slug,content:'<p>Bu sayfa Menü Yönetimi üzerinden oluşturuldu.</p><p>İçeriğini Sayfa Yönetimi bölümünden düzenleyebilirsiniz.</p>',meta_title:item.title+' | EDWISE',meta_description:'EDWISE '+item.title+' sayfası.',status:'draft'})});
+    const result=await created.json();
+    if(!created.ok||!result.success)throw new Error('"'+item.title+'" için taslak sayfa oluşturulamadı: '+(result.message||'Bilinmeyen hata'));
+    existingSlugs.add(slug);
+   }
+   item.url='/pages/sayfa.html?slug='+encodeURIComponent(slug);
+  }
   const payload=items.map((x,i)=>({key:String(x.id||('menu_'+i)),label:String(x.title||'').trim(),url:normalizeUrl(x.url),icon:x.icon||'',group:x.group==='contact'?'contact':'main',visible:x.visible!==false}));
   const r=await fetch('/api/settings',{method:'POST',headers:apiHeaders,credentials:'same-origin',body:JSON.stringify({action:'save_menu',items:payload})});
   const d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||'Menü kaydedilemedi.');
@@ -112,7 +128,7 @@ const urlInput=document.getElementById('url');
 titleInput.addEventListener('input',()=>{
  if(urlManuallyEdited)return;
  const slug=makeSlug(titleInput.value);
- urlInput.value=slug?'/pages/'+slug+'.html':'';
+ urlInput.value=slug?'/pages/sayfa.html?slug='+encodeURIComponent(slug):'';
 });
 urlInput.addEventListener('input',()=>{urlManuallyEdited=true;});
 document.getElementById('editor').onsubmit=async e=>{e.preventDefault();const old=selected===null?null:items[selected],x={id:old?.id||('custom_'+Date.now()),title:document.getElementById('title').value.trim(),url:document.getElementById('url').value.trim(),icon:document.getElementById('icon').value.trim(),group:document.getElementById('group').value,visible:document.getElementById('visibility').value==='visible'};if(!x.title||!x.url)return;try{normalizeUrl(x.url);}catch(err){show(err.message,'err');return;}if(selected===null)items.push(x);else items[selected]=x;clearForm();await save();};
