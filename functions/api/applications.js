@@ -1,4 +1,5 @@
-import { requireSuperAdmin } from "./_auth.js";
+import { requireEditor } from "./_auth.js";
+import { logAudit } from "./_audit.js";
 
 const json = (data, status = 200) => Response.json(data, {
   status, headers: { "Cache-Control": "no-store" }
@@ -86,7 +87,7 @@ export async function onRequestPost({ request, env }) {
 }
 
 export async function onRequestGet(context) {
-  const auth = await requireSuperAdmin(context);
+  const auth = await requireEditor(context);
   if (auth.response) return auth.response;
   try {
     await ensureTable(context.env.DB);
@@ -110,8 +111,17 @@ export async function onRequestPut(context) {
       return json({ success:false, message:"Başvuru durumu geçersiz." },400);
     }
     await ensureTable(context.env.DB);
+    const before = await context.env.DB.prepare("SELECT id,status,program,created_at FROM applications WHERE id=?").bind(id).first();
+    if (!before) return json({ success:false, message:"Başvuru bulunamadı." },404);
     const result = await context.env.DB.prepare("UPDATE applications SET status=? WHERE id=?").bind(status,id).run();
-    if (!result.meta?.changes) return json({ success:false, message:"Başvuru bulunamadı." },404);
+    if (!result.meta?.changes) return json({ success:false, message:"Başvuru güncellenemedi." },409);
+    await logAudit(context.env.DB,context.request,auth.admin,{
+      action:"application_status_updated",
+      entity_type:"application",
+      entity_id:id,
+      entity_title:"Başvuru #"+id,
+      details:{before:{status:before.status},after:{status},program:before.program}
+    });
     return json({ success:true });
   } catch {
     return json({ success:false, message:"Başvuru güncellenemedi." },500);
