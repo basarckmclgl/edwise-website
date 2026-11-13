@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EDWISE | Yönetim Paneli Konsepti</title>
+<style>
+:root{--bg:#090b16;--panel:#111528;--panel2:#171d35;--line:#252d49;--muted:#929bb8;--text:#f4f5ff;--purple:#9a7cff;--cyan:#65d5df;--green:#58d6a1}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 70% -10%,#28204d 0,transparent 35%),var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,Arial}
+.layout{display:grid;grid-template-columns:250px 1fr;min-height:100vh}.side{padding:25px 16px;border-right:1px solid var(--line);background:#0d1020}.brand{display:flex;gap:11px;align-items:center;padding:0 10px 28px}.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#8e73ff,#4b3e9b);display:grid;place-items:center;font-weight:800}.brand b{letter-spacing:2px}.brand small{display:block;color:var(--muted);letter-spacing:1px;font-size:10px}.group{margin:18px 10px 8px;color:#737e9f;font-size:10px;letter-spacing:1.5px;text-transform:uppercase}.nav{display:flex;align-items:center;gap:12px;padding:11px 12px;margin:3px 0;border-radius:10px;color:#aab2cb;text-decoration:none}.nav.active{background:linear-gradient(90deg,#30275a,#211e3b);color:white;border:1px solid #51447d}.nav span{width:18px;text-align:center;color:#a997ff}.sidefoot{position:sticky;top:90vh;margin:36px 8px 0;padding:13px;border:1px solid var(--line);border-radius:12px;color:var(--muted);font-size:11px}.main{min-width:0}.top{height:72px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;padding:0 34px;background:#0c1020b8}.crumb{color:var(--muted)}.right{display:flex;gap:12px;align-items:center}.pill{border:1px solid #3b345f;background:#211d3c;color:#c9bcff;padding:6px 10px;border-radius:20px;font-size:11px}.avatar{width:34px;height:34px;border-radius:50%;background:#453b71;display:grid;place-items:center}.content{max-width:1400px;margin:auto;padding:32px 34px 60px}.welcome{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:26px}.eyebrow{color:var(--purple);font-size:11px;letter-spacing:1.6px;text-transform:uppercase}.welcome h1{font-size:27px;margin:5px 0}.welcome p{color:var(--muted);margin:0}.btn{background:#8066e9;color:white;border:0;border-radius:9px;padding:10px 15px;font-weight:650}.btn.secondary{background:#171d35;border:1px solid var(--line);color:#d7dcf0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.card{background:linear-gradient(145deg,#151a30,#101426);border:1px solid var(--line);border-radius:15px;padding:19px}.card h3{margin:0 0 7px;font-size:14px}.card p{margin:0;color:var(--muted);font-size:12px}.tile{display:flex;gap:13px;align-items:center}.ico{width:40px;height:40px;border-radius:12px;background:#29234a;color:#b7a5ff;display:grid;place-items:center;font-size:18px}.section{margin:30px 0 13px;display:flex;justify-content:space-between;align-items:center}.section h2{font-size:16px;margin:0}.section small{color:var(--muted)}.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.quick .card{min-height:110px}.activity{display:grid;grid-template-columns:1.3fr 1fr;gap:15px}.rowitem{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}.rowitem:last-child{border:0}.rowitem small{display:block;color:var(--muted);font-size:11px}.status{color:var(--green);font-size:11px}.notice{padding:12px 14px;border-radius:10px;background:#182a2c;border:1px solid #28504d;color:#a9e6d2;font-size:12px;margin-top:14px}
+@media(max-width:900px){.layout{grid-template-columns:78px 1fr}.side{padding:20px 9px}.brand{padding:0 10px 25px}.brand div:last-child,.nav .txt,.group,.sidefoot{display:none}.nav{justify-content:center}.content{padding:25px 20px}.grid{grid-template-columns:repeat(2,1fr)}.quick{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.top{padding:0 16px}.content{padding:22px 14px}.welcome{display:block}.welcome .btn{margin-top:15px}.grid,.quick,.activity{grid-template-columns:1fr}.welcome h1{font-size:23px}}
+</style></head>
+<body><div class="layout">
+<aside class="side"><div class="brand"><div class="logo">E</div><div><b>EDWISE</b><small>YÖNETİM MERKEZİ</small></div></div>
+<div class="group">Çalışma alanı</div>
+<a class="nav active" href="#"><span>⌂</span><i class="txt">Genel Bakış</i></a>
+<a class="nav" href="#"><span>▤</span><i class="txt">Sayfalar</i></a>
+<a class="nav" href="#"><span>◇</span><i class="txt">Hizmetler</i></a>
+<a class="nav" href="#"><span>✉</span><i class="txt">Başvurular</i></a>
+<a class="nav" href="#"><span>▧</span><i class="txt">Medya Kütüphanesi</i></a>
+<div class="group">Site yönetimi</div>
+<a class="nav" href="#"><span>☷</span><i class="txt">Menü Yönetimi</i></a>
+<a class="nav" href="#"><span>⌕</span><i class="txt">SEO Ayarları</i></a>
+<a class="nav" href="#"><span>文</span><i class="txt">Dil Yönetimi</i></a>
+<a class="nav" href="#"><span>⚙</span><i class="txt">Site Ayarları</i></a>
+<div class="group">Süper yönetici</div>
+<a class="nav" href="#"><span>♙</span><i class="txt">Kullanıcılar ve Yetkiler</i></a>
+<a class="nav" href="#"><span>⌘</span><i class="txt">Sistem Kayıtları</i></a>
+<div class="sidefoot">Güvenli yönetim oturumu<br><b style="color:#d9dff4">EDWISE CMS</b> · Taslak konsept</div></aside>
+<main class="main"><header class="top"><div class="crumb">EDWISE <span style="color:#555f7d">/</span> <b>Genel Bakış</b></div><div class="right"><span class="pill">● Sistem tasarımı</span><span style="color:var(--muted)">Süper Yönetici</span><div class="avatar">SY</div></div></header>
+<div class="content"><div class="welcome"><div><div class="eyebrow">Yönetim paneli</div><h1>Hoş geldiniz</h1><p>EDWISE web sitenizin içerik ve başvuru süreçlerini buradan yönetin.</p></div><button class="btn">＋ Yeni sayfa oluştur</button></div>
+<div class="grid">
+<div class="card tile"><div class="ico">▤</div><div><h3>Sayfa Yönetimi</h3><p>Sayfa oluşturun, düzenleyin ve yayınlayın.</p></div></div>
+<div class="card tile"><div class="ico">◇</div><div><h3>Hizmetler</h3><p>Eğitim programlarını ve hizmet içeriklerini yönetin.</p></div></div>
+<div class="card tile"><div class="ico">✉</div><div><h3>Başvurular</h3><p>Gelen başvuruları inceleyin ve durumlarını güncelleyin.</p></div></div>
+</div>
+<div class="section"><h2>Hızlı işlemler</h2><small>İçerik yönetimi</small></div>
+<div class="quick">
+<div class="card"><div class="ico">＋</div><h3>Sayfa ekle</h3><p>Yeni bir içerik sayfası hazırlayın.</p></div>
+<div class="card"><div class="ico">▧</div><h3>Görsel yükle</h3><p>Medya kütüphanesine dosya ekleyin.</p></div>
+<div class="card"><div class="ico">☷</div><h3>Menüyü düzenle</h3><p>Ziyaretçi menüsünün sırasını belirleyin.</p></div>
+<div class="card"><div class="ico">⌕</div><h3>SEO bilgilerini düzenle</h3><p>Başlık ve açıklamaları güncelleyin.</p></div>
+</div>
+<div class="section"><h2>Yönetim kısayolları</h2><small>Örnek panel görünümü</small></div>
+<div class="activity">
+<div class="card"><h3>İçerik alanları</h3>
+<div class="rowitem"><div>Sayfalar <small>Site metinleri ve sayfa düzeni</small></div><span>›</span></div>
+<div class="rowitem"><div>Hizmetler <small>IELTS, TOEFL, YDS, YÖKDİL ve diğerleri</small></div><span>›</span></div>
+<div class="rowitem"><div>Başvurular <small>Form kayıtları ve başvuru durumları</small></div><span>›</span></div>
+<div class="rowitem"><div>Medya <small>Görseller ve yüklenen dosyalar</small></div><span>›</span></div></div>
+<div class="card"><h3>Yetki ayrımı</h3><div class="rowitem"><div>İçerik Yöneticisi<small>Günlük içerik, sayfa, hizmet ve başvuru işlemleri</small></div><span class="pill">Admin</span></div><div class="rowitem"><div>Süper Yönetici<small>Kullanıcılar, sistem güvenliği ve teknik yönetim</small></div><span class="pill">Tam yetki</span></div><div class="notice">Bu ekran yalnızca görsel konsepttir. Gerçek kayıt, silme veya yayın işlemi yapmaz; mevcut site ayarlarına dokunmaz.</div></div>
+</div></div></main></div></body></html>
