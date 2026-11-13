@@ -23,7 +23,7 @@ main{min-width:0}.topbar{height:76px;border-bottom:1px solid #282741;background:
 <div class="label">Workspace</div>
 <a class="nav active" href="#"><span class="ic">⌂</span><span class="txt">Genel Bakış</span></a>
 <a class="nav" href="/admin/pages.html"><span class="ic">▤</span><span class="txt">Sayfa Yönetimi</span></a>
-<a class="nav" href="#"><span class="ic">✧</span><span class="txt">Hizmetler</span></a>
+<a class="nav" href="#services"><span class="ic">✧</span><span class="txt">Hizmetler</span></a>
 <a class="nav" href="#"><span class="ic">✉</span><span class="txt">Başvurular</span><span class="tag">Yönet</span></a>
 <a class="nav" href="#"><span class="ic">▧</span><span class="txt">Medya Kütüphanesi</span></a>
 <div class="label">Website studio</div>
@@ -41,7 +41,7 @@ main{min-width:0}.topbar{height:76px;border-bottom:1px solid #282741;background:
 <div class="section-head"><h3>Yönetim modülleri</h3><span>İÇERİK & OPERASYON</span></div>
 <div class="cards">
 <a class="module" href="/admin/pages.html" style="display:block;color:inherit;text-decoration:none"><div class="module-top"><div class="module-icon">▤</div><span class="arrow">↗</span></div><h4>Sayfa Yönetimi</h4><p>Sayfaları oluşturun, düzenleyin ve yayın akışını yönetin.</p></a>
-<div class="module"><div class="module-top"><div class="module-icon">✧</div><span class="arrow">↗</span></div><h4>Hizmetler</h4><p>IELTS, TOEFL, YDS ve diğer eğitim hizmetlerini düzenleyin.</p></div>
+<a class="module" href="#services" style="display:block;color:inherit;text-decoration:none"><div class="module-top"><div class="module-icon">✧</div><span class="arrow">↗</span></div><h4>Hizmetler</h4><p>Eğitim hizmetlerini ve tanıtım içeriklerini yönetin.</p></a>
 <div class="module"><div class="module-top"><div class="module-icon">✉</div><span class="arrow">↗</span></div><h4>Başvurular</h4><p>Gelen talepleri inceleyin, not ekleyin ve süreçleri takip edin.</p></div>
 <div class="module"><div class="module-top"><div class="module-icon">▧</div><span class="arrow">↗</span></div><h4>Medya Kütüphanesi</h4><p>Görsellerinizi ve dosyalarınızı tek merkezden yönetin.</p></div>
 </div>
@@ -57,4 +57,62 @@ main{min-width:0}.topbar{height:76px;border-bottom:1px solid #282741;background:
 <div class="roleline"><div class="roleicon">♛</div><div><b>Süper Yönetici</b><p>Kullanıcılar, yetkiler, güvenlik ve teknik yönetim.</p></div><span class="rolepill">Full access</span></div>
 <div class="footnote">Bu ekran konsept önizlemesidir. Henüz gerçek API işlemlerine bağlı değildir; canlı siteye veya mevcut verilere müdahale etmez.</div>
 </section></div>
-</div></main></div></body></html>
+
+<section id="services" style="margin-top:34px;scroll-margin-top:95px">
+ <div class="intro" style="align-items:center;margin-bottom:18px"><div><div class="eyebrow">İÇERİK YÖNETİMİ</div><h1 style="font-size:25px">Hizmetler</h1><p>EDWISE bünyesindeki eğitim ve danışmanlık hizmetlerini oluşturun, düzenleyin.</p></div><span class="role">7 HİZMET</span></div>
+ <div class="lower" style="grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);align-items:start">
+  <section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><h3>Hizmet listesi</h3><div class="panel-sub">Bir hizmeti seçerek içeriğini düzenleyin.</div></div><button class="primary" type="button" id="newService">＋ Yeni hizmet</button></div>
+   <div id="serviceItems" style="display:grid;gap:9px;margin-top:15px"></div>
+  </section>
+  <section class="panel"><h3 id="serviceEditorTitle">Hizmet içeriği</h3><div class="panel-sub">Web sitesinde gösterilecek hizmet bilgileri.</div>
+   <form id="serviceEditor">
+    <input type="hidden" id="svcId">
+    <label class="svc-label" for="svcName">Hizmet adı</label><input class="svc-input" id="svcName" required maxlength="100" placeholder="Örn. IELTS Hazırlık">
+    <label class="svc-label" for="svcSlug">URL kısa adı</label><input class="svc-input" id="svcSlug" required maxlength="120" placeholder="ielts-hazirlik">
+    <label class="svc-label" for="svcCategory">Kategori</label><select class="svc-input" id="svcCategory"><option>Dil Sınavları</option><option>Konuşma & Pratik</option><option>Danışmanlık</option><option>Koçluk</option></select>
+    <label class="svc-label" for="svcSummary">Kısa tanıtım</label><textarea class="svc-input" id="svcSummary" required maxlength="240" rows="3" placeholder="Hizmet kartında görünecek kısa açıklama"></textarea>
+    <label class="svc-label" for="svcDescription">Detaylı içerik</label><textarea class="svc-input" id="svcDescription" rows="6" placeholder="Hizmetin kapsamı, kimler için olduğu, eğitim yaklaşımı ve kazanımları"></textarea>
+    <label class="svc-label" for="svcStatus">Yayın durumu</label><select class="svc-input" id="svcStatus"><option value="draft">Taslak</option><option value="active">Aktif</option></select>
+    <div style="display:flex;gap:9px;margin-top:16px;flex-wrap:wrap"><button class="primary" type="submit">Kaydet</button><button class="ghost" type="button" id="resetService">Vazgeç</button></div>
+    <p class="hint">Bu konsept ekranındaki düzenlemeler yalnızca önizleme tarayıcısında saklanır. Henüz canlı siteye veya mevcut CMS veritabanına yazılmaz.</p>
+   </form>
+  </section>
+ </div>
+ <section class="panel" style="margin-top:14px"><h3>Hizmet kartı önizlemesi</h3><div class="panel-sub">Düzenlediğiniz hizmetin ziyaretçilere nasıl sunulacağını görün.</div><div id="serviceCardPreview" style="margin-top:12px;border:1px solid #393354;border-radius:13px;padding:20px;background:linear-gradient(120deg,#211b3d,#14172b);max-width:650px"><div id="previewCategory" class="hero-kicker">DİL SINAVLARI</div><h2 id="previewName" style="font:700 21px Manrope;margin:9px 0">IELTS Hazırlık</h2><p id="previewSummary" style="color:#c1bdd6;font-size:12px;line-height:1.7;margin:0">Akademik ve genel İngilizce hedeflerinize yönelik IELTS hazırlık desteği.</p><p id="previewDescription" style="color:#9697b2;font-size:11px;line-height:1.7;margin:12px 0 0">Hedef puanınıza uygun çalışma planı, sınav stratejileri ve beceri odaklı eğitim.</p></div></section>
+</section>
+<style>
+#services .svc-label{display:block;font-size:10px;color:#c7c4dd;margin:13px 0 6px}
+#services .svc-input{display:block;width:100%;border:1px solid #333653;background:#0e1122;color:white;border-radius:8px;padding:11px;font:12px 'DM Sans',sans-serif;resize:vertical}
+#services .svc-input:focus{outline:1px solid var(--violet);border-color:var(--violet)}
+.service-row{display:flex;align-items:center;gap:11px;padding:12px;border:1px solid #2b2d49;border-radius:11px;background:#171a30;cursor:pointer;text-align:left;color:inherit;width:100%}
+.service-row.selected{border-color:#9074dc;background:#211c3c}
+.service-row .svc-symbol{width:35px;height:35px;flex:none;border-radius:10px;background:#30264f;color:#c3b1ff;display:grid;place-items:center}
+.service-row strong{display:block;font-size:11px}.service-row small{display:block;color:#9294ae;font-size:9px;margin-top:4px}.service-row .svc-state{margin-left:auto;font-size:9px;color:#c6baff;white-space:nowrap}
+@media(max-width:900px){#services .lower{grid-template-columns:1fr!important}}
+</style>
+<script>
+(()=>{
+ const initial=[
+ {id:"ielts",name:"IELTS Hazırlık",slug:"ielts",category:"Dil Sınavları",summary:"Akademik ve genel İngilizce hedeflerinize yönelik IELTS hazırlık desteği.",description:"Hedef puanınıza uygun kişisel çalışma planı oluşturulur. Listening, Reading, Writing ve Speaking becerileri sınav formatına uygun çalışmalarla geliştirilir; deneme sınavları ve geri bildirimlerle ilerleme takip edilir.",status:"active"},
+ {id:"toefl",name:"TOEFL Hazırlık",slug:"toefl",category:"Dil Sınavları",summary:"TOEFL sınavının tüm bölümlerine yönelik strateji ve beceri odaklı hazırlık.",description:"TOEFL iBT formatına uygun akademik İngilizce çalışmaları, soru tipleri, zaman yönetimi ve performans takibi bir arada yürütülür.",status:"active"},
+ {id:"yds",name:"YDS Hazırlık",slug:"yds",category:"Dil Sınavları",summary:"YDS hedefinize uygun kelime, dil bilgisi, okuma ve soru çözüm çalışmaları.",description:"Mevcut seviyeniz ve hedef puanınız doğrultusunda yapılandırılmış program; kelime, gramer, paragraf ve sınav tekniği çalışmalarıyla desteklenir.",status:"active"},
+ {id:"yokdil",name:"YÖKDİL Hazırlık",slug:"yokdil",category:"Dil Sınavları",summary:"Fen, sağlık ve sosyal bilimler alanlarına yönelik YÖKDİL hazırlık programı.",description:"Alan odaklı akademik kelime, okuma-anlama, dil bilgisi ve soru çözme stratejileriyle sınava sistemli hazırlık sunulur.",status:"active"},
+ {id:"speaking",name:"Speaking Club",slug:"speaking-club",category:"Konuşma & Pratik",summary:"İngilizce konuşma pratiğiyle akıcılık ve özgüveninizi geliştirin.",description:"Seviyeye uygun konuşma oturumları, gerçek yaşam temaları ve yönlendirilmiş aktivitelerle aktif iletişim becerileri geliştirilir.",status:"active"},
+ {id:"consulting",name:"Eğitim Danışmanlığı",slug:"egitim-danismanligi",category:"Danışmanlık",summary:"Eğitim hedeflerinize uygun yol haritası ve başvuru süreci danışmanlığı.",description:"Hedeflerin, seçeneklerin ve başvuru gerekliliklerinin değerlendirilmesiyle kişiye uygun eğitim planı oluşturulmasına destek verilir.",status:"active"},
+ {id:"coaching",name:"Coaching & Mentoring",slug:"coaching-mentoring",category:"Koçluk",summary:"Hedef belirleme, motivasyon ve gelişim sürecinize bireysel rehberlik.",description:"Kişisel hedeflerin netleştirilmesi, eylem planı oluşturulması ve gelişimin düzenli değerlendirilmesi için yapılandırılmış mentorluk desteği sunulur.",status:"active"}
+ ];
+ let services;try{services=JSON.parse(localStorage.getItem("edwise_preview_services")||"null")||initial}catch{services=initial}
+ let selected=services[0]?.id||null;
+ const $=id=>document.getElementById(id);
+ const save=()=>{try{localStorage.setItem("edwise_preview_services",JSON.stringify(services))}catch{}};
+ function preview(s){$("previewCategory").textContent=(s.category||"HİZMET").toLocaleUpperCase("tr-TR");$("previewName").textContent=s.name||"Hizmet adı";$("previewSummary").textContent=s.summary||"Kısa tanıtım burada görüntülenir.";$("previewDescription").textContent=s.description||"";}
+ function fill(s){$("svcId").value=s?.id||"";$("svcName").value=s?.name||"";$("svcSlug").value=s?.slug||"";$("svcCategory").value=s?.category||"Dil Sınavları";$("svcSummary").value=s?.summary||"";$("svcDescription").value=s?.description||"";$("svcStatus").value=s?.status||"draft";$("serviceEditorTitle").textContent=s?"Hizmeti düzenle":"Yeni hizmet oluştur";preview(s||{});}
+ function render(){ $("serviceItems").innerHTML=services.map(s=>'<button type="button" class="service-row '+(s.id===selected?'selected':'')+'" data-id="'+s.id+'"><span class="svc-symbol">✧</span><span><strong>'+s.name.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))+'</strong><small>'+s.category+'</small></span><span class="svc-state">'+(s.status==="active"?"Aktif":"Taslak")+'</span></button>').join("");$("serviceCount").textContent=services.length+" HİZMET";document.querySelectorAll(".service-row").forEach(b=>b.addEventListener("click",()=>{selected=b.dataset.id;render();fill(services.find(s=>s.id===selected));}));}
+ $("svcName").addEventListener("input",()=>{if(!$("svcId").value)$("svcSlug").value=$("svcName").value.toLocaleLowerCase("tr-TR").replace(/ı/g,"i").replace(/ğ/g,"g").replace(/ü/g,"u").replace(/ş/g,"s").replace(/ö/g,"o").replace(/ç/g,"c").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");});
+ ["svcName","svcCategory","svcSummary","svcDescription"].forEach(id=>$(id).addEventListener("input",()=>preview({name:$("svcName").value,category:$("svcCategory").value,summary:$("svcSummary").value,description:$("svcDescription").value})));
+ $("serviceEditor").addEventListener("submit",e=>{e.preventDefault();const id=$("svcId").value||"svc-"+Date.now();const item={id,name:$("svcName").value.trim(),slug:$("svcSlug").value.trim(),category:$("svcCategory").value,summary:$("svcSummary").value.trim(),description:$("svcDescription").value.trim(),status:$("svcStatus").value};const i=services.findIndex(s=>s.id===id);if(i>=0)services[i]=item;else services.push(item);selected=id;save();render();fill(item);});
+ $("newService").addEventListener("click",()=>{selected=null;render();fill(null);$("svcName").focus();});
+ $("resetService").addEventListener("click",()=>{const item=services.find(s=>s.id===selected);fill(item||null);});
+ render();fill(services.find(s=>s.id===selected)||null);
+})();
+</script></div></main></div></body></html>
