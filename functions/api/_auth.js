@@ -54,10 +54,10 @@ export async function requireAdmin(context) {
     FROM admin_sessions s
     INNER JOIN admins a ON a.id = s.admin_id
     WHERE s.token_hash = ?
-      AND datetime(s.expires_at) > datetime('now')
+      AND s.expires_at > ?
       AND a.is_active = 1
     LIMIT 1
-  `).bind(tokenHash).first();
+  `).bind(tokenHash, new Date().toISOString()).first();
 
   if (!result) {
     return authError(
