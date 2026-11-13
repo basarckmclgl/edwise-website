@@ -18,7 +18,7 @@ function decodePem(value){
  const binary=atob(raw);return Uint8Array.from(binary,c=>c.charCodeAt(0));
 }
 async function getGoogleAccessToken(secret){
- let account=JSON.parse(String(secret).replace(/^\\uFEFF/,"").trim());
+ let account=JSON.parse(String(secret).replace(/^\uFEFF/,"").trim());
  if(typeof account==="string")account=JSON.parse(account.trim());
  if(account?.credentials&&typeof account.credentials==="object")account=account.credentials;
  if(account?.service_account&&typeof account.service_account==="object")account=account.service_account;
@@ -69,7 +69,7 @@ async function onGoogleAnalytics(env,startDate,endDate){
  const sources=rows(sourcesResult,"Kaynak raporu");
  let realtime=null,realtimeError="";
  try{const live=await fetchJson("https://analyticsdata.googleapis.com/v1beta/properties/"+propertyId+":runRealtimeReport",{method:"POST",headers:{Authorization:"Bearer "+token,"Content-Type":"application/json"},body:JSON.stringify({metrics:[{name:"activeUsers"},{name:"eventCount"},{name:"screenPageViews"}]})},10000);realtime={activeUsers:Number(live.rows?.[0]?.metricValues?.[0]?.value||0),eventCount:Number(live.rows?.[0]?.metricValues?.[1]?.value||0),pageViews:Number(live.rows?.[0]?.metricValues?.[2]?.value||0)};}catch(error){realtimeError=error.message||"GA4 gerçek zamanlı verisi alınamadı.";}
- return {configured:true,propertyId,totals:{activeUsers:number(summary[0],0),sessions:number(summary[0],1),pageViews:number(summary[0],2),eventCount:number(summary[0],3)},realtime,realtimeError,reportErrors,daily:daily.map(r=>({date:(r.dimensionValues?.[0]?.value||"").replace(/^(\\d{4})(\\d{2})(\\d{2})$/,"$1-$2-$3"),activeUsers:number(r,0),sessions:number(r,1),pageViews:number(r,2)})),countries:countries.map(r=>({country:r.dimensionValues?.[0]?.value||"Bilinmiyor",activeUsers:number(r,0),sessions:number(r,1)})),pages:pages.map(r=>({path:r.dimensionValues?.[0]?.value||"/",pageViews:number(r,0),activeUsers:number(r,1)})),sources:sources.map(r=>({source:r.dimensionValues?.[0]?.value||"Bilinmiyor",sessions:number(r,0),activeUsers:number(r,1)}))};
+ return {configured:true,propertyId,totals:{activeUsers:number(summary[0],0),sessions:number(summary[0],1),pageViews:number(summary[0],2),eventCount:number(summary[0],3)},realtime,realtimeError,reportErrors,daily:daily.map(r=>({date:(r.dimensionValues?.[0]?.value||"").replace(/^(\d{4})(\d{2})(\d{2})$/,"$1-$2-$3"),activeUsers:number(r,0),sessions:number(r,1),pageViews:number(r,2)})),countries:countries.map(r=>({country:r.dimensionValues?.[0]?.value||"Bilinmiyor",activeUsers:number(r,0),sessions:number(r,1)})),pages:pages.map(r=>({path:r.dimensionValues?.[0]?.value||"/",pageViews:number(r,0),activeUsers:number(r,1)})),sources:sources.map(r=>({source:r.dimensionValues?.[0]?.value||"Bilinmiyor",sessions:number(r,0),activeUsers:number(r,1)}))};
 }
 
 async function onCloudflare(env,startDate,endDate){
