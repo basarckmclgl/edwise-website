@@ -38,7 +38,7 @@ function runEditorCommand(command,value=null){editor.focus();document.execComman
 document.querySelectorAll('[data-cmd]').forEach(b=>b.addEventListener('click',()=>runEditorCommand(b.dataset.cmd)));
 $('fontFamily').addEventListener('change',e=>runEditorCommand('fontName',e.target.value));
 $('fontSize').addEventListener('change',e=>runEditorCommand('fontSize',e.target.value));
-$('linkBtn').addEventListener('click',()=>{const url=prompt('Bağlantı adresini girin (https://…)');if(url){if(!/^https?:\\/\\//i.test(url)){show('Bağlantı https:// veya http:// ile başlamalı.','err');return;}runEditorCommand('createLink',url);}});
+$('linkBtn').addEventListener('click',()=>{const url=prompt('Bağlantı adresini girin (https://…)');if(url){let parsed;try{parsed=new URL(url)}catch{show('Geçerli bir bağlantı adresi girin.','err');return;}if(!['http:','https:'].includes(parsed.protocol)){show('Bağlantı https:// veya http:// ile başlamalı.','err');return;}runEditorCommand('createLink',url);}});
 $('clearFormat').addEventListener('click',()=>{editor.focus();document.execCommand('removeFormat',false,null);document.execCommand('unlink',false,null);contentField.value=editor.innerHTML;});
 editor.addEventListener('input',()=>contentField.value=editor.innerHTML);
 $('title').addEventListener('input',()=>{if(autoSlug)$('slug').value=slugify($('title').value)});$('slug').addEventListener('input',()=>{autoSlug=false;$('slug').value=slugify($('slug').value)});$('newBtn').addEventListener('click',()=>{reset();$('editor').scrollIntoView({behavior:'smooth',block:'start'});$('title').focus()});$('resetBtn').addEventListener('click',reset);$('refreshBtn').addEventListener('click',load);$('search').addEventListener('input',render);
