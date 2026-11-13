@@ -6,8 +6,11 @@
 </head>
 <body><main class="shell"><header class="top"><div><div class="brand">EDWISE</div><div class="subtitle">Canlı Ders Sınıfı</div></div><div class="state" id="connectionState" role="status">Bağlantı hazırlanıyor…</div></header><div id="meetingStage" class="stage" hidden><rtk-meeting id="edwiseMeeting" show-setup-screen="true"></rtk-meeting></div><section id="notice" class="notice" role="alert"><h1>Canlı sınıf hazırlanıyor</h1><p id="noticeText">Güvenli bağlantı kontrol ediliyor.</p><button id="backButton" type="button" hidden>Geri dön</button></section></main>
 <script type="module">
-import RealtimeKitClient from "https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit@latest/dist/index.es.js";
 import { defineCustomElements } from "https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit-ui@latest/loader/index.es2017.js";
+defineCustomElements();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@cloudflare/realtimekit@latest/dist/browser.js"></script>
+<script>
 (async()=>{
  const state=document.getElementById("connectionState"),notice=document.getElementById("notice"),noticeText=document.getElementById("noticeText"),stage=document.getElementById("meetingStage"),back=document.getElementById("backButton");
  let meeting=null;
@@ -17,15 +20,15 @@ import { defineCustomElements } from "https://cdn.jsdelivr.net/npm/@cloudflare/r
  history.replaceState(null,"",location.pathname+location.search);
  if(!authToken){fail("Bu canlı sınıfa katılmak için EDWISE tarafından oluşturulmuş geçerli bir davet bağlantısı gerekir.");return;}
  try{
-  await defineCustomElements();
+  if(!window.RealtimeKitClient||typeof window.RealtimeKitClient.init!=="function")throw new Error("RealtimeKit Core SDK yüklenemedi. CDN isteği başarısız oldu.");
   await Promise.race([
    customElements.whenDefined("rtk-meeting"),
-   new Promise((_,reject)=>setTimeout(()=>reject(new Error("Canlı ders arayüzü zamanında yüklenemedi. CDN bağlantısını kontrol edin.")),15000))
+   new Promise((_,reject)=>setTimeout(()=>reject(new Error("RealtimeKit arayüzü 15 saniyede yüklenemedi.")),15000))
   ]);
-  meeting=await RealtimeKitClient.init({authToken,defaults:{audio:false,video:false}});
+  meeting=await window.RealtimeKitClient.init({authToken,defaults:{audio:false,video:false}});
   document.getElementById("edwiseMeeting").meeting=meeting;
   stage.hidden=false;notice.hidden=true;state.textContent="Canlı sınıf hazır";
  }catch(error){console.error("EDWISE RealtimeKit initialization failed:",error);fail(error?.message||"Canlı sınıfa bağlanırken hata oluştu.");}
  window.addEventListener("beforeunload",()=>{try{meeting?.leave?.();}catch(_){}});
 })();
-</script>></body></html>
+</script>>></body></html>
