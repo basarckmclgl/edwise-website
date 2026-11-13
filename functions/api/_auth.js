@@ -14,7 +14,9 @@ function getCookie(request, name) {
     new RegExp("(?:^|;\\s*)" + name + "=([^;]*)")
   );
 
-  return match ? decodeURIComponent(match[1]) : null;
+  if (!match) return null;
+  try { return decodeURIComponent(match[1]); }
+  catch { return null; }
 }
 
 function authError(message, status) {
@@ -34,7 +36,7 @@ export async function requireAdmin(context) {
     "edwise_session"
   );
 
-  if (!token) {
+  if (!token || !/^[a-f0-9]{64}$/i.test(token)) {
     return authError(
       "Oturum açmanız gerekiyor.",
       401
