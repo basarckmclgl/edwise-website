@@ -401,5 +401,3 @@ header nav#site-menu a.menu-contact:hover {
     color: #1b0d2d !important;
 }
 
-/* Preview-only: hide the floating contact/message tab while preserving all contact links and data. */
-.whatsapp-float{display:none!important}
