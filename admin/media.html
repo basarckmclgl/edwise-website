@@ -1,331 +1,64 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>EDWISE | Medya Kütüphanesi</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EDWISE — Medya Kütüphanesi</title>
 <style>
-:root{--bg:#0d0d18;--panel:#171727;--border:#30304b;--purple:#8055ed;--light:#a78bfa;--text:#f5f3ff;--muted:#aaa7c0}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
-header{padding:20px 5%;background:#131322;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.logo{font-size:23px;font-weight:900;color:var(--light);letter-spacing:3px}
-a{color:var(--light);text-decoration:none;font-size:13px}
-main{max-width:1200px;margin:35px auto;padding:0 20px}
-h1{font-size:25px;margin-bottom:8px}
-p{color:var(--muted);font-size:13px;line-height:1.6}
-.upload{border:2px dashed #514078;background:#171727;border-radius:15px;padding:35px;text-align:center;margin:25px 0}
-.upload.drag{border-color:var(--light);background:#25203a}
-button{background:var(--purple);color:white;border:0;padding:11px 16px;border-radius:8px;cursor:pointer}
-button:disabled{opacity:.5;cursor:wait}
-input{display:none}
-#message{margin:15px 0;font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:17px;margin-top:20px}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.card img{width:100%;height:170px;object-fit:cover;background:#10101c}
-.info{padding:12px}
-.name{font-size:12px;overflow-wrap:anywhere;color:#eee}
-.actions{display:flex;gap:7px;margin-top:12px}
-.actions button{font-size:11px;padding:8px}
-.secondary{background:#29213f}
- .danger{background:#a83248}
-.empty{padding:35px;text-align:center;color:var(--muted);grid-column:1/-1}
-#imageViewer{position:fixed;inset:0;z-index:99999;background:rgba(8,7,15,.94);display:none;align-items:center;justify-content:center;padding:70px 24px 30px}#imageViewer.open{display:flex}#imageViewer img{max-width:94vw;max-height:82vh;object-fit:contain;cursor:zoom-in}.viewer-bar{position:absolute;top:16px;right:18px;display:flex;gap:10px}.viewer-bar button{background:#29213f;border:1px solid #71628d;padding:10px 15px}.viewer-close{background:#9e3049!important}.viewer-caption{position:absolute;left:20px;top:22px;color:white;font-size:13px}</style>
-</head>
-<body>
-<header>
- <div class="logo">EDWISE</div>
- <nav style="display:flex;gap:18px;align-items:center;flex-wrap:wrap"><a href="/admin/dashboard.html">← Yönetim Paneline Dön</a><a href="/admin/pages.html">Sayfa Yönetimi</a><a href="/admin/pages.html?view=trash">Silinen Sayfalar</a></nav>
-</header>
-<div id="imageViewer" role="dialog" aria-modal="true"><div class="viewer-caption" id="viewerCaption"></div><div class="viewer-bar"><button id="viewerZoom">Büyüt</button><button id="viewerClose" class="viewer-close">Kapat ✕</button></div><img id="viewerImage" alt=""></div><main>
- <h1>Medya Kütüphanesi</h1>
- <p>Fotoğraflarınızı yükleyin, görüntüleyin ve sayfalarınızda kullanmak üzere bağlantılarını kopyalayın.</p>
-
- <div class="upload" id="dropArea">
-  <h2>Görsellerinizi buraya bırakın</h2>
-  <p>Veya bilgisayarınızdan dosya seçin.</p>
-  <p>JPG, PNG, WEBP ve GIF · En fazla 5 MB</p>
-  <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
-  <button id="chooseButton">Dosya Seç</button>
-  <button id="uploadButton" disabled>Seçilenleri Yükle</button>
-  <button id="importSiteImagesButton" class="secondary" type="button">Sitedeki Görselleri Aktar</button>
- </div>
-
- <div id="message"></div>
-
- <h2>Yüklenen Görseller</h2>
- <div class="grid" id="mediaGrid">
-  <div class="empty">Medya kütüphanesi yükleniyor...</div>
- </div>
-</main>
-
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+:root{--bg:#080914;--surface:#101225;--surface2:#15182f;--line:#292b49;--muted:#9295b3;--white:#f7f6ff;--violet:#a58bff;--violet2:#7655e8;--mint:#8de3c5;--red:#f08b9a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 78% -15%,#34265e 0,transparent 33%),var(--bg);color:var(--white);font:14px 'DM Sans',sans-serif;min-height:100vh}
+.shell{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}.sidebar{position:sticky;top:0;height:100vh;padding:25px 16px;background:#0d0e1cf5;border-right:1px solid var(--line);display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:12px;padding:3px 10px 30px}.mark{width:40px;height:40px;border-radius:13px;background:linear-gradient(145deg,#b49cff,#6845d5);display:grid;place-items:center;font:800 21px Manrope}.brand strong{font:800 16px Manrope;letter-spacing:2px}.brand small{display:block;color:#8889a8;font-size:9px;letter-spacing:2px;margin-top:3px}
+.label{font-size:9px;letter-spacing:1.8px;color:#777895;text-transform:uppercase;padding:0 12px;margin:17px 0 8px}.nav{display:flex;align-items:center;gap:12px;padding:11px 12px;margin:2px 0;border-radius:10px;text-decoration:none;color:#a7a8c2;font-size:12px}.nav:hover{background:#1b1c35;color:white}.nav.active{background:linear-gradient(100deg,#3b2d69,#25213f);color:white;box-shadow:inset 0 0 0 1px #59468b}.nav .ic{width:18px;text-align:center;color:#b5a2ff;font-size:16px}.side-bottom{margin-top:auto;border:1px solid #302d4c;background:#14152a;border-radius:13px;padding:13px;color:#c6c5df;font-size:11px}.side-bottom small{display:block;color:#8587a4;line-height:1.6;margin-top:7px}
+main{min-width:0}.topbar{height:72px;border-bottom:1px solid #282741;background:#0b0d1bd9;display:flex;align-items:center;justify-content:space-between;padding:0 38px;position:sticky;top:0;z-index:5}.crumb{font-size:11px;color:#8587a6}.crumb b{color:#e8e5fb}.role{border:1px solid #4b3c73;border-radius:20px;padding:6px 11px;color:#c9baff;background:#211b39;font-size:10px}
+.wrap{max-width:1500px;margin:auto;padding:32px 38px 55px}.intro{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:24px}.eyebrow{font-size:10px;color:#b49aff;letter-spacing:2px}.intro h1{font:700 28px Manrope;margin:7px 0 5px}.intro p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}
+.btn{border:1px solid #514477;border-radius:9px;padding:10px 14px;background:#282044;color:#eee9ff;font:600 11px 'DM Sans';cursor:pointer}.btn.primary{border:0;background:linear-gradient(115deg,#a58aff,#7654df);color:white}.btn:disabled{opacity:.5;cursor:wait}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}.stat{padding:15px 17px;border:1px solid var(--line);border-radius:13px;background:linear-gradient(145deg,#171a31,#101325)}.stat span{display:block;color:#9294ae;font-size:10px}.stat strong{display:block;font:700 23px Manrope;margin-top:5px}
+.upload{border:1px dashed #62518e;background:linear-gradient(110deg,#211b39,#15172b);border-radius:16px;padding:23px;display:flex;align-items:center;justify-content:space-between;gap:18px;margin:18px 0}.upload.drag{border-color:var(--violet);background:#292044}.upload h2{font:700 14px Manrope;margin:0 0 5px}.upload p{font-size:11px;color:#aaa7c0;margin:0;line-height:1.6}.upload-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}input[type=file]{display:none}
+.toolbar{display:flex;align-items:center;gap:10px;margin:25px 0 14px;flex-wrap:wrap}.search{flex:1;min-width:210px;background:#111326;border:1px solid var(--line);border-radius:9px;padding:11px 13px;color:white;font:12px 'DM Sans';outline:none}.search:focus{border-color:#8267c5}select{background:#111326;border:1px solid var(--line);border-radius:9px;padding:11px;color:#ddd9f2;font:11px 'DM Sans'}
+.heading{display:flex;justify-content:space-between;align-items:center;margin:18px 0 13px}.heading h2{font:700 13px Manrope;margin:0}.heading span{font-size:10px;color:#8587a5}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:14px}.card{border:1px solid var(--line);border-radius:13px;overflow:hidden;background:linear-gradient(145deg,#171a31,#101325);min-width:0}.preview{height:160px;background:#0c0e1b;display:grid;place-items:center;overflow:hidden;cursor:zoom-in}.preview img{width:100%;height:100%;object-fit:cover;transition:transform .25s}.card:hover .preview img{transform:scale(1.035)}.fileicon{font-size:35px;color:#b5a2ff}.info{padding:12px}.filename{font-size:11px;font-weight:600;overflow-wrap:anywhere;line-height:1.5;min-height:32px}.meta{font-size:9px;color:#8587a5;margin-top:7px;display:flex;justify-content:space-between;gap:8px}.actions{display:flex;gap:6px;margin-top:12px}.actions .btn{flex:1;padding:8px 7px;font-size:10px}.btn.danger{background:#3b1d2a;border-color:#673044;color:#ffc0c9}
+.empty{grid-column:1/-1;text-align:center;padding:48px 20px;border:1px dashed #383654;border-radius:14px;color:#9295b3;font-size:12px}.message{font-size:11px;min-height:18px;color:var(--mint);margin:10px 0}.hint{font-size:10px;color:#8587a5;margin-top:9px}
+#viewer{display:none;position:fixed;inset:0;z-index:50;background:#070711f2;align-items:center;justify-content:center;padding:65px 25px 25px}#viewer.open{display:flex}#viewer img{max-width:94vw;max-height:84vh;object-fit:contain}.viewer-close{position:absolute;right:20px;top:17px}
+@media(max-width:850px){.shell{grid-template-columns:205px 1fr}.wrap{padding:25px 20px}.topbar{padding:0 20px}.upload{align-items:flex-start;flex-direction:column}.upload-actions{justify-content:flex-start}}
+@media(max-width:650px){.shell{grid-template-columns:62px 1fr}.sidebar{padding:18px 7px}.brand{justify-content:center;padding:0 0 25px}.brand>div:last-child,.label,.nav .txt,.side-bottom{display:none}.nav{justify-content:center;padding:12px 4px}.nav .ic{font-size:18px}.topbar{height:60px;padding:0 13px}.wrap{padding:21px 13px}.intro h1{font-size:23px}.stats{gap:7px}.stat{padding:12px}.stat strong{font-size:19px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.preview{height:125px}.actions{flex-wrap:wrap}.actions .btn{font-size:9px}}
+</style></head>
+<body><div class="shell">
+<aside class="sidebar"><div class="brand"><div class="mark">E</div><div><strong>EDWISE</strong><small>MANAGEMENT STUDIO</small></div></div>
+<div class="label">Workspace</div>
+<a class="nav" href="/admin/panel-concept-preview"><span class="ic">⌂</span><span class="txt">Genel Bakış</span></a>
+<a class="nav" href="/admin/pages.html"><span class="ic">▤</span><span class="txt">Sayfa Yönetimi</span></a>
+<a class="nav" href="/admin/services.html"><span class="ic">✧</span><span class="txt">Hizmetler</span></a>
+<a class="nav" href="/admin/applications.html"><span class="ic">✉</span><span class="txt">Başvurular</span></a>
+<a class="nav active" href="/admin/media.html"><span class="ic">▧</span><span class="txt">Medya Kütüphanesi</span></a>
+<div class="label">Website studio</div><a class="nav" href="/admin/panel-concept-preview"><span class="ic">☷</span><span class="txt">Diğer modüller</span></a>
+<div class="side-bottom">● Güvenli yönetim oturumu<small>Dosyalar mevcut medya deposunda saklanır. Bu ekran yeni panel önizlemesidir.</small></div></aside>
+<main><header class="topbar"><div class="crumb">EDWISE <span style="color:#555"> / </span> <b>Medya Kütüphanesi</b></div><span class="role">✦ Yönetim Stüdyosu</span></header>
+<div class="wrap"><div class="intro"><div><div class="eyebrow">CONTENT ASSETS</div><h1>Medya Kütüphanesi</h1><p>Görsellerini tek merkezden yükle, bul, önizle ve sayfalarında kullanmak üzere bağlantılarını kopyala.</p></div><button class="btn primary" id="chooseTop">＋ Görsel yükle</button></div>
+<div class="stats"><div class="stat"><span>Toplam medya</span><strong id="totalCount">—</strong></div><div class="stat"><span>JPEG / PNG</span><strong id="rasterCount">—</strong></div><div class="stat"><span>WEBP / GIF</span><strong id="webCount">—</strong></div></div>
+<section class="upload" id="dropArea"><div><h2>Dosyalarını buraya sürükleyip bırak</h2><p>JPG, PNG, WEBP ve GIF desteklenir · Dosya başına en fazla 5 MB</p><p class="hint" id="selectionHint">Birden fazla görseli aynı anda seçebilirsin.</p></div><div class="upload-actions"><input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/gif" multiple><button class="btn" id="chooseButton">Dosya seç</button><button class="btn primary" id="uploadButton" disabled>Seçilenleri yükle</button><button class="btn" id="importButton">Sitedeki görselleri aktar</button></div></section>
+<div class="message" id="message" role="status" aria-live="polite"></div>
+<div class="toolbar"><input class="search" id="searchInput" type="search" placeholder="Dosya adına göre ara…"><select id="typeFilter" aria-label="Dosya türü"><option value="all">Tüm dosya türleri</option><option value="image/jpeg">JPEG</option><option value="image/png">PNG</option><option value="image/webp">WEBP</option><option value="image/gif">GIF</option></select><button class="btn" id="refreshButton">↻ Yenile</button></div>
+<div class="heading"><h2>Kütüphanedeki dosyalar</h2><span id="resultCount">Yükleniyor…</span></div>
+<div class="grid" id="mediaGrid"><div class="empty">Medya kütüphanesi yükleniyor…</div></div>
+</div></main></div>
+<div id="viewer" role="dialog" aria-modal="true" aria-label="Görsel önizleme"><button class="btn viewer-close" id="viewerClose">Kapat ✕</button><img id="viewerImage" alt=""></div>
 <script>
-const $ = id => document.getElementById(id);
-let selectedFiles = [];
-function openViewer(url,name){$("viewerImage").src=url;$("viewerImage").alt=name||"Görsel";$("viewerCaption").textContent=name||"";$("imageViewer").classList.add("open");$("imageViewer").classList.remove("zoomed");$("viewerZoom").textContent="Büyüt"}
-function closeViewer(){$("imageViewer").classList.remove("open","zoomed");$("viewerImage").src=""}
-$("viewerClose").addEventListener("click",closeViewer);
-$("viewerZoom").addEventListener("click",()=>{const z=$("imageViewer").classList.toggle("zoomed");$("viewerImage").style.transform=z?"scale(1.7)":"";$("viewerZoom").textContent=z?"Küçült":"Büyüt"});
-$("imageViewer").addEventListener("click",e=>{if(e.target===$("imageViewer"))closeViewer()});
-$("viewerImage").addEventListener("click",()=>{$("viewerZoom").click()});
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeViewer()});
-
-function showMessage(text, success = false) {
- $("message").textContent = text;
- $("message").style.color = success ? "#71dbb3" : "#ffadb5";
-}
-
-function selectFiles(files) {
- selectedFiles = Array.from(files || []);
- $("uploadButton").disabled = selectedFiles.length === 0;
- $("chooseButton").textContent = selectedFiles.length
-  ? selectedFiles.length + " dosya seçildi"
-  : "Dosya Seç";
-}
-
-$("importSiteImagesButton").addEventListener("click", async () => {
- const button=$("importSiteImagesButton");
- if(!confirm("Sitede kullanılan mevcut görseller medya kütüphanesine aktarılsın mı? Zaten kayıtlı görseller atlanır."))return;
- button.disabled=true;button.textContent="Aktarılıyor...";
- try{
-  const response=await fetch("/api/media-import",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"}});
-  const data=await response.json();
-  if(!response.ok||!data.success)throw new Error(data.error||"Görseller aktarılamadı.");
-  const imported=(data.imported||[]).length;
-  const skipped=(data.skipped||[]).length;
-  showMessage(imported+" görsel aktarıldı. "+skipped+" görsel zaten kayıtlı veya aktarılamadı.",true);
-  await loadMedia();
- }catch(error){showMessage(error.message);}
- finally{button.disabled=false;button.textContent="Sitedeki Görselleri Aktar";}
-});
-$("chooseButton").addEventListener("click", () => $("fileInput").click());
-
-$("fileInput").addEventListener("change", event => {
- selectFiles(event.target.files);
-});
-
-const dropArea = $("dropArea");
-
-["dragenter","dragover"].forEach(type => {
- dropArea.addEventListener(type, event => {
-  event.preventDefault();
-  dropArea.classList.add("drag");
- });
-});
-
-["dragleave","drop"].forEach(type => {
- dropArea.addEventListener(type, event => {
-  event.preventDefault();
-  dropArea.classList.remove("drag");
- });
-});
-
-dropArea.addEventListener("drop", event => {
- selectFiles(event.dataTransfer.files);
-});
-
-async function loadMedia() {
- $("mediaGrid").innerHTML = '<div class="empty">Görseller yükleniyor...</div>';
-
- try {
-  const response = await fetch("/api/media", {
-   credentials:"same-origin"
-  });
-
-  if (response.status === 401) {
-   location.replace("/admin/");
-   return;
-  }
-
-  const data = await response.json();
-
-  if (!response.ok || !data.success) {
-   throw new Error(data.error || "Medya listesi alınamadı.");
-  }
-
-  const items = data.media || [];
-
-  if (!items.length) {
-   $("mediaGrid").innerHTML =
-    '<div class="empty">Henüz görsel yüklenmemiş.</div>';
-   return;
-  }
-
-  $("mediaGrid").replaceChildren();
-
-  items.forEach(item => {
-   const card = document.createElement("article");
-   card.className = "card";
-
-   const img = document.createElement("img");
-   img.src = item.file_url;
-   img.alt = item.file_name;
-   img.loading = "lazy";
-   img.style.cursor="zoom-in";
-   img.addEventListener("click",()=>openViewer(item.file_url,item.file_name));
-
-   const info = document.createElement("div");
-   info.className = "info";
-
-   const name = document.createElement("div");
-   name.className = "name";
-   name.textContent = item.file_name;
-
-   const actions = document.createElement("div");
-   actions.className = "actions";
-
-   const copy = document.createElement("button");
-   copy.className = "secondary";
-   copy.textContent = "Adresi Kopyala";
-   copy.addEventListener("click", async () => {
-    try {
-     await navigator.clipboard.writeText(item.file_url);
-     showMessage("Görsel adresi kopyalandı.", true);
-    } catch {
-     showMessage("Kopyalama başarısız. Görsel adresini açıp kopyalayabilirsin.");
-    }
-   });
-
-   const open = document.createElement("button");
-   open.textContent = "Görseli Aç";
-   open.addEventListener("click", () => {
-    openViewer(item.file_url,item.file_name);
-   });
-
-   
-const del = document.createElement("button");
-del.className = "danger";
-del.textContent = "Sil";
-
-del.addEventListener("click", async () => {
-  if (!confirm("Bu görseli kalıcı olarak silmek istiyor musun?")) {
-    return;
-  }
-
-  del.disabled = true;
-  del.textContent = "Siliniyor...";
-
-  try {
-    const response = await fetch("/api/media-delete", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        file_name: item.file_name,
-        file_url: item.file_url
-      })
-    });
-
-    const data = await response.json();
-
-    if (!data.success) {
-      throw new Error(data.error || "Silme başarısız.");
-    }
-
-    showMessage(
-      data.warning || "Görsel başarıyla silindi.",
-      !data.warning
-    );
-
-    await loadMedia();
-
-  } catch (error) {
-    showMessage(error.message);
-    del.disabled = false;
-    del.textContent = "Sil";
-  }
-});
-
-   actions.append(copy, open, del);
-   info.append(name, actions);
-   card.append(img, info);
-   $("mediaGrid").append(card);
-  });
-
- } catch (error) {
-  $("mediaGrid").innerHTML = "";
-  showMessage(error.message);
- }
-}
-
-$("uploadButton").addEventListener("click", async () => {
- if (!selectedFiles.length) return;
-
- $("uploadButton").disabled = true;
- let uploaded = 0;
-
- for (const file of selectedFiles) {
-  const form = new FormData();
-  form.append("file", file);
-
-  try {
-   const response = await fetch("/api/media-upload", {
-    method:"POST",
-    credentials:"same-origin",
-    body:form
-   });
-
-   const data = await response.json();
-
-   if (!response.ok || !data.success) {
-    throw new Error(data.error || "Yükleme başarısız.");
-   }
-
-   uploaded++;
-
-   if (data.warning) {
-    showMessage(data.warning);
-   }
-
-  } catch (error) {
-   showMessage(file.name + ": " + error.message);
-  }
- }
-
- selectFiles([]);
- $("fileInput").value = "";
- $("chooseButton").textContent = "Dosya Seç";
-
- if (uploaded) {
-  showMessage(uploaded + " görsel başarıyla yüklendi.", true);
- }
-
- await loadMedia();
-});
-
-async function checkSession() {
- try {
-  const response = await fetch("/api/me", {
-   credentials:"same-origin"
-  });
-
-  if (!response.ok) {
-   location.replace("/admin/");
-   return false;
-  }
-
-  const data = await response.json();
-
-  if (!data.success || !data.admin) {
-   location.replace("/admin/");
-   return false;
-  }
-
-  return true;
- } catch {
-  location.replace("/admin/");
-  return false;
- }
-}
-
-(async () => {
- if (await checkSession()) {
-  await loadMedia();
- }
-})();
-</script>
-</body>
-</html>
+const $=id=>document.getElementById(id);let selectedFiles=[],allMedia=[];
+function message(text,ok=true){$("message").textContent=text;$("message").style.color=ok?"#8de3c5":"#f08b9a"}
+function formatDate(value){if(!value)return"—";const d=new Date(value.includes("T")?value:value.replace(" ","T")+"Z");return Number.isNaN(d.getTime())?"—":d.toLocaleDateString("tr-TR",{day:"2-digit",month:"short",year:"numeric"})}
+function openViewer(url,name){$("viewerImage").src=url;$("viewerImage").alt=name||"Görsel";$("viewer").classList.add("open")}
+function closeViewer(){$("viewer").classList.remove("open");$("viewerImage").src=""}
+$("viewerClose").addEventListener("click",closeViewer);$("viewer").addEventListener("click",e=>{if(e.target===$("viewer"))closeViewer()});document.addEventListener("keydown",e=>{if(e.key==="Escape")closeViewer()});
+function choose(){ $("fileInput").click() }$("chooseButton").addEventListener("click",choose);$("chooseTop").addEventListener("click",choose);
+function selectFiles(files){selectedFiles=Array.from(files||[]);$("uploadButton").disabled=!selectedFiles.length;$("selectionHint").textContent=selectedFiles.length?selectedFiles.length+" dosya seçildi · Yükle düğmesine basarak devam et.":"Birden fazla görseli aynı anda seçebilirsin.";$("chooseButton").textContent=selectedFiles.length?"Dosyaları değiştir":"Dosya seç"}
+$("fileInput").addEventListener("change",e=>selectFiles(e.target.files));
+const drop=$("dropArea");["dragenter","dragover"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("drag")}));["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("drag")}));drop.addEventListener("drop",e=>selectFiles(e.dataTransfer.files));
+function render(){const q=$("searchInput").value.trim().toLocaleLowerCase("tr-TR"),type=$("typeFilter").value;const items=allMedia.filter(x=>(!q||String(x.file_name||"").toLocaleLowerCase("tr-TR").includes(q))&&(type==="all"||x.file_type===type));$("resultCount").textContent=items.length+" dosya gösteriliyor";$("totalCount").textContent=allMedia.length;$("rasterCount").textContent=allMedia.filter(x=>["image/jpeg","image/png"].includes(x.file_type)).length;$("webCount").textContent=allMedia.filter(x=>["image/webp","image/gif"].includes(x.file_type)).length;
+const grid=$("mediaGrid");grid.replaceChildren();if(!items.length){const empty=document.createElement("div");empty.className="empty";empty.textContent=allMedia.length?"Aramana uygun dosya bulunamadı.":"Henüz medya yüklenmemiş. İlk görselini yukarıdan ekleyebilirsin.";grid.append(empty);return}
+items.forEach(item=>{const card=document.createElement("article");card.className="card";const preview=document.createElement("div");preview.className="preview";const img=document.createElement("img");img.src=item.file_url;img.alt=item.file_name||"Medya dosyası";img.loading="lazy";img.addEventListener("error",()=>{preview.replaceChildren();const icon=document.createElement("span");icon.className="fileicon";icon.textContent="▧";preview.append(icon)});preview.append(img);preview.addEventListener("click",()=>openViewer(item.file_url,item.file_name));const info=document.createElement("div");info.className="info";const name=document.createElement("div");name.className="filename";name.textContent=item.file_name;const meta=document.createElement("div");meta.className="meta";const kind=document.createElement("span");kind.textContent=(item.file_type||"Görsel").replace("image/","").toUpperCase();const date=document.createElement("span");date.textContent=formatDate(item.created_at);meta.append(kind,date);const actions=document.createElement("div");actions.className="actions";const copy=document.createElement("button");copy.className="btn";copy.textContent="Bağlantıyı kopyala";copy.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(new URL(item.file_url,location.origin).href);message("Görsel bağlantısı kopyalandı.")}catch{message("Tarayıcı kopyalamaya izin vermedi.",false)}});const view=document.createElement("button");view.className="btn";view.textContent="Önizle";view.addEventListener("click",()=>openViewer(item.file_url,item.file_name));const del=document.createElement("button");del.className="btn danger";del.textContent="Sil";del.title="Bu işlem dosyayı depodan kalıcı olarak siler";del.addEventListener("click",async()=>{if(!confirm("“"+item.file_name+"” dosyası depodan kalıcı olarak silinecek. Bu işlem geri alınamaz. Devam edilsin mi?"))return;del.disabled=true;del.textContent="Siliniyor…";try{const r=await fetch("/api/media-delete",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({file_name:item.file_name,file_url:item.file_url})});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||"Dosya silinemedi.");message(d.message||"Dosya silindi.");await loadMedia()}catch(e){message(e.message,false);del.disabled=false;del.textContent="Sil"}});actions.append(copy,view,del);info.append(name,meta,actions);card.append(preview,info);grid.append(card)})}
+async function loadMedia(){ $("mediaGrid").innerHTML='<div class="empty">Dosyalar getiriliyor…</div>';try{const r=await fetch("/api/media",{credentials:"same-origin",cache:"no-store"});if(r.status===401){location.replace("/admin/");return}const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||"Medya listesi alınamadı.");allMedia=d.media||[];render()}catch(e){$("mediaGrid").innerHTML='<div class="empty"></div>';$("mediaGrid").firstChild.textContent=e.message;message(e.message,false)}}
+$("searchInput").addEventListener("input",render);$("typeFilter").addEventListener("change",render);$("refreshButton").addEventListener("click",loadMedia);
+$("importButton").addEventListener("click",async()=>{if(!confirm("Sitede kullanılan mevcut görseller medya kütüphanesine aktarılsın mı? Kayıtlı görseller atlanır."))return;const b=$("importButton");b.disabled=true;b.textContent="Aktarılıyor…";try{const r=await fetch("/api/media-import",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"}});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||"Aktarım başarısız.");message((d.imported||[]).length+" görsel aktarıldı; "+(d.skipped||[]).length+" görsel atlandı.");await loadMedia()}catch(e){message(e.message,false)}finally{b.disabled=false;b.textContent="Sitedeki görselleri aktar"}});
+$("uploadButton").addEventListener("click",async()=>{if(!selectedFiles.length)return;const b=$("uploadButton");b.disabled=true;let uploaded=0,failed=[];for(let i=0;i<selectedFiles.length;i++){const file=selectedFiles[i];if(file.size>5*1024*1024){failed.push(file.name+": 5 MB sınırını aşıyor");continue}b.textContent="Yükleniyor "+(i+1)+"/"+selectedFiles.length;const f=new FormData();f.append("file",file);try{const r=await fetch("/api/media-upload",{method:"POST",credentials:"same-origin",body:f});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||"Yükleme başarısız");uploaded++;if(d.warning)failed.push(file.name+": "+d.warning)}catch(e){failed.push(file.name+": "+e.message)}}selectFiles([]);$("fileInput").value="";b.textContent="Seçilenleri yükle";b.disabled=true;message(uploaded+" görsel yüklendi"+(failed.length?". Hatalar: "+failed.join(" | "):"."),failed.length===0);await loadMedia()});
+(async()=>{try{const r=await fetch("/api/me",{credentials:"same-origin"});if(!r.ok){location.replace("/admin/");return}const d=await r.json();if(!d.success||!d.admin){location.replace("/admin/");return}await loadMedia()}catch{location.replace("/admin/")}})();
+</script></body></html>
