@@ -133,6 +133,17 @@ export async function onRequestPost(context) {
     }
 
     const mediaRecord = await db.prepare("SELECT * FROM media WHERE file_name = ?").bind(filename).first();
+    await db.prepare(`CREATE TABLE IF NOT EXISTS media_metadata (
+      media_id INTEGER PRIMARY KEY,
+      byte_size INTEGER,
+      alt_text TEXT NOT NULL DEFAULT '',
+      title TEXT NOT NULL DEFAULT '',
+      description TEXT NOT NULL DEFAULT '',
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY(media_id) REFERENCES media(id) ON DELETE CASCADE
+    )`).run();
+    await db.prepare("INSERT INTO media_metadata(media_id,byte_size) VALUES(?,?) ON CONFLICT(media_id) DO UPDATE SET byte_size=excluded.byte_size")
+      .bind(mediaRecord.id, bytes.byteLength).run();
     await logAudit(db,context.request,auth.admin,{action:"media_uploaded",entity_type:"media",entity_id:filename,entity_title:filename,details:{before:null,after:mediaRecord||{file_name:filename,file_url:url,file_type:file.type}}});
     return json({
       success: true,
