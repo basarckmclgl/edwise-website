@@ -724,10 +724,6 @@ td{color:#39334b!important;border-color:#eeebf4!important}
  <div class="menu-label">GENEL</div>
  <button class="nav active" data-page="overview"><span class="ico">⌂</span><span>Genel Bakış</span></button>
  <button class="nav" data-page="panelhome"><span class="ico">⌂</span><span>Ana Sayfa</span></button>
- <div class="nav-submenu" aria-label="Ana Sayfa alt menüsü">
-  <button class="nav nav-sub" data-page="classrooms"><span class="ico">▦</span><span>Derslikler</span></button>
- </div>
-
  <div class="menu-label">SABİT SİTE SAYFALARI</div>
  <div class="menu-label">İÇERİK STÜDYOSU</div>
  <button class="nav" data-page="pages"><span class="ico">▤</span><span>Diğer Sayfalar</span></button>
@@ -758,39 +754,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
  <div class="content">
   <section id="panelhome" class="hidden" aria-label="Ana Sayfa"></section>
   <section id="classrooms" class="hidden" aria-label="Dersler">
- <div class="section-head"><div><h2>Dersler</h2><p>Eğitim alanını seç, istediğin zaman ders başlat ve ders notlarını kaydet.</p></div></div>
- <div id="lessonCourseGrid" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
-  <button type="button" class="panel lesson-course-card" data-course="ielts" style="text-align:left;cursor:pointer"><h3>IELTS</h3><p>Listening · Reading · Writing · Speaking</p><span>Çalışma alanını aç →</span></button>
-  <button type="button" class="panel lesson-course-card" data-course="toefl" style="text-align:left;cursor:pointer"><h3>TOEFL</h3><p>Academic English · Test preparation</p><span>Çalışma alanını aç →</span></button>
-  <button type="button" class="panel lesson-course-card" data-course="yds" style="text-align:left;cursor:pointer"><h3>YDS</h3><p>Kelime · Dil bilgisi · Okuma</p><span>Çalışma alanını aç →</span></button>
-  <button type="button" class="panel lesson-course-card" data-course="yokdil" style="text-align:left;cursor:pointer"><h3>YÖKDİL</h3><p>Akademik kelime ve alan metinleri</p><span>Çalışma alanını aç →</span></button>
-  <button type="button" class="panel lesson-course-card" data-course="speaking-club" style="text-align:left;cursor:pointer"><h3>Speaking Club</h3><p>Konuşma pratiği ve etkinlikler</p><span>Çalışma alanını aç →</span></button>
-  <button type="button" class="panel lesson-course-card" data-course="education-consultancy" style="text-align:left;cursor:pointer"><h3>Education Consultancy</h3><p>Eğitim danışmanlığı görüşmeleri</p><span>Çalışma alanını aç →</span></button>
- </div>
- <div id="lessonWorkspace" class="panel" style="display:none;margin-top:18px">
-  <div class="section-head"><div><h2 id="lessonCourseTitle">Eğitim alanı</h2><p id="lessonCourseDescription"></p></div><button type="button" class="btn" id="lessonBack">← Eğitim alanlarına dön</button></div>
-  <div id="lessonSiteContent" class="panel" style="margin:12px 0">
-   <h3 style="margin:0 0 8px">Siteden içerik</h3>
-   <p class="muted">İlgili eğitim sayfasının yayımlanmış içeriğini bu kutuya aktar.</p>
-   <div class="actions"><button type="button" class="btn" id="lessonFetchSite">Siteden içerik çek</button><a class="btn" id="lessonSiteLink" href="#" target="_blank" rel="noopener">Site sayfasını aç ↗</a></div>
-   <div id="lessonFetchedContent" class="message hidden"></div>
-  </div>
-  <div class="panel" style="margin:12px 0">
-   <h3 style="margin:0 0 8px">Manuel ders notu ekle</h3>
-   <p class="muted">Kendi ders başlığını ve notlarını yazıp kaydet.</p>
-   <div class="field"><label for="lessonTitle">Ders başlığı</label><input id="lessonTitle" maxlength="160" placeholder="Örn. IELTS Speaking – Practice 1"></div>
-   <div class="field"><label for="lessonNotes">Ders notları</label><textarea id="lessonNotes" rows="8" maxlength="20000" placeholder="Ders hedefleri, işlenen konular, öğrenci notları, ödevler..."></textarea></div>
-   <div class="actions"><button type="button" class="btn btn-primary" id="lessonCreate">Ders notunu kaydet</button></div>
-  </div>
-  <div id="lessonSessionList">Ders kayıtları yükleniyor...</div>
- </div>
-</section>
-  <section id="overview">
-   <div class="welcome welcome-logo-only" aria-label="EDWISE">
-    <img class="welcome-logo" src="/assets/images/logo.png" alt="EDWISE">
-   </div>
-
-   <div class="grid">
+ <div class="section-head"><div><h2>Dersler</h2><p>Eğitim alanını seç, istediğin zaman ders başlat ve ders notlarını kclass="grid">
     <div class="stat"><span>Yayındaki Sayfalar</span><h2 id="countPages">—</h2><p>Yayımlanmış site sayfaları</p></div>
     <div class="stat"><span>Yayındaki Hizmetler</span><h2 id="countServices">—</h2><p>Yayımlanmış hizmetler</p></div>
     <div class="stat" data-superadmin><span>Başvurular</span><h2 id="countApplications">—</h2><p>Kayıtlı başvurular</p></div>
@@ -1351,7 +1315,7 @@ const $=id=>document.getElementById(id);
 let pages=[];
 let currentRole=null;
 
-const editorAllowed=["overview","panelhome","classrooms","pages","services","media","profile","messages"];
+const editorAllowed=["overview","panelhome","pages","services","media","profile","messages"];
 
 function canAccess(page){
  if(currentRole==="superadmin") return true;
@@ -1629,68 +1593,6 @@ const fixedSitePages=[
  {slug:"speaking-club",title:"Speaking Club",url:"/pages/speaking-club.html",kind:"Eğitim sayfası"},
  {slug:"yasal-bilgilendirme",title:"Yasal Bilgilendirme",url:"/pages/yasal-bilgilendirme.html",kind:"Yasal sayfa"}
 ];
-
-const lessonCourses={
- ielts:{title:"IELTS",description:"Listening, Reading, Writing ve Speaking çalışma alanı",url:"/pages/ielts.html"},
- toefl:{title:"TOEFL",description:"Akademik İngilizce ve TOEFL hazırlık çalışma alanı",url:"/pages/toefl.html"},
- yds:{title:"YDS",description:"Kelime, dil bilgisi ve okuma çalışmaları",url:"/pages/yds.html"},
- yokdil:{title:"YÖKDİL",description:"Akademik İngilizce ve alan metinleri",url:"/pages/yokdil.html"},
- "speaking-club":{title:"Speaking Club",description:"Konuşma pratiği ve etkinlik planları",url:"/pages/speaking-club.html"},
- "education-consultancy":{title:"Education Consultancy",description:"Eğitim danışmanlığı görüşme ve takip notları",url:"/pages/egitim-danismanligi.html"}
-};
-let activeLessonCourse="";
-function lessonEscape(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-async function openLessonCourse(course){
- const cfg=lessonCourses[course];if(!cfg)return;activeLessonCourse=course;
- $("lessonCourseGrid").style.display="none";$("lessonWorkspace").style.display="block";
- $("lessonCourseTitle").textContent=cfg.title;$("lessonCourseDescription").textContent=cfg.description;
- $("lessonTitle").value="";$("lessonNotes").value="";
- $("lessonSiteLink").href=cfg.url;
- $("lessonFetchedContent").classList.add("hidden");$("lessonFetchedContent").textContent="";
- $("lessonFetchSite").disabled=false;
- await loadLessonSessions();
-}
-async function fetchLessonSiteContent(){
- const cfg=lessonCourses[activeLessonCourse];if(!cfg)return;
- const button=$("lessonFetchSite"),box=$("lessonFetchedContent");
- button.disabled=true;button.textContent="İçerik alınıyor...";
- box.classList.remove("hidden");box.textContent="Sitedeki içerik okunuyor...";
- try{
-  const response=await fetch(cfg.url,{credentials:"same-origin",cache:"no-store"});
-  if(!response.ok)throw new Error("İlgili site sayfası bulunamadı veya yayımlanmamış.");
-  const html=await response.text();
-  const doc=new DOMParser().parseFromString(html,"text/html");
-  doc.querySelectorAll("script,style,noscript,nav,header,footer,form,svg,iframe").forEach(el=>el.remove());
-  const root=doc.querySelector("main")||doc.querySelector("article")||doc.querySelector(".page-content")||doc.body;
-  const nodes=[...root.querySelectorAll("h1,h2,h3,h4,p,li")];
-  const lines=nodes.map(el=>({tag:el.tagName,text:(el.textContent||"").replace(/\\s+/g," ").trim()})).filter(x=>x.text&&x.text.length>2);
-  const unique=lines.filter((x,i)=>lines.findIndex(y=>y.text===x.text)===i).slice(0,100);
-  if(!unique.length)throw new Error("Sayfada aktarılabilecek metin içeriği bulunamadı.");
-  box.innerHTML=unique.map(x=>x.tag.startsWith("H")?'<h4>'+lessonEscape(x.text)+'</h4>':'<p>'+lessonEscape(x.text)+'</p>').join("");
- }catch(error){box.textContent=error.message||"Site içeriği alınamadı.";}
- finally{button.disabled=false;button.textContent="Siteden içerik çek";}
-}
-async function loadLessonSessions(){
- if(!activeLessonCourse)return;$("lessonSessionList").textContent="Ders kayıtları yükleniyor...";
- try{
- const data=await api("/api/lessons?course="+encodeURIComponent(activeLessonCourse));const rows=data.sessions||[];let liveByLesson=new Map();try{const liveData=await api("/api/live-classroom?course="+encodeURIComponent(activeLessonCourse));liveByLesson=new Map((liveData.meetings||[]).map(m=>[Number(m.lesson_id),m]));}catch(error){console.warn("EDWISE canlı sınıf listesi:",error);}
- $("lessonSessionList").innerHTML=rows.length?rows.map(x=>{const room=liveByLesson.get(Number(x.id));const liveActions=room?'<button class="btn btn-primary" data-live-host="'+x.id+'">Canlı sınıfa gir</button><button class="btn" data-live-invite="'+x.id+'">Öğrenci davet et</button>':(x.status==="finished"?'':'<button class="btn btn-primary" data-live-create="'+x.id+'">Canlı sınıf oluştur</button>');return '<article class="panel" style="margin:10px 0"><div class="section-head"><div><h3>'+lessonEscape(x.title)+'</h3><p>'+({draft:"Taslak",live:"Devam ediyor",finished:"Tamamlandı"}[x.status]||x.status)+' · '+lessonEscape(x.created_at||"")+'</p></div><div class="actions">'+(x.status==="draft"?'<button class="btn btn-primary" data-lesson-start="'+x.id+'">Dersi başlat</button>':x.status==="live"?'<button class="btn btn-primary" data-lesson-finish="'+x.id+'">Dersi bitir</button>':'<span class="status published">Tamamlandı</span>')+'<button class="btn" data-lesson-edit="'+x.id+'">Notları aç</button>'+liveActions+'</div></div><div style="display:flex;justify-content:flex-end;margin:8px 0 12px;padding-top:8px;border-top:1px solid var(--border)"><button type="button" class="btn btn-danger" style="min-width:110px;font-weight:700;background:#3b1821;border-color:#b94b60;color:#ffd7dc" data-lesson-delete="'+x.id+'">🗑 Dersi sil</button></div><div id="lesson-note-'+x.id+'" style="display:none"><textarea rows="7" maxlength="20000" id="lesson-text-'+x.id+'">'+lessonEscape(x.notes||"")+'</textarea><div class="actions"><button class="btn btn-primary" data-lesson-save="'+x.id+'">Notları kaydet</button></div></div>'+(room?'<p class="muted">Canlı sınıf hazır · Toplantı: '+lessonEscape(room.title)+'</p>':'')+(x.started_at?'<p>Başlangıç: '+lessonEscape(x.started_at)+'</p>':'')+(x.ended_at?'<p>Bitiş: '+lessonEscape(x.ended_at)+'</p>':'')+'</article>';}).join(""):'<div class="message">Henüz ders oluşturulmadı. İstediğin zaman yeni ders oluşturabilirsin.</div>';
- }catch(e){$("lessonSessionList").textContent=e.message||"Dersler yüklenemedi.";}
-}
-document.querySelectorAll("[data-course]").forEach(b=>b.addEventListener("click",()=>openLessonCourse(b.dataset.course)));
-$("lessonBack")?.addEventListener("click",()=>{$("lessonWorkspace").style.display="none";$("lessonCourseGrid").style.display="grid";activeLessonCourse="";});
-$("lessonFetchSite")?.addEventListener("click",fetchLessonSiteContent);
-$("lessonCreate")?.addEventListener("click",async()=>{const title=$("lessonTitle").value.trim();if(!title){alert("Ders başlığını yaz.");return;}const b=$("lessonCreate");b.disabled=true;try{await api("/api/lessons",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({course:activeLessonCourse,title,notes:$("lessonNotes").value})});$("lessonTitle").value="";$("lessonNotes").value="";$("lessonTitle").value="";$("lessonNotes").value="";await loadLessonSessions();}catch(e){alert(e.message||"Ders oluşturulamadı.");}finally{b.disabled=false;}});
-$("lessonSessionList")?.addEventListener("click",async e=>{const b=e.target.closest("button");if(!b)return;
- if(b.dataset.liveCreate||b.dataset.liveHost){const lessonId=Number(b.dataset.liveCreate||b.dataset.liveHost);const tab=window.open("about:blank","_blank");b.disabled=true;try{const result=await api("/api/live-classroom",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"create",lesson_id:lessonId})});const url="/classroom.html#token="+encodeURIComponent(result.token);if(tab)tab.location.href=url;else location.href=url;}catch(err){if(tab)tab.close();alert(err.message||"Canlı sınıf açılamadı.");}finally{b.disabled=false;}return;}
- if(b.dataset.liveInvite){const lessonId=Number(b.dataset.liveInvite);const name=prompt("Öğrencinin adı (isteğe bağlı):","EDWISE Öğrencisi");if(name===null)return;b.disabled=true;try{const result=await api("/api/live-classroom",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"invite",lesson_id:lessonId,name})});const link=location.origin+"/classroom.html#token="+encodeURIComponent(result.token);try{await navigator.clipboard.writeText(link);alert("Öğrenci davet bağlantısı kopyalandı. Bağlantı 100 gün geçerlidir; canlı dersin çalışma süresine sınır konulmamıştır.");}catch{prompt("Öğrenciye göndereceğin bağlantı:",link);}}catch(err){alert(err.message||"Davet bağlantısı oluşturulamadı.");}finally{b.disabled=false;}return;}
-const id=Number(b.dataset.lessonStart||b.dataset.lessonFinish||b.dataset.lessonEdit||b.dataset.lessonSave||b.dataset.lessonDelete);if(!id)return;
- if(b.dataset.lessonDelete){const title=b.closest("article")?.querySelector("h3")?.textContent||"bu ders";if(!confirm('"'+title+'" dersini kalıcı olarak silmek istiyor musun? Bu işlem geri alınamaz.'))return;b.disabled=true;try{await api("/api/lessons?id="+encodeURIComponent(id),{method:"DELETE"});await loadLessonSessions();}catch(err){alert(err.message||"Ders silinemedi.");}finally{b.disabled=false;}return;}
- if(b.dataset.lessonEdit){const box=$("lesson-note-"+id);box.style.display=box.style.display==="none"?"block":"none";return;}
- try{if(b.dataset.lessonStart||b.dataset.lessonFinish){await api("/api/lessons",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,action:b.dataset.lessonStart?"start":"finish"})});await loadLessonSessions();}
- else if(b.dataset.lessonSave){await api("/api/lessons",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,action:"save",notes:$("lesson-text-"+id).value})});await loadLessonSessions();}}
- catch(err){alert(err.message||"İşlem tamamlanamadı.");}
-});
 
 async function loadPages(){
  $("pagesTable").innerHTML='<tr><td colspan="5">Sayfalar yükleniyor...</td></tr>';
