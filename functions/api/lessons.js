@@ -14,8 +14,14 @@ async function ensure(DB){
  await DB.prepare("CREATE TABLE IF NOT EXISTS lesson_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT,course TEXT NOT NULL,title TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'draft',notes TEXT NOT NULL DEFAULT '',started_at TEXT,ended_at TEXT,created_by TEXT,created_at TEXT NOT NULL DEFAULT (datetime('now')),updated_at TEXT NOT NULL DEFAULT (datetime('now')),room_name TEXT,join_code TEXT)").run();
  const info=await DB.prepare("PRAGMA table_info(lesson_sessions)").all();
  const columns=new Set((info.results||[]).map(column=>column.name));
- if(!columns.has("room_name"))await DB.prepare("ALTER TABLE lesson_sessions ADD COLUMN room_name TEXT").run();
- if(!columns.has("join_code"))await DB.prepare("ALTER TABLE lesson_sessions ADD COLUMN join_code TEXT").run();
+ if(!columns.has("room_name")){
+  try{await DB.prepare("ALTER TABLE lesson_sessions ADD COLUMN room_name TEXT").run();}
+  catch(error){const check=await DB.prepare("PRAGMA table_info(lesson_sessions)").all();if(!(check.results||[]).some(column=>column.name==="room_name"))throw error;}
+ }
+ if(!columns.has("join_code")){
+  try{await DB.prepare("ALTER TABLE lesson_sessions ADD COLUMN join_code TEXT").run();}
+  catch(error){const check=await DB.prepare("PRAGMA table_info(lesson_sessions)").all();if(!(check.results||[]).some(column=>column.name==="join_code"))throw error;}
+ }
  const missing=await DB.prepare("SELECT id FROM lesson_sessions WHERE room_name IS NULL OR room_name='' OR join_code IS NULL OR join_code=''").all();
  for(const row of missing.results||[]){
   await DB.prepare("UPDATE lesson_sessions SET room_name=COALESCE(NULLIF(room_name,''),?),join_code=COALESCE(NULLIF(join_code,''),?) WHERE id=?")

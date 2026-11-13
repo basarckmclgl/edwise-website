@@ -138,7 +138,7 @@ footer{text-align:center;color:#867c9d;font-size:11px;margin:20px 0}
     if(meetingApi){meetingApi.dispose();meetingApi=null;}
     meetingFrame.innerHTML="";meetingFrame.hidden=true;joinSection.hidden=false;joinButton.disabled=false;
    });
-  }catch(error){joinButton.disabled=false;message(error.message||"Canlı derse bağlanılamadı. Jitsi bağlantısını yeni sekmede deneyebilirsiniz.",true);fallbackLink.hidden=false;}
+  }catch(error){joinButton.disabled=false;joinSection.hidden=false;message(error.message||"Canlı derse bağlanılamadı. Jitsi bağlantısını yeni sekmede deneyebilirsiniz.",true);fallbackLink.hidden=false;}
  });
  loadSession();
 })();
