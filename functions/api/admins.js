@@ -210,10 +210,11 @@ export async function onRequestPut(context) {
 
     const username = clean(data.username, 50);
     const email = clean(data.email, 254).toLowerCase();
-    const role = clean(data.role || target.role, 50);
-
-if (role !== "content_admin") {
-      return json({ success: false, message: "Mevcut veritabanı yalnızca İçerik Yöneticisi rolünü destekliyor. Genişletilmiş rol modeli için veritabanı geçişi gerekiyor." }, 400);
+    const requestedRole = clean(data.role || target.role, 50);
+    const roleMap = { "Admin": "content_admin", "content_admin": "content_admin" };
+    const role = roleMap[requestedRole];
+    if (!role) {
+      return json({ success: false, message: "Bu hesap için geçerli rol Admin olmalıdır." }, 400);
     }
 
     if (username.length < 3) {
