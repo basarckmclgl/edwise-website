@@ -1483,7 +1483,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
  if(name==="designcenter")loadDesignRecords();
  if(name==="pages")loadPages();
  if(name==="services")loadServices();
-    if(name==="users")loadUsers();
+    if(name==="users"){loadUsers();loadUserPermissionEditor();}
  if(name==="audit")loadAudit();
  if(name==="history")loadActivityHistory();
   if(name==="archive")loadArchive();
@@ -2724,7 +2724,8 @@ async function loadUserPermissionEditor(){
  select.innerHTML='<option value="">Kullanıcılar yükleniyor...</option>';
  try{
   const result=await api("/api/admin-permissions");
-  permissionUsers=(result.users||[]).filter(user=>user.role!=="superadmin"&&Number(user.id)!==Number(currentAdmin?.id));
+  const signedInUsername=$("username")?.textContent?.trim();
+  permissionUsers=(result.users||[]).filter(user=>user.role!=="superadmin"&&user.username!==signedInUsername);
   select.innerHTML='<option value="">Kullanıcı seçin</option>'+permissionUsers.map(user=>'<option value="'+Number(user.id)+'">'+escapeHtml(user.username)+' · '+escapeHtml(user.email)+'</option>').join("");
   $("permissionEditorMessage").textContent="Yetkileri düzenlemek için bir kullanıcı seçin.";
   renderUserPermissionMatrix();
