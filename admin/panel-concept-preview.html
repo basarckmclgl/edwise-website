@@ -2734,7 +2734,7 @@ let permissionDraft={};
 function renderUserPermissionMatrix(){
  const body=$("userPermissionMatrix");
  if(!selectedPermissionUser){body.innerHTML='<tr><td colspan="6">Önce bir kullanıcı seçin.</td></tr>';return;}
- body.innerHTML=permissionModules.map(([key,label])=>'<tr><td>'+escapeHtml(label)+'</td>'+permissionActions.map(([action])=>'<td><input type="checkbox" data-permission-module="'+key+'" data-permission-action="'+action+'" '+(permissionDraft[key]?.[action]===true?'checked':'')+(!permissionActionLimits[key]?.includes(action)?' disabled':'')+' aria-label="'+escapeHtml(label)+' '+action+'"></td>').join("")+'</tr>').join("");
+ body.innerHTML=permissionModules.map(([key,label])=>'<tr><td>'+escapeHtml(label)+(key==="profile"?' <small class="muted">(her zaman açık)</small>':'')+'</td>'+permissionActions.map(([action])=>'<td><input type="checkbox" data-permission-module="'+key+'" data-permission-action="'+action+'" '+(permissionDraft[key]?.[action]===true?'checked':'')+((key==="profile"||!permissionActionLimits[key]?.includes(action))?' disabled':'')+' aria-label="'+escapeHtml(label)+' '+action+'"></td>').join("")+'</tr>').join("");
 }
 async function loadUserPermissionEditor(){
  const select=$("permissionUserSelect");
