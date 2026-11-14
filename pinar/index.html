@@ -82,8 +82,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <tr data-category="yasal"><td><strong>Yasal Bilgilendirme</strong><small>Gizlilik ve yasal metinler</small></td><td><span class="page-type">Yasal</span></td><td><small>/pages/yasal-bilgilendirme.html</small></td><td>Dosya mevcut</td><td><a class="preview-link" href="../pages/yasal-bilgilendirme.html" target="_blank" rel="noopener">Önizle ↗</a></td></tr>
 <tr data-category="sablon"><td><strong>Dinamik Sayfa Şablonu</strong><small>CMS tarafından üretilecek sayfalar için</small></td><td><span class="page-type">Şablon</span></td><td><small>/pages/sayfa.html</small></td><td>Şablon dosyası</td><td><a class="preview-link" href="../pages/sayfa.html" target="_blank" rel="noopener">Önizle ↗</a></td></tr>
 </tbody></table><div class="no-results" id="noPages">Aramana uygun sayfa bulunamadı.</div></div>
-<div class="page-note">Bu liste, çalışma dalındaki mevcut dosyalar incelenerek hazırlandı. Şu an sayfalar listelenebilir ve önizlenebilir; içerik düzenleme, yeni sayfa oluşturma, taslak kaydetme ve yayınlama işlevleri henüz bağlanmadı. Bu aşamada mevcut sayfa dosyalarına müdahale edilmedi.</div><section class="panel" style="margin-top:16px"><div class="section-head"><div><h2>Silinen sayfalar</h2><p class="section-intro">Silinen yeni/CMS sayfalarını buradan geri yükle.</p></div><button type="button" class="app-refresh" id="pageTrashRefresh">Silinenleri göster / yenile</button></div><div id="pageTrashRows" class="history-scope" hidden></div></section>
-<section class="panel" id="pageEditorPanel" style="margin-top:16px">
+<div class="page-note">Bu liste, çalışma dalındaki mevcut dosyalar incelenerek hazırlandı. Şu an sayfalar listelenebilir ve önizlenebilir; içerik düzenleme, yeni sayfa oluşturma, taslak kaydetme ve yayınlama işlevleri henüz bağlanmadı. Bu aşamada mevcut sayfa dosyalarına müdahale edilmedi.</div><section class="panel" id="pageEditorPanel" style="margin-top:16px">
 <div class="section-head"><div><div class="eyebrow">GÖRSEL SAYFA DÜZENLEYİCİ</div><h2>Sayfa içerik düzenleyici</h2><p class="section-intro">Metin ve görselleri Word benzeri araçlarla düzenle. Taslak bu tarayıcıda saklanır.</p></div><span class="tag">Taslak modu</span></div>
 <div class="page-tools" style="margin-bottom:10px"><input id="editorTitle" placeholder="Sayfa başlığı" style="flex:2"><input id="editorSlug" placeholder="sayfa-adresi" style="flex:1"><button type="button" id="editorNew" class="app-refresh">Yeni sayfa</button></div>
 <div class="page-tools" style="gap:6px;margin-bottom:8px;flex-wrap:wrap">
@@ -322,7 +321,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   }catch(error){feedback(error.message||'Sayfalar yüklenemedi.','error');}
  }
  async function loadTrash(){
-  const hosts=[$('trashRows'),$('pageTrashRows')].filter(Boolean);
+  const hosts=[$('trashRows')].filter(Boolean);
   if(!hosts.length)return;
   try{
    const response=await fetch('/api/pages?view=trash',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
@@ -336,7 +335,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   if(!window.confirm('Bu sayfa çöp kutusuna taşınsın mı? Kalıcı olarak silinmeyecek.'))return;
   try{const response=await fetch('/api/pages?id='+encodeURIComponent(id),{method:'DELETE',credentials:'same-origin',headers:{Accept:'application/json'}});
    const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Sayfa silinemedi.');
-   await loadPages();await loadTrash();feedback('Sayfa İşlem Geçmişi sekmesindeki Silinen sayfalar bölümüne taşındı.');
+   await loadPages();feedback('Sayfa silindi. Silme kaydı İşlem Geçmişi bölümünde tutuluyor.');
   }catch(error){feedback(error.message||'Sayfa silinemedi.','error');}
  }
  async function restorePage(id){
@@ -346,8 +345,8 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
    await loadPages();await loadTrash();feedback('Sayfa başarıyla geri yüklendi.');
   }catch(error){const host=$('trashRows');if(host)host.insertAdjacentHTML('afterbegin','<p class="page-count error">'+safe(error.message||'Geri yükleme başarısız.')+'</p>');}
  }
- $('trashRefresh')?.addEventListener('click',loadTrash);$('pageTrashRefresh')?.addEventListener('click',()=>{const box=$('pageTrashRows');if(box)box.hidden=!box.hidden;loadTrash();});
- $('trashRows')?.addEventListener('click',e=>{const b=e.target.closest('[data-restore-cms]');if(b)restorePage(b.dataset.restoreCms);});$('pageTrashRows')?.addEventListener('click',e=>{const b=e.target.closest('[data-restore-cms]');if(b)restorePage(b.dataset.restoreCms);});
+ $('trashRefresh')?.addEventListener('click',loadTrash);
+ $('trashRows')?.addEventListener('click',e=>{const b=e.target.closest('[data-restore-cms]');if(b)restorePage(b.dataset.restoreCms);});
  async function submit(status){
   const title=$('editorTitle').value.trim(),slug=slugify($('editorSlug').value.trim()||title),content=canvas.innerHTML;
   if(!title||!slug){feedback('Sayfa başlığı ve URL zorunludur.','error');return;}
