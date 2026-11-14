@@ -25,6 +25,7 @@ export function normalizeRole(role) {
 const CONTENT_ADMIN_DEFAULTS = Object.freeze({
   dashboard: { view: true },
   pages: { view: true, create: true, edit: true, delete: false, publish: true },
+  lessons: { view: true, create: true, edit: true, delete: false },
   services: { view: true, create: true, edit: true, delete: false, publish: true },
   media: { view: true, create: true, edit: true, delete: false },
   applications: { view: true, create: false, edit: true, delete: false },
@@ -35,6 +36,7 @@ const CONTENT_ADMIN_DEFAULTS = Object.freeze({
 const CONTENT_ADMIN_LIMITS = Object.freeze({
   dashboard: ["view"],
   pages: ["view", "create", "edit", "publish"],
+  lessons: ["view", "create", "edit"],
   services: ["view", "create", "edit", "publish"],
   media: ["view", "create", "edit"],
   applications: ["view", "edit"],
@@ -145,6 +147,7 @@ export async function requireEditor(context) {
   let moduleKey = null;
 
   if (path === "/api/pages" || path.startsWith("/api/pages/")) moduleKey = "pages";
+  else if (path === "/api/lessons" || path.startsWith("/api/lessons/")) moduleKey = "lessons";
   else if (path === "/api/services" || path.startsWith("/api/services/")) moduleKey = "services";
   else if (path === "/api/applications" || path.startsWith("/api/applications/")) moduleKey = "applications";
   else if (path === "/api/media" || path.startsWith("/api/media/") || path.includes("media-upload") || path.includes("media-delete") || path.includes("media-import") || path.includes("media-metadata")) moduleKey = "media";
