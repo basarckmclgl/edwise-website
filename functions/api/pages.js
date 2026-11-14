@@ -136,7 +136,7 @@ export async function onRequestPost(context) {
     await ensureTrashSchema(context.env.DB);
 
     if (data.action === "static_delete" || data.action === "static_restore") {
-      const pagePath=String(data.page_path||"").trim(), title=String(data.title||"").trim().slice(0,160);
+      const rawPath=String(data.page_path||"").trim(), pagePath=rawPath==="/"?"/index.html":rawPath, title=String(data.title||"").trim().slice(0,160);
       if(!pagePath.startsWith("/")||pagePath.startsWith("//")||pagePath.includes("..")||/[?#]/.test(pagePath)||pagePath==="/")return json({success:false,message:"Sayfa yolu geçersiz."},400);
       const key="static_page_trash", row=await context.env.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key=? LIMIT 1").bind(key).first();
       let trash=[];try{trash=JSON.parse(row?.setting_value||"[]");}catch{} if(!Array.isArray(trash))trash=[];
