@@ -100,6 +100,7 @@ export async function requireEditor(context) {
 
   const allowedRoles = [
     "superadmin",
+    "admin",
     "content_admin"
   ];
 

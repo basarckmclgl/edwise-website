@@ -214,12 +214,9 @@ export async function onRequestPut(context) {
     const email = clean(data.email, 254).toLowerCase();
     const role = clean(data.role || target.role, 50);
 
-if (role !== "content_admin") {
-  return json({
-    success: false,
-    message: "Geçersiz kullanıcı yetkisi."
-  }, 400);
-}
+if (!["admin", "content_admin", "editor", "viewer"].includes(role)) {
+      return json({ success: false, message: "Geçersiz kullanıcı yetkisi." }, 400);
+    }
 
     if (username.length < 3) {
       return json({
@@ -244,10 +241,10 @@ if (role !== "content_admin") {
 
     const password = String(data.password || "");
 
-    if (password && password.length < 8) {
+    if (password && password.length < 6) {
       return json({
         success: false,
-        message: "Yeni şifre en az 8 karakter olmalıdır."
+        message: "Yeni şifre en az 6 karakter olmalıdır."
       }, 400);
     }
 
