@@ -1490,7 +1490,10 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
  if(name==="reports"){loadSiteReports();loadApplications();loadCloudflareReports();}
  if(name==="messages")loadChatConversations();
  if(name==="applications"){loadApplications();loadApplicationFunnel();}
- if(name==="designcenter"&&currentRole==="superadmin")loadThemeSettings();
+ if(name==="designcenter"){
+  if(currentRole==="superadmin"){selectDesignTab("design");loadThemeSettings();}
+  else{selectDesignTab("menu");}
+ }
  if(name==="sitesettings")loadSiteSettings();if(name==="sitesettings")loadSiteControl();
 
  $("mediaLink").classList.toggle("hidden",name!=="media");
@@ -1912,6 +1915,19 @@ $("saveMenu").addEventListener("click",async()=>{
  try{const data=await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"save_menu",items:window.edwiseMenuItems||[]})});$("menuMessage").innerHTML='<div class="message success">'+escapeHtml(data.message)+'</div>';}
  catch(error){$("menuMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}
 });
+
+function selectDesignTab(tab){
+ const menu=tab==="menu";
+ $("designTab")?.classList.toggle("hidden",menu);
+ $("menuTab")?.classList.toggle("hidden",!menu);
+ $("designTabButton")?.classList.toggle("primary",!menu);
+ $("designTabButton")?.classList.toggle("btn",menu);
+ $("menuTabButton")?.classList.toggle("primary",menu);
+ $("menuTabButton")?.classList.toggle("btn",!menu);
+ if(menu)loadMenuSettings();
+}
+$("designTabButton")?.addEventListener("click",()=>selectDesignTab("design"));
+$("menuTabButton")?.addEventListener("click",()=>selectDesignTab("menu"));
 
 $("editSocialProfile")?.addEventListener("click",()=>{ const target=$("profileFirstName");target?.scrollIntoView({behavior:"smooth",block:"center"});target?.focus({preventScroll:true}); });
 $("profile").querySelectorAll("[data-profile-tab]").forEach(tab=>tab.addEventListener("click",()=>{const targetId=({overview:"profileSocialName",account:"profileFirstName",security:"profileCurrentPassword"})[tab.dataset.profileTab];const target=$(targetId);target?.scrollIntoView({behavior:"smooth",block:"center"});if(tab.dataset.profileTab==="security")target?.focus({preventScroll:true});$("profile").querySelectorAll("[data-profile-tab]").forEach(x=>x.classList.toggle("active",x===tab));}));
