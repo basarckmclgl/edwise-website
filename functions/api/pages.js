@@ -19,6 +19,31 @@ function makeSlug(value) {
     .replace(/^-|-$/g, "");
 }
 
+async function ensurePagesSchema(db) {
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS pages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      slug TEXT NOT NULL UNIQUE,
+      content TEXT NOT NULL DEFAULT '',
+      meta_title TEXT NOT NULL DEFAULT '',
+      meta_description TEXT NOT NULL DEFAULT '',
+      status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','published')),
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      deleted_at TEXT
+    )
+  `).run();
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS site_settings (
+      setting_key TEXT PRIMARY KEY,
+      setting_value TEXT NOT NULL DEFAULT '',
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `).run();
+  await db.prepare("CREATE INDEX IF NOT EXISTS idx_pages_status_updated ON pages(status, updated_at DESC)").run();
+}
+
 async function ensureTrashSchema(db) {
   try { await db.prepare("ALTER TABLE pages ADD COLUMN deleted_at TEXT").run(); }
   catch (error) {
@@ -52,6 +77,7 @@ export async function onRequestGet(context) {
   try {
     const auth = await authorized(context);
     if (auth.response) return auth.response;
+    await ensurePagesSchema(context.env.DB);
     await ensureTrashSchema(context.env.DB);
     const view = new URL(context.request.url).searchParams.get("view");
     if (view === "history") {
@@ -101,6 +127,7 @@ export async function onRequestPost(context) {
     if (auth.response) return auth.response;
 
     const data = await context.request.json();
+    await ensurePagesSchema(context.env.DB);
     await ensureTrashSchema(context.env.DB);
 
     if (data.action === "restore_version") {
@@ -223,6 +250,8 @@ export async function onRequestPut(context) {
     if (auth.response) return auth.response;
 
     const data = await context.request.json();
+    await ensurePagesSchema(context.env.DB);
+    await ensureTrashSchema(context.env.DB);
     const id = Number(data.id);
     const title = String(data.title || "").trim();
     const slug = makeSlug(data.slug || title);
@@ -288,6 +317,7 @@ export async function onRequestDelete(context) {
       return json({ success: false, message: "Geçerli bir sayfa numarası belirtilmedi." }, 400);
     }
 
+    await ensurePagesSchema(context.env.DB);
     await ensureTrashSchema(context.env.DB);
     const before = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ? AND deleted_at IS NULL").bind(id).first();
     if (!before) return json({ success: false, message: "Sayfa bulunamadı." }, 404);
