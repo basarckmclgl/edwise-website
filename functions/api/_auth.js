@@ -50,7 +50,8 @@ export async function requireAdmin(context) {
       a.id,
       a.username,
       a.email,
-      a.role
+      a.role,
+      a.force_password_change
     FROM admin_sessions s
     INNER JOIN admins a ON a.id = s.admin_id
     WHERE s.token_hash = ?
@@ -64,6 +65,23 @@ export async function requireAdmin(context) {
       "Oturum geçersiz veya süresi dolmuş.",
       401
     );
+  }
+
+  if (Number(result.force_password_change) === 1) {
+    const path = new URL(context.request.url).pathname;
+    const method = context.request.method.toUpperCase();
+    const allowed = (path === "/api/change-password" && method === "POST") ||
+      (path === "/api/profile" && method === "GET") ||
+      (path === "/api/logout" && method === "POST");
+    if (!allowed) {
+      return {
+        admin: result,
+        response: Response.json(
+          { success:false, code:"PASSWORD_CHANGE_REQUIRED", message:"Devam etmeden önce ilk giriş şifrenizi değiştirmeniz gerekiyor." },
+          { status: 403, headers: { "Cache-Control":"no-store" } }
+        )
+      };
+    }
   }
 
   return {
