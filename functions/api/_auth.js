@@ -95,7 +95,7 @@ export async function requireAdmin(context) {
     const path = new URL(context.request.url).pathname;
     const method = context.request.method.toUpperCase();
     const allowed = (path === "/api/change-password" && method === "POST") ||
-      (path === "/api/profile" && ["GET", "POST"].includes(method)) ||
+      (path === "/api/profile" && method === "GET") ||
       (path === "/api/logout" && method === "POST");
     if (!allowed) {
       return {
