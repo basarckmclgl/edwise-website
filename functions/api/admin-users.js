@@ -35,7 +35,7 @@ export async function onRequestPost(context) {
     if (password.length < 6 || password.length > 128 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
       return json({ success: false, message: "Şifre en az 6 karakter; büyük/küçük harf, rakam ve özel karakter içermeli." }, 400);
     }
-    const roleMap = { "Admin":"content_admin", "Editör":"editor", "Görüntüleyici":"viewer" };
+    const roleMap = { "İçerik Yöneticisi":"content_admin", "Admin":"content_admin", "content_admin":"content_admin" };
     const roleKey = roleMap[role];
     if (!roleKey) return json({ success: false, message: "Bu ekrandan Süper Yönetici hesabı oluşturulamaz." }, 403);
 
