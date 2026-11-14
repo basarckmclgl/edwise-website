@@ -29,7 +29,7 @@ INSERT INTO admin_role_templates (
 VALUES (
   'content_admin',
   'İçerik Yöneticisi',
-  '{"dashboard":{"view":true},"pages":{"view":true,"create":true,"edit":true,"delete":false,"publish":true},"services":{"view":true,"create":true,"edit":true,"delete":false,"publish":true},"media":{"view":true,"create":true,"edit":true,"delete":false},"applications":{"view":true,"create":false,"edit":true,"delete":false},"menu":{"view":true,"create":false,"edit":true,"delete":false,"publish":false},"profile":{"view":true,"create":false,"edit":true,"delete":false,"publish":false}}',
+  '{"dashboard":{"view":true},"pages":{"view":true,"create":true,"edit":true,"delete":false,"publish":true},"lessons":{"view":true,"create":true,"edit":true,"delete":false},"services":{"view":true,"create":true,"edit":true,"delete":false,"publish":true},"media":{"view":true,"create":true,"edit":true,"delete":false},"applications":{"view":true,"create":false,"edit":true,"delete":false},"menu":{"view":true,"create":false,"edit":true,"delete":false,"publish":false},"profile":{"view":true,"create":false,"edit":true,"delete":false,"publish":false}}',
   1,
   datetime('now')
 )
