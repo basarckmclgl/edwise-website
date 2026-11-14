@@ -317,6 +317,9 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
    const data=await response.json();
    if(!response.ok||!data.success)throw new Error(data.message||'CMS sayfaları alınamadı.');
    pages=Array.isArray(data.pages)?data.pages:[];
+   const trashRes=await fetch('/api/pages?view=trash',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}}),trashJson=await trashRes.json();
+   const deletedPaths=new Set(Array.isArray(trashJson.staticPages)?trashJson.staticPages.map(item=>item.page_path):[]);
+   $('pageRows').querySelectorAll('tr:not([data-cms-page-row])').forEach(row=>{const a=row.querySelector('a.preview-link');if(a){const path=new URL(a.href,location.origin).pathname==='/'?'/index.html':new URL(a.href,location.origin).pathname;if(deletedPaths.has(path))row.remove();}});
    renderPages();
   }catch(error){feedback(error.message||'Sayfalar yüklenemedi.','error');}
  }
@@ -391,7 +394,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   const action=row.querySelector('td:last-child');
   const preview=row.querySelector('a.preview-link');
   if(!action||!preview||action.querySelector('[data-edit-static]'))return;
-  const button=document.createElement('button');button.type='button';button.className='app-refresh';button.textContent='Düzenle';button.dataset.editStatic='true';button.dataset.path=new URL(preview.href,location.origin).pathname;const del=document.createElement('button');del.type='button';del.className='app-refresh';del.textContent='Sil';del.dataset.deleteStatic='true';del.dataset.path=button.dataset.path;del.dataset.title=row.querySelector('strong')?.textContent||'Sayfa';action.append(' ',del);
+  const button=document.createElement('button');button.type='button';button.className='app-refresh';button.textContent='Düzenle';button.dataset.editStatic='true';button.dataset.path=(new URL(preview.href,location.origin).pathname==='/'?'/index.html':new URL(preview.href,location.origin).pathname);const del=document.createElement('button');del.type='button';del.className='app-refresh';del.textContent='Sil';del.dataset.deleteStatic='true';del.dataset.path=button.dataset.path;del.dataset.title=row.querySelector('strong')?.textContent||'Sayfa';action.append(' ',del);
   action.append(' ',button);
  });
  $('pageRows').addEventListener('click',async e=>{
