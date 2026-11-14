@@ -53,7 +53,19 @@ export async function onRequestGet(context) {
     const auth = await authorized(context);
     if (auth.response) return auth.response;
     await ensureTrashSchema(context.env.DB);
-    const trashView = new URL(context.request.url).searchParams.get("view") === "trash";
+    const view = new URL(context.request.url).searchParams.get("view");
+    if (view === "history") {
+      const id = Number(new URL(context.request.url).searchParams.get("id"));
+      if (!Number.isInteger(id) || id < 1) return json({success:false,message:"Sayfa kimliği geçersiz."},400);
+      const logs = await context.env.DB.prepare(`
+        SELECT id, actor_username, action, entity_title, details_json, created_at
+        FROM admin_audit_log WHERE entity_type = 'page' AND entity_id = ?
+          AND action IN ('page_created','page_created_published','page_updated','page_published','page_unpublished','page_restored','page_version_restored')
+        ORDER BY created_at DESC, id DESC LIMIT 100
+      `).bind(String(id)).all();
+      return json({success:true,history:(logs.results||[]).map(row=>({...row,details:row.details_json?JSON.parse(row.details_json):null}))});
+    }
+    const trashView = view === "trash";
     const result = await context.env.DB.prepare(`
       SELECT id, title, slug, content, meta_title,
              meta_description, status, created_at, updated_at, deleted_at
@@ -90,6 +102,24 @@ export async function onRequestPost(context) {
 
     const data = await context.request.json();
     await ensureTrashSchema(context.env.DB);
+
+    if (data.action === "restore_version") {
+      const id=Number(data.id), auditId=Number(data.audit_id);
+      if(!Number.isInteger(id)||id<1||!Number.isInteger(auditId)||auditId<1)return json({success:false,message:"Sürüm bilgisi geçersiz."},400);
+      const current=await context.env.DB.prepare("SELECT * FROM pages WHERE id=? AND deleted_at IS NULL").bind(id).first();
+      const log=await context.env.DB.prepare("SELECT * FROM admin_audit_log WHERE id=? AND entity_type='page' AND entity_id=?").bind(auditId,String(id)).first();
+      if(!current||!log)return json({success:false,message:"Sayfa veya sürüm kaydı bulunamadı."},404);
+      let details;try{details=JSON.parse(log.details_json||"{}");}catch{return json({success:false,message:"Sürüm kaydı okunamadı."},400);}
+      const target=details.before;
+      if(!target||!target.title||!target.slug)return json({success:false,message:"Bu kayıt geri yüklenebilir bir sürüm içermiyor."},400);
+      const duplicate=await context.env.DB.prepare("SELECT id FROM pages WHERE slug=? AND id!=? AND deleted_at IS NULL").bind(target.slug,id).first();
+      if(duplicate)return json({success:false,message:"Eski URL başka bir aktif sayfada kullanılıyor."},409);
+      await context.env.DB.prepare("UPDATE pages SET title=?,slug=?,content=?,meta_title=?,meta_description=?,status=?,updated_at=datetime('now') WHERE id=?")
+        .bind(target.title,target.slug,target.content||"",target.meta_title||"",target.meta_description||"",target.status||"draft",id).run();
+      const after=await context.env.DB.prepare("SELECT * FROM pages WHERE id=?").bind(id).first();
+      await logAudit(context.env.DB,context.request,auth.admin,{action:"page_version_restored",entity_type:"page",entity_id:id,entity_title:after.title,details:{before:current,after,restored_from_audit_id:auditId}});
+      return json({success:true,message:"Seçilen sürüm geri yüklendi."});
+    }
 
     if (data.action === "restore") {
       const id = Number(data.id);
