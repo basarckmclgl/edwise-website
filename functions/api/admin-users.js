@@ -32,8 +32,8 @@ export async function onRequestPost(context) {
     if (!name || !/^[a-z0-9._-]{3,50}$/.test(username) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return json({ success: false, message: "Ad, geçerli kullanıcı adı ve e-posta girin." }, 400);
     }
-    if (password.length < 12 || password.length > 128 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
-      return json({ success: false, message: "Şifre en az 12 karakter; büyük/küçük harf, rakam ve özel karakter içermeli." }, 400);
+    if (password.length < 6 || password.length > 128 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+      return json({ success: false, message: "Şifre en az 6 karakter; büyük/küçük harf, rakam ve özel karakter içermeli." }, 400);
     }
     const roleMap = {
       "Admin": "admin",
