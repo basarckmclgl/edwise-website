@@ -10,6 +10,9 @@ export async function onRequestGet({ request, env }) {
     let result;
 
     if (pagePath) {
+      const tr=await env.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key='static_page_trash' LIMIT 1").first();
+      let removed=[];try{removed=JSON.parse(tr?.setting_value||"[]");}catch{}
+      if(Array.isArray(removed)&&removed.some(item=>item.page_path===pagePath))return Response.json({success:false,deleted:true,message:"Bu sayfa yayından kaldırılmış."},{status:410,headers:{"Cache-Control":"no-store"}});
       result = await env.DB.prepare("SELECT id, title, slug, content, meta_title, meta_description FROM pages WHERE page_path = ? AND status = 'published' AND deleted_at IS NULL LIMIT 1").bind(pagePath).first();
       if (result) return Response.json({ success: true, page: result }, { headers: { "Cache-Control": "no-store" } });
       return Response.json({ success: false, message: "Yayımlanmış sayfa bulunamadı." }, { status: 404 });
