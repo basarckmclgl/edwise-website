@@ -5,7 +5,8 @@ export async function onRequestGet({ request, env }) {
     catch (error) { if (!/duplicate column|already exists/i.test(String(error?.message || error))) throw error; }
     const url = new URL(request.url);
     const slug = url.searchParams.get("slug");
-    const pagePath = url.searchParams.get("path");
+    const rawPagePath = url.searchParams.get("path");
+    const pagePath = rawPagePath === "/" ? "/index.html" : rawPagePath;
 
     let result;
 
