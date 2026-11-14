@@ -1,4 +1,4 @@
-import { requireSuperAdmin } from "./_auth.js";
+import { requirePermission } from "./_auth.js";
 
 function json(data,status=200){return Response.json(data,{status});}
 async function originOk(request){
@@ -15,7 +15,7 @@ async function readSettings(DB){
 }
 export async function onRequestGet(context){
  try{
-  const auth=await requireSuperAdmin(context);
+  const auth=await requirePermission(context,"settings","view");
   if(auth.response)return auth.response;
   const values=await readSettings(context.env.DB);
   return json({success:true,draft:values.draft_theme||{},live:values.live_theme||{},menu:values.menu_theme||{},preferences:values.site_preferences||{},panelPreferences:values.panel_preferences||{}});
@@ -24,14 +24,15 @@ export async function onRequestGet(context){
 export async function onRequestPost(context){
  try{
   if(!(await originOk(context.request)))return json({success:false,message:"İstek kaynağı geçersiz."},403);
-  const auth=await requireSuperAdmin(context);
-  if(auth.response)return auth.response;
   const body=await context.request.json();
+  const permissionModule=body.action==="save_menu"?"menu":"settings";
+  const auth=await requirePermission(context,permissionModule,"edit");
+  if(auth.response)return auth.response;
   if(body.action==="save_menu"){
    const items=Array.isArray(body.items)?body.items:[];
    if(items.length>100)return json({success:false,message:"Menüde en fazla 100 bağlantı olabilir."},400);
-   const clean=items.map((item,index)=>({key:String(item.key||"").slice(0,100),label:String(item.label||"").trim().slice(0,80),url:String(item.url||"").slice(0,300),visible:item.visible!==false,order:index}));
-   if(clean.some(item=>!item.key||!item.label||!item.url||!item.url.startsWith("/")||item.url.startsWith("//")))return json({success:false,message:"Menü bağlantılarından biri geçersiz."},400);
+   const clean=items.map((item,index)=>({key:String(item.key||"").slice(0,100),label:String(item.label||"").trim().slice(0,80),url:String(item.url||"").trim().slice(0,300),icon:String(item.icon||"").slice(0,8),group:item.group==="contact"?"contact":"main",visible:item.visible!==false,order:index}));
+   if(clean.some(item=>{if(!item.key||!item.label||!item.url)return true;try{const u=new URL(item.url,context.request.url);return !["http:","https:"].includes(u.protocol)||(u.origin!==new URL(context.request.url).origin&&u.protocol!=="https:")||item.url.startsWith("//");}catch{return true;}}))return json({success:false,message:"Menü bağlantılarından biri geçersiz. Site içi yollar veya https:// bağlantıları kullanın."},400);
    const serialized=JSON.stringify(clean);
    const existing=await context.env.DB.prepare("SELECT id FROM site_settings WHERE setting_key=? LIMIT 1").bind("menu_theme").first();
    if(existing)await context.env.DB.prepare("UPDATE site_settings SET setting_value=?, updated_at=datetime('now') WHERE setting_key=?").bind(serialized,"menu_theme").run();
