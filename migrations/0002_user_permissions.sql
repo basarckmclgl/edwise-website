@@ -34,4 +34,6 @@ CREATE TABLE IF NOT EXISTS admin_password_reset_tokens (
 INSERT OR IGNORE INTO admin_role_templates
   (role_key, role_name, permissions_json, is_system)
 VALUES
-  ('content_admin', 'İçerik Yöneticisi', '{}', 1);
+  ('content_admin', 'Admin', '{"dashboard":{"view":true},"pages":{"view":true,"create":true,"edit":true,"delete":true,"publish":true},"services":{"view":true,"create":true,"edit":true,"delete":true,"publish":true},"applications":{"view":true,"create":true,"edit":true},"menu":{"view":true,"create":true,"edit":true},"seo":{"view":true,"edit":true},"languages":{"view":true,"edit":true},"settings":{"view":true,"edit":true}}', 1),
+  ('editor', 'Editör', '{"dashboard":{"view":true},"pages":{"view":true,"create":true,"edit":true},"services":{"view":true,"create":true,"edit":true},"applications":{"view":true},"menu":{"view":true},"seo":{"view":true}}', 1),
+  ('viewer', 'Görüntüleyici', '{"dashboard":{"view":true},"pages":{"view":true},"services":{"view":true},"applications":{"view":true},"menu":{"view":true},"seo":{"view":true},"languages":{"view":true},"settings":{"view":true}}', 1);
