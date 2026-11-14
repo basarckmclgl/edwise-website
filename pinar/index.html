@@ -272,7 +272,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   const notice=$('siteAnalyticsNotice');
   let contentStatus='';
   try{
-   const d=await get('/api/dashboard');
+   const d=await get('/api/dashboard-preview');
    const c=d.counts||{};
    const show=(entry)=>entry&&entry.available?fmt(entry.count):'—';
    setCard(0,show(c.pages),'Yönetilebilir sayfalar');
