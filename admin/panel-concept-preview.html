@@ -1414,7 +1414,7 @@ function applyRolePermissions(){
   if(!element.matches("[data-page]") && !element.matches("[data-open]")) element.classList.toggle("hidden",!isSuperAdmin);
  });
  const roleLabel=$("roleLabel");
- if(roleLabel) roleLabel.textContent=({superadmin:"Süper Yönetici",content_admin:"Admin",editor:"Editör",viewer:"Görüntüleyici"})[currentRole]||"Kullanıcı";
+ if(roleLabel) roleLabel.textContent=({superadmin:"Süper Yönetici",content_admin:"İçerik Yöneticisi"})[currentRole]||"Kullanıcı";
 }
 
 function escapeHtml(value){
@@ -1939,7 +1939,7 @@ async function checkSession(){
   currentRole=data.admin.role_key||data.admin.role;
   currentPermissions=data.admin.permissions||{};
   mustChangePassword=Number(data.admin.force_password_change)===1;
-  if(!["superadmin","content_admin","editor","viewer"].includes(currentRole))throw new Error("Bu hesabın yönetim paneline erişim yetkisi yok. Yetki: "+String(currentRole||"tanımsız"));
+  if(!["superadmin","content_admin"].includes(currentRole))throw new Error("Bu hesabın yönetim paneline erişim yetkisi yok. Yetki: "+String(currentRole||"tanımsız"));
   const roleName=({superadmin:"Süper Yönetici",content_admin:"Admin",editor:"Editör",viewer:"Görüntüleyici"})[currentRole]||"Yönetici";
   const setText=(id,value)=>{const el=$(id);if(el)el.textContent=value;};
   const setValue=(id,value)=>{const el=$(id);if(el)el.value=value;};
@@ -2703,12 +2703,9 @@ $("usersTable").addEventListener("click",async event=>{
 });
 
 const permissionModules=[
- ["dashboard","Genel Bakış"],["classrooms","Derslikler"],["pages","Sayfa Yönetimi"],
- ["services","Hizmetler"],["media","Medya Kütüphanesi"],["applications","Başvurular"],
- ["messages","Mesaj Kutusu"],["menu","Menü Düzeni"],["seo","SEO & Görünürlük"],
- ["languages","Dil Yönetimi"],["settings","Site Ayarları"],["history","Geçmiş"],
- ["archive","Arşiv"],["profile","Profilim"],["users","Kullanıcılar & Yetkiler"],
- ["audit","Güvenlik Kayıtları"],["reports","Raporlar"]
+ ["dashboard","Genel Bakış"],["pages","Sayfa Yönetimi"],["services","Hizmet Yönetimi"],
+ ["media","Medya Kütüphanesi"],["applications","Başvurular"],["menu","Menü Yönetimi"],
+ ["profile","Kendi Profilim"]
 ];
 const permissionActions=[["view","Görüntüle"],["create","Ekle"],["edit","Düzenle"],["delete","Sil"],["publish","Yayınla"]];
 let permissionUsers=[];
