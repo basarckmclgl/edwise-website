@@ -268,17 +268,23 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  const list=(rows,key,value)=>rows?.length?'<div class="activity-list">'+rows.map(x=>'<div class="item"><div><b>'+safe(x[key])+'</b><small>'+fmt(x[value])+'</small></div></div>').join('')+'</div>':'<div class="empty">Bu dönem için kayıt bulunamadı.</div>';
  async function get(url){const r=await fetch(url,{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});let d={};try{d=await r.json()}catch{}if(!r.ok||d.success===false)throw Object.assign(new Error(d.message||'HTTP '+r.status),{status:r.status});return d;}
  async function load(){
-  const tasks=[
-   ['pages','/api/pages',d=>{const p=d.pages||[];setCard(0,fmt(p.length),'Yönetilebilir sayfalar');}],
-   ['services','/api/services',d=>{const p=d.services||[];setCard(1,fmt(p.length),'Hizmet kayıtları');}],
-   ['applications','/api/applications',d=>{const p=d.applications||[];setCard(2,fmt(p.filter(x=>x.status==='new').length),'Toplam '+fmt(p.length)+' başvuru');}],
-   ['media','/api/media',d=>{const p=d.media||[];setCard(3,fmt(p.length),'Medya kütüphanesindeki dosyalar');}]
-  ];
-  const results=await Promise.allSettled(tasks.map(async([k,url,apply])=>{const d=await get(url);apply(d);return k;}));
-  const denied=results.filter(x=>x.status==='rejected'&&[401,403].includes(x.reason?.status)).length;
-  const failed=results.filter(x=>x.status==='rejected').length;
   const notice=$('siteAnalyticsNotice');
-  let trafficStatus=''; 
+  let contentStatus='';
+  try{
+   const d=await get('/api/dashboard');
+   const c=d.counts||{};
+   const show=(entry)=>entry&&entry.available?fmt(entry.count):'—';
+   setCard(0,show(c.pages),'Yönetilebilir sayfalar');
+   setCard(1,show(c.services),'Hizmet kayıtları');
+   setCard(2,c.pendingApplications==null?'—':fmt(c.pendingApplications),'Toplam '+(c.applications?.available?fmt(c.applications.count):'—')+' başvuru');
+   setCard(3,show(c.media),'Medya kütüphanesindeki dosyalar');
+   const missing=['pages','services','applications','media'].filter(k=>!c[k]?.available);
+   contentStatus=missing.length?'Bazı tablolar bulunamadı: '+missing.join(', ')+'.':'Site içerik sayaçları veritabanından güncellendi.';
+  }catch(e){
+   ['0','1','2','3'].forEach(i=>setCard(Number(i),'—','Veri alınamadı'));
+   contentStatus='Site içerik verileri alınamadı: '+e.message;
+  }
+  let trafficStatus='';
   try{
    const d=await get('/api/analytics');
    const ga=d.googleAnalytics||{},cf=d.cloudflare||{};
@@ -290,18 +296,18 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
     $('siteRealtimeUsers').textContent=ga.realtime?fmt(ga.realtime.activeUsers):'—';
     $('siteTopPages').innerHTML=list(ga.pages,'path','pageViews');
     $('siteTopCountries').innerHTML=list(ga.countries,'country','activeUsers');
-    trafficStatus='GA4 verileri başarıyla alındı.';
+    trafficStatus='GA4 trafik verileri alındı.';
    }else if(cf.configured){
-    $('siteTopPages').innerHTML=cf.pages?.length?list(cf.pages,'path','requests'):'GA4 sayfa raporu için bağlantı gerekli.';
+    $('siteTopPages').innerHTML=cf.pages?.length?list(cf.pages,'path','requests'):'Cloudflare sayfa raporu bulunamadı.';
     $('siteTopCountries').innerHTML=list(cf.countries,'country','requests');
-    trafficStatus='Cloudflare verileri alındı; istek ve benzersiz IP metrikleri kullanıcı/oturum ile aynı şey değildir.';
+    trafficStatus='Cloudflare trafik verileri alındı; bunlar GA4 kullanıcı ve oturum sayıları değildir.';
    }else{
-    trafficStatus='Trafik ölçümü henüz yapılandırılmamış: '+[ga.error,cf.error].filter(Boolean).join(' ');
+    trafficStatus='Trafik analitiği bağlı değil: '+[ga.error,cf.error].filter(Boolean).join(' ');
    }
   }catch(e){
-   trafficStatus=e.status===401||e.status===403?'Trafik raporu için ana yönetici yetkisi gerekiyor.':'Trafik verisi alınamadı: '+e.message;
+   trafficStatus=e.status===401||e.status===403?'Trafik raporu yalnızca ana yönetici oturumunda açılır.':'Trafik raporu alınamadı: '+e.message;
   }
-  notice.textContent=(failed?('İçerik sayaçlarında '+failed+' bağlantı başarısız. '):'İçerik sayaçları güncellendi. ')+trafficStatus+(denied?' Yetki gerektiren bazı sayaçlar gizli.':'');
+  notice.textContent=contentStatus+' '+trafficStatus;
   notice.className='notice';
  }
  load();
