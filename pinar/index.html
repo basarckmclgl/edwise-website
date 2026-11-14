@@ -64,6 +64,21 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <a class="action" href="#sayfalar"><strong>＋ Yeni sayfa</strong><small>Sayfa taslağı oluştur</small></a><a class="action" href="#hizmetler"><strong>◇ Hizmetleri düzenle</strong><small>Eğitim hizmetlerine git</small></a><a class="action" href="#basvurular"><strong>▣ Başvuruları incele</strong><small>Başvuru yönetimine git</small></a><a class="action" href="#medya"><strong>▧ Medya kütüphanesi</strong><small>Dosyaları görüntüle</small></a>
 </div><div class="notice">Bilgi: Bu aşamada gösterge değerleri henüz gerçek veriye bağlı değil. Sayılar, ilgili modüller ve veri bağlantıları tamamlandığında otomatik olarak görüntülenecek.</div></div>
 </section>
+<section class="panel" id="siteAnalyticsPanel" style="margin-top:16px">
+<h2>EDWISE site trafiği</h2>
+<p class="muted" id="siteAnalyticsPeriod">Son 30 gün · Veriler yükleniyor…</p>
+<div class="cards" style="margin-top:12px">
+<div class="card"><div class="card-top"><span>Aktif kullanıcı</span></div><div class="number" id="siteActiveUsers">—</div><div class="card-foot">Google Analytics 4</div></div>
+<div class="card"><div class="card-top"><span>Oturum</span></div><div class="number" id="siteSessions">—</div><div class="card-foot">Google Analytics 4</div></div>
+<div class="card"><div class="card-top"><span>Sayfa görüntüleme</span></div><div class="number" id="sitePageViews">—</div><div class="card-foot">Google Analytics 4</div></div>
+<div class="card"><div class="card-top"><span>Şu an aktif kullanıcı</span></div><div class="number" id="siteRealtimeUsers">—</div><div class="card-foot">Gerçek zamanlı · GA4</div></div>
+</div>
+<div class="layout" style="margin-top:14px">
+<div class="panel"><h3>En çok görüntülenen sayfalar</h3><div id="siteTopPages" class="empty">Veriler bekleniyor…</div></div>
+<div class="panel"><h3>Ziyaretçi ülkeleri</h3><div id="siteTopCountries" class="empty">Veriler bekleniyor…</div></div>
+</div>
+<div class="notice" id="siteAnalyticsNotice" role="status">Analiz bağlantısı kontrol ediliyor…</div>
+</section>
 <section class="panel" style="margin-top:16px"><h2>Son işlemler</h2><div class="empty"><span class="activity-dot"></span>Henüz listelenecek bir işlem yok. İşlem geçmişi modülü tamamlandığında son değişiklikler burada görünecek.</div></section>
 
 </div><div id="view-sayfalar" class="module-view" hidden><header><div><div class="eyebrow">EDWISE / İçerik Yönetimi</div><h1>Sayfa Yönetimi</h1><p>Web sitesindeki sayfaları ayrı bir çalışma alanında görüntüle ve yönet.</p></div><div class="date">İÇERİK MODÜLÜ</div></header><section id="sayfalar" class="panel" style="margin-top:22px">
@@ -242,5 +257,56 @@ $('menuExport').addEventListener('click',()=>{const payload=JSON.stringify(items
 render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı siteye gönderilmedi.');})();
 
 (()=>{const root=document.getElementById('view-seo');if(!root)return;const ids=['seoTitle','seoDescription','seoCanonical','seoRobots','seoKeywords','seoOgTitle','seoOgDescription','seoOgImage','seoGaId','seoGsc'];const $=id=>document.getElementById(id),key='edwise_seo_draft_v1';const defaults={seoTitle:'EDWISE | Eğitim Danışmanlığı ve Yabancı Dil Hazırlık',seoDescription:'EDWISE Hatay Antakya\'da eğitim danışmanlığı, IELTS, TOEFL, YDS, YÖKDİL hazırlığı ve Speaking Club hizmetleri sunar.',seoCanonical:'https://edwisedanismanlik.com/',seoRobots:'index,follow',seoKeywords:'eğitim danışmanlığı, IELTS, TOEFL, YDS, YÖKDİL, Hatay, Antakya',seoOgTitle:'EDWISE | Eğitim Danışmanlığı ve Yabancı Dil Hazırlık',seoOgDescription:'EDWISE eğitim danışmanlığı ve yabancı dil hazırlık hizmetlerini keşfedin.',seoOgImage:'https://edwisedanismanlik.com/assets/images/logo.png',seoGaId:'',seoGsc:''};let data={...defaults};const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));function feedback(msg,type='info'){$('seoFeedback').textContent=msg;$('seoFeedback').className='app-feedback '+type;}function read(){ids.forEach(id=>{data[id]=$(id).value;});}function render(){ids.forEach(id=>{$(id).value=data[id]??'';});updatePreview();}function updatePreview(){const title=$('seoTitle').value.trim()||'Sayfa başlığı';const desc=$('seoDescription').value.trim()||'Meta açıklaması burada görüntülenecek.';const url=$('seoCanonical').value.trim()||'https://edwisedanismanlik.com/';$('seoPreviewTitle').textContent=title;$('seoPreviewDescription').textContent=desc;$('seoPreviewUrl').textContent=url;$('seoTitleCount').textContent=$('seoTitle').value.length+' / 60';$('seoDescriptionCount').textContent=$('seoDescription').value.length+' / 160';}function save(){read();try{localStorage.setItem(key,JSON.stringify(data));feedback('SEO taslağı bu tarayıcıya kaydedildi. Canlı siteye uygulanmadı.','success');}catch{feedback('Tarayıcı kaydı başarısız. JSON olarak indirebilirsin.','error');}}try{const saved=JSON.parse(localStorage.getItem(key)||'null');if(saved&&typeof saved==='object')data={...data,...saved};}catch{}render();ids.forEach(id=>$(id).addEventListener('input',()=>{updatePreview();save();}));$('seoRobots').addEventListener('change',save);$('seoReset').addEventListener('click',()=>{data={...defaults};render();save();});$('seoExport').addEventListener('click',()=>{read();const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='edwise-seo-taslagi.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);feedback('SEO taslağı JSON dosyası olarak indirildi.','success');});if(localStorage.getItem(key))feedback('Önceki SEO taslağı bu tarayıcıdan yüklendi. Canlı siteye uygulanmadı.');})();
+
+/* Genel Bakış: gerçek site verileri. Yalnızca okuma istekleri yapar. */
+(()=> {
+ const root=document.getElementById('view-genel'); if(!root)return;
+ const $=id=>document.getElementById(id);
+ const fmt=n=>Number(n||0).toLocaleString('tr-TR');
+ const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const setCard=(index,value,foot)=>{const card=root.querySelectorAll('.cards .card')[index];if(!card)return;const number=card.querySelector('.number'),caption=card.querySelector('.card-foot');if(number)number.textContent=value;if(caption&&foot)caption.textContent=foot;};
+ const list=(rows,key,value)=>rows?.length?'<div class="activity-list">'+rows.map(x=>'<div class="item"><div><b>'+safe(x[key])+'</b><small>'+fmt(x[value])+'</small></div></div>').join('')+'</div>':'<div class="empty">Bu dönem için kayıt bulunamadı.</div>';
+ async function get(url){const r=await fetch(url,{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});let d={};try{d=await r.json()}catch{}if(!r.ok||d.success===false)throw Object.assign(new Error(d.message||'HTTP '+r.status),{status:r.status});return d;}
+ async function load(){
+  const tasks=[
+   ['pages','/api/pages',d=>{const p=d.pages||[];setCard(0,fmt(p.length),'Yönetilebilir sayfalar');}],
+   ['services','/api/services',d=>{const p=d.services||[];setCard(1,fmt(p.length),'Hizmet kayıtları');}],
+   ['applications','/api/applications',d=>{const p=d.applications||[];setCard(2,fmt(p.filter(x=>x.status==='new').length),'Toplam '+fmt(p.length)+' başvuru');}],
+   ['media','/api/media',d=>{const p=d.media||[];setCard(3,fmt(p.length),'Medya kütüphanesindeki dosyalar');}]
+  ];
+  const results=await Promise.allSettled(tasks.map(async([k,url,apply])=>{const d=await get(url);apply(d);return k;}));
+  const denied=results.filter(x=>x.status==='rejected'&&[401,403].includes(x.reason?.status)).length;
+  const failed=results.filter(x=>x.status==='rejected').length;
+  const notice=$('siteAnalyticsNotice');
+  let trafficStatus=''; 
+  try{
+   const d=await get('/api/analytics');
+   const ga=d.googleAnalytics||{},cf=d.cloudflare||{};
+   $('siteAnalyticsPeriod').textContent='Dönem: '+(d.period?.startDate||'—')+' – '+(d.period?.endDate||'—')+' · Son 30 gün';
+   if(ga.configured){
+    $('siteActiveUsers').textContent=fmt(ga.totals?.activeUsers);
+    $('siteSessions').textContent=fmt(ga.totals?.sessions);
+    $('sitePageViews').textContent=fmt(ga.totals?.pageViews);
+    $('siteRealtimeUsers').textContent=ga.realtime?fmt(ga.realtime.activeUsers):'—';
+    $('siteTopPages').innerHTML=list(ga.pages,'path','pageViews');
+    $('siteTopCountries').innerHTML=list(ga.countries,'country','activeUsers');
+    trafficStatus='GA4 verileri başarıyla alındı.';
+   }else if(cf.configured){
+    $('siteTopPages').innerHTML=cf.pages?.length?list(cf.pages,'path','requests'):'GA4 sayfa raporu için bağlantı gerekli.';
+    $('siteTopCountries').innerHTML=list(cf.countries,'country','requests');
+    trafficStatus='Cloudflare verileri alındı; istek ve benzersiz IP metrikleri kullanıcı/oturum ile aynı şey değildir.';
+   }else{
+    trafficStatus='Trafik ölçümü henüz yapılandırılmamış: '+[ga.error,cf.error].filter(Boolean).join(' ');
+   }
+  }catch(e){
+   trafficStatus=e.status===401||e.status===403?'Trafik raporu için ana yönetici yetkisi gerekiyor.':'Trafik verisi alınamadı: '+e.message;
+  }
+  notice.textContent=(failed?('İçerik sayaçlarında '+failed+' bağlantı başarısız. '):'İçerik sayaçları güncellendi. ')+trafficStatus+(denied?' Yetki gerektiren bazı sayaçlar gizli.':'');
+  notice.className='notice';
+ }
+ load();
+ const refresh=document.createElement('button');refresh.type='button';refresh.className='secondary';refresh.textContent='Verileri yenile';refresh.style.marginTop='10px';refresh.addEventListener('click',load);
+ $('siteAnalyticsPanel')?.appendChild(refresh);
+})();
 </script>
 </main></body></html>
