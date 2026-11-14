@@ -1,5 +1,54 @@
 const json=(data,status=200)=>Response.json(data,{status,headers:{"Cache-Control":"no-store","X-Robots-Tag":"noindex, nofollow"}});
 
+async function ensureDashboardTables(db){
+  await db.prepare(`CREATE TABLE IF NOT EXISTS pages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    content TEXT NOT NULL DEFAULT '',
+    meta_title TEXT NOT NULL DEFAULT '',
+    meta_description TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'draft',
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    deleted_at TEXT
+  )`).run();
+
+  await db.prepare(`CREATE TABLE IF NOT EXISTS services (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    description TEXT NOT NULL DEFAULT '',
+    image_url TEXT NOT NULL DEFAULT '',
+    content TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'draft',
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`).run();
+
+  await db.prepare(`CREATE TABLE IF NOT EXISTS applications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    email TEXT,
+    program TEXT NOT NULL,
+    format TEXT NOT NULL,
+    availability TEXT,
+    note TEXT,
+    status TEXT NOT NULL DEFAULT 'new',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`).run();
+
+  await db.prepare(`CREATE TABLE IF NOT EXISTS media (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    file_name TEXT NOT NULL UNIQUE,
+    file_url TEXT NOT NULL,
+    file_type TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`).run();
+}
+
 async function countTable(db,table,excludeDeleted=false){
   const schema=await db.prepare("PRAGMA table_info('"+table+"')").all();
   const columns=new Set((schema.results||[]).map(column=>column.name));
@@ -16,6 +65,7 @@ export async function onRequestGet({request,env}){
   }
   try{
     if(!env.DB)return json({success:false,message:"Veritabanı bağlantısı bulunamadı."},503);
+    await ensureDashboardTables(env.DB);
     const [pages,services,applications,media]=await Promise.all([
       countTable(env.DB,"pages",true),
       countTable(env.DB,"services"),
