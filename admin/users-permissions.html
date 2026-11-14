@@ -41,7 +41,7 @@ const defaults={
 'Admin':[[1,0,0,0,0],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,0,0],[1,1,1,1,1],[1,0,1,0,0],[1,1,1,0,1],[1,1,1,0,0],[0,0,0,0,0]],
 
 'Editör':[[1,0,0,0,0],[1,1,1,0,0],[1,1,1,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,1,0,0],[1,0,1,0,0],[1,0,0,0,0],[0,0,0,0,0]],
-'Görüntüleyici':modules.map(()=>[1,0,0,0,0])
+'Görüntüleyici':modules.map((_,i)=>i===8?[0,0,0,0,0]:[1,0,0,0,0])
 };
 let data=load(),matrixState=loadMatrix();
 function load(){try{const x=JSON.parse(localStorage.getItem(KEY));return Array.isArray(x)?x:seed.map(u=>({...u}));}catch{return seed.map(u=>({...u}));}}
