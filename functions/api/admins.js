@@ -214,8 +214,8 @@ export async function onRequestPut(context) {
     const email = clean(data.email, 254).toLowerCase();
     const role = clean(data.role || target.role, 50);
 
-if (!["admin", "content_admin", "editor", "viewer"].includes(role)) {
-      return json({ success: false, message: "Geçersiz kullanıcı yetkisi." }, 400);
+if (role !== "content_admin") {
+      return json({ success: false, message: "Mevcut veritabanı yalnızca İçerik Yöneticisi rolünü destekliyor. Genişletilmiş rol modeli için veritabanı geçişi gerekiyor." }, 400);
     }
 
     if (username.length < 3) {
