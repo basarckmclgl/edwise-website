@@ -132,18 +132,50 @@ export async function onRequestPost(context) {
       }, 400);
     }
 
+    const requestedRole = clean(data.role || "Admin", 50);
+    const roleMap = { "Admin":"content_admin", "content_admin":"content_admin", "Editör":"editor", "editor":"editor", "Görüntüleyici":"viewer", "viewer":"viewer" };
+    const roleKey = roleMap[requestedRole];
+    if (!roleKey) return json({ success:false, message:"Geçersiz kullanıcı rolü." },400);
+
     const passwordHash = await hashPassword(password);
+    let permissions = {};
+    const template = await context.env.DB.prepare(
+      "SELECT permissions_json FROM admin_role_templates WHERE role_key = ? LIMIT 1"
+    ).bind(roleKey).first();
+
+    if (template?.permissions_json) {
+      try { permissions = JSON.parse(template.permissions_json || "{}"); } catch {}
+    } else {
+      const modules = ["dashboard","pages","services","applications","menu","seo","languages","settings","users"];
+      const actions = ["view","create","edit","delete","publish"];
+      const defaults = {
+        editor: [[1,0,0,0,0],[1,1,1,0,0],[1,1,1,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,1,0,0],[1,0,1,0,0],[1,0,0,0,0],[0,0,0,0,0]],
+        viewer: modules.map((_,i)=>i===8?[0,0,0,0,0]:[1,0,0,0,0]),
+        content_admin: [[1,0,0,0,0],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,0,0],[1,1,1,1,1],[1,0,1,0,0],[1,1,1,0,1],[1,1,1,0,0],[0,0,0,0,0]]
+      };
+      modules.forEach((module,i) => {
+        permissions[module] = {};
+        actions.forEach((action,j) => permissions[module][action] = !!defaults[roleKey][i][j]);
+      });
+    }
+    permissions.__role_key = roleKey;
+    const forcePasswordChange = data.forcePasswordChange === true || data.force_password_change === true ? 1 : 0;
 
     const result = await context.env.DB.prepare(`
       INSERT INTO admins (
-        username, email, password_hash,
-        role, is_active, created_at, updated_at
+        username, email, password_hash, role, permissions_json,
+        force_password_change, is_active, created_at, updated_at
       )
-      VALUES (?, ?, ?, 'content_admin', 1, datetime('now'), datetime('now'))
-    `).bind(username, email, passwordHash).run();
+      VALUES (?, ?, ?, 'content_admin', ?, ?, 1, datetime('now'), datetime('now'))
+    `).bind(username, email, passwordHash, JSON.stringify(permissions), forcePasswordChange).run();
 
-    await logAudit(context.env.DB,context.request,auth.admin,{action:"admin_created",entity_type:"admin",entity_id:result.meta?.last_row_id,entity_title:username,details:{email,role:"content_admin",is_active:true}});
-    return json({success:true,message:"Yeni kullanıcı oluşturuldu.",id:result.meta?.last_row_id},201);
+    const newId = result.meta?.last_row_id;
+    await logAudit(context.env.DB,context.request,auth.admin,{action:"admin_created",entity_type:"admin",entity_id:newId,entity_title:username,details:{email,role:roleKey,is_active:true}});
+    return json({
+      success:true,
+      message:"Yeni kullanıcı oluşturuldu.",
+      user:{id:newId,username,email,role:"content_admin",permissions_json:JSON.stringify(permissions),force_password_change:forcePasswordChange,is_active:1}
+    },201);
 
   } catch (error) {
     const message = String(error?.message || error);
