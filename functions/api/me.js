@@ -33,7 +33,7 @@ export async function onRequestGet({ request, env }) {
     const tokenHash = await hashToken(match[1]);
 
     const admin = await env.DB.prepare(`
-      SELECT a.id, a.username, a.email, a.role
+      SELECT a.id, a.username, a.email, a.role, a.force_password_change
       FROM admin_sessions s
       INNER JOIN admins a ON a.id = s.admin_id
       WHERE s.token_hash = ?
