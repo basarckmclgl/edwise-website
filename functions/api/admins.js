@@ -244,7 +244,7 @@ export async function onRequestPut(context) {
     const username = clean(data.username, 50);
     const email = clean(data.email, 254).toLowerCase();
     const requestedRole = clean(data.role || "Admin", 50);
-    const roleMap = { "Admin":"content_admin", "content_admin":"content_admin", "Editör":"editor", "editor":"editor", "Görüntüleyici":"viewer", "viewer":"viewer" };
+    const roleMap = { "İçerik Yöneticisi":"content_admin", "Admin":"content_admin", "content_admin":"content_admin" };
     const roleKey = roleMap[requestedRole];
     if (!roleKey) return json({success:false,message:"Geçersiz kullanıcı rolü."},400);
     let existingPermissions = {};
