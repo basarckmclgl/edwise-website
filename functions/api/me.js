@@ -33,7 +33,7 @@ export async function onRequestGet({ request, env }) {
     const tokenHash = await hashToken(match[1]);
 
     const admin = await env.DB.prepare(`
-      SELECT a.id, a.username, a.email, a.role, a.force_password_change
+      SELECT a.id, a.username, a.email, a.role, a.permissions_json, a.force_password_change
       FROM admin_sessions s
       INNER JOIN admins a ON a.id = s.admin_id
       WHERE s.token_hash = ?
@@ -46,10 +46,25 @@ export async function onRequestGet({ request, env }) {
       return json({ success: false, authenticated: false }, 401);
     }
 
+    let own = {};
+    try { own = JSON.parse(admin.permissions_json || "{}"); } catch {}
+    const roleKey = String(own.__role_key || admin.role);
+    const template = await env.DB.prepare("SELECT permissions_json FROM admin_role_templates WHERE role_key=? LIMIT 1").bind(roleKey).first();
+    let templatePermissions = {};
+    try { templatePermissions = JSON.parse(template?.permissions_json || "{}"); } catch {}
+    const builtin = {
+      content_admin:{dashboard:{view:true},pages:{view:true,create:true,edit:true,delete:true,publish:true},services:{view:true,create:true,edit:true,delete:true,publish:true},applications:{view:true,create:true,edit:true},menu:{view:true,create:true,edit:true,delete:true,publish:true},seo:{view:true,edit:true},languages:{view:true,create:true,edit:true,publish:true},settings:{view:true,create:true,edit:true},users:{view:false}},
+      editor:{dashboard:{view:true},pages:{view:true,create:true,edit:true},services:{view:true,create:true,edit:true},applications:{view:true},menu:{view:true},seo:{view:true,edit:true},languages:{view:true,edit:true},settings:{view:true},users:{view:false}},
+      viewer:{dashboard:{view:true},pages:{view:true},services:{view:true},applications:{view:true},menu:{view:true},seo:{view:true},languages:{view:true},settings:{view:true},users:{view:false}}
+    };
+    const base = Object.keys(templatePermissions).length ? templatePermissions : (builtin[roleKey] || builtin.content_admin);
+    const permissions = {...base};
+    for (const [module, actions] of Object.entries(own)) if (module !== "__role_key") permissions[module] = {...(base[module]||{}),...(actions||{})};
+    delete admin.permissions_json;
     return json({
       success: true,
       authenticated: true,
-      admin
+      admin: {...admin, role_key:roleKey, permissions}
     });
 
   } catch (error) {
