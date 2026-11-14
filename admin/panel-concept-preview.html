@@ -1578,7 +1578,7 @@ async function loadApplications(){
    '<td>'+escapeHtml(x.format||"-")+'</td>'+
    '<td>'+escapeHtml(x.availability||"-")+'</td>'+
    '<td style="min-width:220px;white-space:normal">'+escapeHtml(x.note||"-")+'</td>'+
-   '<td><select aria-label="Başvuru durumu" data-app-status="'+escapeHtml(x.id)+'" '+(currentPermissions?.applications?.edit===true?"":"disabled")+'><option value="new" '+(x.status==="new"?"selected":"")+'>Yeni</option><option value="contacted" '+(x.status==="contacted"?"selected":"")+'>İletişime geçildi</option><option value="completed" '+(x.status==="completed"?"selected":"")+'>Tamamlandı</option></select><br><button type="button" class="btn" style="margin-top:6px" data-app-contact="'+index+'" aria-expanded="false">İletişim bilgilerini göster</button></td>'+
+   '<td><select aria-label="Başvuru durumu" data-app-status="'+escapeHtml(x.id)+'" '+(currentRole==="superadmin"||currentPermissions?.applications?.edit===true?"":"disabled")+'><option value="new" '+(x.status==="new"?"selected":"")+'>Yeni</option><option value="contacted" '+(x.status==="contacted"?"selected":"")+'>İletişime geçildi</option><option value="completed" '+(x.status==="completed"?"selected":"")+'>Tamamlandı</option></select><br><button type="button" class="btn" style="margin-top:6px" data-app-contact="'+index+'" aria-expanded="false">İletişim bilgilerini göster</button></td>'+
    '</tr>').join("")||'<tr><td colspan="9">Henüz başvuru yok.</td></tr>';
   bodies.forEach(body=>{
    body.innerHTML=html;
