@@ -45,10 +45,9 @@ export async function onRequestPost(context) {
     if (duplicate) return json({ success: false, message: "Bu kullanıcı adı veya e-posta zaten kayıtlı." }, 409);
 
     const passwordHash = await hashPassword(password);
-    const template = await env.DB.prepare(
-      "SELECT permissions_json FROM admin_role_templates WHERE role_key = ?"
-    ).bind(roleMap[role]).first();
-    const permissionsJson = template?.permissions_json || "{}";
+    // Yeni hesaplar rol şablonunu canlı olarak miras alır. Kişiye özel
+    // izinler yalnızca yetki matrisi üzerinden ayrıca kaydedilir.
+    const permissionsJson = "{}";
     const result = await env.DB.prepare(
       "INSERT INTO admins (username,email,password_hash,role,is_active,permissions_json) VALUES (?,?,?,?,?,?)"
     ).bind(username, email, passwordHash, roleMap[role], data.status === "inactive" ? 0 : 1, permissionsJson).run();
