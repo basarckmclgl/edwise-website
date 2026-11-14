@@ -34,11 +34,11 @@ const CONTENT_ADMIN_DEFAULTS = Object.freeze({
 
 const CONTENT_ADMIN_LIMITS = Object.freeze({
   dashboard: ["view"],
-  pages: ["view", "create", "edit", "delete", "publish"],
-  services: ["view", "create", "edit", "delete", "publish"],
-  media: ["view", "create", "edit", "delete"],
-  applications: ["view", "create", "edit", "delete"],
-  menu: ["view", "create", "edit", "delete", "publish"],
+  pages: ["view", "create", "edit", "publish"],
+  services: ["view", "create", "edit", "publish"],
+  media: ["view", "create", "edit"],
+  applications: ["view", "edit"],
+  menu: ["view", "edit"],
   profile: ["view", "edit"]
 });
 
