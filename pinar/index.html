@@ -37,6 +37,17 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 
 .history-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}.history-stats .card{min-height:104px;padding:15px}.history-stats .number{font-size:21px;margin-top:10px}.history-toolbar{display:flex;gap:9px;margin:16px 0;flex-wrap:wrap}.history-toolbar input,.history-toolbar select{border:1px solid #e6dcf0;border-radius:9px;padding:10px 12px;background:#faf9fc;color:#8d8199;font:inherit;font-size:12px}.history-toolbar input{flex:1;min-width:180px}.history-empty{border:1px dashed #d9c9e8;border-radius:12px;background:#fcfaff;padding:28px 20px;text-align:center}.history-empty-icon{width:46px;height:46px;margin:0 auto 12px;border-radius:14px;background:#f0e6fb;color:#7138b8;display:grid;place-items:center;font-size:24px}.history-empty strong{display:block;color:#54218f;margin-bottom:8px}.history-empty p{max-width:620px;margin:auto;font-size:12px;line-height:1.7}.history-scope{display:grid;grid-template-columns:1fr 1fr;gap:10px}.history-scope>div{border:1px solid var(--line);border-radius:10px;padding:12px}.history-scope b{display:block;color:#54218f;font-size:13px}.history-scope small{display:block;color:var(--muted);font-size:11px;line-height:1.5;margin-top:5px}@media(max-width:650px){.history-stats{grid-template-columns:1fr}.history-scope{grid-template-columns:1fr}}
 </style>
+<style>html:not(.edwise-auth-ready) body{visibility:hidden}</style>
+<script>
+(async()=>{
+  const next=location.pathname+location.search+location.hash;
+  try{
+    const response=await fetch('/api/me',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
+    if(response.ok){document.documentElement.classList.add('edwise-auth-ready');return;}
+  }catch(e){}
+  location.replace('/pinar/login.html?next='+encodeURIComponent(next));
+})();
+</script>
 </head>
 <body>
 <aside><div class="brand"><img src="/assets/images/logo.png" alt="EDWISE Education &amp; Consultancy"></div><div class="sub">YÖNETİM MERKEZİ</div><div class="owner-name">Çilem ATASOY</div>
