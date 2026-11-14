@@ -1378,7 +1378,7 @@ function canAccess(page){
  if(currentRole==="superadmin") return true;
  const moduleMap={
   overview:"dashboard",
-  panelhome:"dashboard",
+  panelhome:"panelhome",
   classrooms:"classrooms",
   pages:"pages",
   services:"services",
@@ -2749,7 +2749,7 @@ $("permissionUserSelect").addEventListener("change",()=>{
  };
  let stored={};try{stored=user?JSON.parse(user.permissions_json||"{}"):{};}catch{}
  permissionDraft=JSON.parse(JSON.stringify(safeDefaults));
- for(const [key,actions] of Object.entries(stored)){if(permissionModules.some(([module])=>module===key)&&actions&&typeof actions==="object")permissionDraft[key]={...permissionDraft[key],...actions};}
+ for(const [key,actions] of Object.entries(stored)){if(permissionModules.some(([module])=>module===key)&&actions&&typeof actions==="object"){const allowed=permissionActionLimits[key]||[];for(const action of allowed){if(typeof actions[action]==="boolean")permissionDraft[key][action]=actions[action];}}}
  if(selectedPermissionUser){
   $("permissionEditorMessage").textContent="Seçili hesap: "+user.username+". İşaretlediğiniz modüller bu hesaba uygulanır.";
  }
