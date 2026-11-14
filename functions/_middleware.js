@@ -3,6 +3,17 @@ const MAINTENANCE_HTML = "<!doctype html><html lang=\"tr\"><meta charset=\"utf-8
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const path = url.pathname;
+
+  // Admin panel removal: keep the public website and public application form intact.
+  if (path === "/admin" || path.startsWith("/admin/") || path === "/admin-v2" || path.startsWith("/admin-v2/")) {
+    return new Response("Not Found", { status: 404, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
+  }
+  const panelOnlyApiPaths = new Set([
+    "/api/login", "/api/logout", "/api/me", "/api/password-reset-request", "/api/password-reset"
+  ]);
+  if (panelOnlyApiPaths.has(path)) {
+    return new Response("Not Found", { status: 404, headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
+  }
   if (!path.startsWith("/admin") && !path.startsWith("/api/") && context.env.DB) {
     try {
       const row = await context.env.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key='site_status' LIMIT 1").first();
