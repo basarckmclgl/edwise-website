@@ -113,6 +113,10 @@ export async function requireEditor(context) {
     : method === "DELETE" ? "delete"
     : method === "PUT" || method === "PATCH" ? "edit" : null;
 
+  // Dosya yönetimi uç noktaları POST kullansa da işlemin gerçek türünü koru.
+  if (path.includes("media-delete")) actionKey = "delete";
+  else if (path.includes("media-upload") || path.includes("media-import")) actionKey = "create";
+
   if (!actionKey) return authError("Bu işlem için yetki tanımlı değil.", 403);
 
   if (moduleKey === "pages" && (method === "PUT" || method === "PATCH")) {
