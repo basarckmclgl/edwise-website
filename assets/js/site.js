@@ -392,6 +392,7 @@
   fetch("/api/public-pages?path="+encodeURIComponent(pagePath),{headers:{"Accept":"application/json"},cache:"no-store"})
     .then(response=>response.ok?response.json():null)
     .then(data=>{
+      if(data&&data.deleted){location.replace("/");return;}
       if(!data||!data.success||!data.page||!data.page.content)return;
       if(window.EDWISEContent)window.EDWISEContent.render(main,data.page.content);
       else main.innerHTML=data.page.content;
