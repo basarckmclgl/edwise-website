@@ -331,7 +331,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
    if(!editing&&data.id)currentId=Number(data.id);
    $('editorSlug').value=slug;
    await loadPages();
-   feedback(status==='published'?'Sayfa ana sitede yayımlandı: '+location.origin+pageUrl(slug):'Taslak veritabanına kaydedildi.');
+   feedback(status==='published'?'Sayfa ana sitede yayımlandı: '+'https://edwisedanismanlik.com'+pageUrl(slug):'Taslak veritabanına kaydedildi.');
   }catch(error){feedback(error.message||'Sayfa kaydedilemedi.','error');}
   finally{button.disabled=false;button.textContent=oldText;}
  }
