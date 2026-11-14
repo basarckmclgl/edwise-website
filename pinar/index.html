@@ -86,7 +86,19 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <tr data-category="yasal"><td><strong>Yasal Bilgilendirme</strong><small>Gizlilik ve yasal metinler</small></td><td><span class="page-type">Yasal</span></td><td><small>/pages/yasal-bilgilendirme.html</small></td><td>Dosya mevcut</td><td><a class="preview-link" href="../pages/yasal-bilgilendirme.html" target="_blank" rel="noopener">Önizle ↗</a></td></tr>
 <tr data-category="sablon"><td><strong>Dinamik Sayfa Şablonu</strong><small>CMS tarafından üretilecek sayfalar için</small></td><td><span class="page-type">Şablon</span></td><td><small>/pages/sayfa.html</small></td><td>Şablon dosyası</td><td><a class="preview-link" href="../pages/sayfa.html" target="_blank" rel="noopener">Önizle ↗</a></td></tr>
 </tbody></table><div class="no-results" id="noPages">Aramana uygun sayfa bulunamadı.</div></div>
-<div class="page-note">Bu liste, çalışma dalındaki mevcut dosyalar incelenerek hazırlandı. Şu an sayfalar listelenebilir ve önizlenebilir; içerik düzenleme, yeni sayfa oluşturma, taslak kaydetme ve yayınlama işlevleri henüz bağlanmadı. Bu aşamada mevcut sayfa dosyalarına müdahale edilmedi.</div>
+<div class="page-note">Bu liste, çalışma dalındaki mevcut dosyalar incelenerek hazırlandı. Şu an sayfalar listelenebilir ve önizlenebilir; içerik düzenleme, yeni sayfa oluşturma, taslak kaydetme ve yayınlama işlevleri henüz bağlanmadı. Bu aşamada mevcut sayfa dosyalarına müdahale edilmedi.</div><section class="panel" id="pageEditorPanel" style="margin-top:16px">
+<div class="section-head"><div><div class="eyebrow">GÖRSEL SAYFA DÜZENLEYİCİ</div><h2>Sayfa içerik düzenleyici</h2><p class="section-intro">Metin ve görselleri Word benzeri araçlarla düzenle. Taslak bu tarayıcıda saklanır.</p></div><span class="tag">Taslak modu</span></div>
+<div class="page-tools" style="margin-bottom:10px"><input id="editorTitle" placeholder="Sayfa başlığı" style="flex:2"><input id="editorSlug" placeholder="sayfa-adresi" style="flex:1"><button type="button" id="editorNew" class="app-refresh">Yeni sayfa</button></div>
+<div class="page-tools" style="gap:6px;margin-bottom:8px;flex-wrap:wrap">
+<button type="button" data-editcmd="bold" class="app-refresh"><b>B</b></button><button type="button" data-editcmd="italic" class="app-refresh"><i>I</i></button><button type="button" data-editcmd="underline" class="app-refresh"><u>U</u></button>
+<select id="editorFormat"><option value="p">Normal metin</option><option value="h1">Başlık 1</option><option value="h2">Başlık 2</option><option value="h3">Başlık 3</option><option value="blockquote">Alıntı</option></select>
+<button type="button" data-editcmd="justifyLeft" class="app-refresh">Sola</button><button type="button" data-editcmd="justifyCenter" class="app-refresh">Ortala</button><button type="button" data-editcmd="justifyRight" class="app-refresh">Sağa</button>
+<label>Yazı rengi <input id="editorColor" type="color" value="#29263d"></label><label>Vurgu <input id="editorMark" type="color" value="#fff0a6"></label>
+<button type="button" id="editorImage" class="app-refresh">Resim ekle</button><input type="file" id="editorImageFile" accept="image/*" hidden>
+</div>
+<div id="pageCanvas" contenteditable="true" style="min-height:280px;padding:22px;border:1px solid #d9d7e2;border-radius:12px;background:#fff;color:#25233a;line-height:1.7;outline:none"><h1>Sayfa başlığınız</h1><p>İçeriğinizi buraya yazın. Metni seçerek biçimlendirebilir, resim ekleyip sürükleyerek yerini değiştirebilirsiniz.</p></div>
+<div class="page-tools" style="margin-top:10px"><button type="button" id="editorSave" class="app-refresh">Taslağı kaydet</button><button type="button" id="editorExport" class="app-refresh">HTML indir</button><span id="editorFeedback" class="page-count" aria-live="polite">Henüz kaydedilmedi.</span></div>
+</section>
 </section>
 
 </div>
@@ -268,5 +280,21 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  }
  load();
 })(); 
+
+(()=>{const root=document.getElementById('view-sayfalar');if(!root)return;const $=id=>document.getElementById(id);const canvas=$('pageCanvas'),key='edwise_page_editor_drafts_v1';let drafts={};try{drafts=JSON.parse(localStorage.getItem(key)||'{}')||{};}catch{}
+function feedback(t){$('editorFeedback').textContent=t;}
+function slugify(t){return t.toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/ı/g,'i').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+function save(){const slug=$('editorSlug').value.trim()||slugify($('editorTitle').value||'yeni-sayfa');drafts[slug]={title:$('editorTitle').value,html:canvas.innerHTML,updatedAt:new Date().toISOString()};try{localStorage.setItem(key,JSON.stringify(drafts));feedback('Taslak kaydedildi: '+slug+' (yalnızca bu tarayıcıda)');}catch{feedback('Tarayıcı depolama alanı yetersiz.');}}
+function fresh(){ $('editorTitle').value='';$('editorSlug').value='';canvas.innerHTML='<h1>Yeni sayfa</h1><p>İçeriğinizi buraya yazın.</p>';feedback('Yeni taslak oluşturuldu.');}
+root.querySelectorAll('.pages-table tbody tr').forEach(row=>{const name=row.querySelector('strong')?.textContent||'';const link=row.querySelector('a.preview-link');const btn=document.createElement('button');btn.type='button';btn.className='app-refresh';btn.textContent='Düzenle';btn.addEventListener('click',()=>{$('editorTitle').value=name;$('editorSlug').value=(link?.getAttribute('href')||'').split('/').pop().replace('.html','').replace('..','')||'index';canvas.innerHTML='<h1>'+name.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))+'</h1><p>Mevcut sayfanın içeriğini buraya ekleyin veya düzenleyin.</p>';feedback('Düzenleme taslağı açıldı. Mevcut canlı dosya değiştirilmedi.');});row.lastElementChild?.append(' ',btn);});
+root.querySelectorAll('[data-editcmd]').forEach(b=>b.addEventListener('click',()=>{canvas.focus();document.execCommand(b.dataset.editcmd,false,null);}));
+$('editorFormat').addEventListener('change',e=>{canvas.focus();document.execCommand('formatBlock',false,e.target.value);});
+$('editorColor').addEventListener('input',e=>{canvas.focus();document.execCommand('foreColor',false,e.target.value);});
+$('editorMark').addEventListener('input',e=>{canvas.focus();document.execCommand('hiliteColor',false,e.target.value);});
+$('editorImage').addEventListener('click',()=>$('editorImageFile').click());
+$('editorImageFile').addEventListener('change',e=>{const f=e.target.files?.[0];if(!f)return;if(!f.type.startsWith('image/')){feedback('Yalnızca resim dosyası seçilebilir.');return;}const reader=new FileReader();reader.onload=()=>{canvas.focus();const img=document.createElement('img');img.src=reader.result;img.alt=f.name;img.style.cssText='max-width:100%;height:auto;cursor:move';img.draggable=true;img.addEventListener('dragstart',ev=>{ev.dataTransfer.setData('text/plain','image');window.__edwiseDraggedImage=img;});img.addEventListener('dragover',ev=>ev.preventDefault());img.addEventListener('drop',ev=>{ev.preventDefault();const dragged=window.__edwiseDraggedImage;if(dragged&&dragged!==img)img.before(dragged);});canvas.append(img);feedback('Resim eklendi. Taslağı kaydetmeyi unutmayın.');};reader.readAsDataURL(f);e.target.value='';});
+$('editorNew').addEventListener('click',fresh);$('editorSave').addEventListener('click',save);
+$('editorExport').addEventListener('click',()=>{const html='<!doctype html><html lang="tr"><meta charset="utf-8"><title>'+$('editorTitle').value+'</title><body>'+canvas.innerHTML+'</body></html>';const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download=($('editorSlug').value||slugify($('editorTitle').value)||'sayfa')+'.html';a.click();URL.revokeObjectURL(a.href);feedback('HTML dosyası indirildi. Henüz siteye yayınlanmadı.');});
+})();
 </script>
 </main></body></html>
