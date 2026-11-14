@@ -73,7 +73,7 @@ export async function onRequestGet(context) {
 
     const result = await context.env.DB.prepare(`
       SELECT
-        id, username, email, role, is_active,
+        id, username, email, role, is_active, permissions_json, force_password_change,
         created_at, updated_at, last_login_at
       FROM admins
       ORDER BY created_at DESC
@@ -193,7 +193,7 @@ export async function onRequestPut(context) {
     }
 
     const target = await context.env.DB.prepare(
-      "SELECT id, username, email, role, is_active FROM admins WHERE id = ?"
+      "SELECT id, username, email, role, is_active, permissions_json FROM admins WHERE id = ?"
     ).bind(id).first();
 
     if (!target) {
@@ -212,14 +212,12 @@ export async function onRequestPut(context) {
 
     const username = clean(data.username, 50);
     const email = clean(data.email, 254).toLowerCase();
-    const role = clean(data.role || target.role, 50);
-
-if (role !== "content_admin") {
-  return json({
-    success: false,
-    message: "Geçersiz kullanıcı yetkisi."
-  }, 400);
-}
+    const requestedRole = clean(data.role || "Admin", 50);
+    const roleMap = { "Admin":"content_admin", "content_admin":"content_admin", "Editör":"editor", "editor":"editor", "Görüntüleyici":"viewer", "viewer":"viewer" };
+    const roleKey = roleMap[requestedRole];
+    if (!roleKey) return json({success:false,message:"Geçersiz kullanıcı rolü."},400);
+    const existingPermissions = JSON.parse(target.permissions_json || "{}");
+    const permissionsJson = JSON.stringify({ ...existingPermissions, __role_key: roleKey });
 
     if (username.length < 3) {
       return json({
@@ -261,7 +259,9 @@ if (role !== "content_admin") {
      UPDATE admins
 SET username = ?,
     email = ?,
-    role = ?,
+    role = 'content_admin',
+    permissions_json = ?,
+    force_password_change = ?,
     is_active = ?,
     password_hash = COALESCE(?, password_hash),
     updated_at = datetime('now')
@@ -269,7 +269,8 @@ WHERE id = ?
     `).bind(
   username,
   email,
-  role,
+  permissionsJson,
+  data.force_password_change ? 1 : 0,
   data.is_active ? 1 : 0,
   passwordHash,
   id
