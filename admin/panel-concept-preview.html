@@ -752,7 +752,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
  <header class="topbar">
 <div style="display:flex;align-items:center;gap:16px"><button type="button" class="menu-toggle" id="menuToggle" aria-label="Menüyü aç veya kapat" aria-expanded="true" title="Menüyü aç/kapat"><span></span><span></span><span></span></button><span>EDWISE / <strong id="breadcrumb">Ana Sayfa</strong></span></div>
 <div class="admin-global-search"><input id="adminGlobalSearch" type="search" placeholder="Panelde ara: sayfa, hizmet..." autocomplete="off" aria-label="Panel genelinde ara"><div id="adminGlobalSearchResults" class="admin-search-results hidden"></div></div>
-<div class="topbar-account"><button type="button" class="admin-notification-button" id="adminNotificationButton" title="Bildirimleri etkinleştir" aria-label="Bildirimleri etkinleştir"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span id="adminNotificationDot" class="admin-notification-dot"></span></button><button type="button" class="account-trigger" id="accountMenuToggle" aria-expanded="false" aria-controls="accountMenu"><img class="account-avatar" id="topbarAvatar" alt="Profil fotoğrafı"><span><span class="account-name" id="username">Yönetici</span><span class="account-role" id="topbarRole">Yönetici</span></span>▾</button><div class="account-menu" id="accountMenu" hidden><div class="account-menu-role" id="accountMenuIdentity">Yönetici hesabı</div><button type="button" id="accountProfileLink">◉ &nbsp; Profilim</button><button type="button" id="accountLogout">↗ &nbsp; Güvenli Çıkış Yap</button></div><button class="logout" id="logout">Güvenli Çıkış ↗</button></div>
+<div class="topbar-account"><button type="button" class="admin-notification-button" id="adminNotificationButton" data-superadmin title="Bildirimleri etkinleştir" aria-label="Bildirimleri etkinleştir"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span id="adminNotificationDot" class="admin-notification-dot"></span></button><button type="button" class="account-trigger" id="accountMenuToggle" aria-expanded="false" aria-controls="accountMenu"><img class="account-avatar" id="topbarAvatar" alt="Profil fotoğrafı"><span><span class="account-name" id="username">Yönetici</span><span class="account-role" id="topbarRole">Yönetici</span></span>▾</button><div class="account-menu" id="accountMenu" hidden><div class="account-menu-role" id="accountMenuIdentity">Yönetici hesabı</div><button type="button" id="accountProfileLink">◉ &nbsp; Profilim</button><button type="button" id="accountLogout">↗ &nbsp; Güvenli Çıkış Yap</button></div><button class="logout" id="logout">Güvenli Çıkış ↗</button></div>
 </header>
 
  <div class="content">
@@ -1158,7 +1158,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
     <div class="field">
      <label for="userRole">Yetki</label>
      <select id="userRole">
-      <option value="content_admin">Site Yöneticisi</option>
+      <option value="content_admin">İçerik Yöneticisi</option>
      </select>
     </div>
    </div>
@@ -1352,7 +1352,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
  </div>
 </main>
 
-<button type="button" class="floating-admin-chat" id="floatingAdminChat" aria-label="Mesaj kutusunu aç" title="Mesaj kutusu">
+<button type="button" class="floating-admin-chat" id="floatingAdminChat" data-superadmin aria-label="Mesaj kutusunu aç" title="Mesaj kutusu">
  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg>
  <span id="floatingChatBadge" class="floating-chat-badge" hidden>+1</span>
 </button>
@@ -2552,7 +2552,7 @@ async function loadUsers(){
     <tr>
      <td>${escapeHtml(user.username)}</td>
      <td>${escapeHtml(user.email)}</td>
-     <td>${isSuper?"Süper Yönetici":"Site Yöneticisi"}</td>
+     <td>${isSuper?"Süper Yönetici":"İçerik Yöneticisi"}</td>
      <td>
       <span class="status ${Number(user.is_active)===1?"published":""}">
        ${Number(user.is_active)===1?"Aktif":"Pasif"}
