@@ -276,9 +276,10 @@
         const lang = (localStorage.getItem("edwise-language") || "tr");
         const dictionary = EDWISE_I18N[lang] || {};
         const items = [...data.menu].filter(item => item.key !== "guide" && item.url !== "/edwise-rehber.html" && item.label !== "EDWISE Rehber").sort((a,b)=>(a.order??0)-(b.order??0));
-        const mainItems = items.filter(item => item.group !== "contact");
+        const mainItems = items.filter(item => item.group === "main");
+        const pageItems = items.filter(item => item.group === "pages");
         const contactItems = items.filter(item => item.group === "contact");
-        const appendItem = item => {
+        const appendItem = (item, parent=siteMenu) => {
           const link = document.createElement("a");
           link.href = item.url;
           if (item.key === "apply") link.classList.add("menu-apply");
@@ -293,14 +294,26 @@
           const destination = new URL(item.url, location.origin);
           if (destination.origin !== location.origin) { link.target="_blank"; link.rel="noopener noreferrer"; }
           if (destination.pathname === location.pathname) link.setAttribute("aria-current","page");
-          siteMenu.appendChild(link);
+          parent.appendChild(link);
         };
-        mainItems.forEach(appendItem);
+        mainItems.forEach(item=>appendItem(item));
+        if (pageItems.length) {
+          const group=document.createElement("details");
+          group.className="edwise-page-menu";
+          const summary=document.createElement("summary");
+          summary.textContent="Sayfalar";
+          summary.style.cssText="cursor:pointer;padding:11px 12px;color:#5a337d;font-weight:700;border-radius:9px";
+          const nested=document.createElement("div");
+          nested.style.cssText="padding-left:14px;display:flex;flex-direction:column;gap:2px";
+          pageItems.forEach(item=>appendItem(item,nested));
+          group.append(summary,nested);
+          siteMenu.appendChild(group);
+        }
         if (contactItems.length) {
           const divider = document.createElement("div");
           divider.className = "dropdown-divider";
           siteMenu.appendChild(divider);
-          contactItems.forEach(appendItem);
+          contactItems.forEach(item=>appendItem(item));
         }
       })
       .catch(error => console.warn("Yayımlanan menü yüklenemedi:", error));
