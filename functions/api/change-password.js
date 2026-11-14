@@ -87,7 +87,7 @@ export async function onRequestPost(context) {
 
     const newHash = await hashPassword(newPassword);
     await env.DB.prepare(
-      "UPDATE admins SET password_hash = ?, updated_at = datetime('now') WHERE id = ?"
+      "UPDATE admins SET password_hash = ?, force_password_change = 0, updated_at = datetime('now') WHERE id = ?"
     ).bind(newHash, admin.id).run();
 
     const currentTokenHash = await hashToken(match[1]);
