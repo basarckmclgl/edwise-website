@@ -1383,7 +1383,7 @@ function canAccess(page){
  const moduleMap={
   overview:"dashboard",
   panelhome:"panelhome",
-  classrooms:"classrooms",
+  classrooms:"lessons",
   pages:"pages",
   services:"services",
   media:"media",
@@ -2727,12 +2727,12 @@ $("usersTable").addEventListener("click",async event=>{
 });
 
 const permissionModules=[
- ["dashboard","Genel Bakış"],["pages","Sayfa Yönetimi"],["services","Hizmet Yönetimi"],
+ ["dashboard","Genel Bakış"],["pages","Sayfa Yönetimi"],["lessons","Eğitim İçerikleri"],["services","Hizmet Yönetimi"],
  ["media","Medya Kütüphanesi"],["applications","Başvurular"],["menu","Menü Yönetimi"],
  ["profile","Kendi Profilim"]
 ];
 const permissionActionLimits={
- dashboard:["view"],pages:["view","create","edit","publish"],services:["view","create","edit","publish"],
+ dashboard:["view"],pages:["view","create","edit","publish"],lessons:["view","create","edit"],services:["view","create","edit","publish"],
  media:["view","create","edit"],applications:["view","edit"],menu:["view","edit"],profile:["view","edit"]
 };
 const permissionActions=[["view","Görüntüle"],["create","Ekle"],["edit","Düzenle"],["delete","Sil"],["publish","Yayınla"]];
@@ -2765,6 +2765,7 @@ $("permissionUserSelect").addEventListener("change",()=>{
  const safeDefaults={
   dashboard:{view:true},
   pages:{view:true,create:true,edit:true,delete:false,publish:true},
+  lessons:{view:true,create:true,edit:true,delete:false},
   services:{view:true,create:true,edit:true,delete:false,publish:true},
   media:{view:true,create:true,edit:true,delete:false},
   applications:{view:true,create:false,edit:true,delete:false},
