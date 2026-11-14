@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>EDWISE Yönetici Girişi</title>
+<style>
+:root{color-scheme:light;--purple:#7138b8;--ink:#54218f;--muted:#786b91;--line:#eee7f8}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:22px;background:linear-gradient(135deg,#f8f3ff,#fff 65%);font:15px Inter,system-ui,Arial;color:var(--ink)}
+.card{width:min(100%,470px);background:#fff;border:1px solid var(--line);border-radius:20px;padding:30px;box-shadow:0 18px 60px #54218f12}
+.brand{font-size:12px;letter-spacing:2px;color:#8b55c5;font-weight:800}.brand strong{display:block;font-size:25px;letter-spacing:0;color:var(--ink);margin-top:7px}
+h1{font-size:21px;margin:24px 0 7px}p{color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 18px}
+label{display:block;font-size:12px;font-weight:700;margin:13px 0 6px;color:#63418b}
+input{width:100%;border:1px solid #e6dcf0;border-radius:10px;padding:12px;font:inherit;color:var(--ink);background:#fff}
+button{width:100%;border:0;border-radius:10px;padding:13px;background:var(--purple);color:#fff;font:700 14px inherit;cursor:pointer;margin-top:17px}
+button:disabled{opacity:.6;cursor:wait}.feedback{display:none;margin-top:14px;padding:12px;border-radius:9px;background:#faf5ff;color:#65428a;font-size:13px;line-height:1.5}.feedback.error{display:block;background:#fff4f3;color:#9e342e}.feedback.success{display:block;background:#f1faf3;color:#28643a}
+details{margin-top:22px;border-top:1px solid var(--line);padding-top:16px}summary{cursor:pointer;font-size:13px;font-weight:700;color:#68458d}
+.setup-user{border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:14px}.setup-user h2{font-size:14px;margin:0 0 8px}
+.small{font-size:11px;color:#88789b;margin-top:10px}
+</style>
+</head>
+<body>
+<main class="card">
+<div class="brand">EDWISE<strong>Yönetim Merkezi</strong></div>
+<section id="loginPanel">
+<h1>Yönetici girişi</h1><p>Kullanıcı adı ve şifrenizle güvenli oturum açın.</p>
+<form id="loginForm">
+<label for="username">Kullanıcı adı</label><input id="username" name="username" autocomplete="username" required maxlength="50">
+<label for="password">Şifre</label><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="128>
+<button id="loginButton" type="submit">Giriş yap</button>
+</form><div id="loginFeedback" class="feedback" role="status"></div>
+</section>
+<details id="setupDetails">
+<summary>İlk kurulum · İki süper yönetici hesabı oluştur</summary>
+<p style="margin-top:12px">Bu işlem yalnızca boş test veritabanında bir kez çalışır. Cloudflare Preview ortamında tanımlanan kurulum anahtarı gerekir. İki hesap da aynı tam yetkiye sahip olur.</p>
+<form id="setupForm">
+<label for="setupToken">İlk kurulum anahtarı</label><input id="setupToken" type="password" autocomplete="off" required>
+<div class="setup-user"><h2>1. Yönetici</h2>
+<label for="u1">Kullanıcı adı</label><input id="u1" required pattern="[a-zA-Z0-9._-]{3,50}">
+<label for="e1">E-posta</label><input id="e1" type="email" required>
+<label for="p1">Şifre (en az 12 karakter)</label><input id="p1" type="password" minlength="12" required autocomplete="new-password"></div>
+<div class="setup-user"><h2>2. Yönetici</h2>
+<label for="u2">Kullanıcı adı</label><input id="u2" required pattern="[a-zA-Z0-9._-]{3,50}">
+<label for="e2">E-posta</label><input id="e2" type="email" required>
+<label for="p2">Şifre (en az 12 karakter)</label><input id="p2" type="password" minlength="12" required autocomplete="new-password"></div>
+<button id="setupButton" type="submit">İki süper yönetici hesabını oluştur</button>
+</form><div id="setupFeedback" class="feedback" role="status"></div>
+</details>
+<p class="small">Oturumlar güvenli çerezle yönetilir. Şifreler tarayıcıda saklanmaz.</p>
+</main>
+<script>
+(()=>{const $=id=>document.getElementById(id);const next=new URLSearchParams(location.search).get('next')||'/pinar/';const safeNext=next.startsWith('/')&&!next.startsWith('//')?next:'/pinar/';
+function show(id,msg,type=''){const el=$(id);el.textContent=msg;el.className='feedback '+type;}
+fetch('/api/me',{credentials:'same-origin',cache:'no-store'}).then(r=>{if(r.ok)location.replace(safeNext)}).catch(()=>{});
+$('loginForm').addEventListener('submit',async e=>{e.preventDefault();const b=$('loginButton');b.disabled=true;show('loginFeedback','Giriş kontrol ediliyor…');try{const r=await fetch('/api/login',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({username:$('username').value,password:$('password').value})});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||'Giriş yapılamadı.');show('loginFeedback','Giriş başarılı. Yönetim paneli açılıyor.','success');location.replace(safeNext)}catch(err){show('loginFeedback',err.message||'Giriş yapılamadı.','error')}finally{b.disabled=false}});
+$('setupForm').addEventListener('submit',async e=>{e.preventDefault();const b=$('setupButton');if($('p1').value!==$('p2').value&&$('u1').value.toLowerCase()===$('u2').value.toLowerCase()){show('setupFeedback','İki kullanıcı adı farklı olmalı.','error');return}b.disabled=true;show('setupFeedback','İlk yönetici hesapları güvenli şekilde oluşturuluyor…');try{const r=await fetch('/api/admin-bootstrap',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({setupToken:$('setupToken').value,users:[{username:$('u1').value,email:$('e1').value,password:$('p1').value},{username:$('u2').value,email:$('e2').value,password:$('p2').value}]})});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||'Kurulum tamamlanamadı.');show('setupFeedback',d.message+' Şimdi giriş bölümünden oturum açabilirsiniz.','success');$('setupForm').reset();}catch(err){show('setupFeedback',err.message||'Kurulum tamamlanamadı.','error')}finally{b.disabled=false}});
+})();
+</script>
+</body></html>
