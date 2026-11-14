@@ -752,7 +752,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
  <header class="topbar">
 <div style="display:flex;align-items:center;gap:16px"><button type="button" class="menu-toggle" id="menuToggle" aria-label="Menüyü aç veya kapat" aria-expanded="true" title="Menüyü aç/kapat"><span></span><span></span><span></span></button><span>EDWISE / <strong id="breadcrumb">Ana Sayfa</strong></span></div>
 <div class="admin-global-search"><input id="adminGlobalSearch" type="search" placeholder="Panelde ara: sayfa, hizmet..." autocomplete="off" aria-label="Panel genelinde ara"><div id="adminGlobalSearchResults" class="admin-search-results hidden"></div></div>
-<div class="topbar-account"><button type="button" class="admin-notification-button" id="adminNotificationButton" title="Bildirimleri etkinleştir" aria-label="Bildirimleri etkinleştir"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span id="adminNotificationDot" class="admin-notification-dot"></span></button><button type="button" class="account-trigger" id="accountMenuToggle" aria-expanded="false" aria-controls="accountMenu"><img class="account-avatar" id="topbarAvatar" alt="Profil fotoğrafı"><span><span class="account-name" id="username">Yönetici</span><span class="account-role" id="topbarRole">Yönetici</span></span>▾</button><div class="account-menu" id="accountMenu" hidden><div class="account-menu-role" id="accountMenuIdentity">Yönetici hesabı</div><button type="button" id="accountProfileLink">◉ &nbsp; Profilim</button><button type="button" id="accountLogout">↗ &nbsp; Güvenli Çıkış Yap</button></div><button class="logout" id="logout">Güvenli Çıkış ↗</button></div>
+<div class="topbar-account"><button type="button" class="admin-notification-button" id="adminNotificationButton" data-superadmin title="Bildirimleri etkinleştir" aria-label="Bildirimleri etkinleştir"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span id="adminNotificationDot" class="admin-notification-dot"></span></button><button type="button" class="account-trigger" id="accountMenuToggle" aria-expanded="false" aria-controls="accountMenu"><img class="account-avatar" id="topbarAvatar" alt="Profil fotoğrafı"><span><span class="account-name" id="username">Yönetici</span><span class="account-role" id="topbarRole">Yönetici</span></span>▾</button><div class="account-menu" id="accountMenu" hidden><div class="account-menu-role" id="accountMenuIdentity">Yönetici hesabı</div><button type="button" id="accountProfileLink">◉ &nbsp; Profilim</button><button type="button" id="accountLogout">↗ &nbsp; Güvenli Çıkış Yap</button></div><button class="logout" id="logout">Güvenli Çıkış ↗</button></div>
 </header>
 
  <div class="content">
@@ -918,14 +918,14 @@ td{color:#39334b!important;border-color:#eeebf4!important}
     </div>
     <p id="designCenterMessage" class="muted">Önizlemede metinlerin üzerine tıklayıp doğrudan yazabilirsiniz. Renk ve görünüm ayarları anında uygulanır; metin değişiklikleri taslak olarak kaydedilir.</p>
    </div>
-   <div id="siteDesignSettings" data-superadmin>
+   <div id="siteDesignSettings">
     <div class="section-head"><div><h2>Site Genel Tasarımı ve Menü Yapısı</h2><p>Değişiklikleri seçili sayfanın gerçek önizlemesinde gör. Taslaklar ziyaretçilere yansımaz.</p></div></div>
     <div id="themeMessage"></div>
     <div class="actions" style="margin-bottom:16px">
-     <button class="primary" type="button" id="designTabButton">Genel Görünüm</button>
+     <button class="primary" type="button" id="designTabButton" data-superadmin>Genel Görünüm</button>
      <button class="btn" type="button" id="menuTabButton">Menü ve Navigasyon</button>
     </div>
-    <div id="designTab">
+    <div id="designTab" data-superadmin>
      <div class="panel">
       <h2>Görünüm ve içerik ayarları</h2>
       <div class="form-grid">
@@ -1158,7 +1158,7 @@ td{color:#39334b!important;border-color:#eeebf4!important}
     <div class="field">
      <label for="userRole">Yetki</label>
      <select id="userRole">
-      <option value="content_admin">Site Yöneticisi</option>
+      <option value="content_admin">İçerik Yöneticisi</option>
      </select>
     </div>
    </div>
@@ -1326,6 +1326,11 @@ td{color:#39334b!important;border-color:#eeebf4!important}
     </div>
     <div id="applicationsModule" class="hidden">
   <div class="panel" style="margin:16px 0">
+   <div class="section-head"><div><h3>Gelen Başvurular</h3><p class="muted">Başvuruları inceleyin, iletişim bilgilerini gerektiğinde açın ve durumlarını güncelleyin.</p></div><div class="actions"><button class="btn" type="button" id="toggleAllApplicationContactsManager">Tüm iletişim bilgilerini göster</button><button class="btn" type="button" id="refreshApplicationsManager">↻ Yenile</button></div></div>
+   <div id="applicationsManagerMessage" class="muted" aria-live="polite"></div>
+   <div class="table-wrap"><table class="application-fit-table"><thead><tr><th>Tarih</th><th>Ad soyad</th><th>Telefon</th><th>E-posta</th><th>Program</th><th>Eğitim tercihi</th><th>Uygun zaman</th><th>Açıklama</th><th>Durum</th></tr></thead><tbody id="applicationsManagerTable"><tr><td colspan="9">Başvurular yükleniyor...</td></tr></tbody></table></div>
+  </div>
+  <div class="panel" data-superadmin style="margin:16px 0">
    <div class="section-head" style="margin:0 0 12px">
     <div><h3>Başvuru Takip Çizelgesi</h3><p class="muted">Son 30 gün · ziyaretçilerin başvuru sürecindeki hareketleri</p></div>
     <button class="btn" id="refreshApplicationFunnel">↻ Takip Çizelgesini Yenile</button>
@@ -1341,18 +1346,17 @@ td{color:#39334b!important;border-color:#eeebf4!important}
      <tbody id="applicationFunnelTable">
       <tr><td colspan="11">Takip verileri bekleniyor...</td></tr>
      </tbody>
-    </table>
-   </div>
+   </table>
   </div>
-
  </div>
+</div>
  <div class="message" id="otherModuleMessage">Bu modül henüz geliştirme aşamasında. Gerçek işlemler, güvenli API bağlantıları tamamlandığında açılacak.</div>
    </div>
   </section>
  </div>
 </main>
 
-<button type="button" class="floating-admin-chat" id="floatingAdminChat" aria-label="Mesaj kutusunu aç" title="Mesaj kutusu">
+<button type="button" class="floating-admin-chat" id="floatingAdminChat" data-superadmin aria-label="Mesaj kutusunu aç" title="Mesaj kutusu">
  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg>
  <span id="floatingChatBadge" class="floating-chat-badge" hidden>+1</span>
 </button>
@@ -1378,8 +1382,8 @@ function canAccess(page){
  if(currentRole==="superadmin") return true;
  const moduleMap={
   overview:"dashboard",
-  panelhome:"dashboard",
-  classrooms:"classrooms",
+  panelhome:"panelhome",
+  classrooms:"lessons",
   pages:"pages",
   services:"services",
   media:"media",
@@ -1395,6 +1399,7 @@ function canAccess(page){
  };
  // Profil yalnızca oturum açan kullanıcının kendi hesabıdır.
  if(page==="profile") return true;
+ if(page==="designcenter") return currentPermissions?.menu?.view===true && currentPermissions?.pages?.view===true;
  const module=moduleMap[page];
  return !!module && currentPermissions?.[module]?.view===true;
 }
@@ -1414,7 +1419,7 @@ function applyRolePermissions(){
   if(!element.matches("[data-page]") && !element.matches("[data-open]")) element.classList.toggle("hidden",!isSuperAdmin);
  });
  const roleLabel=$("roleLabel");
- if(roleLabel) roleLabel.textContent=({superadmin:"Süper Yönetici",content_admin:"Admin",editor:"Editör",viewer:"Görüntüleyici"})[currentRole]||"Kullanıcı";
+ if(roleLabel) roleLabel.textContent=({superadmin:"Süper Yönetici",content_admin:"İçerik Yöneticisi"})[currentRole]||"Kullanıcı";
 }
 
 function escapeHtml(value){
@@ -1489,15 +1494,18 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
   if(name==="archive")loadArchive();
  if(name==="reports"){loadSiteReports();loadApplications();loadCloudflareReports();}
  if(name==="messages")loadChatConversations();
- if(name==="applications"){loadApplications();loadApplicationFunnel();}
- if(name==="designcenter")loadThemeSettings();
+ if(name==="applications"){loadApplications();if(currentRole==="superadmin")loadApplicationFunnel();}
+ if(name==="designcenter"){
+  if(currentRole==="superadmin"){selectDesignTab("design");loadThemeSettings();}
+  else{selectDesignTab("menu");}
+ }
  if(name==="sitesettings")loadSiteSettings();if(name==="sitesettings")loadSiteControl();
 
  $("mediaLink").classList.toggle("hidden",name!=="media");
  $("applicationsModule").classList.toggle("hidden",name!=="applications");
  $("otherModuleMessage").classList.toggle("hidden",name==="applications" || name==="media");
 
- if(name==="designcenter")$("breadcrumb").textContent="Tasarım Yönetimi";
+ if(name==="designcenter")$("breadcrumb").textContent=currentRole==="superadmin"?"Tasarım Yönetimi":"Menü Yönetimi";
  if(otherModules[name]){
   $("otherTitle").textContent=otherModules[name][0];
   $("otherDescription").textContent=otherModules[name][1];
@@ -1529,38 +1537,39 @@ function maskEmail(value){
 }
 let revealedApplicationContacts=new Set();
 let applicationRowsCache=[];
+function applicationBodies(){return ["applicationsTable","applicationsManagerTable"].map(id=>$(id)).filter(Boolean);}
 function renderApplicationContact(index){
- const body=$("applicationsTable"),item=applicationRowsCache[index];
- if(!item)return;
- const phone=body.querySelector('[data-app-phone="'+index+'"]');
- const email=body.querySelector('[data-app-email="'+index+'"]');
- const button=body.querySelector('[data-app-contact="'+index+'"]');
- const visible=revealedApplicationContacts.has(index);
- if(phone)phone.textContent=visible?(item.phone||"—"):maskPhone(item.phone);
- if(email)email.textContent=visible?(item.email||"—"):maskEmail(item.email);
- if(button){
-  button.textContent=visible?"İletişim bilgilerini gizle":"İletişim bilgilerini göster";
-  button.setAttribute("aria-expanded",String(visible));
+ const item=applicationRowsCache[index];if(!item)return;
+ for(const body of applicationBodies()){
+  const phone=body.querySelector('[data-app-phone="'+index+'"]');
+  const email=body.querySelector('[data-app-email="'+index+'"]');
+  const button=body.querySelector('[data-app-contact="'+index+'"]');
+  const visible=revealedApplicationContacts.has(index);
+  if(phone)phone.textContent=visible?(item.phone||"—"):maskPhone(item.phone);
+  if(email)email.textContent=visible?(item.email||"—"):maskEmail(item.email);
+  if(button){button.textContent=visible?"İletişim bilgilerini gizle":"İletişim bilgilerini göster";button.setAttribute("aria-expanded",String(visible));}
  }
 }
 function updateBulkApplicationContactButton(){
- const button=$("toggleAllApplicationContacts");
- if(!button)return;
  const allVisible=applicationRowsCache.length>0&&applicationRowsCache.every((_,index)=>revealedApplicationContacts.has(index));
- button.textContent=allVisible?"Tüm iletişim bilgilerini gizle":"Tüm iletişim bilgilerini göster";
- button.setAttribute("aria-pressed",String(allVisible));
+ ["toggleAllApplicationContacts","toggleAllApplicationContactsManager"].forEach(id=>{
+  const button=$(id);if(!button)return;
+  button.textContent=allVisible?"Tüm iletişim bilgilerini gizle":"Tüm iletişim bilgilerini göster";
+  button.setAttribute("aria-pressed",String(allVisible));
+ });
 }
 async function loadApplications(){
- const body=$("applicationsTable");
- body.innerHTML='<tr><td colspan="9">Başvurular yükleniyor...</td></tr>';
+ const bodies=applicationBodies();
+ bodies.forEach(body=>body.innerHTML='<tr><td colspan="9">Başvurular yükleniyor...</td></tr>');
  try{
   const data=await api("/api/applications");
   const rows=data.applications||[];
   applicationRowsCache=rows;
   revealedApplicationContacts=new Set();
-  $("countApplications").textContent=rows.length;
-  $("applicationsMessage").textContent=rows.length+" başvuru";
-  body.innerHTML=rows.map((x,index)=>'<tr>'+
+  if($("countApplications"))$("countApplications").textContent=rows.length;
+  if($("applicationsMessage"))$("applicationsMessage").textContent=rows.length+" başvuru";
+  if($("applicationsManagerMessage"))$("applicationsManagerMessage").textContent=rows.length+" başvuru bulundu.";
+  const html=rows.map((x,index)=>'<tr>'+
    '<td>'+escapeHtml(x.created_at||"-")+'</td>'+
    '<td>'+escapeHtml(x.name||"-")+'</td>'+
    '<td><span data-app-phone="'+index+'">'+escapeHtml(maskPhone(x.phone))+'</span></td>'+
@@ -1569,35 +1578,37 @@ async function loadApplications(){
    '<td>'+escapeHtml(x.format||"-")+'</td>'+
    '<td>'+escapeHtml(x.availability||"-")+'</td>'+
    '<td style="min-width:220px;white-space:normal">'+escapeHtml(x.note||"-")+'</td>'+
-   '<td><select aria-label="Başvuru durumu" data-app-status="'+escapeHtml(x.id)+'"><option value="new" '+(x.status==="new"?"selected":"")+'>Yeni</option><option value="contacted" '+(x.status==="contacted"?"selected":"")+'>İletişime geçildi</option><option value="completed" '+(x.status==="completed"?"selected":"")+'>Tamamlandı</option></select><br><button type="button" class="btn" style="margin-top:6px" data-app-contact="'+index+'" aria-expanded="false">İletişim bilgilerini göster</button></td>'+
+   '<td><select aria-label="Başvuru durumu" data-app-status="'+escapeHtml(x.id)+'" '+(currentRole==="superadmin"||currentPermissions?.applications?.edit===true?"":"disabled")+'><option value="new" '+(x.status==="new"?"selected":"")+'>Yeni</option><option value="contacted" '+(x.status==="contacted"?"selected":"")+'>İletişime geçildi</option><option value="completed" '+(x.status==="completed"?"selected":"")+'>Tamamlandı</option></select><br><button type="button" class="btn" style="margin-top:6px" data-app-contact="'+index+'" aria-expanded="false">İletişim bilgilerini göster</button></td>'+
    '</tr>').join("")||'<tr><td colspan="9">Henüz başvuru yok.</td></tr>';
-  body.querySelectorAll("[data-app-contact]").forEach(button=>button.addEventListener("click",()=>{
-   const index=Number(button.dataset.appContact);
-   if(revealedApplicationContacts.has(index))revealedApplicationContacts.delete(index);
-   else revealedApplicationContacts.add(index);
-   renderApplicationContact(index);
-   updateBulkApplicationContactButton();
-  }));
+  bodies.forEach(body=>{
+   body.innerHTML=html;
+   body.querySelectorAll("[data-app-contact]").forEach(button=>button.addEventListener("click",()=>{
+    const index=Number(button.dataset.appContact);
+    if(revealedApplicationContacts.has(index))revealedApplicationContacts.delete(index);else revealedApplicationContacts.add(index);
+    renderApplicationContact(index);updateBulkApplicationContactButton();
+   }));
+   body.querySelectorAll("[data-app-status]").forEach(select=>select.addEventListener("change",async()=>{
+    try{await api("/api/applications",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:select.dataset.appStatus,status:select.value})});}
+    catch(error){alert("Durum kaydedilemedi: "+error.message);loadApplications();}
+   }));
+  });
   updateBulkApplicationContactButton();
-  body.querySelectorAll("[data-app-status]").forEach(select=>select.addEventListener("change",async()=>{
-   try{await api("/api/applications",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:select.dataset.appStatus,status:select.value})});}
-   catch(e){alert("Durum kaydedilemedi: "+e.message);loadApplications();}
-  }));
  }catch(error){
-  body.innerHTML='<tr><td colspan="9">Başvurular yüklenemedi: '+escapeHtml(error.message)+'</td></tr>';
-  $("applicationsMessage").textContent="Bağlantı hatası";
-  applicationRowsCache=[];
-  revealedApplicationContacts=new Set();
-  updateBulkApplicationContactButton();
+  bodies.forEach(body=>body.innerHTML='<tr><td colspan="9">Başvurular yüklenemedi: '+escapeHtml(error.message)+'</td></tr>');
+  if($("applicationsMessage"))$("applicationsMessage").textContent="Bağlantı hatası";
+  if($("applicationsManagerMessage"))$("applicationsManagerMessage").textContent="Başvurular yüklenemedi: "+error.message;
+  applicationRowsCache=[];revealedApplicationContacts=new Set();updateBulkApplicationContactButton();
  }
 }
-$("toggleAllApplicationContacts")?.addEventListener("click",()=>{
- const allVisible=applicationRowsCache.length>0&&applicationRowsCache.every((_,index)=>revealedApplicationContacts.has(index));
- revealedApplicationContacts=allVisible?new Set():new Set(applicationRowsCache.map((_,index)=>index));
- applicationRowsCache.forEach((_,index)=>renderApplicationContact(index));
- updateBulkApplicationContactButton();
+["toggleAllApplicationContacts","toggleAllApplicationContactsManager"].forEach(id=>{
+ $(id)?.addEventListener("click",()=>{
+  const allVisible=applicationRowsCache.length>0&&applicationRowsCache.every((_,index)=>revealedApplicationContacts.has(index));
+  revealedApplicationContacts=allVisible?new Set():new Set(applicationRowsCache.map((_,index)=>index));
+  applicationRowsCache.forEach((_,index)=>renderApplicationContact(index));updateBulkApplicationContactButton();
+ });
 });
 $("refreshApplications")?.addEventListener("click",loadApplications);
+$("refreshApplicationsManager")?.addEventListener("click",loadApplications);
 
 async function loadAudit(){
  $("auditTable").innerHTML='<tr><td colspan="6">İşlem geçmişi yükleniyor...</td></tr>';
@@ -1716,7 +1727,7 @@ async function loadLessonSessions(){
  if(!activeLessonCourse)return;$("lessonSessionList").textContent="Ders kayıtları yükleniyor...";
  try{
  const data=await api("/api/lessons?course="+encodeURIComponent(activeLessonCourse));const rows=data.sessions||[];
- $("lessonSessionList").innerHTML=rows.length?rows.map(x=>'<article class="panel" style="margin:10px 0"><div class="section-head"><div><h3>'+lessonEscape(x.title)+'</h3><p>'+({draft:"Taslak",live:"Devam ediyor",finished:"Tamamlandı"}[x.status]||x.status)+' · '+lessonEscape(x.created_at||"")+'</p></div><div class="actions">'+(x.status==="draft"?'<button class="btn btn-primary" data-lesson-start="'+x.id+'">Dersi başlat</button>':x.status==="live"?'<button class="btn btn-primary" data-lesson-finish="'+x.id+'">Dersi bitir</button>':'<span class="status published">Tamamlandı</span>')+'<button class="btn" data-lesson-edit="'+x.id+'">Notları aç</button></div></div><div style="display:flex;justify-content:flex-end;margin:8px 0 12px;padding-top:8px;border-top:1px solid var(--border)"><button type="button" class="btn btn-danger" style="min-width:110px;font-weight:700;background:#3b1821;border-color:#b94b60;color:#ffd7dc" data-lesson-delete="'+x.id+'">🗑 Dersi sil</button></div><div id="lesson-note-'+x.id+'" style="display:none"><textarea rows="7" maxlength="20000" id="lesson-text-'+x.id+'">'+lessonEscape(x.notes||"")+'</textarea><div class="actions"><button class="btn btn-primary" data-lesson-save="'+x.id+'">Notları kaydet</button></div></div>'+(x.started_at?'<p>Başlangıç: '+lessonEscape(x.started_at)+'</p>':'')+(x.ended_at?'<p>Bitiş: '+lessonEscape(x.ended_at)+'</p>':'')+'</article>').join(""):'<div class="message">Henüz ders oluşturulmadı. İstediğin zaman yeni ders oluşturabilirsin.</div>';
+ $("lessonSessionList").innerHTML=rows.length?rows.map(x=>'<article class="panel" style="margin:10px 0"><div class="section-head"><div><h3>'+lessonEscape(x.title)+'</h3><p>'+({draft:"Taslak",live:"Devam ediyor",finished:"Tamamlandı"}[x.status]||x.status)+' · '+lessonEscape(x.created_at||"")+'</p></div><div class="actions">'+(x.status==="draft"?'<button class="btn btn-primary" data-lesson-start="'+x.id+'">Dersi başlat</button>':x.status==="live"?'<button class="btn btn-primary" data-lesson-finish="'+x.id+'">Dersi bitir</button>':'<span class="status published">Tamamlandı</span>')+'<button class="btn" data-lesson-edit="'+x.id+'">Notları aç</button></div></div><div style="display:flex;justify-content:flex-end;margin:8px 0 12px;padding-top:8px;border-top:1px solid var(--border)"><button type="button" class="btn btn-danger" data-superadmin style="min-width:110px;font-weight:700;background:#3b1821;border-color:#b94b60;color:#ffd7dc" data-lesson-delete="'+x.id+'">🗑 Dersi sil</button></div><div id="lesson-note-'+x.id+'" style="display:none"><textarea rows="7" maxlength="20000" id="lesson-text-'+x.id+'">'+lessonEscape(x.notes||"")+'</textarea><div class="actions"><button class="btn btn-primary" data-lesson-save="'+x.id+'">Notları kaydet</button></div></div>'+(x.started_at?'<p>Başlangıç: '+lessonEscape(x.started_at)+'</p>':'')+(x.ended_at?'<p>Bitiş: '+lessonEscape(x.ended_at)+'</p>':'')+'</article>').join(""):'<div class="message">Henüz ders oluşturulmadı. İstediğin zaman yeni ders oluşturabilirsin.</div>';
  }catch(e){$("lessonSessionList").textContent=e.message||"Dersler yüklenemedi.";}
 }
 document.querySelectorAll("[data-course]").forEach(b=>b.addEventListener("click",()=>openLessonCourse(b.dataset.course)));
@@ -1878,7 +1889,7 @@ Object.values(themeFields).forEach(id=>$(id).addEventListener("input",()=>applyT
 $("designPreviewFrame").addEventListener("load",()=>{applyThemePreview(currentTheme());enablePreviewTextEditing();});
 async function loadMenuSettings(){
  try{
-  const [pageData,settingsData]=await Promise.all([api("/api/pages"),api("/api/settings")]);
+  const [pageData,settingsData]=await Promise.all([api("/api/pages"),api("/api/settings?scope=menu")]);
   const saved=Array.isArray(settingsData.menu)?settingsData.menu:null;
   const defaults=[
    {key:"home",label:"Ana Sayfa",url:"/",visible:true},
@@ -1913,6 +1924,19 @@ $("saveMenu").addEventListener("click",async()=>{
  catch(error){$("menuMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}
 });
 
+function selectDesignTab(tab){
+ const menu=tab==="menu";
+ $("designTab")?.classList.toggle("hidden",menu);
+ $("menuTab")?.classList.toggle("hidden",!menu);
+ $("designTabButton")?.classList.toggle("primary",!menu);
+ $("designTabButton")?.classList.toggle("btn",menu);
+ $("menuTabButton")?.classList.toggle("primary",menu);
+ $("menuTabButton")?.classList.toggle("btn",!menu);
+ if(menu)loadMenuSettings();
+}
+$("designTabButton")?.addEventListener("click",()=>selectDesignTab("design"));
+$("menuTabButton")?.addEventListener("click",()=>selectDesignTab("menu"));
+
 $("editSocialProfile")?.addEventListener("click",()=>{ const target=$("profileFirstName");target?.scrollIntoView({behavior:"smooth",block:"center"});target?.focus({preventScroll:true}); });
 $("profile").querySelectorAll("[data-profile-tab]").forEach(tab=>tab.addEventListener("click",()=>{const targetId=({overview:"profileSocialName",account:"profileFirstName",security:"profileCurrentPassword"})[tab.dataset.profileTab];const target=$(targetId);target?.scrollIntoView({behavior:"smooth",block:"center"});if(tab.dataset.profileTab==="security")target?.focus({preventScroll:true});$("profile").querySelectorAll("[data-profile-tab]").forEach(x=>x.classList.toggle("active",x===tab));}));
 $("profilePasswordForm")?.addEventListener("submit",async event=>{
@@ -1939,8 +1963,8 @@ async function checkSession(){
   currentRole=data.admin.role_key||data.admin.role;
   currentPermissions=data.admin.permissions||{};
   mustChangePassword=Number(data.admin.force_password_change)===1;
-  if(!["superadmin","content_admin","editor","viewer"].includes(currentRole))throw new Error("Bu hesabın yönetim paneline erişim yetkisi yok. Yetki: "+String(currentRole||"tanımsız"));
-  const roleName=({superadmin:"Süper Yönetici",content_admin:"Admin",editor:"Editör",viewer:"Görüntüleyici"})[currentRole]||"Yönetici";
+  if(!["superadmin","content_admin"].includes(currentRole))throw new Error("Bu hesabın yönetim paneline erişim yetkisi yok. Yetki: "+String(currentRole||"tanımsız"));
+  const roleName=({superadmin:"Süper Yönetici",content_admin:"İçerik Yöneticisi"})[currentRole]||"Yönetici";
   const setText=(id,value)=>{const el=$(id);if(el)el.textContent=value;};
   const setValue=(id,value)=>{const el=$(id);if(el)el.value=value;};
   setText("username",name);
@@ -2552,7 +2576,7 @@ async function loadUsers(){
     <tr>
      <td>${escapeHtml(user.username)}</td>
      <td>${escapeHtml(user.email)}</td>
-     <td>${isSuper?"Süper Yönetici":"Site Yöneticisi"}</td>
+     <td>${isSuper?"Süper Yönetici":"İçerik Yöneticisi"}</td>
      <td>
       <span class="status ${Number(user.is_active)===1?"published":""}">
        ${Number(user.is_active)===1?"Aktif":"Pasif"}
@@ -2703,13 +2727,14 @@ $("usersTable").addEventListener("click",async event=>{
 });
 
 const permissionModules=[
- ["dashboard","Genel Bakış"],["classrooms","Derslikler"],["pages","Sayfa Yönetimi"],
- ["services","Hizmetler"],["media","Medya Kütüphanesi"],["applications","Başvurular"],
- ["messages","Mesaj Kutusu"],["menu","Menü Düzeni"],["seo","SEO & Görünürlük"],
- ["languages","Dil Yönetimi"],["settings","Site Ayarları"],["history","Geçmiş"],
- ["archive","Arşiv"],["profile","Profilim"],["users","Kullanıcılar & Yetkiler"],
- ["audit","Güvenlik Kayıtları"],["reports","Raporlar"]
+ ["dashboard","Genel Bakış"],["pages","Sayfa Yönetimi"],["lessons","Eğitim İçerikleri"],["services","Hizmet Yönetimi"],
+ ["media","Medya Kütüphanesi"],["applications","Başvurular"],["menu","Menü Yönetimi"],
+ ["profile","Kendi Profilim"]
 ];
+const permissionActionLimits={
+ dashboard:["view"],pages:["view","create","edit","publish"],lessons:["view","create","edit"],services:["view","create","edit","publish"],
+ media:["view","create","edit"],applications:["view","edit"],menu:["view","edit"],profile:["view","edit"]
+};
 const permissionActions=[["view","Görüntüle"],["create","Ekle"],["edit","Düzenle"],["delete","Sil"],["publish","Yayınla"]];
 let permissionUsers=[];
 let selectedPermissionUser=null;
@@ -2717,7 +2742,7 @@ let permissionDraft={};
 function renderUserPermissionMatrix(){
  const body=$("userPermissionMatrix");
  if(!selectedPermissionUser){body.innerHTML='<tr><td colspan="6">Önce bir kullanıcı seçin.</td></tr>';return;}
- body.innerHTML=permissionModules.map(([key,label])=>'<tr><td>'+escapeHtml(label)+'</td>'+permissionActions.map(([action])=>'<td><input type="checkbox" data-permission-module="'+key+'" data-permission-action="'+action+'" '+(permissionDraft[key]?.[action]===true?'checked':'')+' aria-label="'+escapeHtml(label)+' '+action+'"></td>').join("")+'</tr>').join("");
+ body.innerHTML=permissionModules.map(([key,label])=>'<tr><td>'+escapeHtml(label)+(key==="profile"?' <small class="muted">(her zaman açık)</small>':'')+'</td>'+permissionActions.map(([action])=>'<td><input type="checkbox" data-permission-module="'+key+'" data-permission-action="'+action+'" '+(permissionDraft[key]?.[action]===true?'checked':'')+((key==="profile"||!permissionActionLimits[key]?.includes(action))?' disabled':'')+' aria-label="'+escapeHtml(label)+' '+action+'"></td>').join("")+'</tr>').join("");
 }
 async function loadUserPermissionEditor(){
  const select=$("permissionUserSelect");
@@ -2737,7 +2762,20 @@ async function loadUserPermissionEditor(){
 $("permissionUserSelect").addEventListener("change",()=>{
  const user=permissionUsers.find(item=>String(item.id)===$("permissionUserSelect").value);
  selectedPermissionUser=user||null;
- try{permissionDraft=user?JSON.parse(user.permissions_json||"{}"):{};}catch{permissionDraft={};}
+ const safeDefaults={
+  dashboard:{view:true},
+  pages:{view:true,create:true,edit:true,delete:false,publish:true},
+  lessons:{view:true,create:true,edit:true,delete:false},
+  services:{view:true,create:true,edit:true,delete:false,publish:true},
+  media:{view:true,create:true,edit:true,delete:false},
+  applications:{view:true,create:false,edit:true,delete:false},
+  menu:{view:true,create:false,edit:true,delete:false,publish:false},
+  profile:{view:true,create:false,edit:true,delete:false,publish:false}
+ };
+ let stored={};try{stored=user?JSON.parse(user.permissions_json||"{}"):{};}catch{}
+ permissionDraft=JSON.parse(JSON.stringify(safeDefaults));
+ for(const [key,actions] of Object.entries(stored)){if(permissionModules.some(([module])=>module===key)&&actions&&typeof actions==="object"){const allowed=permissionActionLimits[key]||[];for(const action of allowed){if(typeof actions[action]==="boolean")permissionDraft[key][action]=actions[action];}}}
+ permissionDraft.profile={view:true,edit:true};
  if(selectedPermissionUser){
   $("permissionEditorMessage").textContent="Seçili hesap: "+user.username+". İşaretlediğiniz modüller bu hesaba uygulanır.";
  }
