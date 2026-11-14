@@ -1,10 +1,6 @@
 import { requireSuperAdmin } from "./_auth.js";
 
-const MODULES = [
-  "dashboard", "classrooms", "pages", "services", "media", "applications",
-  "messages", "menu", "seo", "languages", "settings", "history", "archive",
-  "profile", "users", "audit", "reports"
-];
+const MODULES = ["dashboard", "pages", "services", "media", "applications", "menu", "profile"];
 const ACTIONS = ["view", "create", "edit", "delete", "publish"];
 
 function json(data, status = 200) {
@@ -32,24 +28,25 @@ export async function onRequestGet(context) {
         "SELECT id, username, email, role, is_active, permissions_json, force_password_change FROM admins ORDER BY username"
       ).all(),
       context.env.DB.prepare(
-        "SELECT id, role_key, role_name, permissions_json, is_system, updated_at FROM admin_role_templates ORDER BY role_name"
+        "SELECT id, role_key, role_name, permissions_json, is_system, updated_at FROM admin_role_templates WHERE role_key = 'content_admin' ORDER BY role_name"
       ).all()
     ]);
     return json({
       success: true,
+      roles: [{ role_key: "superadmin", role_name: "Süper Yönetici" }, { role_key: "content_admin", role_name: "İçerik Yöneticisi" }],
       modules: MODULES,
       actions: ACTIONS,
-      users: users.results || [],
+      users: (users.results || []).map(row => ({ ...row, role: row.role === "superadmin" ? "superadmin" : "content_admin" })),
       templates: (templates.results || []).map(row => ({
         ...row,
         permissions: JSON.parse(row.permissions_json || "{}")
       }))
     });
-  } catch (error) {
+  } catch {
     return json({
       success: false,
       code: "PERMISSIONS_MIGRATION_REQUIRED",
-      message: "Yetki yönetimi veritabanı geçişi henüz uygulanmamış. migrations/0002_user_permissions.sql çalıştırılmalı."
+      message: "Yetki yönetimi tabloları hazır değil. Veritabanı geçişi gerekli."
     }, 503);
   }
 }
@@ -62,47 +59,47 @@ export async function onRequestPut(context) {
     const body = await context.request.json();
     const permissions = body.permissions;
     if (!validPermissions(permissions)) {
-      return json({ success: false, message: "Yetki matrisi geçersiz. Modül ve işlem anahtarlarını kontrol edin." }, 400);
+      return json({ success: false, message: "Yetki matrisi geçersiz. Yalnızca tanımlı içerik modülleri ve işlemleri kullanılabilir." }, 400);
     }
-    const serialized = JSON.stringify(permissions);
+
     if (body.target === "user") {
       const id = Number(body.userId);
       if (!Number.isInteger(id) || id < 1 || id === Number(auth.admin.id)) {
-        return json({ success: false, message: "Geçerli bir kullanıcı seçin. Kendi yetkilerinizi bu ekrandan değiştiremezsiniz." }, 400);
+        return json({ success: false, message: "Geçerli bir kullanıcı seçin. Süper Yönetici kendi yetkilerini bu ekrandan değiştiremez." }, 400);
       }
-      const target = await context.env.DB.prepare("SELECT id, role, permissions_json FROM admins WHERE id = ?").bind(id).first();
+      const target = await context.env.DB.prepare("SELECT id, role FROM admins WHERE id = ?").bind(id).first();
       if (!target || target.role === "superadmin") return json({ success: false, message: "Kullanıcı bulunamadı veya korumalı hesaptır." }, 404);
-      const roleKey = String(body.roleKey || "").trim();
-      if (roleKey && !["content_admin","editor","viewer"].includes(roleKey)) return json({ success:false,message:"Kullanıcı rolü geçersiz." },400);
-      const saved = { ...permissions, __role_key: roleKey || JSON.parse(target.permissions_json || "{}").__role_key || "content_admin" };
+      const saved = { ...permissions, __role_key: "content_admin" };
       await context.env.DB.prepare(
-        "UPDATE admins SET permissions_json = ?, updated_at = datetime('now') WHERE id = ?"
+        "UPDATE admins SET role = 'content_admin', permissions_json = ?, updated_at = datetime('now') WHERE id = ?"
       ).bind(JSON.stringify(saved), id).run();
-      return json({ success: true, message: "Kullanıcıya özel yetkiler kaydedildi." });
+      return json({ success: true, message: "İçerik Yöneticisi kullanıcı yetkileri kaydedildi." });
     }
+
     if (body.target === "template") {
       const roleKey = String(body.roleKey || "").trim();
-      const roleName = String(body.roleName || "").trim().slice(0, 80);
-      if (!/^[a-z][a-z0-9_]{2,39}$/.test(roleKey) || !roleName || roleKey === "superadmin") {
-        return json({ success: false, message: "Geçerli bir rol şablonu adı ve anahtarı girin." }, 400);
+      if (roleKey !== "content_admin") {
+        return json({ success: false, message: "Yalnızca İçerik Yöneticisi rol şablonu düzenlenebilir." }, 400);
       }
       await context.env.DB.prepare(`
         INSERT INTO admin_role_templates (role_key, role_name, permissions_json, is_system, updated_by, updated_at)
-        VALUES (?, ?, ?, 0, ?, datetime('now'))
+        VALUES ('content_admin', 'İçerik Yöneticisi', ?, 1, ?, datetime('now'))
         ON CONFLICT(role_key) DO UPDATE SET
-          role_name = excluded.role_name,
+          role_name = 'İçerik Yöneticisi',
           permissions_json = excluded.permissions_json,
+          is_system = 1,
           updated_by = excluded.updated_by,
           updated_at = datetime('now')
-      `).bind(roleKey, roleName, serialized, auth.admin.id).run();
-      return json({ success: true, message: "Rol şablonu kaydedildi." });
+      `).bind(JSON.stringify(permissions), auth.admin.id).run();
+      return json({ success: true, message: "İçerik Yöneticisi rol şablonu kaydedildi." });
     }
+
     return json({ success: false, message: "Kaydetme hedefi belirtilmedi." }, 400);
-  } catch (error) {
+  } catch {
     return json({
       success: false,
       code: "PERMISSIONS_MIGRATION_REQUIRED",
-      message: "Yetki tabloları hazır değil. Önce migrations/0002_user_permissions.sql uygulanmalı."
+      message: "Yetki tabloları hazır değil. Veritabanı geçişi gerekli."
     }, 503);
   }
 }
