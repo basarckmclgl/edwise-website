@@ -1940,7 +1940,7 @@ async function checkSession(){
   currentPermissions=data.admin.permissions||{};
   mustChangePassword=Number(data.admin.force_password_change)===1;
   if(!["superadmin","content_admin"].includes(currentRole))throw new Error("Bu hesabın yönetim paneline erişim yetkisi yok. Yetki: "+String(currentRole||"tanımsız"));
-  const roleName=({superadmin:"Süper Yönetici",content_admin:"Admin",editor:"Editör",viewer:"Görüntüleyici"})[currentRole]||"Yönetici";
+  const roleName=({superadmin:"Süper Yönetici",content_admin:"İçerik Yöneticisi"})[currentRole]||"Yönetici";
   const setText=(id,value)=>{const el=$(id);if(el)el.textContent=value;};
   const setValue=(id,value)=>{const el=$(id);if(el)el.value=value;};
   setText("username",name);
@@ -2707,6 +2707,10 @@ const permissionModules=[
  ["media","Medya Kütüphanesi"],["applications","Başvurular"],["menu","Menü Yönetimi"],
  ["profile","Kendi Profilim"]
 ];
+const permissionActionLimits={
+ dashboard:["view"],pages:["view","create","edit","publish"],services:["view","create","edit","publish"],
+ media:["view","create","edit"],applications:["view","edit"],menu:["view","edit"],profile:["view","edit"]
+};
 const permissionActions=[["view","Görüntüle"],["create","Ekle"],["edit","Düzenle"],["delete","Sil"],["publish","Yayınla"]];
 let permissionUsers=[];
 let selectedPermissionUser=null;
@@ -2714,7 +2718,7 @@ let permissionDraft={};
 function renderUserPermissionMatrix(){
  const body=$("userPermissionMatrix");
  if(!selectedPermissionUser){body.innerHTML='<tr><td colspan="6">Önce bir kullanıcı seçin.</td></tr>';return;}
- body.innerHTML=permissionModules.map(([key,label])=>'<tr><td>'+escapeHtml(label)+'</td>'+permissionActions.map(([action])=>'<td><input type="checkbox" data-permission-module="'+key+'" data-permission-action="'+action+'" '+(permissionDraft[key]?.[action]===true?'checked':'')+' aria-label="'+escapeHtml(label)+' '+action+'"></td>').join("")+'</tr>').join("");
+ body.innerHTML=permissionModules.map(([key,label])=>'<tr><td>'+escapeHtml(label)+'</td>'+permissionActions.map(([action])=>'<td><input type="checkbox" data-permission-module="'+key+'" data-permission-action="'+action+'" '+(permissionDraft[key]?.[action]===true?'checked':'')+(!permissionActionLimits[key]?.includes(action)?' disabled':'')+' aria-label="'+escapeHtml(label)+' '+action+'"></td>').join("")+'</tr>').join("");
 }
 async function loadUserPermissionEditor(){
  const select=$("permissionUserSelect");
@@ -2734,7 +2738,18 @@ async function loadUserPermissionEditor(){
 $("permissionUserSelect").addEventListener("change",()=>{
  const user=permissionUsers.find(item=>String(item.id)===$("permissionUserSelect").value);
  selectedPermissionUser=user||null;
- try{permissionDraft=user?JSON.parse(user.permissions_json||"{}"):{};}catch{permissionDraft={};}
+ const safeDefaults={
+  dashboard:{view:true},
+  pages:{view:true,create:true,edit:true,delete:false,publish:true},
+  services:{view:true,create:true,edit:true,delete:false,publish:true},
+  media:{view:true,create:true,edit:true,delete:false},
+  applications:{view:true,create:false,edit:true,delete:false},
+  menu:{view:true,create:false,edit:true,delete:false,publish:false},
+  profile:{view:true,create:false,edit:true,delete:false,publish:false}
+ };
+ let stored={};try{stored=user?JSON.parse(user.permissions_json||"{}"):{};}catch{}
+ permissionDraft=JSON.parse(JSON.stringify(safeDefaults));
+ for(const [key,actions] of Object.entries(stored)){if(permissionModules.some(([module])=>module===key)&&actions&&typeof actions==="object")permissionDraft[key]={...permissionDraft[key],...actions};}
  if(selectedPermissionUser){
   $("permissionEditorMessage").textContent="Seçili hesap: "+user.username+". İşaretlediğiniz modüller bu hesaba uygulanır.";
  }
