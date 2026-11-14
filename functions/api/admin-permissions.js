@@ -1,10 +1,11 @@
 import { requireSuperAdmin } from "./_auth.js";
 
-const MODULES = ["dashboard", "pages", "services", "media", "applications", "menu", "profile"];
+const MODULES = ["dashboard", "pages", "lessons", "services", "media", "applications", "menu", "profile"];
 const ACTIONS = ["view", "create", "edit", "delete", "publish"];
 const MODULE_ACTIONS = {
   dashboard: ["view"],
   pages: ["view", "create", "edit", "publish"],
+  lessons: ["view", "create", "edit"],
   services: ["view", "create", "edit", "publish"],
   media: ["view", "create", "edit"],
   applications: ["view", "edit"],
