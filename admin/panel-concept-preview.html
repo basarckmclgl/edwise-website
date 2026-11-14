@@ -1361,21 +1361,22 @@ function canAccess(page){
  const moduleMap={
   overview:"dashboard",
   panelhome:"dashboard",
-  classrooms:"classrooms",
+  reports:"dashboard",
   pages:"pages",
+  classrooms:"pages",
+  media:"pages",
   services:"services",
-  media:"media",
   applications:"applications",
-  profile:"profile",
-  messages:"messages",
+  messages:"applications",
   designcenter:"menu",
   sitesettings:"settings",
+  history:"settings",
+  archive:"pages",
   users:"users",
-  audit:"audit",
-  history:"history",
-  archive:"archive",
-  reports:"reports"
+  audit:"users"
  };
+ // Profil yalnızca oturum açan kullanıcının kendi hesabıdır.
+ if(page==="profile") return true;
  const module=moduleMap[page];
  return !!module && currentPermissions?.[module]?.view===true;
 }
@@ -1421,8 +1422,18 @@ menuToggle?.addEventListener("click",()=>{
  document.body.classList.toggle("sidebar-collapsed");
  menuToggle.setAttribute("aria-expanded",String(!document.body.classList.contains("sidebar-collapsed")));
 });
+function firstAllowedPage(){
+ const item=[...document.querySelectorAll("[data-page]")].find(el=>!el.classList.contains("hidden")&&canAccess(el.dataset.page));
+ return item?.dataset.page||null;
+}
+
 function showPage(name){
- if(!canAccess(name)) name="overview";
+ if(!canAccess(name)) name=firstAllowedPage();
+ if(!name){
+  document.querySelectorAll(".content > section").forEach(section=>section.classList.add("hidden"));
+  document.querySelectorAll(".nav").forEach(item=>item.classList.remove("active"));
+  return;
+ }
  document.body.dataset.activePage=name;
  if(name==="overview"){loadPublishedContentCounts();if(currentRole==="superadmin"){loadApplicationFunnel();loadSiteReports();loadAnalytics();}}
 
@@ -1936,8 +1947,7 @@ async function checkSession(){
    showPage("profile");
    const notice=$("profilePasswordMessage");if(notice){notice.className="message";notice.textContent="İlk giriş güvenliği için devam etmeden önce şifrenizi değiştirin.";}
   }else{
-   const firstAllowed=document.querySelector("[data-page]:not(.hidden)");
-   const firstPage=firstAllowed?.dataset.page;
+   const firstPage=firstAllowedPage();
    if(firstPage) showPage(firstPage);
    else {
     document.querySelectorAll(".content > section").forEach(section=>section.classList.add("hidden"));
