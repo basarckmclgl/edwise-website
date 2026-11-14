@@ -347,6 +347,18 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  }
  $('trashRefresh')?.addEventListener('click',loadTrash);
  $('trashRows')?.addEventListener('click',e=>{const b=e.target.closest('[data-restore-cms]');if(b)restorePage(b.dataset.restoreCms);});
+ async function addPublishedPageToMenu(title,slug){
+  const url=pageUrl(slug);
+  const settingsResponse=await fetch('/api/settings',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
+  const settings=await settingsResponse.json();
+  if(!settingsResponse.ok||!settings.success)throw new Error(settings.message||'Menü ayarları alınamadı.');
+  const items=Array.isArray(settings.menu)?settings.menu:[];
+  if(!items.some(item=>item.url===url)){
+   items.push({key:'cms-page-'+slug,label:title,url,icon:'📄',group:'pages',visible:true});
+   const save=await fetch('/api/settings',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({action:'save_menu',items})});
+   const result=await save.json();if(!save.ok||!result.success)throw new Error(result.message||'Sayfa menüye eklenemedi.');
+  }
+ }
  async function submit(status){
   const title=$('editorTitle').value.trim(),slug=slugify($('editorSlug').value.trim()||title),content=canvas.innerHTML;
   if(!title||!slug){feedback('Sayfa başlığı ve URL zorunludur.','error');return;}
@@ -362,7 +374,8 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
    if(!editing&&data.id)currentId=Number(data.id);
    $('editorSlug').value=slug;
    await loadPages();
-   feedback(status==='published'?'Sayfa ana sitede yayımlandı: '+'https://edwisedanismanlik.com'+pageUrl(slug):'Taslak veritabanına kaydedildi.');
+   if(status==='published'&&!currentPath){await addPublishedPageToMenu(title,slug);}
+   feedback(status==='published'?'Sayfa yayımlandı ve ana menüde Sayfalar alt kategorisine eklendi: '+'https://edwisedanismanlik.com'+pageUrl(slug):'Taslak veritabanına kaydedildi.');
   }catch(error){feedback(error.message||'Sayfa kaydedilemedi.','error');}
   finally{button.disabled=false;button.textContent=oldText;}
  }
