@@ -1326,6 +1326,11 @@ td{color:#39334b!important;border-color:#eeebf4!important}
     </div>
     <div id="applicationsModule" class="hidden">
   <div class="panel" style="margin:16px 0">
+   <div class="section-head"><div><h3>Gelen Başvurular</h3><p class="muted">Başvuruları inceleyin, iletişim bilgilerini gerektiğinde açın ve durumlarını güncelleyin.</p></div><div class="actions"><button class="btn" type="button" id="toggleAllApplicationContactsManager">Tüm iletişim bilgilerini göster</button><button class="btn" type="button" id="refreshApplicationsManager">↻ Yenile</button></div></div>
+   <div id="applicationsManagerMessage" class="muted" aria-live="polite"></div>
+   <div class="table-wrap"><table class="application-fit-table"><thead><tr><th>Tarih</th><th>Ad soyad</th><th>Telefon</th><th>E-posta</th><th>Program</th><th>Eğitim tercihi</th><th>Uygun zaman</th><th>Açıklama</th><th>Durum</th></tr></thead><tbody id="applicationsManagerTable"><tr><td colspan="9">Başvurular yükleniyor...</td></tr></tbody></table></div>
+  </div>
+  <div class="panel" data-superadmin style="margin:16px 0">
    <div class="section-head" style="margin:0 0 12px">
     <div><h3>Başvuru Takip Çizelgesi</h3><p class="muted">Son 30 gün · ziyaretçilerin başvuru sürecindeki hareketleri</p></div>
     <button class="btn" id="refreshApplicationFunnel">↻ Takip Çizelgesini Yenile</button>
@@ -1341,11 +1346,10 @@ td{color:#39334b!important;border-color:#eeebf4!important}
      <tbody id="applicationFunnelTable">
       <tr><td colspan="11">Takip verileri bekleniyor...</td></tr>
      </tbody>
-    </table>
-   </div>
+   </table>
   </div>
-
  </div>
+</div>
  <div class="message" id="otherModuleMessage">Bu modül henüz geliştirme aşamasında. Gerçek işlemler, güvenli API bağlantıları tamamlandığında açılacak.</div>
    </div>
   </section>
@@ -1489,7 +1493,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
   if(name==="archive")loadArchive();
  if(name==="reports"){loadSiteReports();loadApplications();loadCloudflareReports();}
  if(name==="messages")loadChatConversations();
- if(name==="applications"){loadApplications();loadApplicationFunnel();}
+ if(name==="applications"){loadApplications();if(currentRole==="superadmin")loadApplicationFunnel();}
  if(name==="designcenter"){
   if(currentRole==="superadmin"){selectDesignTab("design");loadThemeSettings();}
   else{selectDesignTab("menu");}
@@ -1532,38 +1536,39 @@ function maskEmail(value){
 }
 let revealedApplicationContacts=new Set();
 let applicationRowsCache=[];
+function applicationBodies(){return ["applicationsTable","applicationsManagerTable"].map(id=>$(id)).filter(Boolean);}
 function renderApplicationContact(index){
- const body=$("applicationsTable"),item=applicationRowsCache[index];
- if(!item)return;
- const phone=body.querySelector('[data-app-phone="'+index+'"]');
- const email=body.querySelector('[data-app-email="'+index+'"]');
- const button=body.querySelector('[data-app-contact="'+index+'"]');
- const visible=revealedApplicationContacts.has(index);
- if(phone)phone.textContent=visible?(item.phone||"—"):maskPhone(item.phone);
- if(email)email.textContent=visible?(item.email||"—"):maskEmail(item.email);
- if(button){
-  button.textContent=visible?"İletişim bilgilerini gizle":"İletişim bilgilerini göster";
-  button.setAttribute("aria-expanded",String(visible));
+ const item=applicationRowsCache[index];if(!item)return;
+ for(const body of applicationBodies()){
+  const phone=body.querySelector('[data-app-phone="'+index+'"]');
+  const email=body.querySelector('[data-app-email="'+index+'"]');
+  const button=body.querySelector('[data-app-contact="'+index+'"]');
+  const visible=revealedApplicationContacts.has(index);
+  if(phone)phone.textContent=visible?(item.phone||"—"):maskPhone(item.phone);
+  if(email)email.textContent=visible?(item.email||"—"):maskEmail(item.email);
+  if(button){button.textContent=visible?"İletişim bilgilerini gizle":"İletişim bilgilerini göster";button.setAttribute("aria-expanded",String(visible));}
  }
 }
 function updateBulkApplicationContactButton(){
- const button=$("toggleAllApplicationContacts");
- if(!button)return;
  const allVisible=applicationRowsCache.length>0&&applicationRowsCache.every((_,index)=>revealedApplicationContacts.has(index));
- button.textContent=allVisible?"Tüm iletişim bilgilerini gizle":"Tüm iletişim bilgilerini göster";
- button.setAttribute("aria-pressed",String(allVisible));
+ ["toggleAllApplicationContacts","toggleAllApplicationContactsManager"].forEach(id=>{
+  const button=$(id);if(!button)return;
+  button.textContent=allVisible?"Tüm iletişim bilgilerini gizle":"Tüm iletişim bilgilerini göster";
+  button.setAttribute("aria-pressed",String(allVisible));
+ });
 }
 async function loadApplications(){
- const body=$("applicationsTable");
- body.innerHTML='<tr><td colspan="9">Başvurular yükleniyor...</td></tr>';
+ const bodies=applicationBodies();
+ bodies.forEach(body=>body.innerHTML='<tr><td colspan="9">Başvurular yükleniyor...</td></tr>');
  try{
   const data=await api("/api/applications");
   const rows=data.applications||[];
   applicationRowsCache=rows;
   revealedApplicationContacts=new Set();
-  $("countApplications").textContent=rows.length;
-  $("applicationsMessage").textContent=rows.length+" başvuru";
-  body.innerHTML=rows.map((x,index)=>'<tr>'+
+  if($("countApplications"))$("countApplications").textContent=rows.length;
+  if($("applicationsMessage"))$("applicationsMessage").textContent=rows.length+" başvuru";
+  if($("applicationsManagerMessage"))$("applicationsManagerMessage").textContent=rows.length+" başvuru bulundu.";
+  const html=rows.map((x,index)=>'<tr>'+
    '<td>'+escapeHtml(x.created_at||"-")+'</td>'+
    '<td>'+escapeHtml(x.name||"-")+'</td>'+
    '<td><span data-app-phone="'+index+'">'+escapeHtml(maskPhone(x.phone))+'</span></td>'+
@@ -1572,35 +1577,37 @@ async function loadApplications(){
    '<td>'+escapeHtml(x.format||"-")+'</td>'+
    '<td>'+escapeHtml(x.availability||"-")+'</td>'+
    '<td style="min-width:220px;white-space:normal">'+escapeHtml(x.note||"-")+'</td>'+
-   '<td><select aria-label="Başvuru durumu" data-app-status="'+escapeHtml(x.id)+'"><option value="new" '+(x.status==="new"?"selected":"")+'>Yeni</option><option value="contacted" '+(x.status==="contacted"?"selected":"")+'>İletişime geçildi</option><option value="completed" '+(x.status==="completed"?"selected":"")+'>Tamamlandı</option></select><br><button type="button" class="btn" style="margin-top:6px" data-app-contact="'+index+'" aria-expanded="false">İletişim bilgilerini göster</button></td>'+
+   '<td><select aria-label="Başvuru durumu" data-app-status="'+escapeHtml(x.id)+'" '+(currentPermissions?.applications?.edit===true?"":"disabled")+'><option value="new" '+(x.status==="new"?"selected":"")+'>Yeni</option><option value="contacted" '+(x.status==="contacted"?"selected":"")+'>İletişime geçildi</option><option value="completed" '+(x.status==="completed"?"selected":"")+'>Tamamlandı</option></select><br><button type="button" class="btn" style="margin-top:6px" data-app-contact="'+index+'" aria-expanded="false">İletişim bilgilerini göster</button></td>'+
    '</tr>').join("")||'<tr><td colspan="9">Henüz başvuru yok.</td></tr>';
-  body.querySelectorAll("[data-app-contact]").forEach(button=>button.addEventListener("click",()=>{
-   const index=Number(button.dataset.appContact);
-   if(revealedApplicationContacts.has(index))revealedApplicationContacts.delete(index);
-   else revealedApplicationContacts.add(index);
-   renderApplicationContact(index);
-   updateBulkApplicationContactButton();
-  }));
+  bodies.forEach(body=>{
+   body.innerHTML=html;
+   body.querySelectorAll("[data-app-contact]").forEach(button=>button.addEventListener("click",()=>{
+    const index=Number(button.dataset.appContact);
+    if(revealedApplicationContacts.has(index))revealedApplicationContacts.delete(index);else revealedApplicationContacts.add(index);
+    renderApplicationContact(index);updateBulkApplicationContactButton();
+   }));
+   body.querySelectorAll("[data-app-status]").forEach(select=>select.addEventListener("change",async()=>{
+    try{await api("/api/applications",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:select.dataset.appStatus,status:select.value})});}
+    catch(error){alert("Durum kaydedilemedi: "+error.message);loadApplications();}
+   }));
+  });
   updateBulkApplicationContactButton();
-  body.querySelectorAll("[data-app-status]").forEach(select=>select.addEventListener("change",async()=>{
-   try{await api("/api/applications",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:select.dataset.appStatus,status:select.value})});}
-   catch(e){alert("Durum kaydedilemedi: "+e.message);loadApplications();}
-  }));
  }catch(error){
-  body.innerHTML='<tr><td colspan="9">Başvurular yüklenemedi: '+escapeHtml(error.message)+'</td></tr>';
-  $("applicationsMessage").textContent="Bağlantı hatası";
-  applicationRowsCache=[];
-  revealedApplicationContacts=new Set();
-  updateBulkApplicationContactButton();
+  bodies.forEach(body=>body.innerHTML='<tr><td colspan="9">Başvurular yüklenemedi: '+escapeHtml(error.message)+'</td></tr>');
+  if($("applicationsMessage"))$("applicationsMessage").textContent="Bağlantı hatası";
+  if($("applicationsManagerMessage"))$("applicationsManagerMessage").textContent="Başvurular yüklenemedi: "+error.message;
+  applicationRowsCache=[];revealedApplicationContacts=new Set();updateBulkApplicationContactButton();
  }
 }
-$("toggleAllApplicationContacts")?.addEventListener("click",()=>{
- const allVisible=applicationRowsCache.length>0&&applicationRowsCache.every((_,index)=>revealedApplicationContacts.has(index));
- revealedApplicationContacts=allVisible?new Set():new Set(applicationRowsCache.map((_,index)=>index));
- applicationRowsCache.forEach((_,index)=>renderApplicationContact(index));
- updateBulkApplicationContactButton();
+["toggleAllApplicationContacts","toggleAllApplicationContactsManager"].forEach(id=>{
+ $(id)?.addEventListener("click",()=>{
+  const allVisible=applicationRowsCache.length>0&&applicationRowsCache.every((_,index)=>revealedApplicationContacts.has(index));
+  revealedApplicationContacts=allVisible?new Set():new Set(applicationRowsCache.map((_,index)=>index));
+  applicationRowsCache.forEach((_,index)=>renderApplicationContact(index));updateBulkApplicationContactButton();
+ });
 });
 $("refreshApplications")?.addEventListener("click",loadApplications);
+$("refreshApplicationsManager")?.addEventListener("click",loadApplications);
 
 async function loadAudit(){
  $("auditTable").innerHTML='<tr><td colspan="6">İşlem geçmişi yükleniyor...</td></tr>';
