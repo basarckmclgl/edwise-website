@@ -1,8 +1,9 @@
 import { requireSuperAdmin } from "./_auth.js";
 
 const MODULES = [
-  "dashboard", "pages", "services", "applications", "menu",
-  "seo", "languages", "settings", "users"
+  "dashboard", "classrooms", "pages", "services", "media", "applications",
+  "messages", "menu", "seo", "languages", "settings", "history", "archive",
+  "profile", "users", "audit", "reports"
 ];
 const ACTIONS = ["view", "create", "edit", "delete", "publish"];
 
