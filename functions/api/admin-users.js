@@ -36,10 +36,7 @@ export async function onRequestPost(context) {
       return json({ success: false, message: "Şifre en az 6 karakter; büyük/küçük harf, rakam ve özel karakter içermeli." }, 400);
     }
     const roleMap = {
-      "Admin": "admin",
-      "İçerik Yöneticisi": "content_admin",
-      "Editör": "editor",
-      "Görüntüleyici": "viewer"
+      "İçerik Yöneticisi": "content_admin"
     };
     if (!roleMap[role]) return json({ success: false, message: "Bu ekrandan Süper Yönetici hesabı oluşturulamaz." }, 403);
 
