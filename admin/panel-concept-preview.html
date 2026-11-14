@@ -740,12 +740,12 @@ td{color:#39334b!important;border-color:#eeebf4!important}
  <button class="nav" data-page="history" data-superadmin><span class="ico">◷</span><span>İçerik Hareketleri</span></button>
  <button class="nav" data-page="archive" data-superadmin><span class="ico">▣</span><span>Arşiv</span></button>
  <div class="menu-label" data-superadmin>YÖNETİM</div>
- <button class="nav" data-page="designcenter" data-superadmin><span class="ico">◈</span><span>Site Tasarımı ve Menü</span></button>
- <button class="nav" data-page="sitesettings" data-superadmin><span class="ico">⚙</span><span>Site Ayarları</span></button>
+ <button class="nav" data-page="designcenter"><span class="ico">◈</span><span>Site Tasarımı ve Menü</span></button>
+ <button class="nav" data-page="sitesettings"><span class="ico">⚙</span><span>Site Ayarları</span></button>
  <button class="nav" data-page="profile"><span class="ico">♙</span><span>Profilim</span></button>
  <div class="menu-label" data-superadmin>SİSTEM VE GÜVENLİK</div>
- <button class="nav" data-page="users" data-superadmin><span class="ico">♙</span><span>Kullanıcı ve Yetkiler</span></button>
- <button class="nav" data-page="audit" data-superadmin><span class="ico">◉</span><span>Güvenlik Kayıtları</span></button>
+ <button class="nav" data-page="users"><span class="ico">♙</span><span>Kullanıcı ve Yetkiler</span></button>
+ <button class="nav" data-page="audit"><span class="ico">◉</span><span>Güvenlik Kayıtları</span></button>
 </aside>
 
 <main class="main">
@@ -1358,7 +1358,29 @@ const editorAllowed=["overview","panelhome","classrooms","pages","services","med
 
 function canAccess(page){
  if(currentRole==="superadmin") return true;
- const moduleMap={overview:"dashboard",panelhome:"dashboard",classrooms:"dashboard",pages:"pages",services:"services",media:"pages",applications:"applications",profile:"dashboard",messages:"applications",designcenter:"settings",sitesettings:"settings",audit:"users",history:"users",archive:"pages",reports:"dashboard"};
+ // Menü yalnızca yetki matrisinde karşılığı olan ve aktif modülü bulunan ekranları gösterir.
+ const moduleMap={
+  overview:"dashboard",
+  panelhome:"dashboard",
+  classrooms:null,
+  pages:"pages",
+  services:"services",
+  media:"pages",
+  applications:"applications",
+  profile:"dashboard",
+  messages:"applications",
+  designcenter:"menu",
+  sitesettings:"settings",
+  users:"users",
+  audit:"users",
+  history:"pages",
+  archive:"pages",
+  reports:"dashboard",
+  analyticsOverview:"dashboard",
+  ga4Reports:"dashboard",
+  cloudflareReports:"dashboard",
+  other:null
+ };
  const module=moduleMap[page];
  return !!module && currentPermissions?.[module]?.view===true;
 }
