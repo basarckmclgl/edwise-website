@@ -1359,22 +1359,21 @@ const editorAllowed=["overview","panelhome","classrooms","pages","services","med
 function canAccess(page){
  if(currentRole==="superadmin") return true;
  const moduleMap={
-  // Yetki ekranındaki modül anahtarlarıyla birebir eşleme
   overview:"dashboard",
   panelhome:"dashboard",
-  reports:"dashboard",
+  classrooms:"classrooms",
   pages:"pages",
-  classrooms:"pages",
-  media:"pages",
-  archive:"pages",
   services:"services",
+  media:"media",
   applications:"applications",
-  messages:"applications",
+  messages:"messages",
+  reports:"reports",
+  history:"history",
+  archive:"archive",
   designcenter:"menu",
   sitesettings:"settings",
-  history:"settings",
   users:"users",
-  audit:"users"
+  audit:"audit"
  };
  // Profil yalnızca oturum açan kullanıcının kendi hesabıdır.
  if(page==="profile") return true;
