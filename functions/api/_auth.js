@@ -153,21 +153,24 @@ export async function requirePermission(context, moduleKey, actionKey = "view") 
     // Geriye dönük uyumluluk: henüz izin matrisi tanımlanmamış mevcut
     // content_admin hesaplarının eski erişimlerini koru. İlk açık izin
     // kaydı yapıldıktan sonra yalnızca kaydedilen izinler uygulanır.
-    const permissions = hasUserOverrides
-      ? ownPermissions
-      : hasTemplatePermissions
-        ? templatePermissions
-        : {
-            dashboard: { view: true },
-            pages: { view: true, create: true, edit: true, delete: true, publish: true },
-            services: { view: true, create: true, edit: true, delete: true, publish: true },
-            applications: { view: true, create: true, edit: true, delete: true, publish: true },
-            menu: { view: true, create: true, edit: true, delete: true },
-            seo: { view: true, edit: true },
-            languages: { view: true, edit: true },
-            settings: { view: true, edit: true },
-            users: { view: true }
-          };
+    const legacyDefaults = {
+      dashboard: { view: true },
+      pages: { view: true, create: true, edit: true, delete: true, publish: true },
+      services: { view: true, create: true, edit: true, delete: true, publish: true },
+      applications: { view: true, create: true, edit: true, delete: true, publish: true },
+      menu: { view: true, create: true, edit: true, delete: true },
+      seo: { view: true, edit: true },
+      languages: { view: true, edit: true },
+      settings: { view: true, edit: true },
+      users: { view: true }
+    };
+    // Önce rol şablonunu uygula, ardından kullanıcıya özel açık/kapalı
+    // seçimleri uygula. Böylece şablon güncellemesi tüm mirasçı hesaplara yansır.
+    const base = hasTemplatePermissions ? templatePermissions : legacyDefaults;
+    const permissions = { ...base };
+    for (const [module, actions] of Object.entries(ownPermissions)) {
+      permissions[module] = { ...(base[module] || {}), ...(actions || {}) };
+    }
     if (permissions?.[moduleKey]?.[actionKey] === true) return auth;
     return authError("Bu modülde bu işlem için yetkiniz bulunmuyor.", 403);
   } catch {
