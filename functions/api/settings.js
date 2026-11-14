@@ -31,7 +31,7 @@ export async function onRequestPost(context){
   if(body.action==="save_menu"){
    const items=Array.isArray(body.items)?body.items:[];
    if(items.length>100)return json({success:false,message:"Menüde en fazla 100 bağlantı olabilir."},400);
-   const clean=items.map((item,index)=>({key:String(item.key||"").slice(0,100),label:String(item.label||"").trim().slice(0,80),url:String(item.url||"").trim().slice(0,300),icon:String(item.icon||"").slice(0,8),group:item.group==="contact"?"contact":"main",visible:item.visible!==false,order:index}));
+   const clean=items.map((item,index)=>({key:String(item.key||"").slice(0,100),label:String(item.label||"").trim().slice(0,80),url:String(item.url||"").trim().slice(0,300),icon:String(item.icon||"").slice(0,8),group:["contact","pages"].includes(item.group)?item.group:"main",visible:item.visible!==false,order:index}));
    if(clean.some(item=>{if(!item.key||!item.label||!item.url)return true;try{const u=new URL(item.url,context.request.url);return !["http:","https:"].includes(u.protocol)||(u.origin!==new URL(context.request.url).origin&&u.protocol!=="https:")||item.url.startsWith("//");}catch{return true;}}))return json({success:false,message:"Menü bağlantılarından biri geçersiz. Site içi yollar veya https:// bağlantıları kullanın."},400);
    const serialized=JSON.stringify(clean);
    const existing=await context.env.DB.prepare("SELECT id FROM site_settings WHERE setting_key=? LIMIT 1").bind("menu_theme").first();
