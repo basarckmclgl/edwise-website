@@ -2,6 +2,15 @@ import { requireSuperAdmin } from "./_auth.js";
 
 const MODULES = ["dashboard", "pages", "services", "media", "applications", "menu", "profile"];
 const ACTIONS = ["view", "create", "edit", "delete", "publish"];
+const MODULE_ACTIONS = {
+  dashboard: ["view"],
+  pages: ["view", "create", "edit", "publish"],
+  services: ["view", "create", "edit", "publish"],
+  media: ["view", "create", "edit"],
+  applications: ["view", "edit"],
+  menu: ["view", "edit"],
+  profile: ["view", "edit"]
+};
 
 function json(data, status = 200) {
   return Response.json(data, { status, headers: { "Cache-Control": "no-store" } });
@@ -11,7 +20,7 @@ function validPermissions(value) {
   return Object.entries(value).every(([module, actions]) =>
     MODULES.includes(module) && actions && typeof actions === "object" &&
     !Array.isArray(actions) && Object.entries(actions).every(([action, allowed]) =>
-      ACTIONS.includes(action) && typeof allowed === "boolean"
+      ACTIONS.includes(action) && MODULE_ACTIONS[module].includes(action) && typeof allowed === "boolean"
     )
   );
 }
