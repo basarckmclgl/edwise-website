@@ -1191,6 +1191,24 @@ td{color:#39334b!important;border-color:#eeebf4!important}
    </table>
   </div>
  </div>
+
+ <div class="panel" id="userPermissionPanel">
+  <div class="section-head">
+   <div><h2>Modül Yetkileri</h2><p>Bir kullanıcı seçin; yalnızca izin verdiğiniz modüller onun menüsünde görünsün.</p></div>
+   <button type="button" class="primary" id="saveUserPermissions">Yetkileri Kaydet</button>
+  </div>
+  <div class="field" style="max-width:420px;margin:14px 0">
+   <label for="permissionUserSelect">Yetkileri düzenlenecek kullanıcı</label>
+   <select id="permissionUserSelect"><option value="">Kullanıcı seçin</option></select>
+  </div>
+  <div id="permissionEditorMessage" class="muted" aria-live="polite">Kullanıcı seçtiğinizde mevcut modül izinleri yüklenecek.</div>
+  <div class="table-wrap">
+   <table>
+    <thead><tr><th>Modül</th><th>Görüntüle</th><th>Ekle</th><th>Düzenle</th><th>Sil</th><th>Yayınla</th></tr></thead>
+    <tbody id="userPermissionMatrix"></tbody>
+   </table>
+  </div>
+ </div>
 </section>
 
   <section id="audit" class="hidden">
@@ -2684,6 +2702,71 @@ $("usersTable").addEventListener("click",async event=>{
  }
 });
 
+const permissionModules=[
+ ["dashboard","Genel Bakış"],["classrooms","Derslikler"],["pages","Sayfa Yönetimi"],
+ ["services","Hizmetler"],["media","Medya Kütüphanesi"],["applications","Başvurular"],
+ ["messages","Mesaj Kutusu"],["menu","Menü Düzeni"],["seo","SEO & Görünürlük"],
+ ["languages","Dil Yönetimi"],["settings","Site Ayarları"],["history","Geçmiş"],
+ ["archive","Arşiv"],["profile","Profilim"],["users","Kullanıcılar & Yetkiler"],
+ ["audit","Güvenlik Kayıtları"],["reports","Raporlar"]
+];
+const permissionActions=[["view","Görüntüle"],["create","Ekle"],["edit","Düzenle"],["delete","Sil"],["publish","Yayınla"]];
+let permissionUsers=[];
+let selectedPermissionUser=null;
+let permissionDraft={};
+function renderUserPermissionMatrix(){
+ const body=$("userPermissionMatrix");
+ if(!selectedPermissionUser){body.innerHTML='<tr><td colspan="6">Önce bir kullanıcı seçin.</td></tr>';return;}
+ body.innerHTML=permissionModules.map(([key,label])=>'<tr><td>'+escapeHtml(label)+'</td>'+permissionActions.map(([action])=>'<td><input type="checkbox" data-permission-module="'+key+'" data-permission-action="'+action+'" '+(permissionDraft[key]?.[action]===true?'checked':'')+' aria-label="'+escapeHtml(label)+' '+action+'"></td>').join("")+'</tr>').join("");
+}
+async function loadUserPermissionEditor(){
+ const select=$("permissionUserSelect");
+ select.innerHTML='<option value="">Kullanıcılar yükleniyor...</option>';
+ try{
+  const result=await api("/api/admin-permissions");
+  permissionUsers=(result.users||[]).filter(user=>user.role!=="superadmin"&&Number(user.id)!==Number(currentAdmin?.id));
+  select.innerHTML='<option value="">Kullanıcı seçin</option>'+permissionUsers.map(user=>'<option value="'+Number(user.id)+'">'+escapeHtml(user.username)+' · '+escapeHtml(user.email)+'</option>').join("");
+  $("permissionEditorMessage").textContent="Yetkileri düzenlemek için bir kullanıcı seçin.";
+  renderUserPermissionMatrix();
+ }catch(error){
+  select.innerHTML='<option value="">Kullanıcı listesi alınamadı</option>';
+  $("permissionEditorMessage").textContent=error.message;
+ }
+}
+$("permissionUserSelect").addEventListener("change",()=>{
+ const user=permissionUsers.find(item=>String(item.id)===$("permissionUserSelect").value);
+ selectedPermissionUser=user||null;
+ try{permissionDraft=user?JSON.parse(user.permissions_json||"{}"):{};}catch{permissionDraft={};}
+ if(selectedPermissionUser){
+  $("permissionEditorMessage").textContent="Seçili hesap: "+user.username+". İşaretlediğiniz modüller bu hesaba uygulanır.";
+ }
+ renderUserPermissionMatrix();
+});
+$("userPermissionMatrix").addEventListener("change",event=>{
+ const input=event.target.closest("[data-permission-module]");
+ if(!input)return;
+ const module=input.dataset.permissionModule,action=input.dataset.permissionAction;
+ permissionDraft[module]??={};
+ permissionDraft[module][action]=input.checked;
+});
+$("saveUserPermissions").addEventListener("click",async()=>{
+ if(!selectedPermissionUser){$("permissionEditorMessage").textContent="Önce bir kullanıcı seçin.";return;}
+ const permissions={};
+ for(const [module] of permissionModules){
+  const actions={};
+  for(const [action] of permissionActions)actions[action]=permissionDraft[module]?.[action]===true;
+  permissions[module]=actions;
+ }
+ const roleKey=selectedPermissionUser.permissions_json?(()=>{try{return JSON.parse(selectedPermissionUser.permissions_json).__role_key||"content_admin"}catch{return "content_admin"}})():"content_admin";
+ const button=$("saveUserPermissions");button.disabled=true;button.textContent="Kaydediliyor...";
+ try{
+  const result=await api("/api/admin-permissions",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({target:"user",userId:Number(selectedPermissionUser.id),roleKey,permissions})});
+  $("permissionEditorMessage").textContent=result.message||"Kullanıcı yetkileri kaydedildi.";
+  await loadUserPermissionEditor();
+  $("permissionUserSelect").value=String(selectedPermissionUser.id);
+ }catch(error){$("permissionEditorMessage").textContent=error.message;}
+ finally{button.disabled=false;button.textContent="Yetkileri Kaydet";}
+});
 const designPageSelect=$("designPageSelect");
 const designRecordSelect=$("designRecordSelect");
 function refreshDesignFrame(){
