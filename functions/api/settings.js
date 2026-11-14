@@ -15,9 +15,12 @@ async function readSettings(DB){
 }
 export async function onRequestGet(context){
  try{
-  const auth=await requirePermission(context,"settings","view");
+  const scope=new URL(context.request.url).searchParams.get("scope");
+  const moduleKey=scope==="menu"?"menu":"settings";
+  const auth=await requirePermission(context,moduleKey,"view");
   if(auth.response)return auth.response;
   const values=await readSettings(context.env.DB);
+  if(scope==="menu")return json({success:true,menu:values.menu_theme||{}});
   return json({success:true,draft:values.draft_theme||{},live:values.live_theme||{},menu:values.menu_theme||{},preferences:values.site_preferences||{},panelPreferences:values.panel_preferences||{}});
  }catch(error){return json({success:false,message:"Tasarım ayarları alınamadı."},500);}
 }
