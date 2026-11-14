@@ -88,7 +88,7 @@
 
         if (response.ok && data.success) {
           message.textContent = "Giriş başarılı. Yönlendiriliyorsunuz...";
-          window.location.href = "/admin/dashboard.html";
+          window.location.replace("/admin/panel-concept-preview.html");
           return;
         }
 
