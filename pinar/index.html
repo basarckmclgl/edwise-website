@@ -84,7 +84,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 </tbody></table><div class="no-results" id="noPages">Aramana uygun sayfa bulunamadı.</div></div>
 <div class="page-note">Bu liste, çalışma dalındaki mevcut dosyalar incelenerek hazırlandı. Şu an sayfalar listelenebilir ve önizlenebilir; içerik düzenleme, yeni sayfa oluşturma, taslak kaydetme ve yayınlama işlevleri henüz bağlanmadı. Bu aşamada mevcut sayfa dosyalarına müdahale edilmedi.</div><section class="panel" id="pageEditorPanel" style="margin-top:16px">
 <div class="section-head"><div><div class="eyebrow">GÖRSEL SAYFA DÜZENLEYİCİ</div><h2>Sayfa içerik düzenleyici</h2><p class="section-intro">Metin ve görselleri Word benzeri araçlarla düzenle. Taslak bu tarayıcıda saklanır.</p></div><span class="tag">Taslak modu</span></div>
-<div class="page-tools" style="margin-bottom:10px"><input id="editorTitle" placeholder="Sayfa başlığı" style="flex:2"><input id="editorSlug" placeholder="sayfa-adresi" style="flex:1"><button type="button" id="editorNew" class="app-refresh">Yeni sayfa</button></div>
+<div class="page-tools" style="margin-bottom:10px"><input id="editorTitle" placeholder="Sayfa başlığı" style="flex:2"><input id="editorPath" type="hidden" value=""><input id="editorSlug" placeholder="sayfa-adresi" style="flex:1"><button type="button" id="editorNew" class="app-refresh">Yeni sayfa</button></div>
 <div class="page-tools" style="gap:6px;margin-bottom:8px;flex-wrap:wrap">
 <button type="button" data-editcmd="bold" class="app-refresh"><b>B</b></button><button type="button" data-editcmd="italic" class="app-refresh"><i>I</i></button><button type="button" data-editcmd="underline" class="app-refresh"><u>U</u></button>
 <select id="editorFormat"><option value="p">Normal metin</option><option value="h1">Başlık 1</option><option value="h2">Başlık 2</option><option value="h3">Başlık 3</option><option value="blockquote">Alıntı</option></select>
@@ -288,7 +288,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
 (()=> {
  const root=document.getElementById('view-sayfalar'); if(!root)return;
  const $=id=>document.getElementById(id), canvas=$('pageCanvas');
- let currentId=null, pages=[];
+ let currentId=null, pages=[], currentPath='';
  const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function slugify(t){return String(t||'').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ö/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
  function feedback(message,type='info'){$('editorFeedback').textContent=message;$('editorFeedback').className='page-count '+(type==='error'?'error':'');}
@@ -296,7 +296,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  $('editorSlug').addEventListener('input',()=>{slugManuallyEdited=true;});
  $('editorTitle').addEventListener('input',()=>{if(!slugManuallyEdited)$('editorSlug').value=slugify($('editorTitle').value);});
  function fresh(){
-  currentId=null; $('editorTitle').value=''; $('editorSlug').value=''; slugManuallyEdited=false;
+  currentId=null; currentPath=''; $('editorPath').value=''; $('editorTitle').value=''; $('editorSlug').value=''; slugManuallyEdited=false;
   canvas.innerHTML='<h1>Yeni sayfa</h1><p>İçeriğinizi buraya yazın.</p>';
   feedback('Yeni sayfa hazır. Kaydet veya Yayımla seçeneğini kullan.');
  }
@@ -351,7 +351,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   const title=$('editorTitle').value.trim(),slug=slugify($('editorSlug').value.trim()||title),content=canvas.innerHTML;
   if(!title||!slug){feedback('Sayfa başlığı ve URL zorunludur.','error');return;}
   if(!content.trim()){feedback('Sayfa içeriği boş olamaz.','error');return;}
-  const payload={title,slug,content,status};
+  const payload={title,slug,content,status,page_path:currentPath};
   const button=status==='published'?$('editorPublish'):$('editorSave');
   button.disabled=true;const oldText=button.textContent;button.textContent=status==='published'?'Yayımlanıyor…':'Kaydediliyor…';
   try{
@@ -370,11 +370,40 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  loadTrash();
  $('editorSave').addEventListener('click',()=>submit('draft'));
  $('editorPublish').addEventListener('click',()=>submit('published'));
- $('pageRows').addEventListener('click',e=>{
+ // Mevcut statik sayfaların her birine gerçek içerik düzenleyici bağlantısı ekle.
+ $('pageRows').querySelectorAll('tr').forEach(row=>{
+  if(row.dataset.cmsPageRow)return;
+  const action=row.querySelector('td:last-child');
+  const preview=row.querySelector('a.preview-link');
+  if(!action||!preview||action.querySelector('[data-edit-static]'))return;
+  const button=document.createElement('button');button.type='button';button.className='app-refresh';button.textContent='Düzenle';button.dataset.editStatic='true';button.dataset.path=new URL(preview.href,location.origin).pathname;
+  action.append(' ',button);
+ });
+ $('pageRows').addEventListener('click',async e=>{
+  const staticButton=e.target.closest('[data-edit-static]');
+  if(staticButton){
+   const row=staticButton.closest('tr'),preview=row?.querySelector('a.preview-link');if(!preview)return;
+   try{
+    staticButton.disabled=true;staticButton.textContent='Açılıyor…';
+    const response=await fetch(preview.href,{cache:'no-store'});if(!response.ok)throw new Error('Sayfa dosyası alınamadı.');
+    const html=await response.text(),doc=new DOMParser().parseFromString(html,'text/html'),main=doc.querySelector('main');
+    if(!main)throw new Error('Sayfanın ana içerik alanı bulunamadı.');
+    const pagePath=staticButton.dataset.path||new URL(preview.href,location.origin).pathname;
+    const existing=pages.find(page=>page.page_path===pagePath);
+    currentId=existing?Number(existing.id):null;currentPath=pagePath;$('editorPath').value=pagePath;
+    $('editorTitle').value=existing?.title||row.querySelector('strong')?.textContent?.trim()||doc.title||'Sayfa';
+    $('editorSlug').value=existing?.slug||slugify($('editorTitle').value);slugManuallyEdited=true;
+    canvas.innerHTML=existing?.content||main.innerHTML;
+    feedback('Mevcut sayfa düzenleyicide açıldı. Kaydet veya Yayımla ile aynı URL üzerinde güncelleyebilirsin.');
+    $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
+   }catch(error){feedback(error.message||'Sayfa açılamadı.','error');}
+   finally{staticButton.disabled=false;staticButton.textContent='Düzenle';}
+   return;
+  }
   const del=e.target.closest('[data-delete-cms]');if(del){deletePage(del.dataset.deleteCms);return;}
   const button=e.target.closest('[data-edit-cms]');if(!button)return;
   const page=pages.find(item=>String(item.id)===button.dataset.editCms);if(!page)return;
-  currentId=Number(page.id);slugManuallyEdited=true;
+  currentId=Number(page.id);currentPath=page.page_path||'';$('editorPath').value=currentPath;slugManuallyEdited=true;
   $('editorTitle').value=page.title||'';$('editorSlug').value=page.slug||'';canvas.innerHTML=page.content||'';
   feedback('CMS sayfası düzenlemeye açıldı. Değişiklikleri kaydet veya yeniden yayımla.');
   $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
