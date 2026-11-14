@@ -133,7 +133,7 @@ export async function onRequestPost(context) {
     }
 
     const requestedRole = clean(data.role || "Admin", 50);
-    const roleMap = { "Admin":"content_admin", "content_admin":"content_admin", "Editör":"editor", "editor":"editor", "Görüntüleyici":"viewer", "viewer":"viewer" };
+    const roleMap = { "İçerik Yöneticisi":"content_admin", "Admin":"content_admin", "content_admin":"content_admin" };
     const roleKey = roleMap[requestedRole];
     if (!roleKey) return json({ success:false, message:"Geçersiz kullanıcı rolü." },400);
 
@@ -146,17 +146,16 @@ export async function onRequestPost(context) {
     if (template?.permissions_json) {
       try { permissions = JSON.parse(template.permissions_json || "{}"); } catch {}
     } else {
-      const modules = ["dashboard","pages","services","applications","menu","seo","languages","settings","users"];
-      const actions = ["view","create","edit","delete","publish"];
       const defaults = {
-        editor: [[1,0,0,0,0],[1,1,1,0,0],[1,1,1,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,1,0,0],[1,0,1,0,0],[1,0,0,0,0],[0,0,0,0,0]],
-        viewer: modules.map((_,i)=>i===8?[0,0,0,0,0]:[1,0,0,0,0]),
-        content_admin: [[1,0,0,0,0],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,0,0],[1,1,1,1,1],[1,0,1,0,0],[1,1,1,0,1],[1,1,1,0,0],[0,0,0,0,0]]
+        dashboard: { view: true },
+        pages: { view: true, create: true, edit: true, delete: false, publish: true },
+        services: { view: true, create: true, edit: true, delete: false, publish: true },
+        media: { view: true, create: true, edit: true, delete: false },
+        applications: { view: true, create: false, edit: true, delete: false },
+        menu: { view: true, create: false, edit: true, delete: false },
+        profile: { view: true, edit: true }
       };
-      modules.forEach((module,i) => {
-        permissions[module] = {};
-        actions.forEach((action,j) => permissions[module][action] = !!defaults[roleKey][i][j]);
-      });
+      permissions = JSON.parse(JSON.stringify(defaults));
     }
     permissions.__role_key = roleKey;
     const forcePasswordChange = data.forcePasswordChange === true || data.force_password_change === true ? 1 : 0;
@@ -262,18 +261,15 @@ export async function onRequestPut(context) {
       if (template?.permissions_json) {
         try { assignedPermissions = JSON.parse(template.permissions_json || "{}"); } catch { assignedPermissions = {}; }
       } else {
-        const modules = ["dashboard","pages","services","applications","menu","seo","languages","settings","users"];
-        const actions = ["view","create","edit","delete","publish"];
-        const defaults = {
-          editor: [[1,0,0,0,0],[1,1,1,0,0],[1,1,1,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,1,0,0],[1,0,1,0,0],[1,0,0,0,0],[0,0,0,0,0]],
-          viewer: modules.map((_,i)=>i===8?[0,0,0,0,0]:[1,0,0,0,0]),
-          content_admin: [[1,0,0,0,0],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,0,0],[1,1,1,1,1],[1,0,1,0,0],[1,1,1,0,1],[1,1,1,0,0],[0,0,0,0,0]]
+        assignedPermissions = {
+          dashboard: { view: true },
+          pages: { view: true, create: true, edit: true, delete: false, publish: true },
+          services: { view: true, create: true, edit: true, delete: false, publish: true },
+          media: { view: true, create: true, edit: true, delete: false },
+          applications: { view: true, create: false, edit: true, delete: false },
+          menu: { view: true, create: false, edit: true, delete: false },
+          profile: { view: true, edit: true }
         };
-        assignedPermissions = {};
-        modules.forEach((module,i) => {
-          assignedPermissions[module] = {};
-          actions.forEach((action,j) => assignedPermissions[module][action] = !!defaults[roleKey][i][j]);
-        });
       }
     }
     const permissionsJson = JSON.stringify({ ...assignedPermissions, __role_key: roleKey });
