@@ -8,7 +8,7 @@
 :root{--bg:#ffffff;--panel:#ffffff;--line:#eee7f8;--muted:#786b91;--purple:#7138b8;--white:#54218f}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font:15px Inter,system-ui,Arial;display:flex;min-height:100vh}
 aside{width:250px;background:#fbf9ff;border-right:1px solid var(--line);padding:26px 16px;display:flex;flex-direction:column}
-.brand{font-size:23px;font-weight:800;letter-spacing:2px;padding:0 12px 6px;color:#6329a4}.sub{color:var(--muted);font-size:11px;padding:0 12px 28px;letter-spacing:1.5px}
+.brand{padding:0 12px 10px;display:flex;align-items:center;min-height:48px}.brand img{display:block;width:154px;max-width:100%;max-height:52px;object-fit:contain;object-position:left center}.sub{color:var(--muted);font-size:11px;padding:0 12px 28px;letter-spacing:1.5px}
 .navlabel{color:#9b87b5;font-size:10px;letter-spacing:1.5px;padding:16px 12px 8px}
 nav a{display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px;color:#68458d;text-decoration:none;margin:3px 0}
 nav a.active,nav a:hover{background:#f0e6fb;color:#55208e}nav a.active{box-shadow:inset 3px 0 var(--purple);font-weight:700}
@@ -23,7 +23,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 </style>
 </head>
 <body>
-<aside><div class="brand">EDWISE</div><div class="sub">YÖNETİM MERKEZİ</div>
+<aside><div class="brand"><img src="/assets/images/logo.png" alt="EDWISE Education &amp; Consultancy"></div><div class="sub">YÖNETİM MERKEZİ</div>
 <div class="navlabel">ÇALIŞMA ALANI</div><nav>
 <a class="active" href="#genel">◫ Genel Bakış</a><a href="#sayfalar">▤ Sayfa Yönetimi</a><a href="#hizmetler">◇ Hizmet Yönetimi</a><a href="#basvurular">▣ Başvuru Yönetimi</a><a href="#medya">▧ Medya Kütüphanesi</a><a href="#menu">☷ Menü Yönetimi</a><a href="#seo">⌕ SEO Yönetimi</a>
 </nav><div class="navlabel">YÖNETİM</div><nav><a href="#yetkiler">♙ Kullanıcı ve Yetkiler</a><a href="#gecmis">↶ İşlem Geçmişi</a></nav>
