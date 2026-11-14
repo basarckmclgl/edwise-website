@@ -142,9 +142,28 @@ export async function requirePermission(context, moduleKey, actionKey = "view") 
       "SELECT a.permissions_json, t.permissions_json AS template_permissions_json FROM admins a LEFT JOIN admin_role_templates t ON t.role_key = a.role WHERE a.id = ? AND a.is_active = 1"
     ).bind(auth.admin.id).first();
     const ownPermissions = JSON.parse(row?.permissions_json || "{}");
-    const permissions = Object.keys(ownPermissions).length
+    const templatePermissions = JSON.parse(row?.template_permissions_json || "{}");
+    const hasUserOverrides = Object.keys(ownPermissions).length > 0;
+    const hasTemplatePermissions = Object.keys(templatePermissions).length > 0;
+
+    // Geriye dönük uyumluluk: henüz izin matrisi tanımlanmamış mevcut
+    // content_admin hesaplarının eski erişimlerini koru. İlk açık izin
+    // kaydı yapıldıktan sonra yalnızca kaydedilen izinler uygulanır.
+    const permissions = hasUserOverrides
       ? ownPermissions
-      : JSON.parse(row?.template_permissions_json || "{}");
+      : hasTemplatePermissions
+        ? templatePermissions
+        : {
+            dashboard: { view: true },
+            pages: { view: true, create: true, edit: true, delete: true, publish: true },
+            services: { view: true, create: true, edit: true, delete: true, publish: true },
+            applications: { view: true, create: true, edit: true, delete: true, publish: true },
+            menu: { view: true, create: true, edit: true, delete: true },
+            seo: { view: true, edit: true },
+            languages: { view: true, edit: true },
+            settings: { view: true, edit: true },
+            users: { view: true }
+          };
     if (permissions?.[moduleKey]?.[actionKey] === true) return auth;
     return authError("Bu modülde bu işlem için yetkiniz bulunmuyor.", 403);
   } catch {
