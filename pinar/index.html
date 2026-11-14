@@ -268,7 +268,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  const setCard=(index,value,foot)=>{const ids=cardIds[index];if(!ids)return;const number=$(ids[0]),caption=$(ids[1]);if(number)number.textContent=value;if(caption&&foot)caption.textContent=foot;};
  async function load(){
   try{
-   const r=await fetch('/api/dashboard-preview',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
+   const r=await fetch('/api/dashboard',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
    const d=await r.json();
    if(!r.ok||d.success===false)throw new Error(d.message||'HTTP '+r.status);
    const c=d.counts||{};
