@@ -1399,6 +1399,7 @@ function canAccess(page){
  };
  // Profil yalnızca oturum açan kullanıcının kendi hesabıdır.
  if(page==="profile") return true;
+ if(page==="designcenter") return currentPermissions?.menu?.view===true && currentPermissions?.pages?.view===true;
  const module=moduleMap[page];
  return !!module && currentPermissions?.[module]?.view===true;
 }
@@ -1504,7 +1505,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
  $("applicationsModule").classList.toggle("hidden",name!=="applications");
  $("otherModuleMessage").classList.toggle("hidden",name==="applications" || name==="media");
 
- if(name==="designcenter")$("breadcrumb").textContent="Tasarım Yönetimi";
+ if(name==="designcenter")$("breadcrumb").textContent=currentRole==="superadmin"?"Tasarım Yönetimi":"Menü Yönetimi";
  if(otherModules[name]){
   $("otherTitle").textContent=otherModules[name][0];
   $("otherDescription").textContent=otherModules[name][1];
