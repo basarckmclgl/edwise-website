@@ -20,7 +20,7 @@ function validPermissions(value) {
   return Object.entries(value).every(([module, actions]) =>
     MODULES.includes(module) && actions && typeof actions === "object" &&
     !Array.isArray(actions) && Object.entries(actions).every(([action, allowed]) =>
-      ACTIONS.includes(action) && MODULE_ACTIONS[module].includes(action) && typeof allowed === "boolean"
+      ACTIONS.includes(action) && typeof allowed === "boolean" && (MODULE_ACTIONS[module].includes(action) || allowed === false)
     )
   );
 }
