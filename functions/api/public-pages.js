@@ -5,8 +5,15 @@ export async function onRequestGet({ request, env }) {
     catch (error) { if (!/duplicate column|already exists/i.test(String(error?.message || error))) throw error; }
     const url = new URL(request.url);
     const slug = url.searchParams.get("slug");
+    const pagePath = url.searchParams.get("path");
 
     let result;
+
+    if (pagePath) {
+      result = await env.DB.prepare("SELECT id, title, slug, content, meta_title, meta_description FROM pages WHERE page_path = ? AND status = 'published' AND deleted_at IS NULL LIMIT 1").bind(pagePath).first();
+      if (result) return Response.json({ success: true, page: result }, { headers: { "Cache-Control": "no-store" } });
+      return Response.json({ success: false, message: "Yayımlanmış sayfa bulunamadı." }, { status: 404 });
+    }
 
     if (slug) {
       result = await env.DB.prepare(
