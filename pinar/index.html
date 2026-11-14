@@ -46,11 +46,11 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <div class="profile"><div class="avatar">Y</div><div><b>Yönetici</b><small>Ana Yönetici</small></div></div></aside>
 <main id="genel"><div id="view-genel" class="module-view"><header><div><div class="eyebrow">EDWISE / Yönetim</div><h1>Genel Bakış</h1><p>Web sitenin içerik ve başvuru durumunu tek yerden takip et.</p></div><div class="date">YÖNETİM ÖNİZLEMESİ</div></header>
 <section class="welcome"><div><h2>Yönetim merkezine hoş geldin</h2><p>Sayfalarını, eğitim hizmetlerini, başvurularını ve medya içeriklerini buradan yönetebileceksin.</p></div><div class="welcome-mark">✦</div></section>
-<section class="cards">
-<div class="card"><div class="card-top"><span>Toplam Sayfa</span><span class="card-icon">▤</span></div><div class="number">—</div><div class="card-foot">İçerik bağlantısı kurulacak</div></div>
-<div class="card"><div class="card-top"><span>Hizmetler</span><span class="card-icon">◇</span></div><div class="number">—</div><div class="card-foot">Hizmet kayıtları bağlanacak</div></div>
-<div class="card"><div class="card-top"><span>Bekleyen Başvuru</span><span class="card-icon">▣</span></div><div class="number zero">—</div><div class="card-foot">Başvuru sistemi bağlanacak</div></div>
-<div class="card"><div class="card-top"><span>Medya Dosyası</span><span class="card-icon">▧</span></div><div class="number">—</div><div class="card-foot">Medya kütüphanesi bağlanacak</div></div>
+<section class="cards" id="overviewCounters">
+<div class="card"><div class="card-top"><span>Toplam Sayfa</span><span class="card-icon">▤</span></div><div class="number" id="overviewPages">—</div><div class="card-foot" id="overviewPagesFoot">Veri bekleniyor</div></div>
+<div class="card"><div class="card-top"><span>Hizmetler</span><span class="card-icon">◇</span></div><div class="number" id="overviewServices">—</div><div class="card-foot" id="overviewServicesFoot">Veri bekleniyor</div></div>
+<div class="card"><div class="card-top"><span>Bekleyen Başvuru</span><span class="card-icon">▣</span></div><div class="number zero" id="overviewPending">—</div><div class="card-foot" id="overviewPendingFoot">Veri bekleniyor</div></div>
+<div class="card"><div class="card-top"><span>Medya Dosyası</span><span class="card-icon">▧</span></div><div class="number" id="overviewMedia">—</div><div class="card-foot" id="overviewMediaFoot">Veri bekleniyor</div></div>
 </section>
 <section class="layout">
 <div class="panel"><h2>Yönetim alanları</h2>
@@ -264,7 +264,8 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  const $=id=>document.getElementById(id);
  const fmt=n=>Number(n||0).toLocaleString('tr-TR');
  const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const setCard=(index,value,foot)=>{const card=root.querySelectorAll('.cards .card')[index];if(!card)return;const number=card.querySelector('.number'),caption=card.querySelector('.card-foot');if(number)number.textContent=value;if(caption&&foot)caption.textContent=foot;};
+ const cardIds=[['overviewPages','overviewPagesFoot'],['overviewServices','overviewServicesFoot'],['overviewPending','overviewPendingFoot'],['overviewMedia','overviewMediaFoot']];
+ const setCard=(index,value,foot)=>{const ids=cardIds[index];if(!ids)return;const number=$(ids[0]),caption=$(ids[1]);if(number)number.textContent=value;if(caption&&foot)caption.textContent=foot;};
  const list=(rows,key,value)=>rows?.length?'<div class="activity-list">'+rows.map(x=>'<div class="item"><div><b>'+safe(x[key])+'</b><small>'+fmt(x[value])+'</small></div></div>').join('')+'</div>':'<div class="empty">Bu dönem için kayıt bulunamadı.</div>';
  async function get(url){const r=await fetch(url,{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});let d={};try{d=await r.json()}catch{}if(!r.ok||d.success===false)throw Object.assign(new Error(d.message||'HTTP '+r.status),{status:r.status});return d;}
  async function load(){
