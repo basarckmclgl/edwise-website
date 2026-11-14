@@ -1912,7 +1912,7 @@ $("profilePasswordForm")?.addEventListener("submit",async event=>{
 async function checkSession(){
  try{
   const response=await fetch("/api/me",{credentials:"same-origin",cache:"no-store"});
-  if(response.status===401){location.replace("/admin/");return;}
+  if(response.status===401){location.replace("/admin/");return false;}
   const data=await response.json().catch(()=>({}));
   if(!response.ok)throw new Error(data.message||"Oturum doğrulanamadı (HTTP "+response.status+").");
   if(!data.success||!data.admin)throw new Error(data.message||"Yönetici oturumu doğrulanamadı.");
@@ -1955,7 +1955,9 @@ async function checkSession(){
   notice.style.cssText="margin:20px;padding:18px;background:#3b1822;color:#fff;border:1px solid #a33;border-radius:10px;position:relative;z-index:9999";
   notice.textContent="Yönetim paneli oturumu doğrulanamadı: "+(error.message||"Bilinmeyen hata")+". Giriş ekranına otomatik yönlendirme durduruldu; bu hata mesajını destek için paylaşın.";
   main.prepend(notice);
+  return false;
  }
+ return true;
 }
 
 
@@ -2799,8 +2801,10 @@ $("siteMaintenanceToggle")?.addEventListener("click",async()=>{
  finally{button.disabled=false;}
 });
 
-loadAdminProfile();
-checkSession();
+(async()=>{
+ const authenticated=await checkSession();
+ if(authenticated) await loadAdminProfile();
+})();
 refreshAdminChatStatus();
 setInterval(refreshAdminChatStatus,12000);
 </script>
