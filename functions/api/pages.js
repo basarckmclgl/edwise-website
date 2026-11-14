@@ -94,6 +94,8 @@ export async function onRequestGet(context) {
       return json({success:true,history:(logs.results||[]).map(row=>({...row,details:row.details_json?JSON.parse(row.details_json):null}))});
     }
     const trashView = view === "trash";
+    const staticTrashRow = await context.env.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key = 'static_page_trash' LIMIT 1").first();
+    let staticTrash = []; try { staticTrash = JSON.parse(staticTrashRow?.setting_value || "[]"); } catch {}
     const result = await context.env.DB.prepare(`
       SELECT id, title, slug, content, meta_title,
              meta_description, status, created_at, updated_at, deleted_at, page_path
@@ -109,6 +111,7 @@ export async function onRequestGet(context) {
     return json({
       success: true,
       pages: result.results || [],
+      staticPages: trashView ? staticTrash : [],
       staticPagesMigrated: migration?.setting_value === "done"
     });
   } catch (error) {
@@ -131,6 +134,38 @@ export async function onRequestPost(context) {
     const data = await context.request.json();
     await ensurePagesSchema(context.env.DB);
     await ensureTrashSchema(context.env.DB);
+
+    if (data.action === "static_delete" || data.action === "static_restore") {
+      const pagePath=String(data.page_path||"").trim(), title=String(data.title||"").trim().slice(0,160);
+      if(!pagePath.startsWith("/")||pagePath.startsWith("//")||pagePath.includes("..")||/[?#]/.test(pagePath)||pagePath==="/")return json({success:false,message:"Sayfa yolu geçersiz."},400);
+      const key="static_page_trash", row=await context.env.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key=? LIMIT 1").bind(key).first();
+      let trash=[];try{trash=JSON.parse(row?.setting_value||"[]");}catch{} if(!Array.isArray(trash))trash=[];
+      if(data.action==="static_delete"){
+        if(trash.some(x=>x.page_path===pagePath))return json({success:false,message:"Sayfa zaten silinmiş."},409);
+        const menuRow=await context.env.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key='menu_theme' LIMIT 1").first();
+        let menu=[];try{menu=JSON.parse(menuRow?.setting_value||"[]");}catch{}
+        const removed=Array.isArray(menu)?menu.filter(item=>{try{return new URL(item.url,context.request.url).pathname===pagePath;}catch{return false;}}):[];
+        const next=Array.isArray(menu)?menu.filter(item=>!removed.includes(item)):[];
+        trash.push({page_path:pagePath,title:title||pagePath,deleted_at:new Date().toISOString(),removedMenuItems:removed});
+        const value=JSON.stringify(trash);
+        if(row)await context.env.DB.prepare("UPDATE site_settings SET setting_value=?,updated_at=datetime('now') WHERE setting_key=?").bind(value,key).run();
+        else await context.env.DB.prepare("INSERT INTO site_settings(setting_key,setting_value,updated_at) VALUES(?,?,datetime('now'))").bind(key,value).run();
+        if(menuRow)await context.env.DB.prepare("UPDATE site_settings SET setting_value=?,updated_at=datetime('now') WHERE setting_key='menu_theme'").bind(JSON.stringify(next)).run();
+        await logAudit(context.env.DB,context.request,auth.admin,{action:"static_page_deleted",entity_type:"page",entity_id:"static:"+pagePath,entity_title:title||pagePath,details:{page_path:pagePath,removedMenuItems:removed}});
+        return json({success:true,message:"Sayfa yayımlanmış siteden kaldırıldı."});
+      }
+      const item=trash.find(x=>x.page_path===pagePath);if(!item)return json({success:false,message:"Silinen sayfa kaydı bulunamadı."},404);
+      trash=trash.filter(x=>x.page_path!==pagePath);
+      await context.env.DB.prepare("UPDATE site_settings SET setting_value=?,updated_at=datetime('now') WHERE setting_key=?").bind(JSON.stringify(trash),key).run();
+      if(item.removedMenuItems?.length){
+        const menuRow=await context.env.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key='menu_theme' LIMIT 1").first();
+        let menu=[];try{menu=JSON.parse(menuRow?.setting_value||"[]");}catch{}
+        const restored=[...menu,...item.removedMenuItems.filter(old=>!menu.some(cur=>cur.key===old.key||cur.url===old.url))];
+        if(menuRow)await context.env.DB.prepare("UPDATE site_settings SET setting_value=?,updated_at=datetime('now') WHERE setting_key='menu_theme'").bind(JSON.stringify(restored)).run();
+      }
+      await logAudit(context.env.DB,context.request,auth.admin,{action:"static_page_restored",entity_type:"page",entity_id:"static:"+pagePath,entity_title:item.title||pagePath,details:{page_path:pagePath}});
+      return json({success:true,message:"Sayfa yeniden yayıma açıldı."});
+    }
 
     if (data.action === "restore_version") {
       const id=Number(data.id), auditId=Number(data.audit_id);
