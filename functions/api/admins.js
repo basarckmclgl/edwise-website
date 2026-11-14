@@ -72,11 +72,9 @@ export async function onRequestGet(context) {
     if (auth.response) return auth.response;
 
     const result = await context.env.DB.prepare(`
-      SELECT
-        id, username, email, role, is_active,
-        created_at, updated_at, last_login_at
+      SELECT id, username, email, role, is_active
       FROM admins
-      ORDER BY created_at DESC
+      ORDER BY id DESC
     `).all();
 
     return json({
