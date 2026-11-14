@@ -105,7 +105,7 @@ export async function onRequestPost({ request, env }) {
     }
 
     const admin = await env.DB.prepare(`
-      SELECT id, username, email, password_hash, role
+      SELECT id, username, email, password_hash, role, force_password_change
       FROM admins
       WHERE username = ? AND is_active = 1
       LIMIT 1
@@ -174,7 +174,8 @@ export async function onRequestPost({ request, env }) {
         id: admin.id,
         username: admin.username,
         email: admin.email,
-        role: admin.role
+        role: admin.role,
+        force_password_change: Number(admin.force_password_change) === 1
       }
     }, 200, {
       "Set-Cookie": cookie
