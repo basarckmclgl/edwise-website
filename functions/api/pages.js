@@ -31,7 +31,8 @@ async function ensurePagesSchema(db) {
       status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','published')),
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-      deleted_at TEXT
+      deleted_at TEXT,
+      page_path TEXT
     )
   `).run();
   await db.prepare(`
@@ -41,6 +42,7 @@ async function ensurePagesSchema(db) {
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
   `).run();
+  try { await db.prepare("ALTER TABLE pages ADD COLUMN page_path TEXT").run(); } catch (error) { if (!/duplicate column|already exists/i.test(String(error?.message || error))) throw error; }
   await db.prepare("CREATE INDEX IF NOT EXISTS idx_pages_status_updated ON pages(status, updated_at DESC)").run();
 }
 
@@ -94,7 +96,7 @@ export async function onRequestGet(context) {
     const trashView = view === "trash";
     const result = await context.env.DB.prepare(`
       SELECT id, title, slug, content, meta_title,
-             meta_description, status, created_at, updated_at, deleted_at
+             meta_description, status, created_at, updated_at, deleted_at, page_path
       FROM pages
       WHERE ${trashView ? "deleted_at IS NOT NULL" : "deleted_at IS NULL"}
       ORDER BY ${trashView ? "deleted_at" : "updated_at"} DESC
@@ -199,6 +201,8 @@ export async function onRequestPost(context) {
     const content = String(data.content || "");
     const metaTitle = String(data.meta_title || "").trim();
     const metaDescription = String(data.meta_description || "").trim();
+    const pagePath = String(data.page_path || "").trim().slice(0,300);
+    if (pagePath && (!pagePath.startsWith("/") || pagePath.startsWith("//") || pagePath.includes("..") || /[?#]/.test(pagePath))) return json({success:false,message:"Sayfa yolu geçersiz."},400);
     const status = data.status || "draft";
 
     if (!title || !slug) {
@@ -219,10 +223,10 @@ export async function onRequestPost(context) {
 
     const result = await context.env.DB.prepare(`
       INSERT INTO pages
-      (title, slug, content, meta_title, meta_description, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+      (title, slug, content, meta_title, meta_description, status, page_path, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
     `).bind(
-      title, slug, content, metaTitle, metaDescription, status
+      title, slug, content, metaTitle, metaDescription, status, pagePath || null
     ).run();
 
     const created = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(result.meta.last_row_id).first();
@@ -258,6 +262,8 @@ export async function onRequestPut(context) {
     const content = String(data.content || "");
     const metaTitle = String(data.meta_title || "").trim();
     const metaDescription = String(data.meta_description || "").trim();
+    const pagePath = String(data.page_path || "").trim().slice(0,300);
+    if (pagePath && (!pagePath.startsWith("/") || pagePath.startsWith("//") || pagePath.includes("..") || /[?#]/.test(pagePath))) return json({success:false,message:"Sayfa yolu geçersiz."},400);
     const status = data.status || "draft";
 
     if (!Number.isInteger(id) || id < 1 || !title || !slug) {
@@ -282,10 +288,10 @@ export async function onRequestPut(context) {
     const result = await context.env.DB.prepare(`
       UPDATE pages
       SET title = ?, slug = ?, content = ?, meta_title = ?,
-          meta_description = ?, status = ?, updated_at = datetime('now')
+          meta_description = ?, status = ?, page_path = ?, updated_at = datetime('now')
       WHERE id = ?
     `).bind(
-      title, slug, content, metaTitle, metaDescription, status, id
+      title, slug, content, metaTitle, metaDescription, status, pagePath || null, id
     ).run();
 
     if (!result.meta.changes) {
