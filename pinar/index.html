@@ -326,8 +326,10 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   try{
    const response=await fetch('/api/pages?view=trash',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
    const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Silinen sayfalar alınamadı.');
-   const deleted=Array.isArray(data.pages)?data.pages:[];
-   const markup=!deleted.length?'<div class="history-empty"><div class="history-empty-icon">↶</div><strong>Çöp kutusu boş</strong><p>Silinen CMS sayfaları burada görünecek.</p></div>':deleted.map(page=>'<article class="menu-edit-row"><div><b>'+safe(page.title)+'</b><small>/pages/sayfa.html?slug='+safe(page.slug)+' · Silinme: '+safe(page.deleted_at||'')+'</small></div><button type="button" class="app-refresh" data-restore-cms="'+safe(page.id)+'">Geri yükle</button></article>').join('');
+   const deleted=Array.isArray(data.pages)?data.pages:[], staticDeleted=Array.isArray(data.staticPages)?data.staticPages:[];
+   const cmsMarkup=deleted.map(page=>'<article class="menu-edit-row"><div><b>'+safe(page.title)+'</b><small>/pages/sayfa.html?slug='+safe(page.slug)+' · Silinme: '+safe(page.deleted_at||'')+'</small></div><button type="button" class="app-refresh" data-restore-cms="'+safe(page.id)+'">Geri yükle</button></article>').join('');
+   const staticMarkup=staticDeleted.map(page=>'<article class="menu-edit-row"><div><b>'+safe(page.title)+'</b><small>'+safe(page.page_path)+' · Silinme: '+safe(page.deleted_at||'')+'</small></div><button type="button" class="app-refresh" data-restore-static="true" data-path="'+safe(page.page_path)+'">Geri yükle</button></article>').join('');
+   const markup=(!deleted.length&&!staticDeleted.length)?'<div class="history-empty"><div class="history-empty-icon">↶</div><strong>Çöp kutusu boş</strong><p>Silinen sayfalar burada görünecek.</p></div>':staticMarkup+cmsMarkup;
    hosts.forEach(host=>{host.innerHTML=markup;});
   }catch(error){hosts.forEach(host=>{host.innerHTML='<div class="history-empty"><strong>'+safe(error.message||'Silinen sayfalar yüklenemedi.')+'</strong></div>';});}
  }
@@ -346,7 +348,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   }catch(error){const host=$('trashRows');if(host)host.insertAdjacentHTML('afterbegin','<p class="page-count error">'+safe(error.message||'Geri yükleme başarısız.')+'</p>');}
  }
  $('trashRefresh')?.addEventListener('click',loadTrash);
- $('trashRows')?.addEventListener('click',e=>{const b=e.target.closest('[data-restore-cms]');if(b)restorePage(b.dataset.restoreCms);});
+ $('trashRows')?.addEventListener('click',e=>{const b=e.target.closest('[data-restore-cms]');if(b){restorePage(b.dataset.restoreCms);return;}const st=e.target.closest('[data-restore-static]');if(st)restoreStaticPage(st.dataset.path);});
  async function addPublishedPageToMenu(title,slug){
   const url=pageUrl(slug);
   const settingsResponse=await fetch('/api/settings',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
@@ -389,7 +391,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   const action=row.querySelector('td:last-child');
   const preview=row.querySelector('a.preview-link');
   if(!action||!preview||action.querySelector('[data-edit-static]'))return;
-  const button=document.createElement('button');button.type='button';button.className='app-refresh';button.textContent='Düzenle';button.dataset.editStatic='true';button.dataset.path=new URL(preview.href,location.origin).pathname;
+  const button=document.createElement('button');button.type='button';button.className='app-refresh';button.textContent='Düzenle';button.dataset.editStatic='true';button.dataset.path=new URL(preview.href,location.origin).pathname;const del=document.createElement('button');del.type='button';del.className='app-refresh';del.textContent='Sil';del.dataset.deleteStatic='true';del.dataset.path=button.dataset.path;del.dataset.title=row.querySelector('strong')?.textContent||'Sayfa';action.append(' ',del);
   action.append(' ',button);
  });
  $('pageRows').addEventListener('click',async e=>{
