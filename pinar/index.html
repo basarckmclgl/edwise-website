@@ -18,6 +18,10 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 .layout{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}.panel h2{font-size:16px;margin:0 0 18px;color:#54218f}.item{display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-top:1px solid var(--line)}.item:first-of-type{border-top:0}.item b{font-size:14px;color:#5b2a91}.item small{display:block;color:var(--muted);margin-top:5px}.tag{font-size:11px;color:#7138b8;background:#f1e8fb;padding:5px 9px;border-radius:20px;height:max-content}
 .actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.action{border:1px solid #e7d9f5;padding:14px;border-radius:11px;color:#5b2a91;background:#fcfaff;text-align:left}.action strong{display:block;margin-bottom:5px}.action small{color:var(--muted)}
 .notice{margin-top:18px;padding:13px 15px;border:1px solid #e5d4f5;background:#faf6ff;border-radius:10px;color:#69458c;font-size:12px}
+.welcome{background:linear-gradient(115deg,#f7f0ff,#fff 72%);border:1px solid #eadcf8;border-radius:17px;padding:22px 24px;margin-bottom:22px;display:flex;justify-content:space-between;gap:16px;align-items:center}.welcome h2{margin:0 0 7px;color:#54218f;font-size:19px}.welcome p{font-size:13px;line-height:1.6}.welcome-mark{width:48px;height:48px;flex:0 0 48px;border-radius:15px;background:#eee2fb;color:#7138b8;display:grid;place-items:center;font-size:24px}
+.card{min-height:126px;position:relative;overflow:hidden}.card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.card-icon{width:34px;height:34px;border-radius:10px;background:#f2eafb;color:#7138b8;display:grid;place-items:center;font-size:17px}.card .number{margin-top:14px}.card-foot{font-size:11px;color:#9587a7;margin-top:4px}
+.layout{grid-template-columns:1.25fr 1fr}.item{align-items:center}.item .tag{white-space:nowrap}.actions .action{cursor:pointer;font:inherit}.actions .action:hover{border-color:#c9a9e8;background:#f7f0ff}.empty{padding:20px 0 6px;color:var(--muted);font-size:13px;line-height:1.6}.activity-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#b68add;margin-right:8px}
+@media(max-width:620px){.welcome{padding:17px}.welcome h2{font-size:17px}.welcome-mark{display:none}.layout{grid-template-columns:1fr}}
 @media(max-width:900px){aside{width:210px}.cards{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}}
 @media(max-width:620px){body{display:block}aside{width:100%;padding:14px;display:block;border-right:0;border-bottom:1px solid var(--line)}.brand{display:inline-block}.sub{display:block;padding:0 0 5px 8px}.owner-name{display:block;width:max-content;margin:0 8px 12px}nav{display:flex;overflow:auto;gap:4px}nav a{white-space:nowrap;font-size:12px;padding:9px}.navlabel,.profile{display:none}main{padding:24px 16px}header{margin-bottom:22px}h1{font-size:25px}.date{display:none}.cards{gap:9px}.card{padding:14px}.number{font-size:24px}}
 </style>
@@ -26,16 +30,27 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <aside><div class="brand"><img src="/assets/images/logo.png" alt="EDWISE Education &amp; Consultancy"></div><div class="sub">YÖNETİM MERKEZİ</div><div class="owner-name">Çilem ATASOY</div>
 <div class="navlabel">ÇALIŞMA ALANI</div><nav>
 <a class="active" href="#genel">◫ Genel Bakış</a><a href="#sayfalar">▤ Sayfa Yönetimi</a><a href="#hizmetler">◇ Hizmet Yönetimi</a><a href="#basvurular">▣ Başvuru Yönetimi</a><a href="#medya">▧ Medya Kütüphanesi</a><a href="#menu">☷ Menü Yönetimi</a><a href="#seo">⌕ SEO Yönetimi</a>
-</nav><div class="navlabel">YÖNETİM</div><nav><a href="#yetkiler">♙ Kullanıcı ve Yetkiler</a><a href="#gecmis">↶ İşlem Geçmişi</a></nav>
+</nav><div class="navlabel">YÖNETİM</div><nav><a href="#gecmis">↶ İşlem Geçmişi</a></nav>
 <div class="profile"><div class="avatar">Y</div><div><b>Yönetici</b><small>Ana Yönetici</small></div></div></aside>
-<main id="genel"><header><div><div class="eyebrow">EDWISE / Yönetim</div><h1>Genel Bakış</h1><p>İçeriklerini tek merkezden yönet.</p></div><div class="date">YÖNETİM ÖNİZLEMESİ</div></header>
-<section class="cards"><div class="card"><span>Toplam Sayfa</span><div class="number">—</div></div><div class="card"><span>Hizmetler</span><div class="number">—</div></div><div class="card"><span>Bekleyen Başvuru</span><div class="number zero">—</div></div><div class="card"><span>Medya Dosyası</span><div class="number">—</div></div></section>
-<section class="layout"><div class="panel"><h2>Yönetim alanları</h2>
-<div class="item"><div><b>Sayfa Yönetimi</b><small>Sayfaları düzenle, taslak oluştur ve yayın durumunu yönet.</small></div><span class="tag">Modül</span></div>
-<div class="item"><div><b>Başvuru Yönetimi</b><small>Gelen başvuruları tek listede incele.</small></div><span class="tag">Modül</span></div>
-<div class="item"><div><b>Medya Kütüphanesi</b><small>Görselleri ve dosyaları düzenli tut.</small></div><span class="tag">Modül</span></div>
-<div class="item"><div><b>Kullanıcı ve Yetkiler</b><small>Ana Yönetici ve İçerik Yöneticisi erişimleri.</small></div><span class="tag">Güvenlik</span></div>
-</div><div class="panel"><h2>Hızlı erişim</h2><div class="actions">
-<button class="action"><strong>＋ Yeni sayfa</strong><small>Sayfa taslağı oluştur</small></button><button class="action"><strong>▧ Medya ekle</strong><small>Dosya kütüphanesi</small></button><button class="action"><strong>▣ Başvurular</strong><small>Başvuru listesine git</small></button><button class="action"><strong>⚙ Yetkiler</strong><small>Kullanıcı erişimleri</small></button>
-</div><div class="notice">Bu ekran ilk iskelet taslağıdır. Sayaçlar ve modüller henüz canlı veriye bağlı değildir. Canlı siteye ve mevcut veritabanına müdahale edilmemiştir.</div></div></section>
+<main id="genel"><header><div><div class="eyebrow">EDWISE / Yönetim</div><h1>Genel Bakış</h1><p>Web sitenin içerik ve başvuru durumunu tek yerden takip et.</p></div><div class="date">YÖNETİM ÖNİZLEMESİ</div></header>
+<section class="welcome"><div><h2>Yönetim merkezine hoş geldin</h2><p>Sayfalarını, eğitim hizmetlerini, başvurularını ve medya içeriklerini buradan yönetebileceksin.</p></div><div class="welcome-mark">✦</div></section>
+<section class="cards">
+<div class="card"><div class="card-top"><span>Toplam Sayfa</span><span class="card-icon">▤</span></div><div class="number">—</div><div class="card-foot">İçerik bağlantısı kurulacak</div></div>
+<div class="card"><div class="card-top"><span>Hizmetler</span><span class="card-icon">◇</span></div><div class="number">—</div><div class="card-foot">Hizmet kayıtları bağlanacak</div></div>
+<div class="card"><div class="card-top"><span>Bekleyen Başvuru</span><span class="card-icon">▣</span></div><div class="number zero">—</div><div class="card-foot">Başvuru sistemi bağlanacak</div></div>
+<div class="card"><div class="card-top"><span>Medya Dosyası</span><span class="card-icon">▧</span></div><div class="number">—</div><div class="card-foot">Medya kütüphanesi bağlanacak</div></div>
+</section>
+<section class="layout">
+<div class="panel"><h2>Yönetim alanları</h2>
+<div class="item"><div><b>Sayfa Yönetimi</b><small>Sayfaları düzenle, taslak oluştur ve yayın durumunu yönet.</small></div><span class="tag">İçerik</span></div>
+<div class="item"><div><b>Hizmet Yönetimi</b><small>Eğitim ve danışmanlık hizmetlerini güncelle.</small></div><span class="tag">İçerik</span></div>
+<div class="item"><div><b>Başvuru Yönetimi</b><small>Gelen başvuruları incele ve durumlarını takip et.</small></div><span class="tag">Başvuru</span></div>
+<div class="item"><div><b>Medya Kütüphanesi</b><small>Görselleri ve dosyaları tek yerde düzenle.</small></div><span class="tag">Dosyalar</span></div>
+<div class="item"><div><b>Menü ve SEO Yönetimi</b><small>Site navigasyonunu ve arama görünürlüğünü düzenle.</small></div><span class="tag">Site ayarları</span></div>
+</div>
+<div class="panel"><h2>Hızlı erişim</h2><div class="actions">
+<a class="action" href="#sayfalar"><strong>＋ Yeni sayfa</strong><small>Sayfa taslağı oluştur</small></a><a class="action" href="#hizmetler"><strong>◇ Hizmetleri düzenle</strong><small>Eğitim hizmetlerine git</small></a><a class="action" href="#basvurular"><strong>▣ Başvuruları incele</strong><small>Başvuru yönetimine git</small></a><a class="action" href="#medya"><strong>▧ Medya kütüphanesi</strong><small>Dosyaları görüntüle</small></a>
+</div><div class="notice">Bilgi: Bu aşamada gösterge değerleri henüz gerçek veriye bağlı değil. Sayılar, ilgili modüller ve veri bağlantıları tamamlandığında otomatik olarak görüntülenecek.</div></div>
+</section>
+<section class="panel" style="margin-top:16px"><h2>Son işlemler</h2><div class="empty"><span class="activity-dot"></span>Henüz listelenecek bir işlem yok. İşlem geçmişi modülü tamamlandığında son değişiklikler burada görünecek.</div></section>
 </main></body></html>
