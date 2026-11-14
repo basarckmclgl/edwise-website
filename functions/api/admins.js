@@ -216,8 +216,35 @@ export async function onRequestPut(context) {
     const roleMap = { "Admin":"content_admin", "content_admin":"content_admin", "Editör":"editor", "editor":"editor", "Görüntüleyici":"viewer", "viewer":"viewer" };
     const roleKey = roleMap[requestedRole];
     if (!roleKey) return json({success:false,message:"Geçersiz kullanıcı rolü."},400);
-    const existingPermissions = JSON.parse(target.permissions_json || "{}");
-    const permissionsJson = JSON.stringify({ ...existingPermissions, __role_key: roleKey });
+    let existingPermissions = {};
+    try { existingPermissions = JSON.parse(target.permissions_json || "{}"); } catch {}
+    const previousRoleKey = existingPermissions.__role_key || "content_admin";
+    let assignedPermissions = existingPermissions;
+
+    // Rol değiştiğinde, seçilen rolün kayıtlı yetki şablonunu kullanıcıya uygula.
+    if (previousRoleKey !== roleKey) {
+      const template = await context.env.DB.prepare(
+        "SELECT permissions_json FROM admin_role_templates WHERE role_key = ? LIMIT 1"
+      ).bind(roleKey).first();
+
+      if (template?.permissions_json) {
+        try { assignedPermissions = JSON.parse(template.permissions_json || "{}"); } catch { assignedPermissions = {}; }
+      } else {
+        const modules = ["dashboard","pages","services","applications","menu","seo","languages","settings","users"];
+        const actions = ["view","create","edit","delete","publish"];
+        const defaults = {
+          editor: [[1,0,0,0,0],[1,1,1,0,0],[1,1,1,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,1,0,0],[1,0,1,0,0],[1,0,0,0,0],[0,0,0,0,0]],
+          viewer: modules.map((_,i)=>i===8?[0,0,0,0,0]:[1,0,0,0,0]),
+          content_admin: [[1,0,0,0,0],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,0,0],[1,1,1,1,1],[1,0,1,0,0],[1,1,1,0,1],[1,1,1,0,0],[0,0,0,0,0]]
+        };
+        assignedPermissions = {};
+        modules.forEach((module,i) => {
+          assignedPermissions[module] = {};
+          actions.forEach((action,j) => assignedPermissions[module][action] = !!defaults[roleKey][i][j]);
+        });
+      }
+    }
+    const permissionsJson = JSON.stringify({ ...assignedPermissions, __role_key: roleKey });
 
     if (username.length < 3) {
       return json({
