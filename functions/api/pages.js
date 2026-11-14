@@ -207,7 +207,9 @@ export async function onRequestPost(context) {
     }, 201);
 
   } catch (error) {
-    return json({ success: false, message: "Sayfa oluşturulamadı." }, 500);
+    console.error("EDWISE PAGE CREATE ERROR", error);
+    const detail = String(error?.message || error || "Bilinmeyen veritabanı hatası");
+    return json({ success: false, message: "Sayfa oluşturulamadı: " + detail.slice(0, 240) }, 500);
   }
 }
 
