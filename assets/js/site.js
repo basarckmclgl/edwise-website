@@ -369,3 +369,21 @@
       }
     }catch(error){console.warn("Site tasarımı yüklenemedi:",error);}
   })();
+
+
+// CMS: mevcut statik sayfaların yayımlanmış içerik sürümünü aynı URL üzerinde uygula.
+(function applyManagedPageContent(){
+  const main=document.querySelector("main");
+  if(!main)return;
+  const pagePath=location.pathname.replace(/\\/+/g,"/") || "/";
+  fetch("/api/public-pages?path="+encodeURIComponent(pagePath),{headers:{"Accept":"application/json"},cache:"no-store"})
+    .then(response=>response.ok?response.json():null)
+    .then(data=>{
+      if(!data||!data.success||!data.page||!data.page.content)return;
+      if(window.EDWISEContent)window.EDWISEContent.render(main,data.page.content);
+      else main.innerHTML=data.page.content;
+      if(data.page.meta_title)document.title=data.page.meta_title;
+      if(data.page.meta_description){const meta=document.querySelector('meta[name="description"]');if(meta)meta.content=data.page.meta_description;}
+    })
+    .catch(error=>console.warn("CMS sayfa içeriği uygulanamadı:",error));
+})();
