@@ -272,13 +272,13 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
    const d=await r.json();
    if(!r.ok||d.success===false)throw new Error(d.message||'HTTP '+r.status);
    const c=d.counts||{};
-   const show=e=>e&&e.available?fmt(e.count):'—';
+   const show=e=>fmt(e?.count ?? 0);
    setCard(0,show(c.pages),'Yönetilebilir sayfalar');
    setCard(1,show(c.services),'Hizmet kayıtları');
-   setCard(2,c.pendingApplications==null?'—':fmt(c.pendingApplications),'Toplam '+(c.applications?.available?fmt(c.applications.count):'—')+' başvuru');
+   setCard(2,fmt(c.pendingApplications ?? 0),'Toplam '+fmt(c.applications?.count ?? 0)+' başvuru');
    setCard(3,show(c.media),'Medya kütüphanesindeki dosyalar');
   }catch(e){
-   cardIds.forEach((ids,i)=>setCard(i,'—','Veri alınamadı'));
+   cardIds.forEach((ids,i)=>setCard(i,'0','Veri alınamadı'));
   }
  }
  load();
