@@ -275,7 +275,7 @@
         });
         const lang = (localStorage.getItem("edwise-language") || "tr");
         const dictionary = EDWISE_I18N[lang] || {};
-        const items = [...data.menu].sort((a,b)=>(a.order??0)-(b.order??0));
+        const items = [...data.menu].filter(item => item.key !== "guide" && item.url !== "/edwise-rehber.html" && item.label !== "EDWISE Rehber").sort((a,b)=>(a.order??0)-(b.order??0));
         const mainItems = items.filter(item => item.group !== "contact");
         const contactItems = items.filter(item => item.group === "contact");
         const appendItem = item => {
