@@ -172,7 +172,9 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <section class="panel">
 <div class="section-head"><div><h2>İşlem kayıtları</h2><p class="section-intro">Kayıtlar tarihe göre yeniden eskiye sıralanacak.</p></div><span class="tag">Salt okunur</span></div>
 <div class="history-toolbar"><input type="search" disabled placeholder="İşlem veya içerik ara"><select disabled><option>Tüm işlem türleri</option></select><select disabled><option>Tüm yöneticiler</option></select></div>
-<div class="history-empty"><div class="history-empty-icon">↶</div><strong>Gerçek kayıt bağlantısı henüz etkin değil</strong><p>Denetim kayıtları altyapısı projede mevcut. Ancak önizleme ve canlı ortam aynı D1 veritabanını kullandığından, geçmiş verilerini bu ekrana bağlamak şu aşamada canlı veritabanına erişim oluşturabilir. Veritabanı ayrımı tamamlanınca kayıtlar burada listelenecek.</p></div>
+<div class="section-head"><div><h2>Silinen sayfalar</h2><p class="section-intro">Silinen içerikler burada tutulur. Geri yüklediğinde sayfa yeniden aktif olur.</p></div><button type="button" class="app-refresh" id="trashRefresh">Yenile</button></div>
+<div id="trashRows" class="history-scope"><div class="history-empty"><strong>Silinen sayfa listesi yükleniyor…</strong></div></div>
+<div class="page-note">Silme işlemi kalıcı değildir. Geri yükleme, sayfanın eski başlığını, URL adresini ve içeriğini korur. URL başka bir aktif sayfada kullanılıyorsa önce çakışma çözülmelidir.</div>
 </section>
 <section class="panel" style="margin-top:16px">
 <h2>Şu anda kayıt altyapısında izlenen işlemler</h2>
@@ -302,7 +304,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   pages.forEach(page=>{
    const tr=document.createElement('tr');tr.dataset.cmsPageRow='true';tr.dataset.category='cms';
    const url=pageUrl(page.slug);
-   tr.innerHTML='<td><strong>'+safe(page.title)+'</strong><small>CMS sayfası · #'+safe(page.id)+'</small></td><td><span class="page-type">CMS</span></td><td><small>'+safe(url)+'</small></td><td>'+(page.status==='published'?'Yayımlandı':'Taslak')+'</td><td><a class="preview-link" href="'+url+'" target="_blank" rel="noopener">Aç ↗</a> <button type="button" class="app-refresh" data-edit-cms="'+safe(page.id)+'">Düzenle</button></td>';
+   tr.innerHTML='<td><strong>'+safe(page.title)+'</strong><small>CMS sayfası · #'+safe(page.id)+'</small></td><td><span class="page-type">CMS</span></td><td><small>'+safe(url)+'</small></td><td>'+(page.status==='published'?'Yayımlandı':'Taslak')+'</td><td><a class="preview-link" href="'+url+'" target="_blank" rel="noopener">Aç ↗</a> <button type="button" class="app-refresh" data-edit-cms="'+safe(page.id)+'">Düzenle</button> <button type="button" class="app-refresh" data-delete-cms="'+safe(page.id)+'">Sil</button></td>';
    tbody.appendChild(tr);
   });
   const count=tbody.querySelectorAll('tr').length;$('pageCount').textContent=count+' sayfa gösteriliyor';
@@ -316,6 +318,32 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
    renderPages();
   }catch(error){feedback(error.message||'Sayfalar yüklenemedi.','error');}
  }
+ async function loadTrash(){
+  const host=$('trashRows'); if(!host)return;
+  try{
+   const response=await fetch('/api/pages?view=trash',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
+   const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Silinen sayfalar alınamadı.');
+   const deleted=Array.isArray(data.pages)?data.pages:[];
+   if(!deleted.length){host.innerHTML='<div class="history-empty"><div class="history-empty-icon">↶</div><strong>Çöp kutusu boş</strong><p>Silinen sayfalar burada görünecek.</p></div>';return;}
+   host.innerHTML=deleted.map(page=>'<article class="menu-edit-row"><div><b>'+safe(page.title)+'</b><small> /pages/sayfa.html?slug='+safe(page.slug)+' · Silinme: '+safe(page.deleted_at||'')+'</small></div><button type="button" class="app-refresh" data-restore-cms="'+safe(page.id)+'">Geri yükle</button></article>').join('');
+  }catch(error){host.innerHTML='<div class="history-empty"><strong>'+safe(error.message||'Çöp kutusu yüklenemedi.')+'</strong></div>';}
+ }
+ async function deletePage(id){
+  if(!window.confirm('Bu sayfa çöp kutusuna taşınsın mı? Kalıcı olarak silinmeyecek.'))return;
+  try{const response=await fetch('/api/pages?id='+encodeURIComponent(id),{method:'DELETE',credentials:'same-origin',headers:{Accept:'application/json'}});
+   const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Sayfa silinemedi.');
+   await loadPages();await loadTrash();feedback('Sayfa İşlem Geçmişi sekmesindeki Silinen sayfalar bölümüne taşındı.');
+  }catch(error){feedback(error.message||'Sayfa silinemedi.','error');}
+ }
+ async function restorePage(id){
+  if(!window.confirm('Bu sayfa geri yüklensin mi?'))return;
+  try{const response=await fetch('/api/pages',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({action:'restore',id:Number(id)})});
+   const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Sayfa geri yüklenemedi.');
+   await loadPages();await loadTrash();feedback('Sayfa başarıyla geri yüklendi.');
+  }catch(error){const host=$('trashRows');if(host)host.insertAdjacentHTML('afterbegin','<p class="page-count error">'+safe(error.message||'Geri yükleme başarısız.')+'</p>');}
+ }
+ $('trashRefresh')?.addEventListener('click',loadTrash);
+ $('trashRows')?.addEventListener('click',e=>{const b=e.target.closest('[data-restore-cms]');if(b)restorePage(b.dataset.restoreCms);});
  async function submit(status){
   const title=$('editorTitle').value.trim(),slug=slugify($('editorSlug').value.trim()||title),content=canvas.innerHTML;
   if(!title||!slug){feedback('Sayfa başlığı ve URL zorunludur.','error');return;}
@@ -336,9 +364,11 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   finally{button.disabled=false;button.textContent=oldText;}
  }
  $('editorNew').addEventListener('click',fresh);
+ loadTrash();
  $('editorSave').addEventListener('click',()=>submit('draft'));
  $('editorPublish').addEventListener('click',()=>submit('published'));
  $('pageRows').addEventListener('click',e=>{
+  const del=e.target.closest('[data-delete-cms]');if(del){deletePage(del.dataset.deleteCms);return;}
   const button=e.target.closest('[data-edit-cms]');if(!button)return;
   const page=pages.find(item=>String(item.id)===button.dataset.editCms);if(!page)return;
   currentId=Number(page.id);slugManuallyEdited=true;
