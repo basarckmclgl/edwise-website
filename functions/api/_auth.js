@@ -139,9 +139,12 @@ export async function requirePermission(context, moduleKey, actionKey = "view") 
 
   try {
     const row = await context.env.DB.prepare(
-      "SELECT permissions_json FROM admins WHERE id = ? AND is_active = 1"
+      "SELECT a.permissions_json, t.permissions_json AS template_permissions_json FROM admins a LEFT JOIN admin_role_templates t ON t.role_key = a.role WHERE a.id = ? AND a.is_active = 1"
     ).bind(auth.admin.id).first();
-    const permissions = JSON.parse(row?.permissions_json || "{}");
+    const ownPermissions = JSON.parse(row?.permissions_json || "{}");
+    const permissions = Object.keys(ownPermissions).length
+      ? ownPermissions
+      : JSON.parse(row?.template_permissions_json || "{}");
     if (permissions?.[moduleKey]?.[actionKey] === true) return auth;
     return authError("Bu modülde bu işlem için yetkiniz bulunmuyor.", 403);
   } catch {
