@@ -77,13 +77,13 @@ export async function requireAdmin(context) {
   if (!token || !/^[a-f0-9]{64}$/i.test(token)) return authError("Oturum açmanız gerekiyor.", 401);
 
   const tokenHash = await hashToken(token);
-  const result = await context.env.DB.prepare(\`
+  const result = await context.env.DB.prepare(`
     SELECT a.id, a.username, a.email, a.role, a.permissions_json, a.force_password_change
     FROM admin_sessions s
     INNER JOIN admins a ON a.id = s.admin_id
     WHERE s.token_hash = ? AND datetime(s.expires_at) > datetime('now') AND a.is_active = 1
     LIMIT 1
-  \`).bind(tokenHash).first();
+  `).bind(tokenHash).first();
 
   if (!result) return authError("Oturum geçersiz veya süresi dolmuş.", 401);
 
