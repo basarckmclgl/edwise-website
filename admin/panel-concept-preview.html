@@ -918,14 +918,14 @@ td{color:#39334b!important;border-color:#eeebf4!important}
     </div>
     <p id="designCenterMessage" class="muted">Önizlemede metinlerin üzerine tıklayıp doğrudan yazabilirsiniz. Renk ve görünüm ayarları anında uygulanır; metin değişiklikleri taslak olarak kaydedilir.</p>
    </div>
-   <div id="siteDesignSettings" data-superadmin>
+   <div id="siteDesignSettings">
     <div class="section-head"><div><h2>Site Genel Tasarımı ve Menü Yapısı</h2><p>Değişiklikleri seçili sayfanın gerçek önizlemesinde gör. Taslaklar ziyaretçilere yansımaz.</p></div></div>
     <div id="themeMessage"></div>
     <div class="actions" style="margin-bottom:16px">
-     <button class="primary" type="button" id="designTabButton">Genel Görünüm</button>
+     <button class="primary" type="button" id="designTabButton" data-superadmin>Genel Görünüm</button>
      <button class="btn" type="button" id="menuTabButton">Menü ve Navigasyon</button>
     </div>
-    <div id="designTab">
+    <div id="designTab" data-superadmin>
      <div class="panel">
       <h2>Görünüm ve içerik ayarları</h2>
       <div class="form-grid">
@@ -1490,7 +1490,7 @@ $("other").classList.toggle("hidden",!otherModules[name] || name==="users");
  if(name==="reports"){loadSiteReports();loadApplications();loadCloudflareReports();}
  if(name==="messages")loadChatConversations();
  if(name==="applications"){loadApplications();loadApplicationFunnel();}
- if(name==="designcenter")loadThemeSettings();
+ if(name==="designcenter"&&currentRole==="superadmin")loadThemeSettings();
  if(name==="sitesettings")loadSiteSettings();if(name==="sitesettings")loadSiteControl();
 
  $("mediaLink").classList.toggle("hidden",name!=="media");
@@ -1878,7 +1878,7 @@ Object.values(themeFields).forEach(id=>$(id).addEventListener("input",()=>applyT
 $("designPreviewFrame").addEventListener("load",()=>{applyThemePreview(currentTheme());enablePreviewTextEditing();});
 async function loadMenuSettings(){
  try{
-  const [pageData,settingsData]=await Promise.all([api("/api/pages"),api("/api/settings")]);
+  const [pageData,settingsData]=await Promise.all([api("/api/pages"),api("/api/settings?scope=menu")]);
   const saved=Array.isArray(settingsData.menu)?settingsData.menu:null;
   const defaults=[
    {key:"home",label:"Ana Sayfa",url:"/",visible:true},
