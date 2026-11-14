@@ -119,7 +119,7 @@ export async function requireEditor(context) {
 
   if (!actionKey) return authError("Bu işlem için yetki tanımlı değil.", 403);
 
-  if (moduleKey === "pages" && (method === "PUT" || method === "PATCH")) {
+  if (["pages", "services"].includes(moduleKey) && (method === "PUT" || method === "PATCH")) {
     try {
       const body = await context.request.clone().json();
       if (body?.action === "publish" || body?.status === "published" || body?.published === true) actionKey = "publish";
@@ -147,7 +147,10 @@ export async function requirePermission(context, moduleKey, actionKey = "view") 
     ).bind(auth.admin.id).first();
     const ownPermissions = JSON.parse(row?.permissions_json || "{}");
     const templatePermissions = JSON.parse(row?.template_permissions_json || "{}");
-    const hasUserOverrides = Object.keys(ownPermissions).length > 0;
+    const hasUserOverrides = Object.values(ownPermissions).some(actions =>
+      actions && typeof actions === "object" &&
+      Object.values(actions).some(value => typeof value === "boolean" && value === false)
+    );
     const hasTemplatePermissions = Object.keys(templatePermissions).length > 0;
 
     // Geriye dönük uyumluluk: henüz izin matrisi tanımlanmamış mevcut
