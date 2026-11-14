@@ -2766,6 +2766,7 @@ $("permissionUserSelect").addEventListener("change",()=>{
  let stored={};try{stored=user?JSON.parse(user.permissions_json||"{}"):{};}catch{}
  permissionDraft=JSON.parse(JSON.stringify(safeDefaults));
  for(const [key,actions] of Object.entries(stored)){if(permissionModules.some(([module])=>module===key)&&actions&&typeof actions==="object"){const allowed=permissionActionLimits[key]||[];for(const action of allowed){if(typeof actions[action]==="boolean")permissionDraft[key][action]=actions[action];}}}
+ permissionDraft.profile={view:true,edit:true};
  if(selectedPermissionUser){
   $("permissionEditorMessage").textContent="Seçili hesap: "+user.username+". İşaretlediğiniz modüller bu hesaba uygulanır.";
  }
