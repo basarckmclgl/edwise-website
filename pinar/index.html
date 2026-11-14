@@ -90,7 +90,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <select id="editorFormat"><option value="p">Normal metin</option><option value="h1">Başlık 1</option><option value="h2">Başlık 2</option><option value="h3">Başlık 3</option><option value="blockquote">Alıntı</option></select>
 <button type="button" data-editcmd="justifyLeft" class="app-refresh">Sola</button><button type="button" data-editcmd="justifyCenter" class="app-refresh">Ortala</button><button type="button" data-editcmd="justifyRight" class="app-refresh">Sağa</button>
 <label>Yazı rengi <input id="editorColor" type="color" value="#29263d"></label><label>Vurgu <input id="editorMark" type="color" value="#fff0a6"></label>
-<button type="button" id="editorImage" class="app-refresh">Resim ekle</button><input type="file" id="editorImageFile" accept="image/*" hidden><button type="button" id="editorPdf" class="app-refresh">PDF ekle</button><input type="file" id="editorPdfFile" accept="application/pdf,.pdf" hidden>
+<button type="button" id="editorAddSection" class="app-refresh">+ Bölüm ekle</button><button type="button" id="editorAddHeading" class="app-refresh">+ Başlık ekle</button><button type="button" id="editorAddText" class="app-refresh">+ Metin ekle</button><button type="button" id="editorAddLink" class="app-refresh">+ Bağlantı ekle</button><button type="button" id="editorRemoveBlock" class="app-refresh">Seçili öğeyi kaldır</button><button type="button" id="editorImage" class="app-refresh">Resim ekle</button><input type="file" id="editorImageFile" accept="image/*" hidden><button type="button" id="editorPdf" class="app-refresh">PDF ekle</button><input type="file" id="editorPdfFile" accept="application/pdf,.pdf" hidden>
 </div>
 <div id="pageCanvas" contenteditable="true" style="min-height:280px;padding:22px;border:1px solid #d9d7e2;border-radius:12px;background:#fff;color:#25233a;line-height:1.7;outline:none"><h1>Sayfa başlığınız</h1><p>İçeriğinizi buraya yazın. Metni seçerek biçimlendirebilir, resim ekleyip sürükleyerek yerini değiştirebilirsiniz.</p></div>
 <div class="page-tools" style="margin-top:10px"><button type="button" id="editorSave" class="app-refresh">Taslağı kaydet</button><button type="button" id="editorPublish" class="menu-export">Yayımla</button><button type="button" id="editorExport" class="app-refresh">PDF olarak indir</button><span id="editorFeedback" class="page-count" aria-live="polite">Henüz kaydedilmedi.</span></div>
@@ -372,6 +372,18 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   feedback('CMS sayfası düzenlemeye açıldı. Değişiklikleri kaydet veya yeniden yayımla.');
   $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
  });
+
+ let selectedBlock=null;
+ const blockSelector='h1,h2,h3,h4,p,ul,ol,blockquote,figure,section,article,a,button,img';
+ function selectBlock(el){if(selectedBlock)selectedBlock.style.outline='';selectedBlock=el;if(selectedBlock)selectedBlock.style.outline='2px dashed #8b79df';}
+ canvas.addEventListener('click',e=>{const el=e.target.closest(blockSelector);if(el&&canvas.contains(el)){e.preventDefault();selectBlock(el);}});
+ function addNode(tag,html){const node=document.createElement(tag);node.innerHTML=html;node.style.margin='12px 0';canvas.append(node);selectBlock(node);node.scrollIntoView({behavior:'smooth',block:'center'});canvas.focus();feedback('Yeni öğe eklendi. İçeriğini doğrudan düzenleyebilirsin.');}
+ $('editorAddSection').addEventListener('click',()=>addNode('section','<h2>Yeni bölüm başlığı</h2><p>Bu bölüme içerik ekleyin.</p>'));
+ $('editorAddHeading').addEventListener('click',()=>addNode('h2','Yeni başlık'));
+ $('editorAddText').addEventListener('click',()=>addNode('p','Yeni metninizi buraya yazın.'));
+ $('editorAddLink').addEventListener('click',()=>{const label=window.prompt('Bağlantı metni:','Detayları incele');if(label===null)return;const href=window.prompt('Bağlantı adresi:','https://');if(!href)return;const a=document.createElement('a');a.href=href;a.textContent=label;a.target='_blank';a.rel='noopener';a.style.cssText='display:inline-block;margin:10px 0;color:#6b55c5;text-decoration:underline';canvas.append(a);selectBlock(a);feedback('Bağlantı eklendi.');});
+ $('editorRemoveBlock').addEventListener('click',()=>{if(!selectedBlock||!canvas.contains(selectedBlock)){feedback('Önce kaldırmak istediğin öğeye tıkla.','error');return;}if(!window.confirm('Seçili öğe kaldırılsın mı?'))return;selectedBlock.remove();selectedBlock=null;feedback('Seçili öğe kaldırıldı.');});
+
  root.querySelectorAll('[data-editcmd]').forEach(button=>button.addEventListener('click',()=>{canvas.focus();document.execCommand(button.dataset.editcmd,false,null);}));
  $('editorFormat').addEventListener('change',e=>{canvas.focus();document.execCommand('formatBlock',false,e.target.value);});
  $('editorColor').addEventListener('input',e=>{canvas.focus();document.execCommand('foreColor',false,e.target.value);});
