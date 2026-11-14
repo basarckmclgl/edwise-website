@@ -72,11 +72,9 @@ export async function onRequestGet(context) {
     if (auth.response) return auth.response;
 
     const result = await context.env.DB.prepare(`
-      SELECT
-        id, username, email, role, is_active,
-        created_at, updated_at, last_login_at
+      SELECT id, username, email, role, is_active, permissions_json
       FROM admins
-      ORDER BY created_at DESC
+      ORDER BY id DESC
     `).all();
 
     return json({
@@ -212,10 +210,11 @@ export async function onRequestPut(context) {
 
     const username = clean(data.username, 50);
     const email = clean(data.email, 254).toLowerCase();
-    const role = clean(data.role || target.role, 50);
-
-if (!["admin", "content_admin", "editor", "viewer"].includes(role)) {
-      return json({ success: false, message: "Geçersiz kullanıcı yetkisi." }, 400);
+    const requestedRole = clean(data.role || target.role, 50);
+    const roleMap = { "Admin": "content_admin", "content_admin": "content_admin" };
+    const role = roleMap[requestedRole];
+    if (!role) {
+      return json({ success: false, message: "Bu hesap için geçerli rol Admin olmalıdır." }, 400);
     }
 
     if (username.length < 3) {

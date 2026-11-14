@@ -1,4 +1,4 @@
-import { requireSuperAdmin } from "./_auth.js";
+import { requirePermission } from "./_auth.js";
 
 function json(data,status=200){return Response.json(data,{status});}
 async function originOk(request){
@@ -15,7 +15,7 @@ async function readSettings(DB){
 }
 export async function onRequestGet(context){
  try{
-  const auth=await requireSuperAdmin(context);
+  const auth=await requirePermission(context,"settings","view");
   if(auth.response)return auth.response;
   const values=await readSettings(context.env.DB);
   return json({success:true,draft:values.draft_theme||{},live:values.live_theme||{},menu:values.menu_theme||{},preferences:values.site_preferences||{},panelPreferences:values.panel_preferences||{}});
@@ -24,9 +24,10 @@ export async function onRequestGet(context){
 export async function onRequestPost(context){
  try{
   if(!(await originOk(context.request)))return json({success:false,message:"İstek kaynağı geçersiz."},403);
-  const auth=await requireSuperAdmin(context);
-  if(auth.response)return auth.response;
   const body=await context.request.json();
+  const permissionModule=body.action==="save_menu"?"menu":"settings";
+  const auth=await requirePermission(context,permissionModule,"edit");
+  if(auth.response)return auth.response;
   if(body.action==="save_menu"){
    const items=Array.isArray(body.items)?body.items:[];
    if(items.length>100)return json({success:false,message:"Menüde en fazla 100 bağlantı olabilir."},400);
