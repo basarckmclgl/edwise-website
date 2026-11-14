@@ -90,30 +90,39 @@ export async function requireSuperAdmin(context) {
   return auth;
 }
 
-// Ana yönetici ve içerik editörüne izin verir.
+// Korumalı içerik API'lerinde URL ve HTTP metoduna göre izin kontrolü yapar.
 export async function requireEditor(context) {
-  const auth = await requireAdmin(context);
+  const url = new URL(context.request.url);
+  const path = url.pathname.toLowerCase();
+  const method = context.request.method.toUpperCase();
+  let moduleKey = null;
 
-  if (auth.response) {
-    return auth;
+  if (path.includes("/pages")) moduleKey = "pages";
+  else if (path.includes("/services")) moduleKey = "services";
+  else if (path.includes("/applications")) moduleKey = "applications";
+  else if (path.includes("/media")) moduleKey = "pages";
+
+  if (!moduleKey) {
+    const auth = await requireAdmin(context);
+    if (auth.response) return auth;
+    return auth.admin.role === "superadmin" ? auth : authError("Bu işlem için yetkiniz bulunmuyor.", 403);
   }
 
-  const allowedRoles = [
-    "superadmin",
-    "admin",
-    "content_admin"
-  ];
+  let actionKey = method === "GET" || method === "HEAD" ? "view"
+    : method === "POST" ? "create"
+    : method === "DELETE" ? "delete"
+    : method === "PUT" || method === "PATCH" ? "edit" : null;
 
-  if (!allowedRoles.includes(auth.admin.role)) {
-    return authError(
-      "Bu işlem için yetkiniz bulunmuyor.",
-      403
-    );
+  if (!actionKey) return authError("Bu işlem için yetki tanımlı değil.", 403);
+
+  if (moduleKey === "pages" && (method === "PUT" || method === "PATCH")) {
+    try {
+      const body = await context.request.clone().json();
+      if (body?.action === "publish" || body?.status === "published" || body?.published === true) actionKey = "publish";
+    } catch {}
   }
-
-  return auth;
+  return requirePermission(context, moduleKey, actionKey);
 }
-
 
 // Modül/işlem bazlı yetki kontrolü. API uç noktaları bu yardımcıyı
 // kendi işlem anahtarlarıyla çağırarak sunucu tarafında erişimi doğrulamalıdır.
