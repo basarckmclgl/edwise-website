@@ -1358,28 +1358,23 @@ const editorAllowed=["overview","panelhome","classrooms","pages","services","med
 
 function canAccess(page){
  if(currentRole==="superadmin") return true;
- // Menü yalnızca yetki matrisinde karşılığı olan ve aktif modülü bulunan ekranları gösterir.
  const moduleMap={
   overview:"dashboard",
   panelhome:"dashboard",
-  classrooms:null,
+  classrooms:"classrooms",
   pages:"pages",
   services:"services",
-  media:"pages",
+  media:"media",
   applications:"applications",
-  profile:"dashboard",
-  messages:"applications",
+  profile:"profile",
+  messages:"messages",
   designcenter:"menu",
   sitesettings:"settings",
   users:"users",
-  audit:"users",
-  history:"pages",
-  archive:"pages",
-  reports:"dashboard",
-  analyticsOverview:"dashboard",
-  ga4Reports:"dashboard",
-  cloudflareReports:"dashboard",
-  other:null
+  audit:"audit",
+  history:"history",
+  archive:"archive",
+  reports:"reports"
  };
  const module=moduleMap[page];
  return !!module && currentPermissions?.[module]?.view===true;
@@ -1387,25 +1382,20 @@ function canAccess(page){
 
 function applyRolePermissions(){
  const isSuperAdmin=currentRole==="superadmin";
-
- document.querySelectorAll("[data-superadmin]").forEach(element=>{
-  element.classList.toggle("hidden",!isSuperAdmin);
- });
-
  document.querySelectorAll("[data-page]").forEach(element=>{
-  const page=element.dataset.page;
-  element.classList.toggle("hidden",!canAccess(page));
+  element.classList.toggle("hidden",!canAccess(element.dataset.page));
  });
-
  document.querySelectorAll("[data-open]").forEach(element=>{
-  const page=element.dataset.open;
-  element.classList.toggle("hidden",!canAccess(page));
+  element.classList.toggle("hidden",!canAccess(element.dataset.open));
  });
-
- const roleLabel = $("roleLabel");
- if(roleLabel){
-  roleLabel.textContent=isSuperAdmin?"Süper Yönetici":"Site Yöneticisi";
- }
+ document.querySelectorAll(".content > section[id]").forEach(section=>{
+  section.classList.add("hidden");
+ });
+ document.querySelectorAll("[data-superadmin]").forEach(element=>{
+  if(!element.matches("[data-page]") && !element.matches("[data-open]")) element.classList.toggle("hidden",!isSuperAdmin);
+ });
+ const roleLabel=$("roleLabel");
+ if(roleLabel) roleLabel.textContent=({superadmin:"Süper Yönetici",content_admin:"Admin",editor:"Editör",viewer:"Görüntüleyici"})[currentRole]||"Kullanıcı";
 }
 
 function escapeHtml(value){
@@ -1946,7 +1936,16 @@ async function checkSession(){
    showPage("profile");
    const notice=$("profilePasswordMessage");if(notice){notice.className="message";notice.textContent="İlk giriş güvenliği için devam etmeden önce şifrenizi değiştirin.";}
   }else{
-   showPage("overview");
+   const firstAllowed=document.querySelector("[data-page]:not(.hidden)");
+   const firstPage=firstAllowed?.dataset.page;
+   if(firstPage) showPage(firstPage);
+   else {
+    document.querySelectorAll(".content > section").forEach(section=>section.classList.add("hidden"));
+    const notice=document.createElement("div");
+    notice.className="message error";
+    notice.textContent="Bu hesaba henüz görüntüleme yetkisi verilmiş bir modül bulunmuyor. Sistem yöneticinizden yetki isteyin.";
+    document.querySelector(".content")?.prepend(notice);
+   }
   }
  }catch(error){
   const main=document.querySelector("main")||document.querySelector(".content")||document.body;
