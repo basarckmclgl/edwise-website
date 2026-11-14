@@ -1,9 +1,13 @@
-// Apply baseline browser security headers and honor the super-admin maintenance switch.
+// Apply baseline browser security headers, block the retired admin interface, and honor the maintenance switch.
 const MAINTENANCE_HTML = "<!doctype html><html lang=\"tr\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>EDWISE | Bakım Çalışması</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#190d27;color:#fff;font:16px/1.6 Arial,sans-serif;text-align:center}.card{max-width:560px;padding:40px 28px}h1{font-size:clamp(28px,6vw,42px);margin:0 0 12px}p{color:#d9cce7}</style><main class=\"card\"><h1>EDWISE kısa bir bakım molasında</h1><p>Web sitemizde planlı bir çalışma yürütüyoruz. Kısa süre içinde yeniden hizmetinizde olacağız.</p></main></html>";
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const path = url.pathname;
-  if (!path.startsWith("/admin") && !path.startsWith("/api/") && context.env.DB) {
+  // The administration interface has been retired. Do not serve cached or residual admin routes.
+  if (path === "/admin" || path.startsWith("/admin/")) {
+    return new Response("Not Found", {status:404,headers:{"Content-Type":"text/plain; charset=utf-8","Cache-Control":"no-store, max-age=0","X-Content-Type-Options":"nosniff"}});
+  }
+  if (!path.startsWith("/api/") && context.env.DB) {
     try {
       const row = await context.env.DB.prepare("SELECT setting_value FROM site_settings WHERE setting_key='site_status' LIMIT 1").first();
       let status = "online";
