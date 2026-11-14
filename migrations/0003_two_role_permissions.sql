@@ -8,7 +8,7 @@ WHERE role IN ('editor', 'viewer', 'admin');
 UPDATE admins
 SET permissions_json = json_set(
   CASE
-    WHEN permissions_json IS NOT NULL AND json_valid(permissions_json) THEN permissions_json
+    WHEN permissions_json IS NOT NULL AND json_valid(permissions_json) AND json_type(permissions_json) = 'object' THEN permissions_json
     ELSE '{}'
   END,
   '$.__role_key',
