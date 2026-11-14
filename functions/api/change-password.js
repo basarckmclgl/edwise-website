@@ -62,7 +62,7 @@ export async function onRequestPost(context) {
     if (auth.response) return auth.response;
 
     const cookie = request.headers.get("Cookie") || "";
-    const match = cookie.match(/(?:^|;\\s*)edwise_session=([a-f0-9]{64})(?:;|$)/i);
+    const match = cookie.match(/(?:^|;\s*)edwise_session=([a-f0-9]{64})(?:;|$)/i);
     if (!match) return json({ success: false, message: "Oturum doğrulanamadı. Yeniden giriş yapın." }, 401);
 
     const body = await request.json();
