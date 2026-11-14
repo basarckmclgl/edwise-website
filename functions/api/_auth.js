@@ -113,3 +113,29 @@ export async function requireEditor(context) {
 
   return auth;
 }
+
+
+// Modül/işlem bazlı yetki kontrolü. API uç noktaları bu yardımcıyı
+// kendi işlem anahtarlarıyla çağırarak sunucu tarafında erişimi doğrulamalıdır.
+export async function requirePermission(context, moduleKey, actionKey = "view") {
+  const auth = await requireAdmin(context);
+  if (auth.response) return auth;
+  if (auth.admin.role === "superadmin") return auth;
+
+  const allowedModules = ["dashboard", "pages", "services", "applications", "menu", "seo", "languages", "settings", "users"];
+  const allowedActions = ["view", "create", "edit", "delete", "publish"];
+  if (!allowedModules.includes(moduleKey) || !allowedActions.includes(actionKey)) {
+    return authError("Geçersiz yetki anahtarı.", 400);
+  }
+
+  try {
+    const row = await context.env.DB.prepare(
+      "SELECT permissions_json FROM admins WHERE id = ? AND is_active = 1"
+    ).bind(auth.admin.id).first();
+    const permissions = JSON.parse(row?.permissions_json || "{}");
+    if (permissions?.[moduleKey]?.[actionKey] === true) return auth;
+    return authError("Bu modülde bu işlem için yetkiniz bulunmuyor.", 403);
+  } catch {
+    return authError("Yetki sistemi henüz etkinleştirilmedi. Veritabanı geçişi gerekli.", 503);
+  }
+}
