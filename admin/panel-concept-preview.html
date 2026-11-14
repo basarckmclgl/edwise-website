@@ -1351,13 +1351,15 @@ const $=id=>document.getElementById(id);
 
 let pages=[];
 let currentRole=null;
+let currentPermissions={};
 
 const editorAllowed=["overview","panelhome","classrooms","pages","services","media","applications","profile","messages"];
 
 function canAccess(page){
  if(currentRole==="superadmin") return true;
- if(currentRole==="content_admin") return editorAllowed.includes(page);
- return false;
+ const moduleMap={overview:"dashboard",panelhome:"dashboard",classrooms:"dashboard",pages:"pages",services:"services",media:"pages",applications:"applications",profile:"dashboard",messages:"applications",designcenter:"settings",sitesettings:"settings",audit:"users",history:"users",archive:"pages",reports:"dashboard"};
+ const module=moduleMap[page];
+ return !!module && currentPermissions?.[module]?.view===true;
 }
 
 function applyRolePermissions(){
@@ -1869,7 +1871,7 @@ $("saveMenu").addEventListener("click",async()=>{
  catch(error){$("menuMessage").innerHTML='<div class="message error">'+escapeHtml(error.message)+'</div>';}
 });
 
-$("editSocialProfile")?.addEventListener("click",()=>{ $("profileFirstName").focus(); });
+$("editSocialProfile")?.addEventListener("click",()=>{ const target=$("profileFirstName");target?.scrollIntoView({behavior:"smooth",block:"center"});target?.focus({preventScroll:true}); });
 $("profilePasswordForm")?.addEventListener("submit",async event=>{
  event.preventDefault();
  const currentPassword=$("profileCurrentPassword").value,newPassword=$("profileNewPassword").value,confirmPassword=$("profileConfirmPassword").value;
@@ -1891,9 +1893,10 @@ async function checkSession(){
   if(!response.ok)throw new Error(data.message||"Oturum doğrulanamadı (HTTP "+response.status+").");
   if(!data.success||!data.admin)throw new Error(data.message||"Yönetici oturumu doğrulanamadı.");
   const name=data.admin.username||"Yönetici";
-  currentRole=data.admin.role;
-  if(!["superadmin","content_admin"].includes(currentRole))throw new Error("Bu hesabın yönetim paneline erişim yetkisi yok. Yetki: "+String(currentRole||"tanımsız"));
-  const roleName=currentRole==="superadmin"?"Süper Yönetici":currentRole==="content_admin"?"Site Yöneticisi":"Yönetici";
+  currentRole=data.admin.role_key||data.admin.role;
+  currentPermissions=data.admin.permissions||{};
+  if(!["superadmin","content_admin","editor","viewer"].includes(currentRole))throw new Error("Bu hesabın yönetim paneline erişim yetkisi yok. Yetki: "+String(currentRole||"tanımsız"));
+  const roleName=({superadmin:"Süper Yönetici",content_admin:"Admin",editor:"Editör",viewer:"Görüntüleyici"})[currentRole]||"Yönetici";
   const setText=(id,value)=>{const el=$(id);if(el)el.textContent=value;};
   const setValue=(id,value)=>{const el=$(id);if(el)el.value=value;};
   setText("username",name);
@@ -1911,7 +1914,15 @@ async function checkSession(){
   if(currentRole==="superadmin"){
    await loadSiteSettings();
   }
-  showPage("overview");
+  if(Number(data.admin.force_password_change)===1){
+   document.querySelectorAll("[data-page]").forEach(el=>el.classList.toggle("hidden",el.dataset.page!=="profile"));
+   document.querySelectorAll("[data-open]").forEach(el=>el.classList.add("hidden"));
+   ["editSocialProfile","saveProfileIdentity","profileAvatarFile","profileCoverFile","profileForgotPassword"].forEach(id=>{const el=$(id);if(el)el.classList.add("hidden");});
+   showPage("profile");
+   const notice=$("profilePasswordMessage");if(notice){notice.className="message";notice.textContent="İlk giriş güvenliği için devam etmeden önce şifrenizi değiştirin.";}
+  }else{
+   showPage("overview");
+  }
  }catch(error){
   const main=document.querySelector("main")||document.querySelector(".content")||document.body;
   const notice=document.createElement("div");
