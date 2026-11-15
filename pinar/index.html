@@ -312,11 +312,11 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  function previewDocTarget(doc){return doc.querySelector('main, body > section.single-page-content, body > section.section, body > section');}
  async function loadFullPagePreview(url,content){
   if(!livePreview)return;
-  livePreview.src=url;
   await new Promise((resolve,reject)=>{
    const timer=setTimeout(()=>reject(new Error('Sayfa önizlemesi zamanında yüklenemedi.')),12000);
    livePreview.onload=()=>{clearTimeout(timer);resolve();};
    livePreview.onerror=()=>{clearTimeout(timer);reject(new Error('Sayfa önizlemesi yüklenemedi.'));};
+   livePreview.src=url;
   });
   syncLivePreview(content);
  }
