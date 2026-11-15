@@ -88,7 +88,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <style>
 #pageEditorPanel .editor-workspace{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:16px;align-items:start;margin-top:12px}
 #pageEditorPanel .editor-page-stage{min-width:0;padding:16px;border:1px solid #e8e2f0;border-radius:14px;background:#f7f5fa}
-#pageEditorPanel .editor-toolbar{display:block;min-width:0;margin:0;position:sticky;top:12px}
+#pageEditorPanel .editor-toolbar{display:block;min-width:0;margin:0;position:sticky;top:12px;grid-column:2;grid-row:1} #pageEditorPanel .editor-page-stage{grid-column:1;grid-row:1}
 #pageEditorPanel .editor-tabs{display:flex;gap:4px;padding:5px;background:#f1edf7;border:1px solid #e7e0f0;border-radius:11px;margin-bottom:9px}
 #pageEditorPanel .editor-tabs button{flex:1;min-width:0;border:0;border-radius:8px;background:transparent;color:#65546f;padding:8px 5px;font-size:12px;font-weight:650;cursor:pointer}
 #pageEditorPanel .editor-tabs button[aria-selected="true"]{background:#fff;color:#54218f;box-shadow:0 1px 4px #34204a18}
@@ -111,25 +111,28 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 #pageEditorPanel #editorSelectionStatus{display:block;width:100%;font-size:11px;color:#65546f;margin-top:6px}
 #pageEditorPanel .editor-page-stage #pageCanvas{min-height:640px;resize:vertical;max-width:100%;background:#fff}
 @media(max-width:900px){#pageEditorPanel .editor-workspace{grid-template-columns:minmax(0,1fr) 270px}}
-@media(max-width:700px){#pageEditorPanel .editor-workspace{grid-template-columns:1fr}#pageEditorPanel .editor-toolbar{position:static}#pageEditorPanel .editor-page-stage{order:0}#pageEditorPanel .editor-toolbar{order:1}#pageEditorPanel .editor-toolrow{align-items:center}#pageEditorPanel .editor-toolrow button{flex:0 0 auto}}
+@media(max-width:700px){#pageEditorPanel .editor-workspace{grid-template-columns:1fr}#pageEditorPanel .editor-toolbar{position:static;grid-column:1;grid-row:2}#pageEditorPanel .editor-page-stage{grid-column:1;grid-row:1}#pageEditorPanel .editor-toolrow{align-items:center}#pageEditorPanel .editor-toolrow button{flex:0 0 auto}}
 </style>
-<div class="editor-workspace">\n <div class="editor-page-stage">\n <div class="editor-toolbar">\n <div class="editor-tabs" role="tablist" aria-label="Düzenleme araçları">
+<div class="editor-workspace">
+ <div class="editor-toolbar">
+ <div class="editor-tabs" role="tablist" aria-label="Düzenleme araçları">
  <button type="button" role="tab" data-editor-tab="home" aria-selected="true">Giriş</button>
  <button type="button" role="tab" data-editor-tab="insert" aria-selected="false">Ekle</button>
  <button type="button" role="tab" data-editor-tab="design" aria-selected="false">Tasarım</button>
  <button type="button" role="tab" data-editor-tab="arrange" aria-selected="false">Düzen</button>
 </div>
- <section class="editor-toolgroup">
+ <section class="editor-toolgroup is-active" data-editor-panel="home">
   <h3>Çalışma modu</h3>
   <div class="editor-toolrow"><span id="editorSelectionStatus">Bir öğeye tıklayarak seçin</span></div>
  </section>
- <section class="editor-toolgroup">
+ <section class="editor-toolgroup is-active" data-editor-panel="home">
   <h3>Metin biçimlendirme</h3>
   <div class="editor-toolrow">
    <button type="button" data-editcmd="bold" class="app-refresh"><b>B</b></button><button type="button" data-editcmd="italic" class="app-refresh"><i>I</i></button><button type="button" data-editcmd="underline" class="app-refresh"><u>U</u></button>
    <select id="editorFormat" aria-label="Metin stili" title="Metin stili"><option value="p">Normal metin</option><option value="h1">Başlık 1</option><option value="h2">Başlık 2</option><option value="h3">Başlık 3</option><option value="blockquote">Alıntı</option></select>
    <label>Yazı tipi<select id="editorFont" aria-label="Yazı tipi" title="Seçili metnin yazı tipini değiştir" style="max-width:190px"><optgroup label="Standart yazı tipleri"><option value="Arial">Arial</option><option value="Arial Black">Arial Black</option><option value="Calibri">Calibri</option><option value="Cambria">Cambria</option><option value="Comic Sans MS">Comic Sans MS</option><option value="Courier New">Courier New</option><option value="Georgia">Georgia</option><option value="Impact">Impact</option><option value="Lucida Sans">Lucida Sans</option><option value="Palatino Linotype">Palatino Linotype</option><option value="Tahoma">Tahoma</option><option value="Times New Roman">Times New Roman</option><option value="Trebuchet MS">Trebuchet MS</option><option value="Verdana">Verdana</option></optgroup><optgroup label="Çok dilli karakter desteği"><option value="Noto Sans">Noto Sans</option><option value="Noto Serif">Noto Serif</option><option value="Noto Sans Arabic">Noto Sans Arabic</option><option value="Noto Naskh Arabic">Noto Naskh Arabic</option><option value="Noto Sans Devanagari">Noto Sans Devanagari</option><option value="Noto Sans CJK SC">Noto Sans CJK (Çince)</option><option value="Noto Sans CJK JP">Noto Sans CJK (Japonca)</option><option value="Noto Sans CJK KR">Noto Sans CJK (Korece)</option></optgroup></select></label>
-   <button type="button" data-editcmd="justifyLeft" class="app-refresh">Sola</button><button type="button" data-editcmd="justifyCenter" class="app-refresh">Ortala</button><button type="button" data-editcmd="justifyRight" class="app-refresh">Sağa</button>
+   <label>Punto<select id="editorFontSize" aria-label="Yazı boyutu"><option value="10">10</option><option value="12" selected>12</option><option value="14">14</option><option value="16">16</option><option value="18">18</option><option value="24">24</option><option value="32">32</option><option value="48">48</option></select></label>
+   <button type="button" data-editcmd="justifyLeft" class="app-refresh" aria-label="Sola hizala" title="Sola hizala">☰</button><button type="button" data-editcmd="justifyCenter" class="app-refresh" aria-label="Ortala" title="Ortala">≡</button><button type="button" data-editcmd="justifyRight" class="app-refresh" aria-label="Sağa hizala" title="Sağa hizala">☰</button><button type="button" data-editcmd="justifyFull" class="app-refresh" aria-label="İki yana yasla" title="İki yana yasla">☷</button>
    <label>Yazı rengi<input id="editorColor" type="color" value="#29263d"></label><label>Vurgu<input id="editorMark" type="color" value="#fff0a6"></label>
   </div>
  </section>
@@ -139,7 +142,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
    <button type="button" id="editorAddSection" class="app-refresh">＋ Bölüm</button><button type="button" id="editorAddBand" class="app-refresh">▰ Tam genişlik renk bandı</button><button type="button" id="editorAddHeading" class="app-refresh">＋ Başlık</button><button type="button" id="editorAddText" class="app-refresh">＋ Metin</button><button type="button" id="editorAddCard" class="app-refresh">＋ Kutu / Kart</button><button type="button" id="editorAddColumns" class="app-refresh">＋ 2 Sütun</button><button type="button" id="editorAddButton" class="app-refresh">＋ Buton</button><button type="button" id="editorAddLink" class="app-refresh">＋ Bağlantı</button><button type="button" id="editorImage" class="app-refresh">＋ Resim</button><input type="file" id="editorImageFile" accept="image/*" hidden><button type="button" id="editorPdf" class="app-refresh">＋ PDF</button><input type="file" id="editorPdfFile" accept="application/pdf,.pdf" hidden>
   </div>
  </section>
- <section class="editor-toolgroup">
+ <section class="editor-toolgroup" data-editor-panel="design">
   <h3>Seçili öğenin tasarımı</h3>
   <div class="editor-toolrow">
    <label>İç dolgu rengi<input id="editorBlockBg" type="color" value="#f3f0fb" title="Seçili kutu veya bölümün arka plan rengi"></label><label>Yazı rengi<input id="editorBlockText" type="color" value="#29263d"></label><label>Kutu çerçevesi<input id="editorBlockBorder" type="color" value="#e2dced" title="Seçili kutunun kenarlık rengi"></label><label>Çerçeve kalınlığı<select id="editorBlockBorderWidth"><option value="0">Yok</option><option value="1px">İnce</option><option value="2px" selected>Orta</option><option value="4px">Kalın</option></select></label>
@@ -152,6 +155,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
   <div class="editor-toolrow"><button type="button" id="editorMoveUp" class="app-refresh">↑ Yukarı</button><button type="button" id="editorMoveDown" class="app-refresh">↓ Aşağı</button><button type="button" id="editorDuplicate" class="app-refresh">Çoğalt</button><button type="button" id="editorRemoveBlock" class="app-refresh">Seçili öğeyi sil</button></div>
  </section>
 </div>
+ <div class="editor-page-stage">
  <div id="pageCanvas" contenteditable="false" aria-label="Boyutu sürükleyerek ayarlanabilir sayfa içerik alanı" title="Sağ alt köşeyi sürükleyerek alanı genişletip daraltabilirsiniz." style="display:block;width:100%;max-width:100%;height:520px;min-height:280px;max-height:1200px;resize:both;overflow:auto;box-sizing:border-box;padding:22px;border:1px solid #d9d7e2;border-radius:12px;background:#fff;color:#25233a;line-height:1.7;outline:none"><h1>Sayfa başlığınız</h1><p>İçeriğinizi buraya yazın. Metni seçerek biçimlendirebilir, resim ekleyip sürükleyerek yerini değiştirebilirsiniz.</p></div>
  </div>
  <div class="editor-toolbar-footer" style="margin-top:10px">
