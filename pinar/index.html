@@ -399,8 +399,13 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
    const result=await save.json();if(!save.ok||!result.success)throw new Error(result.message||'Sayfa menüye eklenemedi.');
   }
  }
+ function getCleanEditorContent(){
+  const copy=canvas.cloneNode(true);
+  copy.querySelectorAll('[data-editor-old-outline]').forEach(el=>{el.style.outline=el.dataset.editorOldOutline||'';el.removeAttribute('data-editor-old-outline');});
+  return copy.innerHTML;
+ }
  async function submit(status){
-  const title=$('editorTitle').value.trim(),slug=slugify($('editorSlug').value.trim()||title),content=canvas.innerHTML;
+  const title=$('editorTitle').value.trim(),slug=slugify($('editorSlug').value.trim()||title),content=getCleanEditorContent();
   if(!title||!slug){feedback('Sayfa başlığı ve URL zorunludur.','error');return;}
   if(!content.trim()){feedback('Sayfa içeriği boş olamaz.','error');return;}
   const payload={title,slug,content,status,page_path:currentPath};
