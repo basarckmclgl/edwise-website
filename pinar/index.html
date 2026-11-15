@@ -379,8 +379,10 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
    if(!editing&&data.id)currentId=Number(data.id);
    $('editorSlug').value=slug;
    await loadPages();
-   if(status==='published'&&!currentPath){await addPublishedPageToMenu(title,slug);}
-   feedback(status==='published'?'Sayfa yayımlandı ve ana menüde Sayfalar alt kategorisine eklendi: '+'https://edwisedanismanlik.com'+pageUrl(slug):'Taslak veritabanına kaydedildi.');
+   if(status==='published'){
+    if(data.menuSynced===false) feedback('Sayfa yayımlandı ancak menüye otomatik eklenemedi. Menü ayarlarını kontrol et.','error');
+    else feedback(currentPath?'Mevcut sayfa aynı adres üzerinde güncellendi ve yayımlandı.':'Yeni sayfa yayımlandı ve ana menüde Sayfalar bölümüne eklendi: '+'https://edwisedanismanlik.com'+pageUrl(slug));
+   }else feedback('Taslak veritabanına kaydedildi.');
   }catch(error){feedback(error.message||'Sayfa kaydedilemedi.','error');}
   finally{button.disabled=false;button.textContent=oldText;}
  }
