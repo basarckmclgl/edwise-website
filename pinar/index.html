@@ -88,6 +88,17 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <style>
 #pageEditorPanel .editor-workspace{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:16px;align-items:start;margin-top:12px}
 #pageEditorPanel .editor-page-stage{min-width:0;padding:16px;border:1px solid #e8e2f0;border-radius:14px;background:#f7f5fa}
+#pageEditorPanel .editor-page-stage{padding:0;overflow:hidden;background:#fff;border:1px solid #e3ddeb;border-radius:14px;box-shadow:0 5px 22px #30204a0a}
+#pageEditorPanel .editor-surface-tabs{display:flex;align-items:center;gap:6px;padding:9px 12px;background:#f8f6fb;border-bottom:1px solid #e9e4ef}
+#pageEditorPanel .editor-surface-tabs button{border:0;border-radius:8px;background:transparent;padding:7px 12px;color:#65546f;font-size:12px;font-weight:650;cursor:pointer}
+#pageEditorPanel .editor-surface-tabs button.is-active{background:#fff;color:#54218f;box-shadow:0 1px 4px #34204a18}
+#pageEditorPanel .editor-surface-tabs span{margin-left:auto;font-size:11px;color:#81788e}
+#pageEditorPanel .editor-canvas-surface{padding:0;background:#fff}
+#pageEditorPanel .editor-preview-surface{background:#fff}
+#pageEditorPanel .editor-preview-surface[hidden]{display:none}
+#pageEditorPanel #pageCanvas{resize:none;overflow:visible}
+#pageEditorPanel .editor-workspace{grid-template-columns:minmax(0,1fr) 310px}
+
 #pageEditorPanel .editor-toolbar{display:block;min-width:0;margin:0;position:sticky;top:12px;grid-column:2;grid-row:1} #pageEditorPanel .editor-page-stage{grid-column:1;grid-row:1}
 #pageEditorPanel .editor-tabs{display:flex;gap:4px;padding:5px;background:#f1edf7;border:1px solid #e7e0f0;border-radius:11px;margin-bottom:9px}
 #pageEditorPanel .editor-tabs button{flex:1;min-width:0;border:0;border-radius:8px;background:transparent;color:#65546f;padding:8px 5px;font-size:12px;font-weight:650;cursor:pointer}
@@ -156,16 +167,17 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
  </section>
 </div>
  <div class="editor-page-stage">
- <div id="pageCanvas" contenteditable="false" aria-label="Boyutu sürükleyerek ayarlanabilir sayfa içerik alanı" title="Sağ alt köşeyi sürükleyerek alanı genişletip daraltabilirsiniz." style="display:block;width:100%;max-width:100%;height:520px;min-height:280px;max-height:1200px;resize:both;overflow:auto;box-sizing:border-box;padding:22px;border:1px solid #d9d7e2;border-radius:12px;background:#fff;color:#25233a;line-height:1.7;outline:none"><h1>Sayfa başlığınız</h1><p>İçeriğinizi buraya yazın. Metni seçerek biçimlendirebilir, resim ekleyip sürükleyerek yerini değiştirebilirsiniz.</p></div>
+ <div class="editor-surface-tabs" role="tablist" aria-label="Sayfa çalışma görünümü">
+  <button type="button" id="editorCanvasView" class="is-active" aria-selected="true">Düzenle</button>
+  <button type="button" id="editorPreviewView" aria-selected="false">Gerçek sayfa görünümü</button>
+  <span id="editorPreviewStatus">Düzenlemeler burada anlık görünür</span>
  </div>
- <div class="editor-toolbar-footer" style="margin-top:10px">
- <div class="editor-live-preview" style="margin-top:16px;border:1px solid #d9d7e2;border-radius:12px;overflow:hidden;background:#fff">
- <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:#f7f6fb;border-bottom:1px solid #e7e4ef">
-  <strong style="font-size:13px;color:#40376e">Canlı sayfa görünümü</strong>
-  <span id="editorPreviewStatus" style="font-size:12px;color:#777">Düzenlemeler burada anlık görünür</span>
+ <div id="editorCanvasSurface" class="editor-canvas-surface">
+  <div id="pageCanvas" contenteditable="false" aria-label="Sayfa içerik alanı" title="Sayfa içeriğini burada doğrudan düzenleyin." style="display:block;width:100%;max-width:100%;min-height:680px;box-sizing:border-box;padding:30px;border:0;border-radius:0;background:#fff;color:#25233a;line-height:1.7;outline:none"><h1>Sayfa başlığınız</h1><p>İçeriğinizi buraya yazın. Metni seçerek biçimlendirebilir, resim ekleyip sürükleyerek yerini değiştirebilirsiniz.</p></div>
  </div>
- <iframe id="editorLivePreview" title="Sayfanın canlı önizlemesi" style="display:block;width:100%;height:760px;min-height:320px;max-height:1400px;resize:vertical;overflow:auto;border:0;background:#fff" loading="lazy"></iframe>
-</div>
+ <div id="editorPreviewSurface" class="editor-preview-surface" hidden>
+  <iframe id="editorLivePreview" title="Sayfanın gerçek görünümü" style="display:block;width:100%;height:760px;min-height:420px;max-height:1400px;resize:vertical;overflow:auto;border:0;background:#fff" loading="lazy"></iframe>
+ </div>
  </div>
 <div class="page-tools" style="margin-top:10px"><button type="button" id="editorSave" class="app-refresh">Taslağı kaydet</button><button type="button" id="editorPublish" class="menu-export">Yayımla</button><button type="button" id="editorExport" class="app-refresh">PDF olarak indir</button><span id="editorFeedback" class="page-count" aria-live="polite">Henüz kaydedilmedi.</span></div>
 </section>
@@ -372,10 +384,21 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  function fresh(){
   currentId=null; currentPath=''; $('editorPath').value=''; $('editorTitle').value=''; $('editorSlug').value=''; slugManuallyEdited=false;
   canvas.innerHTML='<h1>Yeni sayfa</h1><p>İçeriğinizi buraya yazın.</p>';
-  canvas.contentEditable='false';setEditorMode(false);selectBlock(null);
-  feedback('Yeni sayfa hazır. Tasarım modunda öğeleri seçebilir, Metin düzenleme modunda yazabilirsiniz.');
+  canvas.contentEditable='false';setEditorMode(false);selectBlock(null);showEditorSurface('canvas');
+  feedback('Yeni sayfa taslağı hazır. Sayfa alanında çalışabilirsiniz.');
  }
 
+ function showEditorSurface(which){
+  const canvasMode=which!=='preview';
+  $('editorCanvasSurface').hidden=!canvasMode;
+  $('editorPreviewSurface').hidden=canvasMode;
+  $('editorCanvasView').classList.toggle('is-active',canvasMode);
+  $('editorPreviewView').classList.toggle('is-active',!canvasMode);
+  $('editorCanvasView').setAttribute('aria-selected',String(canvasMode));
+  $('editorPreviewView').setAttribute('aria-selected',String(!canvasMode));
+ }
+ $('editorCanvasView').addEventListener('click',()=>showEditorSurface('canvas'));
+ $('editorPreviewView').addEventListener('click',()=>showEditorSurface('preview'));
  const livePreview=$('editorLivePreview');
  function previewDocTarget(doc){return doc.querySelector('main, body > section.single-page-content, body > section.section, body > section');}
  async function loadFullPagePreview(url,content){
@@ -386,7 +409,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
    livePreview.onerror=()=>{clearTimeout(timer);reject(new Error('Sayfa önizlemesi yüklenemedi.'));};
    livePreview.src=url;
   });
-  syncLivePreview(content);
+  syncLivePreview(content);showEditorSurface('preview');
  }
  function syncLivePreview(content){
   try{
@@ -552,7 +575,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  canvas.addEventListener('click',e=>{if(editorTextMode)return;const el=e.target.closest(blockSelector);if(el&&canvas.contains(el)){e.preventDefault();selectBlock(el);}});
  canvas.addEventListener('dblclick',e=>{if(editorTextMode)return;const el=e.target.closest(blockSelector);if(el&&canvas.contains(el)){selectBlock(el);setEditorMode(true);canvas.focus();}});
 
- function addNode(tag,html,styles={},kind='Öğe'){const node=document.createElement(tag);node.innerHTML=html;node.dataset.editorKind=kind;node.style.margin='12px 0';Object.assign(node.style,styles);canvas.append(node);selectBlock(node);node.scrollIntoView({behavior:'smooth',block:'center'});syncLivePreview(canvas.innerHTML);feedback(kind+' eklendi.');return node;}
+ function addNode(tag,html,styles={},kind='Öğe'){const node=document.createElement(tag);node.innerHTML=html;node.dataset.editorKind=kind;node.style.margin='12px 0';Object.assign(node.style,styles);if(selectedBlock&&canvas.contains(selectedBlock)){selectedBlock.insertAdjacentElement('afterend',node);}else{canvas.append(node);}selectBlock(node);showEditorSurface('canvas');node.scrollIntoView({behavior:'smooth',block:'center'});syncLivePreview(canvas.innerHTML);feedback(kind+' eklendi.');return node;}
  $('editorAddSection').addEventListener('click',()=>addNode('section','<h2>Yeni bölüm başlığı</h2><p>Bu bölüme içerik ekleyin.</p>',{padding:'22px',background:'#f8f7fc',border:'1px solid #e7e2f1',borderRadius:'14px'},'Bölüm'));
  $('editorAddBand').addEventListener('click',()=>addNode('section','<div style="max-width:1100px;margin:0 auto"><h2 style="color:inherit">Yeni renkli bölüm</h2><p style="color:inherit">Bu alana kendi metninizi, kartlarınızı ve görsellerinizi ekleyin.</p></div>',{display:'block',width:'calc(100% + 44px)',maxWidth:'none',boxSizing:'border-box',margin:'18px -22px',padding:'52px 32px',background:'#30256f',color:'#ffffff',border:'0',borderRadius:'0'},'Tam genişlik renk bandı'));
  $('editorAddHeading').addEventListener('click',()=>addNode('h2','Yeni başlık',{},'Başlık'));
