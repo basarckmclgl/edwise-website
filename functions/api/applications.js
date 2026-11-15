@@ -8,17 +8,25 @@ const recipient = "edwisedanismanlik@gmail.com";
 
 async function ensureTable(DB) {
   await DB.prepare(`CREATE TABLE IF NOT EXISTS applications (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    phone TEXT NOT NULL,
-    email TEXT,
-    program TEXT NOT NULL,
-    format TEXT NOT NULL,
-    availability TEXT,
-    note TEXT,
-    status TEXT NOT NULL DEFAULT 'new',
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,phone TEXT NOT NULL,email TEXT,
+    program TEXT NOT NULL,format TEXT NOT NULL,availability TEXT,note TEXT,
+    status TEXT NOT NULL DEFAULT 'new',created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    priority TEXT NOT NULL DEFAULT 'normal',internal_note TEXT NOT NULL DEFAULT '',
+    follow_up_at TEXT,archived_at TEXT
   )`).run();
+  const cols=await DB.prepare("PRAGMA table_info(applications)").all();
+  const existing=new Set((cols.results||[]).map(x=>x.name));
+  for(const [name,sql] of [["priority","ALTER TABLE applications ADD COLUMN priority TEXT NOT NULL DEFAULT 'normal'"],["internal_note","ALTER TABLE applications ADD COLUMN internal_note TEXT NOT NULL DEFAULT ''"],["follow_up_at","ALTER TABLE applications ADD COLUMN follow_up_at TEXT"],["archived_at","ALTER TABLE applications ADD COLUMN archived_at TEXT"]]){
+    if(!existing.has(name)) await DB.prepare(sql).run();
+  }
+  await DB.prepare(`CREATE TABLE IF NOT EXISTS application_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,application_id INTEGER NOT NULL,admin_email TEXT,
+    action TEXT NOT NULL,details TEXT,created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`).run();
+}
+async function history(DB,id,admin,action,details={}){
+  await DB.prepare("INSERT INTO application_history (application_id,admin_email,action,details) VALUES (?,?,?,?)")
+    .bind(id,admin?.email||"",action,JSON.stringify(details)).run();
 }
 function validOrigin(request) {
   const origin = request.headers.get("Origin");
@@ -92,7 +100,7 @@ export async function onRequestGet(context) {
   try {
     await ensureTable(context.env.DB);
     const { results } = await context.env.DB.prepare(
-      "SELECT * FROM applications ORDER BY created_at DESC LIMIT 500"
+      "SELECT * FROM applications ORDER BY (archived_at IS NULL) DESC, created_at DESC LIMIT 500"
     ).all();
     return json({ success:true, applications:results || [] });
   } catch {
@@ -101,30 +109,37 @@ export async function onRequestGet(context) {
 }
 
 export async function onRequestPut(context) {
-  if (!validOrigin(context.request)) return json({ success:false, message:"İstek kaynağı doğrulanamadı." },403);
-  const auth = await requireEditor(context);
-  if (auth.response) return auth.response;
-  try {
-    const body = await context.request.json();
-    const id = Number(body.id);
-    const status = clean(body.status,20);
-    if (!Number.isInteger(id) || !["new","contacted","completed"].includes(status)) {
-      return json({ success:false, message:"Başvuru durumu geçersiz." },400);
-    }
+  if (!validOrigin(context.request)) return json({ success:false,message:"İstek kaynağı doğrulanamadı." },403);
+  const auth=await requireEditor(context); if(auth.response)return auth.response;
+  try{
+    const body=await context.request.json(),id=Number(body.id);
+    if(!Number.isInteger(id)||id<1)return json({success:false,message:"Başvuru numarası geçersiz."},400);
     await ensureTable(context.env.DB);
-    const before = await context.env.DB.prepare("SELECT id,status,program,created_at FROM applications WHERE id=?").bind(id).first();
-    if (!before) return json({ success:false, message:"Başvuru bulunamadı." },404);
-    const result = await context.env.DB.prepare("UPDATE applications SET status=? WHERE id=?").bind(status,id).run();
-    if (!result.meta?.changes) return json({ success:false, message:"Başvuru güncellenemedi." },409);
-    await logAudit(context.env.DB,context.request,auth.admin,{
-      action:"application_status_updated",
-      entity_type:"application",
-      entity_id:id,
-      entity_title:"Başvuru #"+id,
-      details:{before:{status:before.status},after:{status},program:before.program}
-    });
-    return json({ success:true });
-  } catch {
-    return json({ success:false, message:"Başvuru güncellenemedi." },500);
-  }
+    const DB=context.env.DB, before=await DB.prepare("SELECT * FROM applications WHERE id=?").bind(id).first();
+    if(!before)return json({success:false,message:"Başvuru bulunamadı."},404);
+    let action=clean(body.action||"status",30),details={};
+    if(action==="status"){
+      const status=clean(body.status,20);
+      if(!["new","contacted","completed"].includes(status))return json({success:false,message:"Durum geçersiz."},400);
+      await DB.prepare("UPDATE applications SET status=? WHERE id=?").bind(status,id).run();
+      details={before:before.status,after:status};
+    }else if(action==="manage"){
+      const priority=clean(body.priority||before.priority,20);
+      const internalNote=clean(body.internal_note??before.internal_note,2000);
+      const follow=body.follow_up_at===null||body.follow_up_at===""?null:clean(body.follow_up_at,30);
+      if(!["normal","high"].includes(priority))return json({success:false,message:"Öncelik geçersiz."},400);
+      if(follow&&!/^\d{4}-\d{2}-\d{2}$/.test(follow))return json({success:false,message:"Takip tarihi geçersiz."},400);
+      await DB.prepare("UPDATE applications SET priority=?,internal_note=?,follow_up_at=? WHERE id=?").bind(priority,internalNote,follow,id).run();
+      details={priority,follow_up_at:follow,noteChanged:internalNote!==before.internal_note};
+    }else if(action==="archive"){
+      await DB.prepare("UPDATE applications SET archived_at=COALESCE(archived_at,datetime('now')) WHERE id=?").bind(id).run();
+      details={archived:true};
+    }else if(action==="restore"){
+      await DB.prepare("UPDATE applications SET archived_at=NULL WHERE id=?").bind(id).run();
+      details={archived:false};
+    }else return json({success:false,message:"İşlem türü tanınmadı."},400);
+    await history(DB,id,auth.admin,action,details);
+    await logAudit(DB,context.request,auth.admin,{action:"application_"+action,entity_type:"application",entity_id:id,entity_title:"Başvuru #"+id,details});
+    return json({success:true});
+  }catch(error){return json({success:false,message:"Başvuru güncellenemedi."},500);}
 }
