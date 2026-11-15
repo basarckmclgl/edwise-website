@@ -123,7 +123,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 </div>
  <section class="editor-toolgroup is-active" data-editor-panel="home">
   <h3>Çalışma modu</h3>
-  <div class="editor-toolrow"><span id="editorSelectionStatus">Bir öğeye tıklayarak seçin</span></div>
+  <div class="editor-toolrow"><button type="button" id="editorModeToggle" class="menu-export" aria-pressed="false">✥ Tasarım modu açık</button><span id="editorSelectionStatus">Bir öğeye tıklayarak seçin</span></div>
  </section>
  <section class="editor-toolgroup is-active" data-editor-panel="home">
   <h3>Metin biçimlendirme</h3>
@@ -546,9 +546,9 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  canvas.addEventListener('input',()=>syncLivePreview(canvas.innerHTML));
   let selectedBlock=null,editorTextMode=false;
  const blockSelector='h1,h2,h3,h4,h5,p,ul,ol,blockquote,figure,section,article,div,a,button,img';
- function setEditorMode(textMode){editorTextMode=!!textMode;canvas.contentEditable=editorTextMode?'true':'false';const b=$('editorModeToggle');if(b){b.textContent=editorTextMode?'✎ Metin düzenleme açık':'✥ Tasarım modu açık';b.setAttribute('aria-pressed',String(editorTextMode));}const st=$('editorSelectionStatus');if(st)st.textContent=editorTextMode?'Metni seçip yazabilir ve biçimlendirebilirsiniz':'Bir başlığa, paragrafa veya karta tıklayarak yalnızca onu biçimlendirin';}
+ function setEditorMode(textMode){editorTextMode=!!textMode;canvas.contentEditable=editorTextMode?'true':'false';if(editorTextMode&&typeof activateEditorTab==='function')activateEditorTab('home');const b=$('editorModeToggle');if(b){b.textContent=editorTextMode?'✎ Metin düzenleme açık':'✥ Tasarım modu açık';b.setAttribute('aria-pressed',String(editorTextMode));}const st=$('editorSelectionStatus');if(st)st.textContent=editorTextMode?'Metni seçip yazabilir ve biçimlendirebilirsiniz':'Bir başlığa, paragrafa veya karta tıklayarak yalnızca onu biçimlendirin';}
  $('editorModeToggle').addEventListener('click',()=>{setEditorMode(!editorTextMode);if(editorTextMode)canvas.focus();else canvas.blur();});
- function selectBlock(el){if(selectedBlock)selectedBlock.style.outline=selectedBlock.dataset.editorOldOutline||'';selectedBlock=el;const st=$('editorSelectionStatus'),rm=$('editorRemoveBlock');if(selectedBlock){selectedBlock.dataset.editorOldOutline=selectedBlock.style.outline||'';selectedBlock.style.outline='2px dashed #8b79df';const kind=selectedBlock.dataset.editorKind||({section:'Bölüm',h1:'Başlık',h2:'Başlık',h3:'Başlık',p:'Metin',a:'Bağlantı',button:'Buton',img:'Resim',figure:'Görsel',div:'Kutu / alan'}[selectedBlock.tagName.toLowerCase()]||'Öğe');if(st)st.textContent='Seçili: '+kind;if(rm)rm.textContent='Seçili '+kind.toLocaleLowerCase('tr-TR')+' öğesini sil';}else{if(st)st.textContent='Henüz öğe seçilmedi';if(rm)rm.textContent='Seçili öğeyi sil';}}
+ function selectBlock(el){if(selectedBlock)selectedBlock.style.outline=selectedBlock.dataset.editorOldOutline||'';selectedBlock=el;if(selectedBlock&&typeof activateEditorTab==='function')activateEditorTab('design');const st=$('editorSelectionStatus'),rm=$('editorRemoveBlock');if(selectedBlock){selectedBlock.dataset.editorOldOutline=selectedBlock.style.outline||'';selectedBlock.style.outline='2px dashed #8b79df';const kind=selectedBlock.dataset.editorKind||({section:'Bölüm',h1:'Başlık',h2:'Başlık',h3:'Başlık',p:'Metin',a:'Bağlantı',button:'Buton',img:'Resim',figure:'Görsel',div:'Kutu / alan'}[selectedBlock.tagName.toLowerCase()]||'Öğe');if(st)st.textContent='Seçili: '+kind;if(rm)rm.textContent='Seçili '+kind.toLocaleLowerCase('tr-TR')+' öğesini sil';}else{if(st)st.textContent='Henüz öğe seçilmedi';if(rm)rm.textContent='Seçili öğeyi sil';}}
  canvas.addEventListener('click',e=>{if(editorTextMode)return;const el=e.target.closest(blockSelector);if(el&&canvas.contains(el)){e.preventDefault();selectBlock(el);}});
  canvas.addEventListener('dblclick',e=>{if(editorTextMode)return;const el=e.target.closest(blockSelector);if(el&&canvas.contains(el)){selectBlock(el);setEditorMode(true);canvas.focus();}});
 
