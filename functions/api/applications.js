@@ -102,7 +102,14 @@ export async function onRequestGet(context) {
     const { results } = await context.env.DB.prepare(
       "SELECT * FROM applications ORDER BY (archived_at IS NULL) DESC, created_at DESC LIMIT 500"
     ).all();
-    return json({ success:true, applications:results || [] });
+    const applications=results||[];
+    for(const item of applications){
+      const {results:events}=await context.env.DB.prepare(
+        "SELECT admin_email,action,details,created_at FROM application_history WHERE application_id=? ORDER BY created_at DESC,id DESC LIMIT 30"
+      ).bind(item.id).all();
+      item.history=(events||[]).map(event=>({...event,details:undefined}));
+    }
+    return json({ success:true, applications });
   } catch {
     return json({ success:false, message:"Başvurular alınamadı." },500);
   }
