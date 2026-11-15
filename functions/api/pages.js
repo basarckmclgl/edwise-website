@@ -53,6 +53,29 @@ async function ensureTrashSchema(db) {
   }
 }
 
+async function syncPublishedPageMenu(db, page, previous = null) {
+  if (!page || page.page_path) return true;
+  const key = "menu_theme";
+  const row = await db.prepare("SELECT setting_value FROM site_settings WHERE setting_key = ? LIMIT 1").bind(key).first();
+  let menu = [];
+  if (row?.setting_value) {
+    try { menu = JSON.parse(row.setting_value); } catch { throw new Error("Mevcut menü ayarları okunamadı; menü verisi korunarak yayın durduruldu."); }
+  }
+  if (!Array.isArray(menu)) throw new Error("Menü verisinin biçimi geçersiz; mevcut menü korunarak yayın durduruldu.");
+  const pageUrl = slug => "/pages/sayfa.html?slug=" + encodeURIComponent(slug);
+  if (previous?.slug && previous.slug !== page.slug && !previous.page_path) {
+    menu = menu.filter(item => item.url !== pageUrl(previous.slug));
+  }
+  const url = pageUrl(page.slug);
+  const index = menu.findIndex(item => item.url === url || item.key === "cms-page-" + page.slug);
+  const entry = { key: "cms-page-" + page.slug, label: page.title, url, icon: "📄", group: "pages", visible: true };
+  if (index >= 0) menu[index] = { ...menu[index], ...entry };
+  else menu.push(entry);
+  const serialized = JSON.stringify(menu.map((item, order) => ({ ...item, order: Number.isFinite(Number(item.order)) ? Number(item.order) : order })));
+  await db.prepare("INSERT INTO site_settings (setting_key, setting_value, updated_at) VALUES (?, ?, datetime('now')) ON CONFLICT(setting_key) DO UPDATE SET setting_value=excluded.setting_value, updated_at=datetime('now')").bind(key, serialized).run();
+  return true;
+}
+
 function validStatus(status) {
   return status === "draft" || status === "published";
 }
@@ -194,6 +217,11 @@ export async function onRequestPost(context) {
       if (conflict) return json({ success: false, message: "Aynı URL başka bir aktif sayfada kullanılıyor. Önce URL çakışmasını çözün." }, 409);
       await context.env.DB.prepare("UPDATE pages SET deleted_at = NULL, updated_at = datetime('now') WHERE id = ?").bind(id).run();
       const after = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(id).first();
+    let menuSynced = true;
+    if (status === "published" && !after.page_path) {
+      try { await syncPublishedPageMenu(context.env.DB, after, before); }
+      catch (menuError) { console.error("EDWISE PUBLISHED PAGE MENU SYNC ERROR", menuError); menuSynced = false; }
+    }
       await logAudit(context.env.DB,context.request,auth.admin,{action:"page_restored",entity_type:"page",entity_id:id,entity_title:before.title,details:{before,after}});
       return json({ success: true, message: "Sayfa geri yüklendi." });
     }
@@ -265,11 +293,18 @@ export async function onRequestPost(context) {
     ).run();
 
     const created = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(result.meta.last_row_id).first();
+    let menuSynced = true;
+    if (status === "published" && !created.page_path) {
+      try { await syncPublishedPageMenu(context.env.DB, created); }
+      catch (menuError) { console.error("EDWISE PUBLISHED PAGE MENU SYNC ERROR", menuError); menuSynced = false; }
+    }
     await logAudit(context.env.DB,context.request,auth.admin,{action:status==="published"?"page_created_published":"page_created",entity_type:"page",entity_id:result.meta.last_row_id,entity_title:title,details:{before:null,after:created}});
     return json({
       success: true,
       message: "Sayfa oluşturuldu.",
-      id: result.meta.last_row_id
+      id: result.meta.last_row_id,
+      menuSynced,
+      message: menuSynced ? "Sayfa oluşturuldu." : "Sayfa yayımlandı ancak menüye otomatik eklenemedi; menü ayarları kontrol edilmeli."
     }, 201);
 
   } catch (error) {
@@ -336,7 +371,7 @@ export async function onRequestPut(context) {
     const after = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(id).first();
     const action = before.status !== status ? (status==="published"?"page_published":"page_unpublished") : "page_updated";
     await logAudit(context.env.DB,context.request,auth.admin,{action,entity_type:"page",entity_id:id,entity_title:title,details:{before,after}});
-    return json({ success: true, message: "Sayfa güncellendi." });
+    return json({ success: true, menuSynced, message: menuSynced ? "Sayfa güncellendi." : "Sayfa güncellendi ve yayımlandı ancak menüye otomatik eklenemedi; menü ayarları kontrol edilmeli." });
 
   } catch (error) {
     return json({ success: false, message: "Sayfa güncellenemedi." }, 500);
