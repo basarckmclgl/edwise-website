@@ -93,6 +93,13 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <button type="button" id="editorAddSection" class="app-refresh">+ Bölüm ekle</button><button type="button" id="editorAddHeading" class="app-refresh">+ Başlık ekle</button><button type="button" id="editorAddText" class="app-refresh">+ Metin ekle</button><button type="button" id="editorAddLink" class="app-refresh">+ Bağlantı ekle</button><button type="button" id="editorRemoveBlock" class="app-refresh">Seçili öğeyi kaldır</button><button type="button" id="editorImage" class="app-refresh">Resim ekle</button><input type="file" id="editorImageFile" accept="image/*" hidden><button type="button" id="editorPdf" class="app-refresh">PDF ekle</button><input type="file" id="editorPdfFile" accept="application/pdf,.pdf" hidden>
 </div>
 <div id="pageCanvas" contenteditable="true" style="min-height:280px;padding:22px;border:1px solid #d9d7e2;border-radius:12px;background:#fff;color:#25233a;line-height:1.7;outline:none"><h1>Sayfa başlığınız</h1><p>İçeriğinizi buraya yazın. Metni seçerek biçimlendirebilir, resim ekleyip sürükleyerek yerini değiştirebilirsiniz.</p></div>
+<div class="editor-live-preview" style="margin-top:16px;border:1px solid #d9d7e2;border-radius:12px;overflow:hidden;background:#fff">
+ <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:#f7f6fb;border-bottom:1px solid #e7e4ef">
+  <strong style="font-size:13px;color:#40376e">Canlı sayfa görünümü</strong>
+  <span id="editorPreviewStatus" style="font-size:12px;color:#777">Düzenlemeler burada anlık görünür</span>
+ </div>
+ <iframe id="editorLivePreview" title="Sayfanın canlı önizlemesi" style="display:block;width:100%;height:760px;border:0;background:#fff" loading="lazy"></iframe>
+</div>
 <div class="page-tools" style="margin-top:10px"><button type="button" id="editorSave" class="app-refresh">Taslağı kaydet</button><button type="button" id="editorPublish" class="menu-export">Yayımla</button><button type="button" id="editorExport" class="app-refresh">PDF olarak indir</button><span id="editorFeedback" class="page-count" aria-live="polite">Henüz kaydedilmedi.</span></div>
 </section>
 </section>
@@ -300,6 +307,27 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   canvas.innerHTML='<h1>Yeni sayfa</h1><p>İçeriğinizi buraya yazın.</p>';
   feedback('Yeni sayfa hazır. Kaydet veya Yayımla seçeneğini kullan.');
  }
+
+ const livePreview=$('editorLivePreview');
+ function previewDocTarget(doc){return doc.querySelector('main, body > section.single-page-content, body > section.section, body > section');}
+ async function loadFullPagePreview(url,content){
+  if(!livePreview)return;
+  livePreview.src=url;
+  await new Promise((resolve,reject)=>{
+   const timer=setTimeout(()=>reject(new Error('Sayfa önizlemesi zamanında yüklenemedi.')),12000);
+   livePreview.onload=()=>{clearTimeout(timer);resolve();};
+   livePreview.onerror=()=>{clearTimeout(timer);reject(new Error('Sayfa önizlemesi yüklenemedi.'));};
+  });
+  syncLivePreview(content);
+ }
+ function syncLivePreview(content){
+  try{
+   const doc=livePreview?.contentDocument,target=doc&&previewDocTarget(doc);
+   if(!target)return;
+   target.innerHTML=content;
+   const status=$('editorPreviewStatus');if(status)status.textContent='Görünüm güncel';
+  }catch(error){const status=$('editorPreviewStatus');if(status)status.textContent='Önizleme yenilenemedi';}
+ }
  function pageUrl(slug){return '/pages/sayfa.html?slug='+encodeURIComponent(slug);}
  function renderPages(){
   const tbody=$('pageRows'); tbody.querySelectorAll('[data-cms-page-row]').forEach(row=>row.remove());
@@ -406,15 +434,21 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
    try{
     staticButton.disabled=true;staticButton.textContent='Açılıyor…';
     const response=await fetch(preview.href,{cache:'no-store'});if(!response.ok)throw new Error('Sayfa dosyası alınamadı.');
-    const html=await response.text(),doc=new DOMParser().parseFromString(html,'text/html'),main=doc.querySelector('main');
-    if(!main)throw new Error('Sayfanın ana içerik alanı bulunamadı.');
     const pagePath=staticButton.dataset.path||new URL(preview.href,location.origin).pathname;
+    if(pagePath==='/pages/sayfa.html'){
+      feedback('Bu dosya dinamik sayfa şablonudur; doğrudan içerik sayfası değildir. Düzenlemek istediğin gerçek CMS sayfasını CMS sayfa satırından seçmelisin.','error');
+      return;
+    }
+    const html=await response.text(),doc=new DOMParser().parseFromString(html,'text/html');
+    const main=doc.querySelector('main, body > section.single-page-content, body > section.section, body > section');
+    if(!main)throw new Error('Sayfanın içerik alanı bulunamadı; mevcut sayfa değiştirilmedi.');
     const existing=pages.find(page=>page.page_path===pagePath);
     currentId=existing?Number(existing.id):null;currentPath=pagePath;$('editorPath').value=pagePath;
     $('editorTitle').value=existing?.title||row.querySelector('strong')?.textContent?.trim()||doc.title||'Sayfa';
     $('editorSlug').value=existing?.slug||slugify($('editorTitle').value);slugManuallyEdited=true;
     canvas.innerHTML=existing?.content||main.innerHTML;
-    feedback('Mevcut sayfa düzenleyicide açıldı. Kaydet veya Yayımla ile aynı URL üzerinde güncelleyebilirsin.');
+    await loadFullPagePreview(preview.href,canvas.innerHTML);
+    feedback('Mevcut sayfanın tam tasarımı yüklendi. Metin kutusundaki değişiklikler canlı görünümde anlık yansır.');
     $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
    }catch(error){feedback(error.message||'Sayfa açılamadı.','error');}
    finally{staticButton.disabled=false;staticButton.textContent='Düzenle';}
@@ -426,11 +460,14 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   const page=pages.find(item=>String(item.id)===button.dataset.editCms);if(!page)return;
   currentId=Number(page.id);currentPath=page.page_path||'';$('editorPath').value=currentPath;slugManuallyEdited=true;
   $('editorTitle').value=page.title||'';$('editorSlug').value=page.slug||'';canvas.innerHTML=page.content||'';
-  feedback('CMS sayfası düzenlemeye açıldı. Değişiklikleri kaydet veya yeniden yayımla.');
+  if(page.status==='published') await loadFullPagePreview(pageUrl(page.slug),canvas.innerHTML).catch(()=>{});
+  else if(livePreview){livePreview.removeAttribute('src');livePreview.srcdoc='<main style="font:16px/1.7 Arial;padding:28px"><h1>'+safe(page.title)+'</h1>'+canvas.innerHTML+'</main>';}
+  feedback('CMS sayfası düzenlemeye açıldı. Tam sayfa görünümü aşağıda; metin kutusu değişiklikleri anlık yansıtır.');
   $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
  });
 
- let selectedBlock=null;
+ canvas.addEventListener('input',()=>syncLivePreview(canvas.innerHTML));
+  let selectedBlock=null;
  const blockSelector='h1,h2,h3,h4,p,ul,ol,blockquote,figure,section,article,a,button,img';
  function selectBlock(el){if(selectedBlock)selectedBlock.style.outline='';selectedBlock=el;if(selectedBlock)selectedBlock.style.outline='2px dashed #8b79df';}
  canvas.addEventListener('click',e=>{const el=e.target.closest(blockSelector);if(el&&canvas.contains(el)){e.preventDefault();selectBlock(el);}});
