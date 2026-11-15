@@ -217,11 +217,6 @@ export async function onRequestPost(context) {
       if (conflict) return json({ success: false, message: "Aynı URL başka bir aktif sayfada kullanılıyor. Önce URL çakışmasını çözün." }, 409);
       await context.env.DB.prepare("UPDATE pages SET deleted_at = NULL, updated_at = datetime('now') WHERE id = ?").bind(id).run();
       const after = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(id).first();
-    let menuSynced = true;
-    if (status === "published" && !after.page_path) {
-      try { await syncPublishedPageMenu(context.env.DB, after, before); }
-      catch (menuError) { console.error("EDWISE PUBLISHED PAGE MENU SYNC ERROR", menuError); menuSynced = false; }
-    }
       await logAudit(context.env.DB,context.request,auth.admin,{action:"page_restored",entity_type:"page",entity_id:id,entity_title:before.title,details:{before,after}});
       return json({ success: true, message: "Sayfa geri yüklendi." });
     }
@@ -301,7 +296,6 @@ export async function onRequestPost(context) {
     await logAudit(context.env.DB,context.request,auth.admin,{action:status==="published"?"page_created_published":"page_created",entity_type:"page",entity_id:result.meta.last_row_id,entity_title:title,details:{before:null,after:created}});
     return json({
       success: true,
-      message: "Sayfa oluşturuldu.",
       id: result.meta.last_row_id,
       menuSynced,
       message: menuSynced ? "Sayfa oluşturuldu." : "Sayfa yayımlandı ancak menüye otomatik eklenemedi; menü ayarları kontrol edilmeli."
@@ -369,6 +363,11 @@ export async function onRequestPut(context) {
     }
 
     const after = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(id).first();
+    let menuSynced = true;
+    if (status === "published" && !after.page_path) {
+      try { await syncPublishedPageMenu(context.env.DB, after, before); }
+      catch (menuError) { console.error("EDWISE PUBLISHED PAGE MENU SYNC ERROR", menuError); menuSynced = false; }
+    }
     const action = before.status !== status ? (status==="published"?"page_published":"page_unpublished") : "page_updated";
     await logAudit(context.env.DB,context.request,auth.admin,{action,entity_type:"page",entity_id:id,entity_title:title,details:{before,after}});
     return json({ success: true, menuSynced, message: menuSynced ? "Sayfa güncellendi." : "Sayfa güncellendi ve yayımlandı ancak menüye otomatik eklenemedi; menü ayarları kontrol edilmeli." });
