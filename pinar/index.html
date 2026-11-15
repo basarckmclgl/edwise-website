@@ -87,6 +87,16 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <div class="page-tools" style="margin-bottom:10px"><input id="editorTitle" placeholder="Sayfa başlığı" style="flex:2"><input id="editorPath" type="hidden" value=""><input id="editorSlug" placeholder="sayfa-adresi" style="flex:1"><button type="button" id="editorNew" class="app-refresh">Yeni sayfa</button></div>
 <style>
 #pageEditorPanel .editor-workspace{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:16px;align-items:start;margin-top:12px}
+#pageEditorPanel{margin-top:10px!important}
+#pageEditorPanel>.section-head{margin:0 0 8px;align-items:center}
+#pageEditorPanel>.section-head .eyebrow{font-size:9px;letter-spacing:.08em;margin-bottom:2px}
+#pageEditorPanel>.section-head h2{font-size:17px;line-height:1.25;margin:0}
+#pageEditorPanel>.section-head .section-intro{font-size:11px;line-height:1.4;margin:3px 0 0}
+#pageEditorPanel>.section-head>.tag{font-size:10px;padding:5px 8px}
+#pageEditorPanel .editor-sidebar-actions{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:10px;padding:10px;background:#f8f6fb;border:1px solid #e8e2f0;border-radius:10px}
+#pageEditorPanel .editor-sidebar-actions button{min-height:32px;padding:7px 10px;font-size:11px}
+#pageEditorPanel .editor-sidebar-actions #editorFeedback{flex:1 1 100%;font-size:10px;margin:0}
+
 #pageEditorPanel .editor-page-stage{min-width:0;padding:16px;border:1px solid #e8e2f0;border-radius:14px;background:#f7f5fa}
 #pageEditorPanel .editor-page-stage{padding:0;overflow:hidden;background:#fff;border:1px solid #e3ddeb;border-radius:14px;box-shadow:0 5px 22px #30204a0a}
 #pageEditorPanel .editor-surface-tabs{display:flex;align-items:center;gap:6px;padding:9px 12px;background:#f8f6fb;border-bottom:1px solid #e9e4ef}
@@ -165,6 +175,12 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
   <h3>Seçili öğeyi yönet</h3>
   <div class="editor-toolrow"><button type="button" id="editorMoveUp" class="app-refresh">↑ Yukarı</button><button type="button" id="editorMoveDown" class="app-refresh">↓ Aşağı</button><button type="button" id="editorDuplicate" class="app-refresh">Çoğalt</button><button type="button" id="editorRemoveBlock" class="app-refresh">Seçili öğeyi sil</button></div>
  </section>
+ <div class="editor-sidebar-actions" aria-label="Sayfa işlemleri">
+  <button type="button" id="editorSave" class="app-refresh">Taslağı kaydet</button>
+  <button type="button" id="editorPublish" class="menu-export">Yayımla</button>
+  <button type="button" id="editorExport" class="app-refresh">PDF olarak indir</button>
+  <span id="editorFeedback" class="page-count" aria-live="polite">Henüz kaydedilmedi.</span>
+ </div>
 </div>
  <div class="editor-page-stage">
  <div class="editor-surface-tabs" role="tablist" aria-label="Sayfa çalışma görünümü">
@@ -179,7 +195,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
   <iframe id="editorLivePreview" title="Sayfanın gerçek görünümü" style="display:block;width:100%;height:760px;min-height:420px;max-height:1400px;resize:vertical;overflow:auto;border:0;background:#fff" loading="lazy"></iframe>
  </div>
  </div>
-<div class="page-tools" style="margin-top:10px"><button type="button" id="editorSave" class="app-refresh">Taslağı kaydet</button><button type="button" id="editorPublish" class="menu-export">Yayımla</button><button type="button" id="editorExport" class="app-refresh">PDF olarak indir</button><span id="editorFeedback" class="page-count" aria-live="polite">Henüz kaydedilmedi.</span></div>
+
 </section>
 </section>
 
