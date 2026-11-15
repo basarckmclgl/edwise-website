@@ -53,6 +53,21 @@ async function ensureTrashSchema(db) {
   }
 }
 
+async function removePublishedPageFromMenu(db, page) {
+  if (!page || page.page_path) return true;
+  const row = await db.prepare("SELECT setting_value FROM site_settings WHERE setting_key = ? LIMIT 1").bind("menu_theme").first();
+  if (!row?.setting_value) return true;
+  let menu;
+  try { menu = JSON.parse(row.setting_value); } catch { throw new Error("Mevcut menü ayarları okunamadı; menü verisi korunarak işlem durduruldu."); }
+  if (!Array.isArray(menu)) throw new Error("Menü verisinin biçimi geçersiz; mevcut menü korunarak işlem durduruldu.");
+  const url = "/pages/sayfa.html?slug=" + encodeURIComponent(page.slug);
+  const next = menu.filter(item => item.url !== url && item.key !== "cms-page-" + page.slug);
+  if (next.length !== menu.length) {
+    await db.prepare("UPDATE site_settings SET setting_value=?, updated_at=datetime('now') WHERE setting_key=?").bind(JSON.stringify(next), "menu_theme").run();
+  }
+  return true;
+}
+
 async function syncPublishedPageMenu(db, page, previous = null) {
   if (!page || page.page_path) return true;
   const key = "menu_theme";
@@ -217,6 +232,10 @@ export async function onRequestPost(context) {
       if (conflict) return json({ success: false, message: "Aynı URL başka bir aktif sayfada kullanılıyor. Önce URL çakışmasını çözün." }, 409);
       await context.env.DB.prepare("UPDATE pages SET deleted_at = NULL, updated_at = datetime('now') WHERE id = ?").bind(id).run();
       const after = await context.env.DB.prepare("SELECT * FROM pages WHERE id = ?").bind(id).first();
+      if (after.status === "published" && !after.page_path) {
+        try { await syncPublishedPageMenu(context.env.DB, after); }
+        catch (menuError) { console.error("EDWISE RESTORED PAGE MENU SYNC ERROR", menuError); }
+      }
       await logAudit(context.env.DB,context.request,auth.admin,{action:"page_restored",entity_type:"page",entity_id:id,entity_title:before.title,details:{before,after}});
       return json({ success: true, message: "Sayfa geri yüklendi." });
     }
@@ -399,6 +418,10 @@ export async function onRequestDelete(context) {
     const result = await context.env.DB.prepare(
       "UPDATE pages SET deleted_at = datetime('now'), updated_at = datetime('now') WHERE id = ? AND deleted_at IS NULL"
     ).bind(id).run();
+    if (before.status === "published" && !before.page_path) {
+      try { await removePublishedPageFromMenu(context.env.DB, before); }
+      catch (menuError) { console.error("EDWISE DELETED PAGE MENU SYNC ERROR", menuError); }
+    }
 
     if (!result.meta.changes) {
       return json({ success: false, message: "Sayfa bulunamadı." }, 404);
