@@ -86,6 +86,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <div class="section-head"><div><div class="eyebrow">GÖRSEL SAYFA DÜZENLEYİCİ</div><h2>Sayfa içerik düzenleyici</h2><p class="section-intro">Metin ve görselleri Word benzeri araçlarla düzenle. Taslak bu tarayıcıda saklanır.</p></div><span class="tag">Taslak modu</span></div>
 <div class="page-tools" style="margin-bottom:10px"><input id="editorTitle" placeholder="Sayfa başlığı" style="flex:2"><input id="editorPath" type="hidden" value=""><input id="editorSlug" placeholder="sayfa-adresi" style="flex:1"><button type="button" id="editorNew" class="app-refresh">Yeni sayfa</button></div>
 <div class="page-tools" style="gap:6px;margin-bottom:8px;flex-wrap:wrap">
+<button type="button" id="editorModeToggle" class="menu-export" aria-pressed="false">✥ Tasarım modu açık</button><span id="editorSelectionStatus" style="font-size:12px;color:#65546f;padding:8px">Bir öğeye tıklayarak seç ve biçimlendir</span>
 <button type="button" data-editcmd="bold" class="app-refresh"><b>B</b></button><button type="button" data-editcmd="italic" class="app-refresh"><i>I</i></button><button type="button" data-editcmd="underline" class="app-refresh"><u>U</u></button>
 <select id="editorFormat"><option value="p">Normal metin</option><option value="h1">Başlık 1</option><option value="h2">Başlık 2</option><option value="h3">Başlık 3</option><option value="blockquote">Alıntı</option></select>
 <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:#65546f">Yazı tipi
@@ -94,10 +95,10 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <optgroup label="Çok dilli karakter desteği (cihazda yüklüyse)"><option value="Noto Sans">Noto Sans</option><option value="Noto Serif">Noto Serif</option><option value="Noto Sans Arabic">Noto Sans Arabic</option><option value="Noto Naskh Arabic">Noto Naskh Arabic</option><option value="Noto Sans Devanagari">Noto Sans Devanagari</option><option value="Noto Sans CJK SC">Noto Sans CJK (Çince)</option><option value="Noto Sans CJK JP">Noto Sans CJK (Japonca)</option><option value="Noto Sans CJK KR">Noto Sans CJK (Korece)</option></optgroup>
 </select></label>
 <button type="button" data-editcmd="justifyLeft" class="app-refresh">Sola</button><button type="button" data-editcmd="justifyCenter" class="app-refresh">Ortala</button><button type="button" data-editcmd="justifyRight" class="app-refresh">Sağa</button>
-<label>Yazı rengi <input id="editorColor" type="color" value="#29263d"></label><label>Vurgu <input id="editorMark" type="color" value="#fff0a6"></label><label>Arka plan <input id="editorBlockBg" type="color" value="#f3f0fb" title="Seçili kutunun arka planı"></label><label>Köşe <select id="editorBlockRadius"><option value="0">Düz</option><option value="8px">8 px</option><option value="14px" selected>14 px</option><option value="22px">22 px</option></select></label><label>İç boşluk <select id="editorBlockPadding"><option value="8px">Az</option><option value="16px" selected>Orta</option><option value="28px">Geniş</option></select></label>
+<label>Yazı rengi <input id="editorColor" type="color" value="#29263d"></label><label>Vurgu <input id="editorMark" type="color" value="#fff0a6"></label><label>Öğe arka planı <input id="editorBlockBg" type="color" value="#f3f0fb" title="Seçili öğenin arka planı"></label><label>Öğe yazı rengi <input id="editorBlockText" type="color" value="#29263d" title="Seçili öğenin yazı rengi"></label><label>Kenar rengi <input id="editorBlockBorder" type="color" value="#e2dced" title="Seçili öğenin kenarlık rengi"></label><label>Köşe <select id="editorBlockRadius"><option value="0">Düz</option><option value="8px">8 px</option><option value="14px" selected>14 px</option><option value="22px">22 px</option></select></label><label>İç boşluk <select id="editorBlockPadding"><option value="8px">Az</option><option value="16px" selected>Orta</option><option value="28px">Geniş</option></select></label>
 <button type="button" id="editorAddSection" class="app-refresh">+ Bölüm ekle</button><button type="button" id="editorAddHeading" class="app-refresh">+ Başlık ekle</button><button type="button" id="editorAddText" class="app-refresh">+ Metin ekle</button><button type="button" id="editorAddCard" class="app-refresh">+ Kutu / Kart</button><button type="button" id="editorAddColumns" class="app-refresh">+ 2 Sütun</button><button type="button" id="editorAddButton" class="app-refresh">+ Buton</button><button type="button" id="editorAddLink" class="app-refresh">+ Bağlantı ekle</button><button type="button" id="editorMoveUp" class="app-refresh">↑ Yukarı</button><button type="button" id="editorMoveDown" class="app-refresh">↓ Aşağı</button><button type="button" id="editorDuplicate" class="app-refresh">Çoğalt</button><button type="button" id="editorRemoveBlock" class="app-refresh">Seçili öğeyi kaldır</button><button type="button" id="editorImage" class="app-refresh">Resim ekle</button><input type="file" id="editorImageFile" accept="image/*" hidden><button type="button" id="editorPdf" class="app-refresh">PDF ekle</button><input type="file" id="editorPdfFile" accept="application/pdf,.pdf" hidden>
 </div>
-<div id="pageCanvas" contenteditable="true" aria-label="Boyutu sürükleyerek ayarlanabilir sayfa içerik alanı" title="Sağ alt köşeyi sürükleyerek alanı genişletip daraltabilirsiniz." style="display:block;width:100%;max-width:100%;height:520px;min-height:280px;max-height:1200px;resize:both;overflow:auto;box-sizing:border-box;padding:22px;border:1px solid #d9d7e2;border-radius:12px;background:#fff;color:#25233a;line-height:1.7;outline:none"><h1>Sayfa başlığınız</h1><p>İçeriğinizi buraya yazın. Metni seçerek biçimlendirebilir, resim ekleyip sürükleyerek yerini değiştirebilirsiniz.</p></div>
+<div id="pageCanvas" contenteditable="false" aria-label="Boyutu sürükleyerek ayarlanabilir sayfa içerik alanı" title="Sağ alt köşeyi sürükleyerek alanı genişletip daraltabilirsiniz." style="display:block;width:100%;max-width:100%;height:520px;min-height:280px;max-height:1200px;resize:both;overflow:auto;box-sizing:border-box;padding:22px;border:1px solid #d9d7e2;border-radius:12px;background:#fff;color:#25233a;line-height:1.7;outline:none"><h1>Sayfa başlığınız</h1><p>İçeriğinizi buraya yazın. Metni seçerek biçimlendirebilir, resim ekleyip sürükleyerek yerini değiştirebilirsiniz.</p></div>
 <div class="editor-live-preview" style="margin-top:16px;border:1px solid #d9d7e2;border-radius:12px;overflow:hidden;background:#fff">
  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:#f7f6fb;border-bottom:1px solid #e7e4ef">
   <strong style="font-size:13px;color:#40376e">Canlı sayfa görünümü</strong>
@@ -310,7 +311,8 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  function fresh(){
   currentId=null; currentPath=''; $('editorPath').value=''; $('editorTitle').value=''; $('editorSlug').value=''; slugManuallyEdited=false;
   canvas.innerHTML='<h1>Yeni sayfa</h1><p>İçeriğinizi buraya yazın.</p>';
-  feedback('Yeni sayfa hazır. Kaydet veya Yayımla seçeneğini kullan.');
+  canvas.contentEditable='false';setEditorMode(false);selectBlock(null);
+  feedback('Yeni sayfa hazır. Tasarım modunda öğeleri seçebilir, Metin düzenleme modunda yazabilirsiniz.');
  }
 
  const livePreview=$('editorLivePreview');
@@ -451,7 +453,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
     currentId=existing?Number(existing.id):null;currentPath=pagePath;$('editorPath').value=pagePath;
     $('editorTitle').value=existing?.title||row.querySelector('strong')?.textContent?.trim()||doc.title||'Sayfa';
     $('editorSlug').value=existing?.slug||slugify($('editorTitle').value);slugManuallyEdited=true;
-    canvas.innerHTML=existing?.content||main.innerHTML;
+    canvas.innerHTML=existing?.content||main.innerHTML;canvas.contentEditable='false';setEditorMode(false);selectBlock(null);
     await loadFullPagePreview(preview.href,canvas.innerHTML);
     feedback('Mevcut sayfanın tam tasarımı yüklendi. Metin kutusundaki değişiklikler canlı görünümde anlık yansır.');
     $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
@@ -464,7 +466,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   const button=e.target.closest('[data-edit-cms]');if(!button)return;
   const page=pages.find(item=>String(item.id)===button.dataset.editCms);if(!page)return;
   currentId=Number(page.id);currentPath=page.page_path||'';$('editorPath').value=currentPath;slugManuallyEdited=true;
-  $('editorTitle').value=page.title||'';$('editorSlug').value=page.slug||'';canvas.innerHTML=page.content||'';
+  $('editorTitle').value=page.title||'';$('editorSlug').value=page.slug||'';canvas.innerHTML=page.content||'';canvas.contentEditable='false';setEditorMode(false);selectBlock(null);
   if(page.status==='published') await loadFullPagePreview(pageUrl(page.slug),canvas.innerHTML).catch(()=>{});
   else if(livePreview){livePreview.removeAttribute('src');livePreview.srcdoc='<main style="font:16px/1.7 Arial;padding:28px"><h1>'+safe(page.title)+'</h1>'+canvas.innerHTML+'</main>';}
   feedback('CMS sayfası düzenlemeye açıldı. Tam sayfa görünümü aşağıda; metin kutusu değişiklikleri anlık yansıtır.');
@@ -472,10 +474,14 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  });
 
  canvas.addEventListener('input',()=>syncLivePreview(canvas.innerHTML));
-  let selectedBlock=null;
- const blockSelector='h1,h2,h3,h4,p,ul,ol,blockquote,figure,section,article,a,button,img';
- function selectBlock(el){if(selectedBlock)selectedBlock.style.outline='';selectedBlock=el;if(selectedBlock)selectedBlock.style.outline='2px dashed #8b79df';}
- canvas.addEventListener('click',e=>{const el=e.target.closest(blockSelector);if(el&&canvas.contains(el)){e.preventDefault();selectBlock(el);}});
+  let selectedBlock=null,editorTextMode=false;
+ const blockSelector='h1,h2,h3,h4,h5,p,ul,ol,blockquote,figure,section,article,div,a,button,img';
+ function setEditorMode(textMode){editorTextMode=!!textMode;canvas.contentEditable=editorTextMode?'true':'false';const b=$('editorModeToggle');if(b){b.textContent=editorTextMode?'✎ Metin düzenleme açık':'✥ Tasarım modu açık';b.setAttribute('aria-pressed',String(editorTextMode));}const st=$('editorSelectionStatus');if(st)st.textContent=editorTextMode?'Metni seçip yazabilir ve biçimlendirebilirsiniz':'Bir başlığa, paragrafa veya karta tıklayarak yalnızca onu biçimlendirin';}
+ $('editorModeToggle').addEventListener('click',()=>{setEditorMode(!editorTextMode);if(editorTextMode)canvas.focus();else canvas.blur();});
+ function selectBlock(el){if(selectedBlock)selectedBlock.style.outline=selectedBlock.dataset.editorOldOutline||'';selectedBlock=el;if(selectedBlock){selectedBlock.dataset.editorOldOutline=selectedBlock.style.outline||'';selectedBlock.style.outline='2px dashed #8b79df';const st=$('editorSelectionStatus');if(st)st.textContent='Seçili: '+selectedBlock.tagName.toLowerCase()+' · Renk ve kutu ayarları bu öğeye uygulanır';}}
+ canvas.addEventListener('click',e=>{if(editorTextMode)return;const el=e.target.closest(blockSelector);if(el&&canvas.contains(el)){e.preventDefault();selectBlock(el);}});
+ canvas.addEventListener('dblclick',e=>{if(editorTextMode)return;const el=e.target.closest(blockSelector);if(el&&canvas.contains(el)){selectBlock(el);setEditorMode(true);canvas.focus();}});
+
  function addNode(tag,html,styles={}){const node=document.createElement(tag);node.innerHTML=html;node.style.margin='12px 0';Object.assign(node.style,styles);canvas.append(node);selectBlock(node);node.scrollIntoView({behavior:'smooth',block:'center'});canvas.focus();syncLivePreview(canvas.innerHTML);feedback('Yeni öğe eklendi. İçeriğini doğrudan düzenleyebilirsin.');return node;}
  $('editorAddSection').addEventListener('click',()=>addNode('section','<h2>Yeni bölüm başlığı</h2><p>Bu bölüme içerik ekleyin.</p>',{padding:'22px',background:'#f8f7fc',border:'1px solid #e7e2f1',borderRadius:'14px'}));
  $('editorAddHeading').addEventListener('click',()=>addNode('h2','Yeni başlık'));
@@ -487,7 +493,9 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  $('editorMoveUp').addEventListener('click',()=>{if(!selectedBlock||!selectedBlock.previousElementSibling){feedback('Önce taşınacak bir öğe seç.','error');return;}selectedBlock.parentNode.insertBefore(selectedBlock,selectedBlock.previousElementSibling);syncLivePreview(canvas.innerHTML);});
  $('editorMoveDown').addEventListener('click',()=>{if(!selectedBlock||!selectedBlock.nextElementSibling){feedback('Önce taşınacak bir öğe seç.','error');return;}selectedBlock.parentNode.insertBefore(selectedBlock.nextElementSibling,selectedBlock);syncLivePreview(canvas.innerHTML);});
  $('editorDuplicate').addEventListener('click',()=>{if(!selectedBlock||!canvas.contains(selectedBlock)){feedback('Önce çoğaltılacak öğeyi seç.','error');return;}const copy=selectedBlock.cloneNode(true);selectedBlock.after(copy);selectBlock(copy);syncLivePreview(canvas.innerHTML);feedback('Öğe çoğaltıldı.');});
- $('editorBlockBg').addEventListener('input',e=>{if(!selectedBlock){feedback('Önce biçimlendirmek istediğin kutuyu seç.','error');return;}selectedBlock.style.backgroundColor=e.target.value;syncLivePreview(canvas.innerHTML);});
+ $('editorBlockBg').addEventListener('input',e=>{if(!selectedBlock){feedback('Önce biçimlendirmek istediğin öğeyi seç.','error');return;}selectedBlock.style.backgroundColor=e.target.value;syncLivePreview(canvas.innerHTML);});
+ $('editorBlockText').addEventListener('input',e=>{if(!selectedBlock){feedback('Önce yazı rengini değiştireceğin öğeyi seç.','error');return;}selectedBlock.style.color=e.target.value;syncLivePreview(canvas.innerHTML);});
+ $('editorBlockBorder').addEventListener('input',e=>{if(!selectedBlock){feedback('Önce kenarlığını değiştireceğin öğeyi seç.','error');return;}selectedBlock.style.border='1px solid '+e.target.value;syncLivePreview(canvas.innerHTML);});
  $('editorBlockRadius').addEventListener('change',e=>{if(!selectedBlock){feedback('Önce bir öğe seç.','error');return;}selectedBlock.style.borderRadius=e.target.value;syncLivePreview(canvas.innerHTML);});
  $('editorBlockPadding').addEventListener('change',e=>{if(!selectedBlock){feedback('Önce bir öğe seç.','error');return;}selectedBlock.style.padding=e.target.value;syncLivePreview(canvas.innerHTML);});
  $('editorRemoveBlock').addEventListener('click',()=>{if(!selectedBlock||!canvas.contains(selectedBlock)){feedback('Önce kaldırmak istediğin öğeye tıkla.','error');return;}if(!window.confirm('Seçili öğe kaldırılsın mı?'))return;selectedBlock.remove();selectedBlock=null;syncLivePreview(canvas.innerHTML);feedback('Seçili öğe kaldırıldı.');});
