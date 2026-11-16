@@ -30,6 +30,7 @@ export async function onRequestPost(context){
     if(auth.response)return auth.response;
     if(!env.DB||!env.GITHUB_TOKEN||!env.GITHUB_REPO)return json({success:false,error:"Sunucu ayarları eksik."},500);
 
+    const mediaBranch=env.MEDIA_GITHUB_BRANCH||"main";
     const headers={"Authorization":"Bearer "+env.GITHUB_TOKEN,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"EDWISE-CMS"};
     const sources=[
       {path:"media/4117a118-e1e2-47b0-b56b-74833991107a.png",copy:false},
@@ -40,7 +41,7 @@ export async function onRequestPost(context){
 
     for(const source of sources){
       const sourceName=source.path.split("/").pop();
-      const sourceResponse=await fetch("https://api.github.com/repos/"+env.GITHUB_REPO+"/contents/"+source.path+"?ref=main",{headers});
+      const sourceResponse=await fetch("https://api.github.com/repos/"+env.GITHUB_REPO+"/contents/"+source.path+"?ref="+encodeURIComponent(mediaBranch),{headers});
       if(!sourceResponse.ok){skipped.push({file:sourceName,reason:"Kaynak dosya okunamadı."});continue;}
       const sourceData=await sourceResponse.json();
       const bytes=base64ToBytes(sourceData.content||"");
@@ -53,7 +54,7 @@ export async function onRequestPost(context){
         filename=crypto.randomUUID()+"."+extension;
         const put=await fetch("https://api.github.com/repos/"+env.GITHUB_REPO+"/contents/media/"+filename,{
           method:"PUT",headers:{...headers,"Content-Type":"application/json"},
-          body:JSON.stringify({message:"EDWISE: site görselini medya kütüphanesine aktar",content:toBase64(bytes),branch:"main"})
+          body:JSON.stringify({message:"EDWISE: site görselini medya kütüphanesine aktar",content:toBase64(bytes),branch:mediaBranch})
         });
         if(!put.ok){skipped.push({file:sourceName,reason:"Medya deposuna kopyalanamadı."});continue;}
       }
