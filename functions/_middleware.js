@@ -91,7 +91,16 @@ export async function onRequest(context) {
           if (ogTitle) rewrite.on('meta[property="og:title"]', {element(el) { el.setAttribute("content", ogTitle); }});
           if (ogDescription) rewrite.on('meta[property="og:description"]', {element(el) { el.setAttribute("content", ogDescription); }});
           if (ogImage) rewrite.on('meta[property="og:image"]', {element(el) { el.setAttribute("content", ogImage); }});
+          if (canonical) rewrite.on('meta[property="og:url"]', {element(el) { el.setAttribute("content", canonical); }});
+          if (ogTitle) rewrite.on('meta[name="twitter:title"]', {element(el) { el.setAttribute("content", ogTitle); }});
+          if (ogDescription) rewrite.on('meta[name="twitter:description"]', {element(el) { el.setAttribute("content", ogDescription); }});
+          if (ogImage) rewrite.on('meta[name="twitter:image"]', {element(el) { el.setAttribute("content", ogImage); }});
           if (verification) rewrite.on('meta[name="google-site-verification"]', {element(el) { el.setAttribute("content", verification); }});
+          rewrite.on("head", {element(el) {
+            if (ogTitle) el.append('<meta name="twitter:title" content="' + escapeHtml(ogTitle) + '">', {html:true});
+            if (ogDescription) el.append('<meta name="twitter:description" content="' + escapeHtml(ogDescription) + '">', {html:true});
+            if (ogImage) el.append('<meta name="twitter:image" content="' + escapeHtml(ogImage) + '">', {html:true});
+          }});
           if (settings.seoKeywords) rewrite.on("head", {element(el) { el.append('<meta name="keywords" content="' + escapeHtml(String(settings.seoKeywords).slice(0,300)) + '">', {html:true}); }});
           if (verification) rewrite.on("head", {element(el) { el.append('<meta name="google-site-verification" content="' + escapeHtml(verification) + '">', {html:true}); }});
           return rewrite.transform(new Response(response.body, {status:response.status,statusText:response.statusText,headers}));
