@@ -42,7 +42,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <body>
 <aside><div class="brand"><img src="/assets/images/logo.png" alt="EDWISE Education &amp; Consultancy"></div><div class="sub">YÖNETİM MERKEZİ</div><div class="owner-name">Çilem ATASOY</div>
 <div class="navlabel">ÇALIŞMA ALANI</div><nav>
-<a class="active" href="#genel">◫ Genel Bakış</a><a href="#sayfalar">▤ Sayfa Yönetimi</a><a href="#basvurular">▣ Başvuru Yönetimi</a><a href="#medya">▧ Medya Kütüphanesi</a><a href="#menu">☷ Menü Yönetimi</a><a href="#seo">⌕ SEO Yönetimi</a>
+<a class="active" href="#genel">◫ Genel Bakış</a><a href="#sayfalar">▤ Sayfa Yönetimi</a><a href="#basvurular">▣ Başvuru Yönetimi</a><a href="#medya">▧ Medya Kütüphanesi</a><a href="#menu">☷ Menü Yönetimi</a><a href="#seo">⌕ SEO Yönetimi</a><a href="#hesap">♙ Hesap Yönetimi</a>
 </nav><div class="navlabel">YÖNETİM</div><nav><a href="#gecmis">↶ İşlem Geçmişi</a></nav>
 <div class="profile" id="accountProfile" style="position:relative;flex-wrap:wrap">
 <div class="avatar" id="accountAvatar">Y</div>
@@ -253,6 +253,40 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <div class="page-note">Önemli: Mevcut menü kaydetme API'si menu_theme ayarını ortak D1 veritabanına yazıyor; önizleme ve canlı ortam aynı veritabanını kullandığı için bu modülde sunucuya kaydetme/yayınlama düğmesi bilerek etkin değil. Önizleme için ayrı veritabanı oluşturulduktan sonra gerçek kaydetme ve yayınlama bağlanacak.</div>
 </section></div>
 
+<div id="view-hesap" class="module-view" hidden>
+<header><div><div class="eyebrow">EDWISE / Yönetim ve Güvenlik</div><h1>Hesap Yönetimi</h1><p>Yönetici hesaplarını, erişim durumlarını ve hesap güvenliğini yönet.</p></div><div class="date">HESAP MERKEZİ</div></header>
+<section class="welcome"><div><h2>Hesap ve erişim kontrolü</h2><p>Yalnızca yetkili Süper Yönetici hesapları kullanıcı oluşturabilir ve diğer hesapların erişimini yönetebilir.</p></div><div class="welcome-mark">♙</div></section>
+<div class="history-stats">
+<div class="card"><span>Yönetici hesapları</span><div class="number" id="accountTotal">—</div><div class="card-foot">Kayıtlı hesap sayısı</div></div>
+<div class="card"><span>Aktif hesaplar</span><div class="number" id="accountActive">—</div><div class="card-foot">Giriş yapabilen hesaplar</div></div>
+<div class="card"><span>Yetki modeli</span><div class="number" style="font-size:18px">Rol tabanlı</div><div class="card-foot">Sunucu tarafında doğrulanır</div></div>
+</div>
+<section class="panel">
+<div class="section-head"><div><h2>Yönetici hesapları</h2><p class="section-intro">Hesap listesi sunucudan alınır. Ana yönetici hesabı başka bir hesaptan değiştirilemez.</p></div><button class="app-refresh" id="accountRefresh" type="button">Listeyi yenile</button></div>
+<div class="app-feedback" id="accountFeedback" role="status" aria-live="polite">Hesap listesi yükleniyor…</div>
+<div class="table-wrap" id="accountTableWrap" hidden><table class="pages-table"><thead><tr><th>Hesap</th><th>E-posta</th><th>Rol</th><th>Durum</th></tr></thead><tbody id="accountRows"></tbody></table></div>
+</section>
+<section class="panel" style="margin-top:16px">
+<div class="section-head"><div><h2>Yeni yönetici hesabı</h2><p class="section-intro">Yeni hesap ayrı kullanıcı adı, e-posta ve şifreyle oluşturulur. Şifre ilk kurulumda güvenli biçimde belirlenmelidir.</p></div><span class="tag">Süper Yönetici</span></div>
+<form id="newAdminForm" class="seo-fields" style="margin-top:16px">
+<label>Ad soyad<input id="newAdminName" maxlength="80" required placeholder="Ad Soyad"></label>
+<label>Kullanıcı adı<input id="newAdminUsername" maxlength="50" required placeholder="kullanici.adi"></label>
+<label>E-posta<input id="newAdminEmail" type="email" maxlength="254" required placeholder="ornek@edwisedanismanlik.com"></label>
+<label>İlk şifre<input id="newAdminPassword" type="password" minlength="8" maxlength="128" required placeholder="En az 8 karakter"></label>
+<div class="full"><button class="menu-export" id="newAdminSubmit" type="submit">＋ Yönetici hesabı oluştur</button></div>
+</form>
+<div class="page-note">Mevcut sunucu API'si yeni hesapları içerik yöneticisi rolüyle oluşturur. Süper Yönetici hesabı bu ekrandan oluşturulamaz. Kullanıcı listesi ve hesap oluşturma işlemi yalnızca Süper Yönetici yetkisiyle çalışır.</div>
+</section>
+<section class="panel" style="margin-top:16px">
+<h2>Hesap güvenliği</h2>
+<div class="history-scope">
+<div><b>Şifre ve kurtarma</b><small>Kullanıcılar kendi şifrelerini değiştirebilir. Şifremi Unuttum akışı e-posta servisi yapılandırıldığında etkinleşir.</small></div>
+<div><b>Oturum güvenliği</b><small>Hesap devre dışı bırakıldığında o hesaba ait mevcut oturumlar iptal edilir.</small></div>
+<div><b>Rol ve yetkiler</b><small>Şu an etkin roller: Süper Yönetici ve İçerik Yöneticisi. Ayrıntılı Editör/Görüntüleyici rol matrisi henüz sunucu tarafında etkin değil.</small></div>
+<div><b>İşlem geçmişi</b><small>Hesap oluşturma ve hesap değişiklikleri denetim kaydına yazılır.</small></div>
+</div>
+</section>
+</div>
 <div id="view-gecmis" class="module-view" hidden>
 <header><div><div class="eyebrow">EDWISE / Denetim ve Güvenlik</div><h1>İşlem Geçmişi</h1><p>Yönetim merkezinde gerçekleştirilen değişikliklerin izlenmesi ve gerektiğinde önceki sürümlerin geri yüklenmesi.</p></div><div class="date">DENETİM KAYITLARI</div></header>
 <section class="welcome"><div><h2>Değişiklikleri takip et</h2><p>İşlemi yapan yönetici, işlem türü, etkilenen içerik ve işlem zamanı tek kayıtta tutulur. Geri yükleme yalnızca uygun yedeği bulunan kayıtlar için kullanılabilir.</p></div><div class="welcome-mark">↶</div></section>
@@ -304,7 +338,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <script>
 (()=>{const q=document.getElementById('serviceSearch'),c=document.getElementById('serviceCategory'),rows=[...document.querySelectorAll('#serviceRows tr')],count=document.getElementById('serviceCount'),empty=document.getElementById('noServices');if(!q||!c)return;const apply=()=>{const term=q.value.toLocaleLowerCase('tr-TR').trim(),cat=c.value;let shown=0;rows.forEach(row=>{const visible=row.textContent.toLocaleLowerCase('tr-TR').includes(term)&&(cat==='all'||row.dataset.category===cat);row.hidden=!visible;if(visible)shown++;});count.textContent=shown+' hizmet gösteriliyor';empty.style.display=shown?'none':'block';};q.addEventListener('input',apply);c.addEventListener('change',apply);})();
 (()=>{const q=document.getElementById('pageSearch'),c=document.getElementById('pageCategory'),rows=[...document.querySelectorAll('#pageRows tr')],count=document.getElementById('pageCount'),empty=document.getElementById('noPages');if(!q||!c)return;const apply=()=>{const term=q.value.toLocaleLowerCase('tr-TR').trim(),cat=c.value;let shown=0;rows.forEach(row=>{const matchText=row.textContent.toLocaleLowerCase('tr-TR').includes(term),matchCat=cat==='all'||row.dataset.category===cat;const visible=matchText&&matchCat;row.hidden=!visible;if(visible)shown++;});count.textContent=shown+' sayfa gösteriliyor';empty.style.display=shown?'none':'block';};q.addEventListener('input',apply);c.addEventListener('change',apply);})();
-(()=>{const views={genel:document.getElementById('view-genel'),sayfalar:document.getElementById('view-sayfalar'),basvurular:document.getElementById('view-basvurular'),medya:document.getElementById('view-medya'),menu:document.getElementById('view-menu'),seo:document.getElementById('view-seo'),gecmis:document.getElementById('view-gecmis')};const links=[...document.querySelectorAll('aside nav a')];function show(key){if(!views[key])return;Object.entries(views).forEach(([name,node])=>{node.hidden=name!==key;});links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+key));if(location.hash!=='#'+key)history.replaceState(null,'','#'+key);window.scrollTo({top:0,behavior:'auto'});}links.forEach(a=>{const key=['genel','sayfalar','basvurular','medya','menu','seo','gecmis'].find(k=>a.getAttribute('href')==='#'+k);if(key)a.addEventListener('click',e=>{e.preventDefault();show(key);});});document.querySelectorAll('.actions a[href="#sayfalar"],.actions a[href="#basvurular"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();show(a.getAttribute('href').slice(1));}));const initial=['#genel','#sayfalar','#basvurular','#medya','#menu','#seo','#gecmis'].includes(location.hash)?location.hash.slice(1):'genel';show(initial);})();
+(()=>{const views={genel:document.getElementById('view-genel'),sayfalar:document.getElementById('view-sayfalar'),basvurular:document.getElementById('view-basvurular'),medya:document.getElementById('view-medya'),menu:document.getElementById('view-menu'),seo:document.getElementById('view-seo'),hesap:document.getElementById('view-hesap'),gecmis:document.getElementById('view-gecmis')};const links=[...document.querySelectorAll('aside nav a')];function show(key){if(!views[key])return;Object.entries(views).forEach(([name,node])=>{node.hidden=name!==key;});links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+key));if(location.hash!=='#'+key)history.replaceState(null,'','#'+key);window.scrollTo({top:0,behavior:'auto'});}links.forEach(a=>{const key=['genel','sayfalar','basvurular','medya','menu','seo','hesap','gecmis'].find(k=>a.getAttribute('href')==='#'+k);if(key)a.addEventListener('click',e=>{e.preventDefault();show(key);});});document.querySelectorAll('.actions a[href="#sayfalar"],.actions a[href="#basvurular"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();show(a.getAttribute('href').slice(1));}));const initial=['#genel','#sayfalar','#basvurular','#medya','#menu','#seo','#hesap','#gecmis'].includes(location.hash)?location.hash.slice(1):'genel';show(initial);})();
 
 (()=>{const root=document.getElementById('view-basvurular');if(!root)return;const $=id=>document.getElementById(id);let records=[],loading=false,selected=null;
 const labels={new:'Yeni',contacted:'İletişime geçildi',completed:'Tamamlandı'};
@@ -630,7 +664,14 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  $('editorExport').addEventListener('click',()=>{
   const title=$('editorTitle').value||'Sayfa',win=window.open('','_blank');
   if(!win){feedback('PDF oluşturmak için açılır pencereye izin verin.','error');return;}
-  const doc='<!doctype html><html lang="tr"><head><meta charset="utf-8"><title>'+safe(title)+'</title><style>@page{size:A4;margin:18mm}body{font:12pt/1.65 Arial,sans-serif;color:#25233a}img{max-width:100%;height:auto}h1,h2,h3{break-after:avoid}</style></head><body>'+canvas.innerHTML+'</body></html>';
+  const doc='<!doctype html><html lang="tr"><head><meta charset="utf-8"><title>'+safe(title)+'</title><style>@page{size:A4;margin:18mm}body{font:12pt/1.65 Arial,sans-serif;color:#25233a}img{max-width:100%;height:auto}h1,h2,h3{break-after:avoid}</style></head><body>'+canvas.innerHTML+'<script>
+(()=>{const $=id=>document.getElementById(id);const root=$('view-hesap');if(!root)return;const safe=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));const feedback=(msg,type='info')=>{const el=$('accountFeedback');el.textContent=msg;el.className='app-feedback '+type;el.hidden=false;};
+async function load(){const btn=$('accountRefresh');btn.disabled=true;try{const r=await fetch('/api/admins',{credentials:'same-origin',headers:{Accept:'application/json'}});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.message|| (r.status===403?'Bu bölümü görüntülemek için Süper Yönetici yetkisi gerekiyor.':'Hesap listesi alınamadı.'));const users=d.admins||[];$('accountTotal').textContent=users.length;$('accountActive').textContent=users.filter(x=>Number(x.is_active)===1).length;$('accountRows').innerHTML=users.map(x=>'<tr><td><strong>'+safe(x.username)+'</strong><small>#'+safe(x.id)+'</small></td><td>'+safe(x.email)+'</td><td><span class="page-type">'+(x.role==='superadmin'?'Süper Yönetici':'İçerik Yöneticisi')+'</span></td><td><span class="app-status '+(Number(x.is_active)===1?'completed':'new')+'">'+(Number(x.is_active)===1?'Aktif':'Pasif')+'</span></td></tr>').join('');$('accountTableWrap').hidden=false;feedback('Hesap listesi güncellendi.','success');}catch(e){$('accountTotal').textContent='—';$('accountActive').textContent='—';$('accountTableWrap').hidden=true;feedback(e.message||'Hesap listesi yüklenemedi.','error');}finally{btn.disabled=false;}}
+$('accountRefresh').addEventListener('click',load);
+$('newAdminForm').addEventListener('submit',async e=>{e.preventDefault();const btn=$('newAdminSubmit');btn.disabled=true;btn.textContent='Oluşturuluyor…';try{const body={name:$('newAdminName').value.trim(),username:$('newAdminUsername').value.trim(),email:$('newAdminEmail').value.trim(),password:$('newAdminPassword').value};const r=await fetch('/api/admin-users',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({...body,role:'İçerik Yöneticisi',status:'active'})});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.message||'Hesap oluşturulamadı.');$('newAdminForm').reset();feedback(d.message||'Yönetici hesabı oluşturuldu.','success');await load();}catch(e){feedback(e.message||'Hesap oluşturulamadı.','error');}finally{btn.disabled=false;btn.textContent='＋ Yönetici hesabı oluştur';}});
+$('accountRefresh').click();
+})();
+</script></body></html>';
   win.document.open();win.document.write(doc);win.document.close();win.onload=()=>{win.focus();win.print();};
  });
  loadPages();
