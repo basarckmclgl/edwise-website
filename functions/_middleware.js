@@ -4,6 +4,10 @@ const MAINTENANCE_HTML = "<!doctype html><html lang=\"tr\"><meta charset=\"utf-8
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const path = url.pathname;
+  // Static assets bypass application middleware entirely.
+  if (path.startsWith("/assets/") || path.startsWith("/media/") || /\\.(?:css|js|mjs|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|otf|map)$/i.test(path)) {
+    return context.next();
+  }
   // Serve the management panel at /admin without changing the browser URL.
   // Only the exact entry routes are mapped; unknown /admin/* paths remain unavailable.
   const isAdminEntry = path === "/admin" || path === "/admin/";
