@@ -7,8 +7,8 @@ export async function onRequest(context) {
   // Serve the management panel at /admin without changing the browser URL.
   // Only the exact entry routes are mapped; unknown /admin/* paths remain unavailable.
   const isAdminEntry = path === "/admin" || path === "/admin/";
-  const isPanelPage = path === "/yonetim" || path === "/yonetim/" || path === "/yonetim/index.html";
   const isLoginPage = path === "/yonetim/giris.html";
+  const isPanelPage = path === "/yonetim" || (path.startsWith("/yonetim/") && !isLoginPage);
 
   if ((isAdminEntry || isPanelPage) && !isLoginPage) {
     const auth = await requireAdmin(context);
