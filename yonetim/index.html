@@ -36,7 +36,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 .seo-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:16px;margin-top:16px}.seo-fields{display:grid;grid-template-columns:1fr 1fr;gap:13px}.seo-fields label{display:grid;gap:6px;color:#65546f;font-size:12px;font-weight:700}.seo-fields label.full{grid-column:1/-1}.seo-fields input,.seo-fields textarea,.seo-fields select{width:100%;min-width:0;border:1px solid #e6deec;border-radius:8px;padding:10px 11px;background:#fff;color:#332442;font:inherit;font-size:13px}.seo-fields textarea{min-height:84px;resize:vertical;line-height:1.5}.seo-help{font-size:11px;color:#9385a3;font-weight:400}.seo-counter{font-size:11px;color:#8b55c5;font-weight:600;text-align:right}.seo-preview{border:1px solid #e8e1ef;border-radius:12px;padding:17px;background:#fff;margin-top:12px}.seo-preview cite{display:block;color:#28713d;font-size:12px;font-style:normal;overflow-wrap:anywhere}.seo-preview strong{display:block;color:#1a0dab;font-size:18px;font-weight:500;margin:7px 0 5px;line-height:1.35}.seo-preview p{color:#4d5156;font-size:12px;line-height:1.5}.seo-checks{display:grid;gap:10px}.seo-check{display:flex;justify-content:space-between;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:9px;color:#65546f;font-size:12px}.seo-check b{color:#54218f}.seo-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}.seo-stat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}.seo-stat .card{min-height:90px;padding:14px}.seo-stat .number{font-size:21px;margin-top:8px}@media(max-width:850px){.seo-grid{grid-template-columns:1fr}}@media(max-width:520px){.seo-fields{grid-template-columns:1fr}.seo-fields label.full{grid-column:auto}.seo-stat{grid-template-columns:1fr}}
 
 .history-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}.history-stats .card{min-height:104px;padding:15px}.history-stats .number{font-size:21px;margin-top:10px}.history-toolbar{display:flex;gap:9px;margin:16px 0;flex-wrap:wrap}.history-toolbar input,.history-toolbar select{border:1px solid #e6dcf0;border-radius:9px;padding:10px 12px;background:#faf9fc;color:#8d8199;font:inherit;font-size:12px}.history-toolbar input{flex:1;min-width:180px}.history-empty{border:1px dashed #d9c9e8;border-radius:12px;background:#fcfaff;padding:28px 20px;text-align:center}.history-empty-icon{width:46px;height:46px;margin:0 auto 12px;border-radius:14px;background:#f0e6fb;color:#7138b8;display:grid;place-items:center;font-size:24px}.history-empty strong{display:block;color:#54218f;margin-bottom:8px}.history-empty p{max-width:620px;margin:auto;font-size:12px;line-height:1.7}.history-scope{display:grid;grid-template-columns:1fr 1fr;gap:10px}.history-scope>div{border:1px solid var(--line);border-radius:10px;padding:12px}.history-scope b{display:block;color:#54218f;font-size:13px}.history-scope small{display:block;color:var(--muted);font-size:11px;line-height:1.5;margin-top:5px}@media(max-width:650px){.history-stats{grid-template-columns:1fr}.history-scope{grid-template-columns:1fr}}
-</style>
+.profile #accountMenu[hidden]{display:none!important}.profile #accountMenu button{font:inherit;font-size:12px;font-weight:650}.profile #accountEmail{overflow-wrap:anywhere}.profile #accountMenu button:disabled{opacity:.6;cursor:wait}</style>
 
 </head>
 <body>
@@ -44,7 +44,15 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <div class="navlabel">ÇALIŞMA ALANI</div><nav>
 <a class="active" href="#genel">◫ Genel Bakış</a><a href="#sayfalar">▤ Sayfa Yönetimi</a><a href="#basvurular">▣ Başvuru Yönetimi</a><a href="#medya">▧ Medya Kütüphanesi</a><a href="#menu">☷ Menü Yönetimi</a><a href="#seo">⌕ SEO Yönetimi</a>
 </nav><div class="navlabel">YÖNETİM</div><nav><a href="#gecmis">↶ İşlem Geçmişi</a></nav>
-<div class="profile"><div class="avatar">Y</div><div><b>Yönetici</b><small>Ana Yönetici</small></div></div></aside>
+<div class="profile" id="accountProfile" style="position:relative;flex-wrap:wrap">
+<div class="avatar" id="accountAvatar">Y</div>
+<div style="min-width:0;flex:1"><b id="accountName">Yönetici</b><small id="accountEmail">Hesap bilgileri yükleniyor</small></div>
+<button type="button" id="accountMenuToggle" aria-expanded="false" aria-controls="accountMenu" style="border:1px solid #e8def1;background:#fff;color:#68458d;border-radius:8px;padding:7px 10px;cursor:pointer">Hesap ▾</button>
+<div id="accountMenu" hidden style="flex-basis:100%;padding:10px 4px 0;display:grid;gap:8px">
+<button type="button" id="changePasswordOpen" style="border:1px solid #e8def1;background:#fff;color:#68458d;border-radius:8px;padding:9px;text-align:left;cursor:pointer">Şifre Değiştir</button>
+<button type="button" id="logoutButton" style="border:1px solid #f0dada;background:#fff8f8;color:#a43e38;border-radius:8px;padding:9px;text-align:left;cursor:pointer">Çıkış Yap</button>
+<div id="accountFeedback" style="font-size:11px;color:#a43e38" role="status"></div>
+</div></div></aside>
 <main id="genel"><div id="view-genel" class="module-view"><header><div><div class="eyebrow">EDWISE / Yönetim</div><h1>Genel Bakış</h1><p>Web sitenin içerik ve başvuru durumunu tek yerden takip et.</p></div><div class="date">YÖNETİM ÖNİZLEMESİ</div></header>
 <section class="welcome"><div><h2>Yönetim merkezine hoş geldin</h2><p>Tüm sayfalarını, hizmet içeriklerini, başvurularını ve medya dosyalarını buradan yönetebileceksin.</p></div><div class="welcome-mark">✦</div></section>
 
@@ -627,6 +635,19 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  });
  loadPages();
 })();;
+
+// Hesap menüsü: yalnızca bu tarayıcının mevcut oturumunu kapatır.
+(()=>{const $=id=>document.getElementById(id),toggle=$('accountMenuToggle'),menu=$('accountMenu'),logout=$('logoutButton'),feedback=$('accountFeedback');
+ if(!toggle||!menu||!logout)return;
+ toggle.addEventListener('click',()=>{menu.hidden=!menu.hidden;toggle.setAttribute('aria-expanded',String(!menu.hidden));});
+ document.addEventListener('click',e=>{if(!e.target.closest('#accountProfile')){menu.hidden=true;toggle.setAttribute('aria-expanded','false');}});
+ fetch('/api/me',{credentials:'same-origin',cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{
+  const a=d?.admin||d?.user||d;
+  if(a){$('accountName').textContent=a.username||'Yönetici';$('accountEmail').textContent=a.email||a.role||'Yönetici hesabı';$('accountAvatar').textContent=(a.username||'Y').trim().charAt(0).toLocaleUpperCase('tr-TR');}
+ }).catch(()=>{});
+ $('changePasswordOpen')?.addEventListener('click',()=>{location.hash='#hesap-sifre';feedback.textContent='Şifre değiştirme ekranı henüz bu panele bağlanmadı.';});
+ logout.addEventListener('click',async()=>{logout.disabled=true;logout.textContent='Çıkış yapılıyor…';feedback.textContent='';try{const r=await fetch('/api/logout',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Accept':'application/json'}});const d=await r.json().catch(()=>({}));if(!r.ok||!d.success)throw new Error(d.message||'Çıkış yapılamadı.');location.replace('/yonetim/giris.html');}catch(e){feedback.textContent=e.message||'Çıkış yapılamadı.';logout.disabled=false;logout.textContent='Çıkış Yap';}});
+})();
 
 let edwiseWorkActive=false,edwiseWorkStarting=false,edwiseChecking=false;
 async function edwiseSetWork(active){
