@@ -90,7 +90,7 @@ export async function onRequestPost(context) {
       "UPDATE admins SET password_hash = ?, updated_at = datetime('now') WHERE id = ?"
     ).bind(newHash, admin.id).run();
 
-    const currentTokenHash = await hashToken(match[1]);
+    const currentTokenHash = await hashToken(token);
     await env.DB.prepare(
       "DELETE FROM admin_sessions WHERE admin_id = ? AND token_hash <> ?"
     ).bind(admin.id, currentTokenHash).run();
