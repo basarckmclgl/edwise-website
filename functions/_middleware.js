@@ -3,7 +3,7 @@ const MAINTENANCE_HTML = "<!doctype html><html lang=\"tr\"><meta charset=\"utf-8
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const path = url.pathname;
-  // Serve the Pinar control panel at /admin without changing the browser URL.
+  // Serve the management panel at /admin without changing the browser URL.
   // Only the exact entry routes are mapped; unknown /admin/* paths remain unavailable.
   const isAdminEntry = path === "/admin" || path === "/admin/";
   if (path.startsWith("/admin/") && !isAdminEntry) {
@@ -22,7 +22,7 @@ export async function onRequest(context) {
     }
   }
   const response = isAdminEntry
-    ? await context.next(new Request(new URL("/pinar/" + url.search, url), context.request))
+    ? await context.next(new Request(new URL("/yonetim/" + url.search, url), context.request))
     : await context.next();
   const headers = new Headers(response.headers);
   headers.set("X-Content-Type-Options", "nosniff");
