@@ -28,12 +28,6 @@ export async function onRequest(context) {
   if (isAdminEntry) {
     return Response.redirect(new URL("/yonetim/giris.html?next=%2Fyonetim%2F", url), 302);
   }
-  if (isPanelPage && !isLoginPage) {
-    const auth = await requireAdmin(context);
-    if (auth.response) {
-      return Response.redirect(new URL("/yonetim/giris.html?next=" + encodeURIComponent(path + url.search), url), 302);
-    }
-  }
   if (path.startsWith("/admin/") && !isAdminEntry) {
     return new Response("Not Found", {status:404,headers:{"Content-Type":"text/plain; charset=utf-8","Cache-Control":"no-store, max-age=0","X-Content-Type-Options":"nosniff"}});
   }
