@@ -627,5 +627,47 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  });
  loadPages();
 })();;
+
+let edwiseWorkActive=false,edwiseWorkStarting=false,edwiseChecking=false;
+async function edwiseSetWork(active){
+ if(active&&edwiseWorkActive)return;
+ if(active&&edwiseWorkStarting)return;
+ if(active)edwiseWorkStarting=true;
+ try{
+  const r=await fetch('/api/session-work',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({active})});
+  if(r.status===401){location.replace('/yonetim/giris.html?next='+encodeURIComponent(location.pathname+location.search));return;}
+  if(r.ok)edwiseWorkActive=active;
+ }catch(e){}
+ finally{edwiseWorkStarting=false;}
+}
+document.addEventListener('input',e=>{
+ if(e.target&&e.target.closest('main')&&!['password','file','hidden'].includes((e.target.type||'').toLowerCase()))edwiseSetWork(true);
+},true);
+document.addEventListener('change',e=>{
+ if(e.target&&e.target.closest('main')&&!['password','file','hidden'].includes((e.target.type||'').toLowerCase()))edwiseSetWork(true);
+},true);
+const edwiseOriginalFetch=window.fetch.bind(window);
+window.fetch=async function(input,init){
+ const response=await edwiseOriginalFetch(input,init);
+ const url=typeof input==='string'?input:(input&&input.url)||'';
+ const method=String((init&&init.method)||(input&&input.method)||'GET').toUpperCase();
+ if(response.status===401&&url.startsWith('/api/')&&!url.includes('/api/session-work')&&!url.includes('/api/login')){
+  location.replace('/yonetim/giris.html?next='+encodeURIComponent(location.pathname+location.search));
+ }
+ if(edwiseWorkActive&&url.startsWith('/api/')&&!url.includes('/api/session-work')&&['POST','PUT','PATCH','DELETE'].includes(method)&&response.ok){
+  edwiseSetWork(false);
+ }
+ return response;
+};
+setInterval(async()=>{
+ if(edwiseChecking)return;
+ edwiseChecking=true;
+ try{
+  const r=await edwiseOriginalFetch('/api/me',{credentials:'same-origin',cache:'no-store'});
+  if(r.status===401)location.replace('/yonetim/giris.html?next='+encodeURIComponent(location.pathname+location.search));
+ }catch(e){}
+ finally{edwiseChecking=false;}
+},30000);
+
 </script>
 </main></body></html>
