@@ -1,5 +1,6 @@
 import { requireEditor } from "./_auth.js";
 import { logAudit } from "./_audit.js";
+import { getMediaBranch } from "./_media-branch.js";
 
 function json(data,status=200){return Response.json(data,{status,headers:{"Cache-Control":"no-store"}});}
 function base64ToBytes(value){
@@ -30,7 +31,7 @@ export async function onRequestPost(context){
     if(auth.response)return auth.response;
     if(!env.DB||!env.GITHUB_TOKEN||!env.GITHUB_REPO)return json({success:false,error:"Sunucu ayarları eksik."},500);
 
-    const mediaBranch=env.MEDIA_GITHUB_BRANCH||"main";
+    const mediaBranch=getMediaBranch(context);
     const headers={"Authorization":"Bearer "+env.GITHUB_TOKEN,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"EDWISE-CMS"};
     const sources=[
       {path:"media/4117a118-e1e2-47b0-b56b-74833991107a.png",copy:false},
