@@ -97,5 +97,22 @@ export async function onRequest(context) {
       console.error("Preview SEO metadata could not be applied; serving original HTML.", error);
     }
   }
+  // GA4 ID is exposed to the consent script on Preview pages only.
+  if (url.hostname === "yonetim-paneli.edwise.pages.dev" && response.ok && (headers.get("Content-Type")||"").includes("text/html")) {
+    try {
+      const seoDb = context.env["edwise-deneme"];
+      const row = seoDb ? await seoDb.prepare("SELECT settings_json FROM seo_settings WHERE id=1").first() : null;
+      const settings = JSON.parse(row?.settings_json || "{}");
+      const gaId = String(settings.seoGaId || "").trim();
+      if (gaId && /^G-[A-Z0-9]+$/.test(gaId)) {
+        const gaRewrite = new HTMLRewriter().on("head", {
+          element(el) { el.append('<meta name="edwise-ga4-id" content="' + gaId + '">', {html:true}); }
+        });
+        return gaRewrite.transform(new Response(response.body, {status:response.status,statusText:response.statusText,headers}));
+      }
+    } catch (error) {
+      console.error("Preview GA4 setting could not be exposed; serving current HTML.", error);
+    }
+  }
     return new Response(response.body, {status:response.status,statusText:response.statusText,headers});
 }
