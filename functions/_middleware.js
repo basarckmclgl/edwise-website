@@ -132,6 +132,10 @@ export async function onRequest(context) {
       const gaId = String(settings.seoGaId || "").trim();
       const escapeHtml = value => String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
       const rewrite = new HTMLRewriter();
+      let twitterTitleSeen = false, twitterDescriptionSeen = false, twitterImageSeen = false, twitterCardSeen = false;
+      let effectiveTwitterTitle = ogTitle || title || "";
+      let effectiveTwitterDescription = ogDescription || description || "";
+      let effectiveTwitterImage = ogImage || "";
       if (title) rewrite.on("title",{element(el){el.setInnerContent(title);}});
       if (description) rewrite.on('meta[name="description"]',{element(el){el.setAttribute("content",description);}});
       rewrite.on('link[rel="canonical"]',{element(el){el.setAttribute("href",canonical);}});
@@ -139,10 +143,20 @@ export async function onRequest(context) {
       if (ogTitle) rewrite.on('meta[property="og:title"]',{element(el){el.setAttribute("content",ogTitle);}});
       if (ogDescription) rewrite.on('meta[property="og:description"]',{element(el){el.setAttribute("content",ogDescription);}});
       rewrite.on('meta[property="og:url"]',{element(el){el.setAttribute("content",canonical);}});
-      if (ogImage) rewrite.on('meta[property="og:image"]',{element(el){el.setAttribute("content",ogImage);}});
-      if (ogTitle) rewrite.on('meta[name="twitter:title"]',{element(el){el.setAttribute("content",ogTitle);}});
-      if (ogDescription) rewrite.on('meta[name="twitter:description"]',{element(el){el.setAttribute("content",ogDescription);}});
-      if (ogImage) rewrite.on('meta[name="twitter:image"]',{element(el){el.setAttribute("content",ogImage);}});
+      rewrite.on('meta[property="og:image"]',{element(el){
+        if (ogImage) el.setAttribute("content",ogImage);
+        if (!effectiveTwitterImage) effectiveTwitterImage = el.getAttribute("content") || "";
+      }});
+      rewrite.on('meta[name="twitter:title"]',{element(el){twitterTitleSeen=true; if(effectiveTwitterTitle) el.setAttribute("content",effectiveTwitterTitle);}});
+      rewrite.on('meta[name="twitter:description"]',{element(el){twitterDescriptionSeen=true; if(effectiveTwitterDescription) el.setAttribute("content",effectiveTwitterDescription);}});
+      rewrite.on('meta[name="twitter:image"]',{element(el){twitterImageSeen=true; if(effectiveTwitterImage) el.setAttribute("content",effectiveTwitterImage);}});
+      rewrite.on('meta[name="twitter:card"]',{element(el){twitterCardSeen=true; el.setAttribute("content",effectiveTwitterImage ? "summary_large_image" : "summary");}});
+      rewrite.on("head",{element(el){el.onEndTag(end=>{
+        if (!twitterTitleSeen && effectiveTwitterTitle) end.append('<meta name="twitter:title" content="' + escapeHtml(effectiveTwitterTitle) + '">',{html:true});
+        if (!twitterDescriptionSeen && effectiveTwitterDescription) end.append('<meta name="twitter:description" content="' + escapeHtml(effectiveTwitterDescription) + '">',{html:true});
+        if (!twitterImageSeen && effectiveTwitterImage) end.append('<meta name="twitter:image" content="' + escapeHtml(effectiveTwitterImage) + '">',{html:true});
+        if (!twitterCardSeen) end.append('<meta name="twitter:card" content="' + (effectiveTwitterImage ? 'summary_large_image' : 'summary') + '">',{html:true});
+      });}});
       if (verification) rewrite.on('meta[name="google-site-verification"]',{element(el){el.setAttribute("content",verification);}});
       if (keywords) rewrite.on('meta[name="keywords"]',{element(el){el.setAttribute("content",keywords);}});
       if (gaId && /^G-[A-Z0-9]+$/.test(gaId)) rewrite.on("head",{element(el){el.append('<meta name="edwise-ga4-id" content="' + gaId + '">',{html:true});}});
