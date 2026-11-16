@@ -22,7 +22,7 @@ export async function onRequest(context) {
     }
   }
   const response = isAdminEntry
-    ? await context.next({request: new Request(new URL("/pinar/index.html" + url.search, url), context.request)})
+    ? await context.next(new Request(new URL("/pinar/" + url.search, url), context.request))
     : await context.next();
   const headers = new Headers(response.headers);
   headers.set("X-Content-Type-Options", "nosniff");
