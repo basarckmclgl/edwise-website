@@ -1,5 +1,6 @@
 import { requireEditor } from "./_auth.js";
 import { logAudit } from "./_audit.js";
+import { getMediaBranch } from "./_media-branch.js";
 
 export async function onRequestPost(context) {
   const origin = context.request.headers.get("Origin");
@@ -33,7 +34,7 @@ export async function onRequestPost(context) {
     }
 
     const before = await env.DB.prepare("SELECT * FROM media WHERE file_name = ?").bind(fileName).first();
-    const mediaBranch = env.MEDIA_GITHUB_BRANCH || "main";
+    const mediaBranch = getMediaBranch(context);
     const apiUrl = "https://api.github.com/repos/" + env.GITHUB_REPO +
       "/contents/media/" + encodeURIComponent(fileName) + "?ref=" + encodeURIComponent(mediaBranch);
     const headers = {
