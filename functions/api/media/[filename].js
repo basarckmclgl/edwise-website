@@ -31,8 +31,8 @@ export async function onRequestGet({ params, env }) {
   if (!token || !repo) return response("Görsel deposu yapılandırılmamış.", 500);
 
   try {
-    const upstream = await fetch(
-      "https://api.github.com/repos/" + repo + "/contents/media/" + filename + "?ref=" + encodeURIComponent(mediaBranch),
+    const requestImage = async branch => fetch(
+      "https://api.github.com/repos/" + repo + "/contents/media/" + filename + "?ref=" + encodeURIComponent(branch),
       {
         headers: {
           "Authorization": "Bearer " + token,
@@ -42,6 +42,12 @@ export async function onRequestGet({ params, env }) {
         }
       }
     );
+
+    // Eski medya dosyaları main dalında duruyorsa Preview'da da salt okunur sun.
+    let upstream = await requestImage(mediaBranch);
+    if (upstream.status === 404 && mediaBranch !== "main") {
+      upstream = await requestImage("main");
+    }
 
     if (!upstream.ok) {
       return response("Görsel deposundan dosya alınamadı.", upstream.status === 404 ? 404 : 502);
