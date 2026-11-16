@@ -11,3 +11,9 @@ export function getMediaBranch(context) {
   }
   return configured || "main";
 }
+
+// Medya dosyaları iki ortamda da kullanılacağı için yüklemeler ortak canlı depoya yazılır.
+// Bu yalnızca media/ klasörüne dosya ekler; uygulama kodunu değiştirmez.
+export function getSharedMediaWriteBranch() {
+  return "main";
+}
