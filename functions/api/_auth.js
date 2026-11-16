@@ -29,6 +29,11 @@ function authError(message, status) {
   };
 }
 
+async function ensureSessionColumns(db) {
+  try { await db.prepare("ALTER TABLE admin_sessions ADD COLUMN work_started_at TEXT").run(); } catch {}
+  try { await db.prepare("ALTER TABLE admin_sessions ADD COLUMN grace_until TEXT").run(); } catch {}
+}
+
 // Oturum kontrolü: Mevcut giriş sistemi korunur.
 export async function requireAdmin(context) {
   const token = getCookie(
@@ -43,6 +48,7 @@ export async function requireAdmin(context) {
     );
   }
 
+  await ensureSessionColumns(context.env.DB);
   const tokenHash = await hashToken(token);
 
   const result = await context.env.DB.prepare(`
@@ -54,7 +60,7 @@ export async function requireAdmin(context) {
     FROM admin_sessions s
     INNER JOIN admins a ON a.id = s.admin_id
     WHERE s.token_hash = ?
-      AND datetime(s.expires_at) > datetime('now')
+      AND (datetime(s.expires_at) > datetime('now') OR (s.work_started_at IS NOT NULL AND datetime(s.grace_until) > datetime('now')))
       AND a.is_active = 1
     LIMIT 1
   `).bind(tokenHash).first();
