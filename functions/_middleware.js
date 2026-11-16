@@ -129,6 +129,7 @@ export async function onRequest(context) {
       const ogImage = String(isHome ? (settings.seoOgImage || "") : "").slice(0,500);
       const verification = String(isHome ? (settings.seoGsc || "") : "").slice(0,300);
       const keywords = String(isHome ? (settings.seoKeywords || "") : "").slice(0,300);
+      const gaId = String(settings.seoGaId || "").trim();
       const escapeHtml = value => String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
       const rewrite = new HTMLRewriter();
       if (title) rewrite.on("title",{element(el){el.setInnerContent(title);}});
@@ -144,6 +145,7 @@ export async function onRequest(context) {
       if (ogImage) rewrite.on('meta[name="twitter:image"]',{element(el){el.setAttribute("content",ogImage);}});
       if (verification) rewrite.on('meta[name="google-site-verification"]',{element(el){el.setAttribute("content",verification);}});
       if (keywords) rewrite.on('meta[name="keywords"]',{element(el){el.setAttribute("content",keywords);}});
+      if (gaId && /^G-[A-Z0-9]+$/.test(gaId)) rewrite.on("head",{element(el){el.append('<meta name="edwise-ga4-id" content="' + gaId + '">',{html:true});}});
       // CMS pages are rendered server-side for crawlers; the client renderer remains unchanged.
       return rewrite.transform(new Response(response.body,{status:response.status,statusText:response.statusText,headers}));
     } catch (error) {
