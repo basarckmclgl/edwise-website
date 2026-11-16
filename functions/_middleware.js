@@ -59,6 +59,8 @@ export async function onRequest(context) {
   headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   headers.set("Cross-Origin-Resource-Policy", "same-origin");
+  // Search engines must not index temporary Preview deployments.
+  if (url.hostname === "yonetim-paneli.edwise.pages.dev") headers.set("X-Robots-Tag", "noindex, nofollow");
   if (path.startsWith("/api/") || isAdminEntry || isPanelPage || isLoginPage) {
     headers.set("Cache-Control", "no-store, max-age=0");
     headers.set("Pragma", "no-cache");
