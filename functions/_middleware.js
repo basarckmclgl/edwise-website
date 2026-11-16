@@ -10,6 +10,19 @@ export async function onRequest(context) {
   const isLoginPage = path === "/yonetim/giris.html";
   const isPanelPage = path === "/yonetim" || (path.startsWith("/yonetim/") && !isLoginPage);
 
+  // The login document must always be served as a public static asset.
+  // Bypass every auth/maintenance redirect for this exact path.
+  if (isLoginPage) {
+    const loginResponse = await context.next();
+    const loginHeaders = new Headers(loginResponse.headers);
+    loginHeaders.set("Cache-Control", "no-store, max-age=0");
+    loginHeaders.set("Pragma", "no-cache");
+    loginHeaders.set("X-Robots-Tag", "noindex, nofollow");
+    loginHeaders.set("X-Content-Type-Options", "nosniff");
+    loginHeaders.set("X-Frame-Options", "SAMEORIGIN");
+    return new Response(loginResponse.body, {status:loginResponse.status,statusText:loginResponse.statusText,headers:loginHeaders});
+  }
+
   // /admin is only an entry alias. Always send it to the real login
   // page; the login page then sends authenticated users to the panel.
   if (isAdminEntry) {
