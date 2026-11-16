@@ -144,7 +144,7 @@ export async function onRequestPost({ request, env }) {
 
     await env.DB.prepare(`
       DELETE FROM admin_sessions
-      WHERE expires_at <= ?
+      WHERE datetime(COALESCE(grace_until, expires_at)) <= datetime(?)
     `).bind(new Date().toISOString()).run();
 
     await env.DB.prepare(`
