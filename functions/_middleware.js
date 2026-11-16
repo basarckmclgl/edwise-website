@@ -126,7 +126,7 @@ export async function onRequest(context) {
       const robots = isHome && settings.seoRobots ? String(settings.seoRobots) : "";
       const ogTitle = String((isHome && settings.seoOgTitle) || title || "").slice(0,200);
       const ogDescription = String((isHome && settings.seoOgDescription) || description || "").slice(0,500);
-      const ogImage = String(isHome ? (settings.seoOgImage || "") : "").slice(0,500);
+      const ogImage = String(settings.seoOgImage || "").slice(0,500);
       const verification = String(isHome ? (settings.seoGsc || "") : "").slice(0,300);
       const keywords = String(isHome ? (settings.seoKeywords || "") : "").slice(0,300);
       const gaId = String(settings.seoGaId || "").trim();
