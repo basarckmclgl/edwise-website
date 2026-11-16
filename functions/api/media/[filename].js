@@ -26,12 +26,13 @@ export async function onRequestGet({ params, env }) {
   if (!match) return response("Geçersiz görsel adresi.", 400);
 
   const token = env.GITHUB_TOKEN;
+  const mediaBranch = env.MEDIA_GITHUB_BRANCH || "main";
   const repo = env.GITHUB_REPO;
   if (!token || !repo) return response("Görsel deposu yapılandırılmamış.", 500);
 
   try {
     const upstream = await fetch(
-      "https://api.github.com/repos/" + repo + "/contents/media/" + filename + "?ref=main",
+      "https://api.github.com/repos/" + repo + "/contents/media/" + filename + "?ref=" + encodeURIComponent(mediaBranch),
       {
         headers: {
           "Authorization": "Bearer " + token,
