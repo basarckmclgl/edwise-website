@@ -136,9 +136,10 @@ export async function onRequestPost({ request, env }) {
 
     const tokenHash = await hashToken(token);
 
-    const expiresAt = new Date(
-      Date.now() + 24 * 60 * 60 * 1000
-    ).toISOString();
+    const rememberMe = data.rememberMe === true;
+    const sessionDuration = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+    const expiresAt = new Date(Date.now() + sessionDuration).toISOString();
+    const cookieMaxAge = Math.floor(sessionDuration / 1000) + 15 * 60;
 
     await env.DB.prepare(`
       DELETE FROM admin_sessions
@@ -164,7 +165,7 @@ export async function onRequestPost({ request, env }) {
       "Secure",
       "SameSite=Lax",
       "Path=/",
-      "Max-Age=87300"
+      `Max-Age=${cookieMaxAge}`
     ].join("; ");
 
     return json({
