@@ -1,7 +1,7 @@
 
 import { requireEditor } from "./_auth.js";
 import { logAudit } from "./_audit.js";
-import { getMediaBranch } from "./_media-branch.js";
+import { getSharedMediaWriteBranch } from "./_media-branch.js";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
@@ -55,9 +55,7 @@ export async function onRequestPost(context) {
     const token = context.env.GITHUB_TOKEN;
     const repo = context.env.GITHUB_REPO;
     const db = context.env.DB;
-    let mediaBranch;
-    try { mediaBranch = getMediaBranch(context); }
-    catch (error) { return json({ error: error.message }, 503); }
+    const mediaBranch = getSharedMediaWriteBranch();
 
     if (!token || !repo || !db) {
       return json({
