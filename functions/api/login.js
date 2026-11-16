@@ -88,6 +88,8 @@ export async function onRequestPost({ request, env }) {
       return json({ success: false, message: "İstek kaynağı geçersiz." }, 403);
     }
 
+    try { await env.DB.prepare("ALTER TABLE admin_sessions ADD COLUMN work_started_at TEXT").run(); } catch {}
+    try { await env.DB.prepare("ALTER TABLE admin_sessions ADD COLUMN grace_until TEXT").run(); } catch {}
     await env.DB.exec(`CREATE TABLE IF NOT EXISTS admin_login_attempts (ip_address TEXT NOT NULL, username TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, first_attempt_at TEXT NOT NULL DEFAULT (datetime('now')), last_attempt_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY(ip_address,username));`);
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";
     const data = await request.json();
@@ -137,7 +139,7 @@ export async function onRequestPost({ request, env }) {
     const tokenHash = await hashToken(token);
 
     const expiresAt = new Date(
-      Date.now() + 7 * 24 * 60 * 60 * 1000
+      Date.now() + 24 * 60 * 60 * 1000
     ).toISOString();
 
     await env.DB.prepare(`
@@ -164,7 +166,7 @@ export async function onRequestPost({ request, env }) {
       "Secure",
       "SameSite=Lax",
       "Path=/",
-      "Max-Age=604800"
+      "Max-Age=87300"
     ].join("; ");
 
     return json({
