@@ -6,9 +6,10 @@ function json(data, status = 200) {
 
 async function getTokenHash(request) {
   const cookie = request.headers.get("Cookie") || "";
-  const match = cookie.match(/(?:^|;\\s*)edwise_session=([a-f0-9]{64})(?:;|$)/i);
-  if (!match) return null;
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(match[1]));
+  const pair = cookie.split(";").map(value => value.trim()).find(value => value.startsWith("edwise_session="));
+  const token = pair ? pair.slice("edwise_session=".length) : "";
+  if (!/^[a-f0-9]{64}$/i.test(token)) return null;
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
   return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
