@@ -124,14 +124,15 @@ export async function onRequest(context) {
         ? "https://edwisedanismanlik.com/pages/sayfa.html?slug=" + encodeURIComponent(pageSeo.slug)
         : "https://edwisedanismanlik.com" + canonicalPath;
       const robots = isHome && settings.seoRobots ? String(settings.seoRobots) : "";
-      const ogTitle = String((isHome && settings.seoOgTitle) || title || "").slice(0,200);
-      const ogDescription = String((isHome && settings.seoOgDescription) || description || "").slice(0,500);
-      const ogImage = String(settings.seoOgImage || "").slice(0,500);
+      const ogTitle = String((isHome && settings.seoOgTitle) || title || "EDWISE | Education & Consultancy").slice(0,200);
+      const ogDescription = String((isHome && settings.seoOgDescription) || description || "EDWISE Hatay Antakya'da eğitim danışmanlığı ve yabancı dil hazırlık hizmetleri sunar.").slice(0,500);
+      const ogImage = String(settings.seoOgImage || "https://edwisedanismanlik.com/assets/images/logo.png").slice(0,500);
       const verification = String(isHome ? (settings.seoGsc || "") : "").slice(0,300);
       const keywords = String(isHome ? (settings.seoKeywords || "") : "").slice(0,300);
       const gaId = String(settings.seoGaId || "").trim();
       const escapeHtml = value => String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
       const rewrite = new HTMLRewriter();
+      let ogTypeSeen = false, ogSiteNameSeen = false, ogTitleSeen = false, ogDescriptionSeen = false, ogUrlSeen = false, ogImageSeen = false, ogImageAltSeen = false;
       let twitterTitleSeen = false, twitterDescriptionSeen = false, twitterImageSeen = false, twitterCardSeen = false;
       let effectiveTwitterTitle = ogTitle || title || "";
       let effectiveTwitterDescription = ogDescription || description || "";
@@ -140,24 +141,34 @@ export async function onRequest(context) {
       if (description) rewrite.on('meta[name="description"]',{element(el){el.setAttribute("content",description);}});
       rewrite.on('link[rel="canonical"]',{element(el){el.setAttribute("href",canonical);}});
       if (robots) rewrite.on('meta[name="robots"]',{element(el){el.setAttribute("content",robots);}});
+      rewrite.on('meta[property="og:type"]',{element(el){ogTypeSeen=true; el.setAttribute("content","website");}});
+      rewrite.on('meta[property="og:site_name"]',{element(el){ogSiteNameSeen=true; el.setAttribute("content","EDWISE Education & Consultancy");}});
       rewrite.on('meta[property="og:title"]',{element(el){
-        if (ogTitle) el.setAttribute("content",ogTitle);
-        if (!effectiveTwitterTitle) effectiveTwitterTitle = el.getAttribute("content") || "";
+        ogTitleSeen=true; el.setAttribute("content",ogTitle);
+        if (!effectiveTwitterTitle) effectiveTwitterTitle = ogTitle;
       }});
       rewrite.on('meta[property="og:description"]',{element(el){
-        if (ogDescription) el.setAttribute("content",ogDescription);
-        if (!effectiveTwitterDescription) effectiveTwitterDescription = el.getAttribute("content") || "";
+        ogDescriptionSeen=true; el.setAttribute("content",ogDescription);
+        if (!effectiveTwitterDescription) effectiveTwitterDescription = ogDescription;
       }});
-      rewrite.on('meta[property="og:url"]',{element(el){el.setAttribute("content",canonical);}});
+      rewrite.on('meta[property="og:url"]',{element(el){ogUrlSeen=true; el.setAttribute("content",canonical);}});
       rewrite.on('meta[property="og:image"]',{element(el){
-        if (ogImage) el.setAttribute("content",ogImage);
-        if (!effectiveTwitterImage) effectiveTwitterImage = el.getAttribute("content") || "";
+        ogImageSeen=true; el.setAttribute("content",ogImage);
+        if (!effectiveTwitterImage) effectiveTwitterImage = ogImage;
       }});
+      rewrite.on('meta[property="og:image:alt"]',{element(el){ogImageAltSeen=true; el.setAttribute("content","EDWISE Education & Consultancy");}});
       rewrite.on('meta[name="twitter:title"]',{element(el){twitterTitleSeen=true; if(effectiveTwitterTitle) el.setAttribute("content",effectiveTwitterTitle);}});
       rewrite.on('meta[name="twitter:description"]',{element(el){twitterDescriptionSeen=true; if(effectiveTwitterDescription) el.setAttribute("content",effectiveTwitterDescription);}});
       rewrite.on('meta[name="twitter:image"]',{element(el){twitterImageSeen=true; if(effectiveTwitterImage) el.setAttribute("content",effectiveTwitterImage);}});
       rewrite.on('meta[name="twitter:card"]',{element(el){twitterCardSeen=true; el.setAttribute("content",effectiveTwitterImage ? "summary_large_image" : "summary");}});
       rewrite.on("head",{element(el){el.onEndTag(end=>{
+        if (!ogTypeSeen) end.append('<meta property="og:type" content="website">',{html:true});
+        if (!ogSiteNameSeen) end.append('<meta property="og:site_name" content="EDWISE Education &amp; Consultancy">',{html:true});
+        if (!ogTitleSeen) end.append('<meta property="og:title" content="' + escapeHtml(ogTitle) + '">',{html:true});
+        if (!ogDescriptionSeen) end.append('<meta property="og:description" content="' + escapeHtml(ogDescription) + '">',{html:true});
+        if (!ogUrlSeen) end.append('<meta property="og:url" content="' + escapeHtml(canonical) + '">',{html:true});
+        if (!ogImageSeen) end.append('<meta property="og:image" content="' + escapeHtml(ogImage) + '">',{html:true});
+        if (!ogImageAltSeen) end.append('<meta property="og:image:alt" content="EDWISE Education &amp; Consultancy">',{html:true});
         if (!twitterTitleSeen && effectiveTwitterTitle) end.append('<meta name="twitter:title" content="' + escapeHtml(effectiveTwitterTitle) + '">',{html:true});
         if (!twitterDescriptionSeen && effectiveTwitterDescription) end.append('<meta name="twitter:description" content="' + escapeHtml(effectiveTwitterDescription) + '">',{html:true});
         if (!twitterImageSeen && effectiveTwitterImage) end.append('<meta name="twitter:image" content="' + escapeHtml(effectiveTwitterImage) + '">',{html:true});
