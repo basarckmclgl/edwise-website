@@ -31,8 +31,8 @@ export async function onRequestGet({ params, env }) {
   if (!token || !repo) return response("Görsel deposu yapılandırılmamış.", 500);
 
   try {
-    const requestImage = async branch => fetch(
-      "https://api.github.com/repos/" + repo + "/contents/media/" + filename + "?ref=" + encodeURIComponent(branch),
+    const upstream = await fetch(
+      "https://api.github.com/repos/" + repo + "/contents/media/" + filename + "?ref=" + encodeURIComponent(mediaBranch),
       {
         headers: {
           "Authorization": "Bearer " + token,
@@ -42,12 +42,6 @@ export async function onRequestGet({ params, env }) {
         }
       }
     );
-
-    // Preview dalında bulunmayan eski medya dosyalarını salt okunur biçimde ana daldan da sun.
-    let upstream = await requestImage(mediaBranch);
-    if (upstream.status === 404 && mediaBranch !== "main") {
-      upstream = await requestImage("main");
-    }
 
     if (!upstream.ok) {
       return response("Görsel deposundan dosya alınamadı.", upstream.status === 404 ? 404 : 502);
