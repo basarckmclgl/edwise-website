@@ -54,6 +54,7 @@ export async function onRequestPost(context) {
     const token = context.env.GITHUB_TOKEN;
     const repo = context.env.GITHUB_REPO;
     const db = context.env.DB;
+    const mediaBranch = context.env.MEDIA_GITHUB_BRANCH || "main";
 
     if (!token || !repo || !db) {
       return json({
@@ -102,7 +103,7 @@ export async function onRequestPost(context) {
         body: JSON.stringify({
           message: `EDWISE CMS görseli: ${filename}`,
           content: toBase64(bytes),
-          branch: "main"
+          branch: mediaBranch
         })
       }
     );
