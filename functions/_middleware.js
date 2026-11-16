@@ -12,11 +12,12 @@ export async function onRequest(context) {
   // Only the exact entry routes are mapped; unknown /admin/* paths remain unavailable.
   const isAdminEntry = path === "/admin" || path === "/admin/";
   const isLoginPage = path === "/yonetim/giris.html";
-  const isPanelPage = path === "/yonetim" || (path.startsWith("/yonetim/") && !isLoginPage);
+  const isPasswordResetPage = path === "/yonetim/sifre-sifirla.html";
+  const isPanelPage = path === "/yonetim" || (path.startsWith("/yonetim/") && !isLoginPage && !isPasswordResetPage);
 
   // The login document must always be served as a public static asset.
   // Bypass every auth/maintenance redirect for this exact path.
-  if (isLoginPage) {
+  if (isLoginPage || isPasswordResetPage) {
     const loginResponse = await context.next();
     const loginHeaders = new Headers(loginResponse.headers);
     loginHeaders.set("Cache-Control", "no-store, max-age=0");
