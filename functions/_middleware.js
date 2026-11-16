@@ -10,11 +10,15 @@ export async function onRequest(context) {
   const isLoginPage = path === "/yonetim/giris.html";
   const isPanelPage = path === "/yonetim" || (path.startsWith("/yonetim/") && !isLoginPage);
 
-  if ((isAdminEntry || isPanelPage) && !isLoginPage) {
+  // /admin is only an entry alias. Always send it to the real login
+  // page; the login page then sends authenticated users to the panel.
+  if (isAdminEntry) {
+    return Response.redirect(new URL("/yonetim/giris.html?next=%2Fyonetim%2F", url), 302);
+  }
+  if (isPanelPage && !isLoginPage) {
     const auth = await requireAdmin(context);
     if (auth.response) {
-      const next = isAdminEntry ? "/admin" : path + url.search;
-      return Response.redirect(new URL("/yonetim/giris.html?next=" + encodeURIComponent(next), url), 302);
+      return Response.redirect(new URL("/yonetim/giris.html?next=" + encodeURIComponent(path + url.search), url), 302);
     }
   }
   if (path.startsWith("/admin/") && !isAdminEntry) {
@@ -34,10 +38,7 @@ export async function onRequest(context) {
   }
   // Use a browser redirect instead of an internal rewrite. Rewriting /admin
   // to /yonetim/ can re-enter this middleware and create a redirect loop.
-  if (isAdminEntry) {
-    return Response.redirect(new URL("/yonetim/" + url.search, url), 302);
-  }
-  const response = await context.next();
+    const response = await context.next();
   const headers = new Headers(response.headers);
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("X-Permitted-Cross-Domain-Policies", "none");
