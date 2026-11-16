@@ -140,8 +140,14 @@ export async function onRequest(context) {
       if (description) rewrite.on('meta[name="description"]',{element(el){el.setAttribute("content",description);}});
       rewrite.on('link[rel="canonical"]',{element(el){el.setAttribute("href",canonical);}});
       if (robots) rewrite.on('meta[name="robots"]',{element(el){el.setAttribute("content",robots);}});
-      if (ogTitle) rewrite.on('meta[property="og:title"]',{element(el){el.setAttribute("content",ogTitle);}});
-      if (ogDescription) rewrite.on('meta[property="og:description"]',{element(el){el.setAttribute("content",ogDescription);}});
+      rewrite.on('meta[property="og:title"]',{element(el){
+        if (ogTitle) el.setAttribute("content",ogTitle);
+        if (!effectiveTwitterTitle) effectiveTwitterTitle = el.getAttribute("content") || "";
+      }});
+      rewrite.on('meta[property="og:description"]',{element(el){
+        if (ogDescription) el.setAttribute("content",ogDescription);
+        if (!effectiveTwitterDescription) effectiveTwitterDescription = el.getAttribute("content") || "";
+      }});
       rewrite.on('meta[property="og:url"]',{element(el){el.setAttribute("content",canonical);}});
       rewrite.on('meta[property="og:image"]',{element(el){
         if (ogImage) el.setAttribute("content",ogImage);
