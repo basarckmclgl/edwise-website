@@ -66,48 +66,88 @@ export async function onRequest(context) {
     headers.set("Pragma", "no-cache");
   }
   if (isAdminEntry || isPanelPage || isLoginPage) headers.set("X-Robots-Tag", "noindex, nofollow");
-  // Preview-only SEO metadata: read exclusively from the dedicated edwise-deneme D1 binding.
-  if (url.hostname === "yonetim-paneli.edwise.pages.dev" && (path === "/" || path === "/index.html") && response.ok && (headers.get("Content-Type")||"").includes("text/html")) {
+  // Preview SEO: page-specific metadata for homepage, static pages and published CMS pages.
+  const isPreview = url.hostname === "yonetim-paneli.edwise.pages.dev";
+  const isPublicHtml = !path.startsWith("/api/") && !isPanelPage && !isLoginPage &&
+    response.ok && (headers.get("Content-Type") || "").includes("text/html");
+  if (isPreview && path === "/sitemap.xml") {
     try {
-      const seoDb = context.env["edwise-deneme"];
-      if (seoDb) {
-        const row = await seoDb.prepare("SELECT settings_json FROM seo_settings WHERE id=1").first();
-        const settings = JSON.parse(row?.settings_json || "{}");
-        const title = String(settings.seoTitle || "").slice(0,200);
-        const description = String(settings.seoDescription || "").slice(0,500);
-        const canonical = String(settings.seoCanonical || "").slice(0,300);
-        const robots = String(settings.seoRobots || "");
-        const ogTitle = String(settings.seoOgTitle || title).slice(0,200);
-        const ogDescription = String(settings.seoOgDescription || description).slice(0,500);
-        const ogImage = String(settings.seoOgImage || "").slice(0,500);
-        const verification = String(settings.seoGsc || "").slice(0,300);
-        if (title || description || canonical || robots || ogTitle || ogDescription || ogImage || verification) {
-          const escapeHtml = value => String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
-          const rewrite = new HTMLRewriter();
-          if (title) rewrite.on("title", {element(el) { el.setInnerContent(title); }});
-          if (description) rewrite.on('meta[name="description"]', {element(el) { el.setAttribute("content", description); }});
-          if (canonical) rewrite.on('link[rel="canonical"]', {element(el) { el.setAttribute("href", canonical); }});
-          if (robots) rewrite.on('meta[name="robots"]', {element(el) { el.setAttribute("content", robots); }});
-          if (ogTitle) rewrite.on('meta[property="og:title"]', {element(el) { el.setAttribute("content", ogTitle); }});
-          if (ogDescription) rewrite.on('meta[property="og:description"]', {element(el) { el.setAttribute("content", ogDescription); }});
-          if (ogImage) rewrite.on('meta[property="og:image"]', {element(el) { el.setAttribute("content", ogImage); }});
-          if (canonical) rewrite.on('meta[property="og:url"]', {element(el) { el.setAttribute("content", canonical); }});
-          if (ogTitle) rewrite.on('meta[name="twitter:title"]', {element(el) { el.setAttribute("content", ogTitle); }});
-          if (ogDescription) rewrite.on('meta[name="twitter:description"]', {element(el) { el.setAttribute("content", ogDescription); }});
-          if (ogImage) rewrite.on('meta[name="twitter:image"]', {element(el) { el.setAttribute("content", ogImage); }});
-          if (verification) rewrite.on('meta[name="google-site-verification"]', {element(el) { el.setAttribute("content", verification); }});
-          rewrite.on("head", {element(el) {
-            if (ogTitle) el.append('<meta name="twitter:title" content="' + escapeHtml(ogTitle) + '">', {html:true});
-            if (ogDescription) el.append('<meta name="twitter:description" content="' + escapeHtml(ogDescription) + '">', {html:true});
-            if (ogImage) el.append('<meta name="twitter:image" content="' + escapeHtml(ogImage) + '">', {html:true});
-          }});
-          if (settings.seoKeywords) rewrite.on("head", {element(el) { el.append('<meta name="keywords" content="' + escapeHtml(String(settings.seoKeywords).slice(0,300)) + '">', {html:true}); }});
-          if (verification) rewrite.on("head", {element(el) { el.append('<meta name="google-site-verification" content="' + escapeHtml(verification) + '">', {html:true}); }});
-          return rewrite.transform(new Response(response.body, {status:response.status,statusText:response.statusText,headers}));
+      const db = context.env.DB;
+      if (db) {
+        const published = await db.prepare("SELECT slug, updated_at FROM pages WHERE status='published' AND deleted_at IS NULL AND page_path IS NULL ORDER BY updated_at DESC").all();
+        const staticPaths = [
+          "/", "/pages/basvuru.html", "/pages/coaching-mentoring.html",
+          "/pages/egitim-danismanligi.html", "/pages/hakkimizda.html",
+          "/pages/hizmetlerimiz.html", "/pages/ielts.html", "/pages/iletisim.html",
+          "/pages/speaking-club.html", "/pages/toefl.html",
+          "/pages/yasal-bilgilendirme.html", "/pages/yds.html", "/pages/yokdil.html"
+        ];
+        const urls = staticPaths.map(p => ({loc:"https://edwisedanismanlik.com" + p}));
+        for (const page of (published.results || [])) {
+          if (page.slug) urls.push({loc:"https://edwisedanismanlik.com/pages/sayfa.html?slug=" + encodeURIComponent(page.slug), lastmod:page.updated_at});
         }
+        const xml = '<?xml version="1.0" encoding="UTF-8"?>' +
+          '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' +
+          urls.map(item => '<url><loc>' + item.loc.replace(/&/g, '&amp;') + '</loc>' +
+            (item.lastmod ? '<lastmod>' + new Date(item.lastmod).toISOString().slice(0,10) + '</lastmod>' : '') +
+            '</url>').join('') + '</urlset>';
+        headers.set("Content-Type","application/xml; charset=utf-8");
+        headers.set("Cache-Control","public, max-age=300");
+        return new Response(xml,{status:200,headers});
       }
     } catch (error) {
-      console.error("Preview SEO metadata could not be applied; serving original HTML.", error);
+      console.error("Preview sitemap could not be generated; serving repository sitemap.",error);
+    }
+  }
+  if (isPreview && isPublicHtml) {
+    try {
+      const seoDb = context.env["edwise-deneme"];
+      let settings = {};
+      if (seoDb) {
+        const row = await seoDb.prepare("SELECT settings_json FROM seo_settings WHERE id=1").first();
+        settings = JSON.parse(row?.settings_json || "{}");
+      }
+      let pageSeo = null;
+      if (path === "/pages/sayfa.html") {
+        const slug = url.searchParams.get("slug");
+        if (slug && context.env.DB) {
+          pageSeo = await context.env.DB.prepare(
+            "SELECT title, slug, meta_title, meta_description FROM pages WHERE slug=? AND status='published' AND deleted_at IS NULL LIMIT 1"
+          ).bind(slug).first();
+        }
+      }
+      const isHome = path === "/" || path === "/index.html";
+      const title = String(pageSeo?.meta_title || (pageSeo?.title ? pageSeo.title + " | EDWISE" : (isHome ? settings.seoTitle : ""))).slice(0,200);
+      const description = String(pageSeo?.meta_description || (isHome ? settings.seoDescription : "")).slice(0,500);
+      const canonicalPath = path === "/index.html" ? "/" : path;
+      const canonical = pageSeo
+        ? "https://edwisedanismanlik.com/pages/sayfa.html?slug=" + encodeURIComponent(pageSeo.slug)
+        : "https://edwisedanismanlik.com" + canonicalPath;
+      const robots = isHome && settings.seoRobots ? String(settings.seoRobots) : "";
+      const ogTitle = String((isHome && settings.seoOgTitle) || title || "").slice(0,200);
+      const ogDescription = String((isHome && settings.seoOgDescription) || description || "").slice(0,500);
+      const ogImage = String(isHome ? (settings.seoOgImage || "") : "").slice(0,500);
+      const verification = String(isHome ? (settings.seoGsc || "") : "").slice(0,300);
+      const keywords = String(isHome ? (settings.seoKeywords || "") : "").slice(0,300);
+      const escapeHtml = value => String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+      const rewrite = new HTMLRewriter();
+      if (title) rewrite.on("title",{element(el){el.setInnerContent(title);}});
+      if (description) rewrite.on('meta[name="description"]',{element(el){el.setAttribute("content",description);}});
+      rewrite.on('link[rel="canonical"]',{element(el){el.setAttribute("href",canonical);}});
+      if (robots) rewrite.on('meta[name="robots"]',{element(el){el.setAttribute("content",robots);}});
+      if (ogTitle) rewrite.on('meta[property="og:title"]',{element(el){el.setAttribute("content",ogTitle);}});
+      if (ogDescription) rewrite.on('meta[property="og:description"]',{element(el){el.setAttribute("content",ogDescription);}});
+      rewrite.on('meta[property="og:url"]',{element(el){el.setAttribute("content",canonical);}});
+      if (ogImage) rewrite.on('meta[property="og:image"]',{element(el){el.setAttribute("content",ogImage);}});
+      if (ogTitle) rewrite.on('meta[name="twitter:title"]',{element(el){el.setAttribute("content",ogTitle);}});
+      if (ogDescription) rewrite.on('meta[name="twitter:description"]',{element(el){el.setAttribute("content",ogDescription);}});
+      if (ogImage) rewrite.on('meta[name="twitter:image"]',{element(el){el.setAttribute("content",ogImage);}});
+      if (verification) rewrite.on('meta[name="google-site-verification"]',{element(el){el.setAttribute("content",verification);}});
+      if (keywords) rewrite.on('meta[name="keywords"]',{element(el){el.setAttribute("content",keywords);}});
+      // CMS pages are rendered server-side for crawlers; the client renderer remains unchanged.
+      return rewrite.transform(new Response(response.body,{status:response.status,statusText:response.statusText,headers}));
+    } catch (error) {
+      console.error("Preview page SEO could not be applied; serving original HTML.",error);
     }
   }
   // GA4 ID is exposed to the consent script on Preview pages only.
