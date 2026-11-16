@@ -35,7 +35,7 @@ export async function onRequestPost(context) {
     const before = await env.DB.prepare("SELECT * FROM media WHERE file_name = ?").bind(fileName).first();
     const mediaBranch = env.MEDIA_GITHUB_BRANCH || "main";
     const apiUrl = "https://api.github.com/repos/" + env.GITHUB_REPO +
-      "/contents/media/" + encodeURIComponent(fileName) + "?ref=" + encodeURIComponent(mediaBranch)";
+      "/contents/media/" + encodeURIComponent(fileName) + "?ref=" + encodeURIComponent(mediaBranch);
     const headers = {
       "Authorization": "Bearer " + env.GITHUB_TOKEN,
       "Accept": "application/vnd.github+json",
