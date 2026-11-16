@@ -19,7 +19,7 @@ function getCookie(request, name) {
   catch { return null; }
 }
 
-async function ensureSessionColumns(db) {\n  try { await db.prepare("ALTER TABLE admin_sessions ADD COLUMN work_started_at TEXT").run(); } catch {}\n  try { await db.prepare("ALTER TABLE admin_sessions ADD COLUMN grace_until TEXT").run(); } catch {}\n}\n\nfunction authError(message, status) {
+function authError(message, status) {
   return {
     admin: null,
     response: Response.json(
@@ -31,7 +31,7 @@ async function ensureSessionColumns(db) {\n  try { await db.prepare("ALTER TABLE
 
 // Oturum kontrolü: Mevcut giriş sistemi korunur.
 export async function requireAdmin(context) {
-  if (!context?.env?.DB) return authError("Veritabanı bağlantısı bulunamadı.", 503);\n  const token = getCookie(
+  const token = getCookie(
     context.request,
     "edwise_session"
   );
@@ -43,7 +43,7 @@ export async function requireAdmin(context) {
     );
   }
 
-  await ensureSessionColumns(context.env.DB);\n  const tokenHash = await hashToken(token);
+  const tokenHash = await hashToken(token);
 
   const result = await context.env.DB.prepare(`
     SELECT
