@@ -11,7 +11,7 @@ document.addEventListener('click',function(event){
 });
 
 // Google Analytics 4: yalnızca ziyaretçi analiz çerezlerine izin verdikten sonra yüklenir.
-const EDWISE_GA4_ID = "G-EM5WNPP2EM";
+const EDWISE_GA4_ID = document.querySelector('meta[name="edwise-ga4-id"]')?.content || "G-EM5WNPP2EM";
 let edwiseGA4Started = false;
 window.edwiseStartGoogleAnalytics = () => {
  if (edwiseGA4Started) return;
