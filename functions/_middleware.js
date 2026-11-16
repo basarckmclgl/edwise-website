@@ -132,7 +132,7 @@ export async function onRequest(context) {
       const gaId = String(settings.seoGaId || "").trim();
       const escapeHtml = value => String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
       const rewrite = new HTMLRewriter();
-      let ogTypeSeen = false, ogSiteNameSeen = false, ogTitleSeen = false, ogDescriptionSeen = false, ogUrlSeen = false, ogImageSeen = false, ogImageAltSeen = false;
+      let ogTypeSeen = false, ogLocaleSeen = false, ogSiteNameSeen = false, ogTitleSeen = false, ogDescriptionSeen = false, ogUrlSeen = false, ogImageSeen = false, ogImageAltSeen = false, ogImageSecureSeen = false;
       let twitterTitleSeen = false, twitterDescriptionSeen = false, twitterImageSeen = false, twitterCardSeen = false;
       let effectiveTwitterTitle = ogTitle || title || "";
       let effectiveTwitterDescription = ogDescription || description || "";
@@ -142,6 +142,8 @@ export async function onRequest(context) {
       rewrite.on('link[rel="canonical"]',{element(el){el.setAttribute("href",canonical);}});
       if (robots) rewrite.on('meta[name="robots"]',{element(el){el.setAttribute("content",robots);}});
       rewrite.on('meta[property="og:type"]',{element(el){ogTypeSeen=true; el.setAttribute("content","website");}});
+      rewrite.on('meta[property="og:locale"]',{element(el){ogLocaleSeen=true; el.setAttribute("content","tr_TR");}});
+      rewrite.on('meta[property="og:image:secure_url"]',{element(el){ogImageSecureSeen=true; el.setAttribute("content",ogImage);}});
       rewrite.on('meta[property="og:site_name"]',{element(el){ogSiteNameSeen=true; el.setAttribute("content","EDWISE Education & Consultancy");}});
       rewrite.on('meta[property="og:title"]',{element(el){
         ogTitleSeen=true; el.setAttribute("content",ogTitle);
@@ -163,6 +165,8 @@ export async function onRequest(context) {
       rewrite.on('meta[name="twitter:card"]',{element(el){twitterCardSeen=true; el.setAttribute("content",effectiveTwitterImage ? "summary_large_image" : "summary");}});
       rewrite.on("head",{element(el){el.onEndTag(end=>{
         if (!ogTypeSeen) end.append('<meta property="og:type" content="website">',{html:true});
+        if (!ogLocaleSeen) end.append('<meta property="og:locale" content="tr_TR">',{html:true});
+        if (!ogImageSecureSeen) end.append('<meta property="og:image:secure_url" content="' + escapeHtml(ogImage) + '">',{html:true});
         if (!ogSiteNameSeen) end.append('<meta property="og:site_name" content="EDWISE Education &amp; Consultancy">',{html:true});
         if (!ogTitleSeen) end.append('<meta property="og:title" content="' + escapeHtml(ogTitle) + '">',{html:true});
         if (!ogDescriptionSeen) end.append('<meta property="og:description" content="' + escapeHtml(ogDescription) + '">',{html:true});
@@ -181,23 +185,6 @@ export async function onRequest(context) {
       return rewrite.transform(new Response(response.body,{status:response.status,statusText:response.statusText,headers}));
     } catch (error) {
       console.error("Preview page SEO could not be applied; serving original HTML.",error);
-    }
-  }
-  // GA4 ID is exposed to the consent script on Preview pages only.
-  if (url.hostname === "yonetim-paneli.edwise.pages.dev" && response.ok && (headers.get("Content-Type")||"").includes("text/html")) {
-    try {
-      const seoDb = context.env["edwise-deneme"];
-      const row = seoDb ? await seoDb.prepare("SELECT settings_json FROM seo_settings WHERE id=1").first() : null;
-      const settings = JSON.parse(row?.settings_json || "{}");
-      const gaId = String(settings.seoGaId || "").trim();
-      if (gaId && /^G-[A-Z0-9]+$/.test(gaId)) {
-        const gaRewrite = new HTMLRewriter().on("head", {
-          element(el) { el.append('<meta name="edwise-ga4-id" content="' + gaId + '">', {html:true}); }
-        });
-        return gaRewrite.transform(new Response(response.body, {status:response.status,statusText:response.statusText,headers}));
-      }
-    } catch (error) {
-      console.error("Preview GA4 setting could not be exposed; serving current HTML.", error);
     }
   }
     return new Response(response.body, {status:response.status,statusText:response.statusText,headers});
