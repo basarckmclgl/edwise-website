@@ -64,5 +64,41 @@ export async function onRequest(context) {
     headers.set("Pragma", "no-cache");
   }
   if (isAdminEntry || isPanelPage || isLoginPage) headers.set("X-Robots-Tag", "noindex, nofollow");
-  return new Response(response.body, {status:response.status,statusText:response.statusText,headers});
+  // Preview-only SEO metadata: read exclusively from the dedicated edwise-deneme D1 binding.
+  if (url.hostname === "yonetim-paneli.edwise.pages.dev" && (path === "/" || path === "/index.html") && response.ok && (headers.get("Content-Type")||"").includes("text/html")) {
+    try {
+      const seoDb = context.env["edwise-deneme"];
+      if (seoDb) {
+        const row = await seoDb.prepare("SELECT settings_json FROM seo_settings WHERE id=1").first();
+        const settings = JSON.parse(row?.settings_json || "{}");
+        const title = String(settings.seoTitle || "").slice(0,200);
+        const description = String(settings.seoDescription || "").slice(0,500);
+        const canonical = String(settings.seoCanonical || "").slice(0,300);
+        const robots = String(settings.seoRobots || "");
+        const ogTitle = String(settings.seoOgTitle || title).slice(0,200);
+        const ogDescription = String(settings.seoOgDescription || description).slice(0,500);
+        const ogImage = String(settings.seoOgImage || "").slice(0,500);
+        const verification = String(settings.seoGsc || "").slice(0,300);
+        if (title || description || canonical || robots || ogTitle || ogDescription || ogImage || verification) {
+          class SeoHead {
+            element(el) {
+              if (title) el.append('<title>' + escapeHtml(title) + '</title>', {html:true});
+              if (description) el.append('<meta name="description" content="' + escapeHtml(description) + '">', {html:true});
+              if (canonical) el.append('<link rel="canonical" href="' + escapeHtml(canonical) + '">', {html:true});
+              if (robots) el.append('<meta name="robots" content="' + escapeHtml(robots) + '">', {html:true});
+              if (ogTitle) el.append('<meta property="og:title" content="' + escapeHtml(ogTitle) + '">', {html:true});
+              if (ogDescription) el.append('<meta property="og:description" content="' + escapeHtml(ogDescription) + '">', {html:true});
+              if (ogImage) el.append('<meta property="og:image" content="' + escapeHtml(ogImage) + '">', {html:true});
+              if (verification) el.append('<meta name="google-site-verification" content="' + escapeHtml(verification) + '">', {html:true});
+            }
+          }
+          const escapeHtml = value => String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+          return new HTMLRewriter().on("head", new SeoHead()).transform(new Response(response.body, {status:response.status,statusText:response.statusText,headers}));
+        }
+      }
+    } catch (error) {
+      console.error("Preview SEO metadata could not be applied; serving original HTML.", error);
+    }
+  }
+    return new Response(response.body, {status:response.status,statusText:response.statusText,headers});
 }
