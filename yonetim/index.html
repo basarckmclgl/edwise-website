@@ -424,14 +424,14 @@ render();loadPagePool();if(localStorage.getItem(storageKey))feedback('Önceki ye
  const paths=['/robots.txt','/sitemap.xml'];
  const checks=await Promise.all(paths.map(async p=>{try{const r=await fetch(p,{cache:'no-store'});return {ok:r.ok,status:r.status,body:await r.text()};}catch{return {ok:false,status:0,body:''};}}));
  const robots=checks[0],sitemap=checks[1];
- const robotsOk=robots.ok&&/User-agent:/i.test(robots.body)&&/Sitemap:\\s*https:\\/\\/edwisedanismanlik\\.com\\/sitemap\\.xml/i.test(robots.body);
+ const robotsOk=robots.ok&&/User-agent:/i.test(robots.body)&&/Sitemap:\s*https:\/\/edwisedanismanlik\.com\/sitemap\.xml/i.test(robots.body);
  const xml=new DOMParser().parseFromString(sitemap.body,'application/xml');
  const sitemapUrls=[...xml.querySelectorAll('url loc')].map(x=>x.textContent.trim());
  const sitemapOk=sitemap.ok&&!xml.querySelector('parsererror')&&sitemapUrls.length>0;
  const home=await inspectPage('/');
  const titleOk=home.title.length>=50&&home.title.length<=60,descOk=home.description.length>=140&&home.description.length<=160;
  const canonicalOk=!!home.canonical&&new URL(home.canonical,location.origin).hostname==='edwisedanismanlik.com';
- const ogOk=!!home.ogTitle&&!!home.ogDescription;
+ const ogOk=home.og;
  const scoreParts=[robotsOk,sitemapOk,titleOk,descOk,canonicalOk,ogOk,home.jsonLd].filter(Boolean).length;
  const score=Math.round(scoreParts/7*100),status=(ok,yes='Uygun',no='Eksik')=>ok?yes:no;
  $('seoTitleStatus').textContent=status(titleOk,home.title.length+' karakter','İncele ('+home.title.length+')');
@@ -470,7 +470,7 @@ async function auditAllPages(urls){
   results.push(...batch.filter(Boolean));
  }
  const rows=results.map(p=>{
-  const titleOk=p.title.length>=30&&p.title.length<=60,descOk=p.description.length>=120&&p.description.length<=160;
+  const titleOk=p.title.length>=50&&p.title.length<=60,descOk=p.description.length>=140&&p.description.length<=160;
   const canonicalOk=!!p.canonical&&(()=>{try{return new URL(p.canonical).hostname==='edwisedanismanlik.com';}catch{return false;}})();
   const h1Ok=p.h1Count===1,altOk=p.missingAlt===0,technicalOk=p.ok&&canonicalOk&&p.viewport&&!p.noindex;
   const issues=[!p.ok?'HTTP erişim':null,!titleOk?'Başlık uzunluğu':null,!descOk?'Meta açıklama':null,!canonicalOk?'Canonical':null,!h1Ok?'H1 sayısı':null,!altOk?'ALT metni':null,!p.viewport?'Viewport':null,p.noindex?'Noindex':null,!p.og?'Open Graph':null].filter(Boolean);
