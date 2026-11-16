@@ -37,7 +37,56 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 
 .history-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}.history-stats .card{min-height:104px;padding:15px}.history-stats .number{font-size:21px;margin-top:10px}.history-toolbar{display:flex;gap:9px;margin:16px 0;flex-wrap:wrap}.history-toolbar input,.history-toolbar select{border:1px solid #e6dcf0;border-radius:9px;padding:10px 12px;background:#faf9fc;color:#8d8199;font:inherit;font-size:12px}.history-toolbar input{flex:1;min-width:180px}.history-empty{border:1px dashed #d9c9e8;border-radius:12px;background:#fcfaff;padding:28px 20px;text-align:center}.history-empty-icon{width:46px;height:46px;margin:0 auto 12px;border-radius:14px;background:#f0e6fb;color:#7138b8;display:grid;place-items:center;font-size:24px}.history-empty strong{display:block;color:#54218f;margin-bottom:8px}.history-empty p{max-width:620px;margin:auto;font-size:12px;line-height:1.7}.history-scope{display:grid;grid-template-columns:1fr 1fr;gap:10px}.history-scope>div{border:1px solid var(--line);border-radius:10px;padding:12px}.history-scope b{display:block;color:#54218f;font-size:13px}.history-scope small{display:block;color:var(--muted);font-size:11px;line-height:1.5;margin-top:5px}@media(max-width:650px){.history-stats{grid-template-columns:1fr}.history-scope{grid-template-columns:1fr}}
 .profile #accountMenu[hidden]{display:none!important}.profile #accountMenu button{font:inherit;font-size:12px;font-weight:650}.profile #accountEmail{overflow-wrap:anywhere}.profile #accountMenu button:disabled{opacity:.6;cursor:wait}
-.menu-pool-tools{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:14px 0}.menu-pool-tools input,.menu-pool-tools select{border:1px solid #e6dcf0;border-radius:9px;padding:10px 12px;background:#fff;color:#54218f;font:inherit;font-size:12px}.menu-pool-tools input{flex:1;min-width:180px}.menu-page-pool{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.menu-page-card{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:#fff}.menu-page-card strong{display:block;color:#54218f;font-size:12px}.menu-page-card small{display:block;color:var(--muted);font-size:10px;margin-top:4px;overflow-wrap:anywhere}.menu-page-card button{flex:0 0 auto;border:1px solid #e4d6f1;background:#fbf8ff;color:#65349a;border-radius:8px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer}.menu-fields{grid-template-columns:1fr 1.3fr .7fr .9fr .8fr}@media(max-width:850px){.menu-page-pool{grid-template-columns:1fr}.menu-fields{grid-template-columns:1fr 1fr}}</style>
+.menu-pool-tools{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:14px 0}.menu-pool-tools input,.menu-pool-tools select{border:1px solid #e6dcf0;border-radius:9px;padding:10px 12px;background:#fff;color:#54218f;font:inherit;font-size:12px}.menu-pool-tools input{flex:1;min-width:180px}.menu-page-pool{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.menu-page-card{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:#fff}.menu-page-card strong{display:block;color:#54218f;font-size:12px}.menu-page-card small{display:block;color:var(--muted);font-size:10px;margin-top:4px;overflow-wrap:anywhere}.menu-page-card button{flex:0 0 auto;border:1px solid #e4d6f1;background:#fbf8ff;color:#65349a;border-radius:8px;padding:7px 10px;font-size:11px;font-weight:700;cursor:pointer}.menu-fields{grid-template-columns:1fr 1.3fr .7fr .9fr .8fr}@media(max-width:850px){.menu-page-pool{grid-template-columns:1fr}.menu-fields{grid-template-columns:1fr 1fr}}
+.menu-workspace{padding:16px!important;background:#f8f9fd!important;border:1px solid #e8eaf3!important}
+.menu-top-grid{display:grid;grid-template-columns:minmax(190px,.78fr) minmax(330px,1.7fr) minmax(230px,1fr);gap:12px;align-items:stretch}
+.menu-card{min-width:0;background:#fff;border:1px solid #e7e9f1;border-radius:13px;padding:14px;box-shadow:0 2px 8px rgba(39,35,72,.035)}
+.menu-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.menu-card-head h2{font-size:14px;margin:3px 0 4px;color:#292342}
+.menu-card-head p{font-size:10px;line-height:1.5;color:#85839a;margin:0}
+.menu-step{font-size:9px;font-weight:800;letter-spacing:.09em;color:#8254cf}
+.menu-card-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#f3edff;color:#7546bf;font-size:16px}
+.menu-groups-card .menu-editor{display:grid;gap:7px}
+.menu-groups-card .menu-edit-row{padding:8px;border:1px solid #eceaf3;border-radius:9px;background:#fff}
+.menu-groups-card .menu-fields{grid-template-columns:1fr!important}
+.menu-groups-card .menu-row-actions{justify-content:flex-end}
+.menu-add-group{width:100%;margin-top:9px;padding:9px;border:1px dashed #cfc2e8;border-radius:9px;background:#fbf9ff;color:#7042b5;font-weight:700;font-size:11px;cursor:pointer}
+.menu-pages-card{display:flex;flex-direction:column}
+.menu-pool-tools{display:flex;gap:7px;margin:0 0 9px;flex-wrap:wrap}
+.menu-pool-tools input,.menu-pool-tools select{min-width:0;border:1px solid #e7e8f0;border-radius:8px;padding:8px 9px;background:#fff;color:#51466c;font:inherit;font-size:10px}
+.menu-pool-tools input{flex:1}
+.menu-pool-tools button{padding:7px 9px;font-size:10px}
+.menu-page-pool{display:grid;grid-template-columns:1fr;gap:6px;max-height:300px;overflow:auto;padding-right:3px}
+.menu-page-card{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 9px;border:1px solid #edf0f5;border-radius:8px;background:#fff}
+.menu-page-card strong{font-size:10px;color:#39334f}
+.menu-page-card small{font-size:9px;color:#9290a2;overflow-wrap:anywhere}
+.menu-page-card button{border:1px solid #e4d9f5;background:#f8f4ff;color:#7044b8;border-radius:7px;padding:6px 8px;font-size:9px;font-weight:700;white-space:nowrap;cursor:pointer}
+.menu-page-card button:disabled{opacity:.48;cursor:not-allowed}
+.menu-settings-card{display:flex;flex-direction:column;gap:10px}
+.menu-settings-card>label{display:grid;gap:5px;color:#5a566c;font-size:10px;font-weight:700}
+.menu-settings-card input[type=text],.menu-settings-card select{width:100%;padding:8px 9px;border:1px solid #e8e7ef;border-radius:8px;background:white;color:#403953;font:inherit;font-size:10px}
+.menu-settings-card .menu-toggle-line{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.menu-settings-card input[type=checkbox]{accent-color:#7950c7;width:15px;height:15px}
+.menu-quick-actions{border-top:1px solid #f0eef5;padding-top:9px;display:grid;gap:6px}
+.menu-quick-actions h3{font-size:10px;margin:0 0 2px;color:#39334f}
+.menu-quick-actions button{padding:8px;border:1px solid #e9e5f1;border-radius:8px;background:#fff;color:#6941a9;font-size:10px;font-weight:700;cursor:pointer}
+.menu-editor-section{margin-top:13px;padding:14px;background:#fff;border:1px solid #e7e9f1;border-radius:13px}
+.menu-editor-section .menu-card-head{align-items:center}
+.menu-editor-section .menu-card-head h2{font-size:14px}
+.menu-editor-section .menu-editor{display:grid;gap:7px}
+.menu-editor-section .menu-edit-row{border:1px solid #ececf3;border-radius:9px;background:#fff;padding:9px}
+.menu-editor-section .menu-fields{grid-template-columns:1.1fr 1.4fr .8fr 1fr .8fr;gap:8px}
+.menu-editor-section .menu-fields label{font-size:9px;color:#777287}
+.menu-editor-section .menu-fields input,.menu-editor-section .menu-fields select{font-size:10px;padding:7px;border:1px solid #e9e7ef;border-radius:7px;min-width:0}
+.menu-editor-section .menu-row-actions{gap:12px}
+.menu-bottom-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px;padding:10px 12px;border:1px solid #e9e7f1;background:#fff;border-radius:10px}
+.menu-bottom-bar .app-feedback{margin:0;flex:1;font-size:10px}
+.menu-bottom-actions{display:flex;gap:7px;flex-wrap:wrap}
+.menu-bottom-actions button{padding:8px 12px;border-radius:8px;font-size:10px}
+.menu-workspace>.page-note{margin-top:10px;font-size:10px}
+@media(max-width:1100px){.menu-top-grid{grid-template-columns:minmax(180px,.8fr) minmax(280px,1.5fr)}.menu-settings-card{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:end}.menu-settings-card .menu-card-head,.menu-settings-card .menu-quick-actions{grid-column:1/-1}}
+@media(max-width:700px){.menu-top-grid{grid-template-columns:1fr}.menu-settings-card{grid-template-columns:1fr}.menu-settings-card .menu-card-head,.menu-settings-card .menu-quick-actions{grid-column:auto}.menu-editor-section .menu-fields{grid-template-columns:1fr 1fr}.menu-bottom-bar{align-items:stretch;flex-direction:column}}
+</style>
 
 </head>
 <body>
@@ -245,15 +294,15 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <div id="view-menu" class="module-view" hidden>
 <header><div><div class="eyebrow">EDWISE / Site Yapısı</div><h1>Menü Yönetimi</h1><p>Web sitesinin ana menü bağlantılarını düzenle ve sıralamasını taslak olarak hazırla.</p></div><div class="date">MENÜ MODÜLÜ</div></header>
 <section class="welcome menu-welcome"><div><h2>Menü taslağı</h2><p>Buradaki düzenlemeler yalnızca bu tarayıcıda taslak olarak saklanır. Canlı menüye gönderilmez.</p></div><div class="welcome-mark">☷</div></section>
-<section class="panel">
-<div class="section-head"><div><h2>Menü seçimi ve sayfa havuzu</h2><p class="section-intro">Yayınlanan sayfaları buradan seçerek menüye ekle. Sayfa Yönetimi'ndeki sayfalar otomatik listelenir.</p></div><span class="tag" id="menuDraftCount">Yükleniyor…</span></div>
-<div class="menu-pool-tools"><input id="menuPageSearch" type="search" placeholder="Sayfa ara…" aria-label="Sayfalarda ara"><select id="menuPageFilter" aria-label="Sayfa durumu"><option value="all">Tüm sayfalar</option><option value="published">Yayınlananlar</option><option value="draft">Taslaklar</option></select><button type="button" class="app-refresh" id="menuPageRefresh">Sayfaları yenile</button></div>
-<div id="menuPagePool" class="menu-page-pool"><p class="empty">Sayfalar yükleniyor…</p></div>
-<div class="section-head" style="margin-top:22px"><div><h2>Menü grupları</h2><p class="section-intro">Ana menü, üst menü, alt bilgi veya kendi kategorilerini oluştur.</p></div><button type="button" class="app-refresh" id="menuCategoryAdd">＋ Grup ekle</button></div><div id="menuCategories" class="menu-editor"></div>
-<div class="section-head" style="margin-top:22px"><div><h2>Menü öğeleri</h2><p class="section-intro">Sıralamayı değiştir, alt menü oluştur, başlık ve bağlantıları düzenle.</p></div></div><div class="menu-editor" id="menuEditor"></div>
-<div class="menu-editor-actions"><button type="button" class="app-refresh" id="menuAdd">＋ Özel bağlantı ekle</button><div class="menu-action-right"><button type="button" class="app-refresh" id="menuReset">Taslağı sıfırla</button><button type="button" class="menu-export" id="menuExport">Taslağı Kaydet</button><button type="button" class="menu-export" id="menuDownload">JSON indir</button></div></div>
-<div class="app-feedback" id="menuFeedback" role="status" aria-live="polite">Menü taslağı bu tarayıcıya kaydedilir; canlı siteye gönderilmez.</div>
-<div class="page-note">Güvenli Önizleme modu: Taslak kaydı yalnızca bu tarayıcıda tutulur. Önizleme ve canlı site aynı veritabanını kullandığından sunucuya kaydetme ve yayınlama etkinleştirilmemiştir. Bu modüldeki düzenlemeler canlı siteyi değiştirmez.</div>
+<section class="panel menu-workspace">
+<div class="menu-top-grid">
+<section class="menu-card menu-groups-card"><div class="menu-card-head"><div><span class="menu-step">01</span><h2>Menü seçimi</h2><p>Yönetmek istediğin menü grubunu seç.</p></div><span class="menu-card-icon">☷</span></div><div id="menuCategories" class="menu-editor"></div><button type="button" class="menu-add-group" id="menuCategoryAdd">＋ Yeni grup oluştur</button></section>
+<section class="menu-card menu-pages-card"><div class="menu-card-head"><div><span class="menu-step">02</span><h2>Sayfa havuzu</h2><p>Yayınlanan sayfaları menüye ekle.</p></div><span class="tag" id="menuDraftCount">Yükleniyor…</span></div><div class="menu-pool-tools"><input id="menuPageSearch" type="search" placeholder="Sayfa ara…" aria-label="Sayfalarda ara"><select id="menuPageFilter" aria-label="Sayfa durumu"><option value="all">Tüm sayfalar</option><option value="published">Yayınlananlar</option><option value="draft">Taslaklar</option></select><button type="button" class="app-refresh" id="menuPageRefresh">Yenile</button></div><div id="menuPagePool" class="menu-page-pool"><p class="empty">Sayfalar yükleniyor…</p></div></section>
+<aside class="menu-card menu-settings-card"><div class="menu-card-head"><div><span class="menu-step">03</span><h2>Menü ayarları</h2><p>Seçili menünün genel ayarları.</p></div><span class="menu-card-icon">⚙</span></div><label>Menü başlığı<input id="menuTitleSetting" type="text" value="Ana Menü" maxlength="60"></label><label>Açılış davranışı<select id="menuOpenSetting"><option>Alt menüler tıklandığında açılsın</option><option>Alt menüler üzerine gelince açılsın</option></select></label><label class="menu-toggle-line">Mobil menüde göster<input id="menuMobileSetting" type="checkbox" checked></label><label class="menu-toggle-line">Yeni sekmede aç<input id="menuNewTabSetting" type="checkbox"></label><label class="menu-toggle-line">Aktif sayfa vurgulansın<input id="menuActiveSetting" type="checkbox" checked></label><div class="menu-quick-actions"><h3>Hızlı işlemler</h3><button type="button" id="menuAdd">＋ Özel bağlantı ekle</button><button type="button" id="menuCategoryAddQuick">＋ Alt menü grubu oluştur</button></div></aside>
+</div>
+<div class="menu-editor-section"><div class="menu-card-head"><div><span class="menu-step">04</span><h2>Menü düzenleme</h2><p>Sürükleyerek veya okları kullanarak sıralamayı değiştir. Alt menüleri ilgili öğenin altına yerleştir.</p></div><button type="button" class="app-refresh" id="menuReset">Sıralamayı sıfırla</button></div><div class="menu-editor" id="menuEditor"></div></div>
+<div class="menu-bottom-bar"><div class="app-feedback" id="menuFeedback" role="status" aria-live="polite">Menü taslağı bu tarayıcıya kaydedilir; canlı siteye gönderilmez.</div><div class="menu-bottom-actions"><button type="button" class="menu-export" id="menuDownload">JSON indir</button><button type="button" class="menu-export" id="menuExport">Taslağı Kaydet</button></div></div>
+<div class="page-note">Güvenli Önizleme: Değişiklikler yalnızca bu tarayıcıda taslak olarak saklanır. Canlı siteye aktarım kapalıdır; canlı site etkilenmez.</div>
 </section></div>
 
 <div id="view-gecmis" class="module-view" hidden>
