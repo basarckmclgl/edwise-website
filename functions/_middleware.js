@@ -32,9 +32,12 @@ export async function onRequest(context) {
       console.error("EDWISE maintenance status check failed; public site remains available.", error);
     }
   }
-  const response = isAdminEntry
-    ? await context.next(new Request(new URL("/yonetim/" + url.search, url), context.request))
-    : await context.next();
+  // Use a browser redirect instead of an internal rewrite. Rewriting /admin
+  // to /yonetim/ can re-enter this middleware and create a redirect loop.
+  if (isAdminEntry) {
+    return Response.redirect(new URL("/yonetim/" + url.search, url), 302);
+  }
+  const response = await context.next();
   const headers = new Headers(response.headers);
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("X-Permitted-Cross-Domain-Policies", "none");
