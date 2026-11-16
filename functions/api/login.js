@@ -88,8 +88,6 @@ export async function onRequestPost({ request, env }) {
       return json({ success: false, message: "İstek kaynağı geçersiz." }, 403);
     }
 
-    try { await env.DB.prepare("ALTER TABLE admin_sessions ADD COLUMN work_started_at TEXT").run(); } catch {}
-    try { await env.DB.prepare("ALTER TABLE admin_sessions ADD COLUMN grace_until TEXT").run(); } catch {}
     await env.DB.exec(`CREATE TABLE IF NOT EXISTS admin_login_attempts (ip_address TEXT NOT NULL, username TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, first_attempt_at TEXT NOT NULL DEFAULT (datetime('now')), last_attempt_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY(ip_address,username));`);
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";
     const data = await request.json();
@@ -144,7 +142,7 @@ export async function onRequestPost({ request, env }) {
 
     await env.DB.prepare(`
       DELETE FROM admin_sessions
-      WHERE datetime(COALESCE(grace_until, expires_at)) <= datetime(?)
+      WHERE datetime(expires_at, '+15 minutes') <= datetime(?)
     `).bind(new Date().toISOString()).run();
 
     await env.DB.prepare(`
