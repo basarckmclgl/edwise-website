@@ -29,12 +29,21 @@ function authError(message, status) {
   };
 }
 
-async function ensureSessionColumns(db) {
-  try { await db.prepare("ALTER TABLE admin_sessions ADD COLUMN work_started_at TEXT").run(); } catch {}
-  try { await db.prepare("ALTER TABLE admin_sessions ADD COLUMN grace_until TEXT").run(); } catch {}
+async function validWorkCookie(token, value, expiresAt) {
+  if (!value) return false;
+  const parts = value.split(".");
+  if (parts.length !== 2) return false;
+  const expiry = Number(parts[0]);
+  if (!Number.isFinite(expiry) || expiry !== Date.parse(expiresAt) || Date.now() >= expiry + 15 * 60 * 1000) return false;
+  try {
+    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(token), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+    const signature = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(String(expiry)));
+    const expected = Array.from(new Uint8Array(signature)).map(b => b.toString(16).padStart(2, "0")).join("");
+    return expected === parts[1];
+  } catch { return false; }
 }
 
-// Oturum kontrolü: Mevcut giriş sistemi korunur.
+// Oturum kontrolü: 24 saatlik oturum ve iş sürüyorsa 15 dakikalık ek süre.
 export async function requireAdmin(context) {
   const token = getCookie(
     context.request,
@@ -48,7 +57,6 @@ export async function requireAdmin(context) {
     );
   }
 
-  await ensureSessionColumns(context.env.DB);
   const tokenHash = await hashToken(token);
 
   const result = await context.env.DB.prepare(`
@@ -56,26 +64,25 @@ export async function requireAdmin(context) {
       a.id,
       a.username,
       a.email,
-      a.role
+      a.role,
+      s.expires_at
     FROM admin_sessions s
     INNER JOIN admins a ON a.id = s.admin_id
     WHERE s.token_hash = ?
-      AND (datetime(s.expires_at) > datetime('now') OR (s.work_started_at IS NOT NULL AND datetime(s.grace_until) > datetime('now')))
       AND a.is_active = 1
     LIMIT 1
   `).bind(tokenHash).first();
 
-  if (!result) {
-    return authError(
-      "Oturum geçersiz veya süresi dolmuş.",
-      401
-    );
+  if (!result) return authError("Oturum geçersiz veya süresi dolmuş.", 401);
+  const expiry = Date.parse(result.expires_at);
+  const normalSession = Number.isFinite(expiry) && Date.now() < expiry;
+  const workCookie = getCookie(context.request, "edwise_work");
+  const workGrace = !normalSession && await validWorkCookie(token, workCookie, result.expires_at);
+  if (!normalSession && !workGrace) {
+    await context.env.DB.prepare("DELETE FROM admin_sessions WHERE token_hash = ?").bind(tokenHash).run();
+    return authError("Oturum süresi doldu. Yeniden giriş yapın.", 401);
   }
-
-  return {
-    admin: result,
-    response: null
-  };
+  return { admin: { id: result.id, username: result.username, email: result.email, role: result.role }, response: null };
 }
 
 // Yalnızca ana yöneticiye izin verir.
