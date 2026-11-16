@@ -90,6 +90,8 @@ export async function onRequest(context) {
           if (ogDescription) rewrite.on('meta[property="og:description"]', {element(el) { el.setAttribute("content", ogDescription); }});
           if (ogImage) rewrite.on('meta[property="og:image"]', {element(el) { el.setAttribute("content", ogImage); }});
           if (verification) rewrite.on('meta[name="google-site-verification"]', {element(el) { el.setAttribute("content", verification); }});
+          if (settings.seoKeywords) rewrite.on("head", {element(el) { el.append('<meta name="keywords" content="' + escapeHtml(String(settings.seoKeywords).slice(0,300)) + '">', {html:true}); }});
+          if (verification) rewrite.on("head", {element(el) { el.append('<meta name="google-site-verification" content="' + escapeHtml(verification) + '">', {html:true}); }});
           return rewrite.transform(new Response(response.body, {status:response.status,statusText:response.statusText,headers}));
         }
       }
