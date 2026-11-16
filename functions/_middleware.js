@@ -32,6 +32,15 @@ export async function onRequest(context) {
   if (isAdminEntry) {
     return Response.redirect(new URL("/yonetim/giris.html?next=%2Fyonetim%2F", url), 302);
   }
+  // Protect the admin HTML document itself; APIs still enforce their own permissions.
+  if (isPanelPage) {
+    const auth = await requireAdmin(context);
+    if (auth.response) {
+      const loginUrl = new URL("/yonetim/giris.html", url);
+      loginUrl.searchParams.set("next", path + url.search);
+      return Response.redirect(loginUrl, 302);
+    }
+  }
   if (path.startsWith("/admin/") && !isAdminEntry) {
     return new Response("Not Found", {status:404,headers:{"Content-Type":"text/plain; charset=utf-8","Cache-Control":"no-store, max-age=0","X-Content-Type-Options":"nosniff"}});
   }
