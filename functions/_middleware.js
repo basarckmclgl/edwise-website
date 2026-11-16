@@ -1,3 +1,4 @@
+import { requireAdmin } from "./api/_auth.js";
 // Apply baseline browser security headers and honor the maintenance switch.
 const MAINTENANCE_HTML = "<!doctype html><html lang=\"tr\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>EDWISE | Bakım Çalışması</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#190d27;color:#fff;font:16px/1.6 Arial,sans-serif;text-align:center}.card{max-width:560px;padding:40px 28px}h1{font-size:clamp(28px,6vw,42px);margin:0 0 12px}p{color:#d9cce7}</style><main class=\"card\"><h1>EDWISE kısa bir bakım molasında</h1><p>Web sitemizde planlı bir çalışma yürütüyoruz. Kısa süre içinde yeniden hizmetinizde olacağız.</p></main></html>";
 export async function onRequest(context) {
@@ -6,6 +7,16 @@ export async function onRequest(context) {
   // Serve the management panel at /admin without changing the browser URL.
   // Only the exact entry routes are mapped; unknown /admin/* paths remain unavailable.
   const isAdminEntry = path === "/admin" || path === "/admin/";
+  const isPanelPage = path === "/yonetim" || path === "/yonetim/" || path === "/yonetim/index.html";
+  const isLoginPage = path === "/yonetim/giris.html";
+
+  if ((isAdminEntry || isPanelPage) && !isLoginPage) {
+    const auth = await requireAdmin(context);
+    if (auth.response) {
+      const next = isAdminEntry ? "/admin" : path + url.search;
+      return Response.redirect(new URL("/yonetim/giris.html?next=" + encodeURIComponent(next), url), 302);
+    }
+  }
   if (path.startsWith("/admin/") && !isAdminEntry) {
     return new Response("Not Found", {status:404,headers:{"Content-Type":"text/plain; charset=utf-8","Cache-Control":"no-store, max-age=0","X-Content-Type-Options":"nosniff"}});
   }
@@ -33,10 +44,10 @@ export async function onRequest(context) {
   headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   headers.set("Cross-Origin-Resource-Policy", "same-origin");
-  if (path.startsWith("/api/") || isAdminEntry) {
+  if (path.startsWith("/api/") || isAdminEntry || isPanelPage || isLoginPage) {
     headers.set("Cache-Control", "no-store, max-age=0");
     headers.set("Pragma", "no-cache");
   }
-  if (isAdminEntry) headers.set("X-Robots-Tag", "noindex, nofollow");
+  if (isAdminEntry || isPanelPage || isLoginPage) headers.set("X-Robots-Tag", "noindex, nofollow");
   return new Response(response.body, {status:response.status,statusText:response.statusText,headers});
 }
