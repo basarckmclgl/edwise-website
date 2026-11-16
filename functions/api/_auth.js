@@ -113,7 +113,7 @@ export async function requireEditor(context) {
   if (path.includes("/pages")) moduleKey = "pages";
   else if (path.includes("/services")) moduleKey = "services";
   else if (path.includes("/applications")) moduleKey = "applications";
-  else if (path.includes("/media")) moduleKey = "pages";
+  else if (path.includes("/media")) moduleKey = "media";
 
   if (!moduleKey) {
     const auth = await requireAdmin(context);
@@ -148,7 +148,7 @@ export async function requirePermission(context, moduleKey, actionKey = "view") 
   if (auth.response) return auth;
   if (auth.admin.role === "superadmin") return auth;
 
-  const allowedModules = ["dashboard", "pages", "services", "applications", "menu", "seo", "languages", "settings", "users"];
+  const allowedModules = ["dashboard", "pages", "services", "applications", "media", "menu", "seo", "languages", "settings", "users"];
   const allowedActions = ["view", "create", "edit", "delete", "publish"];
   if (!allowedModules.includes(moduleKey) || !allowedActions.includes(actionKey)) {
     return authError("Geçersiz yetki anahtarı.", 400);
@@ -174,6 +174,7 @@ export async function requirePermission(context, moduleKey, actionKey = "view") 
       pages: { view: true, create: true, edit: true, delete: true, publish: true },
       services: { view: true, create: true, edit: true, delete: true, publish: true },
       applications: { view: true, create: true, edit: true, delete: true, publish: true },
+      media: { view: true, create: true, delete: true },
       menu: { view: true, create: true, edit: true, delete: true },
       seo: { view: true, edit: true },
       languages: { view: true, edit: true },
