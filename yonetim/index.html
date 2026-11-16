@@ -109,6 +109,19 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 @media(max-width:620px){#view-seo .seo-fields{grid-template-columns:1fr 1fr}#view-seo>.seo-stat{grid-template-columns:repeat(2,minmax(0,1fr))}#view-seo .seo-checks{grid-template-columns:1fr}#view-seo .seo-data-grid{grid-template-columns:1fr}}
 @media(min-width:1100px){#view-seo #seo-settings .seo-fields{grid-template-columns:repeat(3,minmax(0,1fr))}#view-seo #seo-settings .seo-fields label.full{grid-column:auto}#view-seo #seo-settings .seo-fields label:nth-child(2),#view-seo #seo-settings .seo-fields label:nth-child(7){grid-column:span 2}}
 
+
+/* Sayfa Yönetimi: uzun içerikleri tek bir kontrollü çalışma alanında tut */
+#view-sayfalar{max-height:calc(100vh - 40px);overflow-y:auto;overscroll-behavior:contain;padding:0 10px 24px 0;scrollbar-width:thin;scrollbar-color:#c9b3df transparent}
+#view-sayfalar::-webkit-scrollbar{width:6px}
+#view-sayfalar::-webkit-scrollbar-track{background:transparent}
+#view-sayfalar::-webkit-scrollbar-thumb{background:#c9b3df;border-radius:8px}
+#view-sayfalar .table-wrap{max-height:340px;overflow:auto;overscroll-behavior:contain}
+#view-sayfalar .pages-table thead th{position:sticky;top:0;z-index:2}
+#view-sayfalar .page-toolbar{margin:12px 0 10px;gap:8px}
+#view-sayfalar .pages-table th{padding:10px 12px}
+#view-sayfalar .pages-table td{padding:10px 12px}
+@media(max-width:700px){#view-sayfalar{max-height:calc(100vh - 20px);padding-right:4px}#view-sayfalar .table-wrap{max-height:300px}}
+
 </style>
 
 </head>
