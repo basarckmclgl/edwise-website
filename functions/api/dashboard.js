@@ -1,3 +1,5 @@
+import { requirePermission } from "./_auth.js";
+
 const json = (data, status = 200) => Response.json(data, {
   status,
   headers: { "Cache-Control": "no-store" }
@@ -16,6 +18,8 @@ async function countTable(db, table, excludeDeleted = false) {
 }
 
 export async function onRequestGet(context) {
+  const auth = await requirePermission(context, "dashboard", "view");
+  if (auth.response) return auth.response;
   try {
     const db = context.env.DB;
     if (!db) return json({ success: false, message: "Veritabanı bağlantısı bulunamadı." }, 503);
