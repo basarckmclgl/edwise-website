@@ -80,20 +80,17 @@ export async function onRequest(context) {
         const ogImage = String(settings.seoOgImage || "").slice(0,500);
         const verification = String(settings.seoGsc || "").slice(0,300);
         if (title || description || canonical || robots || ogTitle || ogDescription || ogImage || verification) {
-          class SeoHead {
-            element(el) {
-              if (title) el.append('<title>' + escapeHtml(title) + '</title>', {html:true});
-              if (description) el.append('<meta name="description" content="' + escapeHtml(description) + '">', {html:true});
-              if (canonical) el.append('<link rel="canonical" href="' + escapeHtml(canonical) + '">', {html:true});
-              if (robots) el.append('<meta name="robots" content="' + escapeHtml(robots) + '">', {html:true});
-              if (ogTitle) el.append('<meta property="og:title" content="' + escapeHtml(ogTitle) + '">', {html:true});
-              if (ogDescription) el.append('<meta property="og:description" content="' + escapeHtml(ogDescription) + '">', {html:true});
-              if (ogImage) el.append('<meta property="og:image" content="' + escapeHtml(ogImage) + '">', {html:true});
-              if (verification) el.append('<meta name="google-site-verification" content="' + escapeHtml(verification) + '">', {html:true});
-            }
-          }
           const escapeHtml = value => String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
-          return new HTMLRewriter().on("head", new SeoHead()).transform(new Response(response.body, {status:response.status,statusText:response.statusText,headers}));
+          const rewrite = new HTMLRewriter();
+          if (title) rewrite.on("title", {element(el) { el.setInnerContent(title); }});
+          if (description) rewrite.on('meta[name="description"]', {element(el) { el.setAttribute("content", description); }});
+          if (canonical) rewrite.on('link[rel="canonical"]', {element(el) { el.setAttribute("href", canonical); }});
+          if (robots) rewrite.on('meta[name="robots"]', {element(el) { el.setAttribute("content", robots); }});
+          if (ogTitle) rewrite.on('meta[property="og:title"]', {element(el) { el.setAttribute("content", ogTitle); }});
+          if (ogDescription) rewrite.on('meta[property="og:description"]', {element(el) { el.setAttribute("content", ogDescription); }});
+          if (ogImage) rewrite.on('meta[property="og:image"]', {element(el) { el.setAttribute("content", ogImage); }});
+          if (verification) rewrite.on('meta[name="google-site-verification"]', {element(el) { el.setAttribute("content", verification); }});
+          return rewrite.transform(new Response(response.body, {status:response.status,statusText:response.statusText,headers}));
         }
       }
     } catch (error) {
