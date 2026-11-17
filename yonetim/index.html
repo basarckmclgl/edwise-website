@@ -440,7 +440,16 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   const seen=new Set();
   [...tbody.querySelectorAll('tr:not([data-cms-page-row])')].forEach(row=>{const title=contentKey(row.querySelector('strong')?.textContent),link=row.querySelector('a.preview-link'),path=link?pathKey(link.href):'',keys=[title,path].filter(Boolean);if(keys.some(key=>seen.has(key))){row.remove();return;}keys.forEach(key=>seen.add(key));});
   const uniquePages=[];
-  [...pages].sort((a,b)=>String(b.updated_at||'').localeCompare(String(a.updated_at||''))).forEach(page=>{const title=contentKey(page.title),slug=contentKey(page.slug),path=page.page_path?pathKey(page.page_path):'',keys=[title,slug,path].filter(Boolean);if(keys.some(key=>seen.has(key)))return;keys.forEach(key=>seen.add(key));uniquePages.push(page);});
+  // Hizmet içerikleri yalnızca Hizmet Yönetimi modülünde listelenir.
+  const serviceTitles=new Set(['hizmetlerimiz','egitim danismanligi','coaching ve mentorluk','ielts hazirlik','toefl hazirlik','yds hazirlik','yokdil hazirlik','speaking club'].map(contentKey));
+  const serviceSlugs=new Set(['hizmetlerimiz','egitim-danismanligi','coaching-mentoring','ielts','toefl','yds','yokdil','speaking-club'].map(contentKey));
+  const servicePaths=new Set(['/pages/hizmetlerimiz.html','/pages/egitim-danismanligi.html','/pages/coaching-mentoring.html','/pages/ielts.html','/pages/toefl.html','/pages/yds.html','/pages/yokdil.html','/pages/speaking-club.html'].map(pathKey));
+  [...pages].sort((a,b)=>String(b.updated_at||'').localeCompare(String(a.updated_at||''))).forEach(page=>{
+   const title=contentKey(page.title),slug=contentKey(page.slug),path=page.page_path?pathKey(page.page_path):'',keys=[title,slug,path].filter(Boolean);
+   if(serviceTitles.has(title)||serviceSlugs.has(slug)||servicePaths.has(path))return;
+   if(keys.some(key=>seen.has(key)))return;
+   keys.forEach(key=>seen.add(key));uniquePages.push(page);
+  });
   uniquePages.forEach(page=>{
    const tr=document.createElement('tr');tr.dataset.cmsPageRow='true';tr.dataset.category='cms';
    const url=pageUrl(page.slug);
