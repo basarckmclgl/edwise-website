@@ -621,20 +621,30 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
  async function loadFullPagePreview(url,content){
   if(!livePreview)return;
   try{
-   // iframe gizli durumdayken lazy-load onload beklemek kilitlenmeye yol açabilir.
-   // Önce önizleme yüzeyini görünür yap, sonra iframe'i yükle.
+   // Önce ana pencerede HTML'i al; iframe navigasyon/erişim yarışını ortadan kaldır.
+   const sourceUrl=new URL(url,location.origin);
+   if(sourceUrl.origin!==location.origin)throw new Error('Önizleme yalnızca aynı site içindeki sayfaları açabilir.');
+   const response=await fetch(sourceUrl.href,{credentials:'same-origin',cache:'no-store',redirect:'follow'});
+   if(!response.ok)throw new Error('Sayfa önizlemesi alınamadı (HTTP '+response.status+').');
+   let html=await response.text();
+   const base='<base href="'+sourceUrl.href.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'">';
+   // srcdoc içinde göreli CSS, görsel ve script yolları kaynak sayfaya göre çözülür.
+   html=html.replace(/<base\\b[^>]*>/i,'');
+   if(/<head\\b[^>]*>/i.test(html))html=html.replace(/<head\\b[^>]*>/i,match=>match+base);
+   else html='<!doctype html><html lang="tr"><head>'+base+'</head><body>'+html+'</body></html>';
    showEditorSurface('preview');
    livePreview.loading='eager';
+   livePreview.removeAttribute('src');
    await new Promise((resolve,reject)=>{
-    const timer=setTimeout(()=>reject(new Error('Sayfa önizlemesi zamanında yüklenemedi.')),12000);
+    const timer=setTimeout(()=>reject(new Error('Sayfa önizlemesi zamanında yüklenemedi.')),15000);
     livePreview.onload=()=>{clearTimeout(timer);resolve();};
     livePreview.onerror=()=>{clearTimeout(timer);reject(new Error('Sayfa önizlemesi yüklenemedi.'));};
-    livePreview.src=url;
+    livePreview.srcdoc=html;
    });
    syncLivePreview(content);
   }catch(error){
    showFallbackPreview(content);
-   const status=$('editorPreviewStatus');if(status)status.textContent='Tam sayfa açılamadı; içerik önizlemesi gösteriliyor';
+   const status=$('editorPreviewStatus');if(status)status.textContent='Tam sayfa önizlemesi açılamadı: '+(error.message||'bilinmeyen hata')+' · İçerik önizlemesi gösteriliyor';
   }
  }
  function syncLivePreview(content){
