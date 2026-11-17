@@ -706,13 +706,30 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
   const tbody=$('pageRows');
   tbody.querySelectorAll('[data-cms-page-row]').forEach(row=>row.remove());
 
-  // Yalnızca kullanıcı tarafından belirtilen iki mükerrer CMS kaydını listeden gizle.
-  // Diğer CMS sayfaları ve tüm içerik/veritabanı kayıtları aynen korunur.
-  const duplicateSlugs=new Set(['edwise-rehber','ana-sayfa']);
+  // Statik dosya olarak zaten listelenen sayfaların CMS kopyalarını ikinci kez gösterme.
+  // Kayıtlar veritabanından silinmez; böylece içerik kaybı yaşanmaz.
+  const normalize=value=>String(value||'').trim().toLocaleLowerCase('tr-TR')
+    .normalize('NFD').replace(/[\\u0300-\\u036f]/g,'')
+    .replace(/ı/g,'i').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const staticRows=[...tbody.querySelectorAll('tr:not([data-cms-page-row])')];
+  const staticTitles=new Set(staticRows.map(row=>normalize(row.querySelector('strong')?.textContent)));
+  const staticPaths=new Set(staticRows.flatMap(row=>[...row.querySelectorAll('a.preview-link')].map(a=>{
+    try{return new URL(a.href,location.origin).pathname.replace(/\\/$/,'')||'/';}catch{return '';}
+  })));
+  const uniquePages=new Map();
   pages.forEach(page=>{
    const slug=String(page.slug||'').trim().toLocaleLowerCase('tr-TR');
-   if(!slug||duplicateSlugs.has(slug))return;
-
+   if(!slug||slug==='edwise-rehber')return;
+   const titleKey=normalize(page.title);
+   const path=String(page.page_path||'').trim();
+   const pathKey=path.replace(/\\/$/,'')||'/';
+   if((titleKey&&staticTitles.has(titleKey))||(path&&staticPaths.has(pathKey)))return;
+   const key=titleKey||normalize(slug);
+   const previous=uniquePages.get(key);
+   const score=item=>(item.status==='published'?4:0)+(String(item.content||'').trim()?2:0)+(Date.parse(item.updated_at||'')||0)/1e15;
+   if(!previous||score(page)>score(previous))uniquePages.set(key,page);
+  });
+  [...uniquePages.values()].forEach(page=>{
    const tr=document.createElement('tr');tr.dataset.cmsPageRow='true';tr.dataset.category='cms';
    const url=pageUrl(page.slug);
    tr.innerHTML='<td><strong>'+safe(page.title)+'</strong><small>CMS sayfası · #'+safe(page.id)+'</small></td><td><span class="page-type">CMS</span></td><td><small>'+safe(url)+'</small></td><td>'+(page.status==='published'?'Yayımlandı':'Taslak')+'</td><td><a class="preview-link" href="'+url+'" target="_blank" rel="noopener">Aç ↗</a> <button type="button" class="app-refresh" data-edit-cms="'+safe(page.id)+'">Düzenle</button> <button type="button" class="app-refresh" data-delete-cms="'+safe(page.id)+'">Sil</button></td>';
