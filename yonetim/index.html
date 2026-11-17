@@ -12,7 +12,7 @@ aside{width:250px;background:#fbf9ff;border-right:1px solid var(--line);padding:
 .navlabel{color:#9b87b5;font-size:10px;letter-spacing:1.5px;padding:16px 12px 8px}
 nav a{display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px;color:#68458d;text-decoration:none;margin:3px 0}
 nav a.active,nav a:hover{background:#f0e6fb;color:#55208e}nav a.active{box-shadow:inset 3px 0 var(--purple);font-weight:700}
-.profile{margin-top:auto;border-top:1px solid var(--line);padding:18px 8px 0;display:flex;gap:10px;align-items:center}.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#d9baff,#7138b8);display:grid;place-items:center;font-weight:700;color:white}.profile small{display:block;color:var(--muted);margin-top:3px}
+.nav-group{margin:3px 0}.nav-group-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;border:0;border-radius:10px;background:#f0e6fb;color:#55208e;font:inherit;font-weight:700;text-align:left;cursor:pointer}.nav-submenu{display:grid;gap:2px;padding:4px 0 4px 16px}.nav-submenu a{font-size:13px;padding:9px 12px;margin:0}.nav-submenu a:before{content:"•";color:#9b75c6;margin-right:2px}.nav-group-toggle span{margin-left:auto}.profile{margin-top:auto;border-top:1px solid var(--line);padding:18px 8px 0;display:flex;gap:10px;align-items:center}.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#d9baff,#7138b8);display:grid;place-items:center;font-weight:700;color:white}.profile small{display:block;color:var(--muted);margin-top:3px}
 main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:34px}.eyebrow{color:#8b55c5;font-size:12px;letter-spacing:1.8px;text-transform:uppercase}h1{font-size:30px;margin:8px 0;color:#54218f}p{color:var(--muted);margin:0}.date{color:var(--muted);font-size:13px}
 .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:26px 0}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:20px;box-shadow:0 5px 18px rgba(83,38,130,.045)}.card span{color:var(--muted);font-size:13px}.number{font-size:29px;font-weight:750;margin-top:12px;color:#642ca3}.zero{color:#8b55c5}
 .layout{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}.panel h2{font-size:16px;margin:0 0 18px;color:#54218f}.item{display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-top:1px solid var(--line)}.item:first-of-type{border-top:0}.item b{font-size:14px;color:#5b2a91}.item small{display:block;color:var(--muted);margin-top:5px}.tag{font-size:11px;color:#7138b8;background:#f1e8fb;padding:5px 9px;border-radius:20px;height:max-content}
@@ -42,7 +42,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <body>
 <aside><div class="brand"><img src="/assets/images/logo.png" alt="EDWISE Education &amp; Consultancy"></div><div class="sub">YÖNETİM MERKEZİ</div><div class="owner-name">Çilem ATASOY</div>
 <div class="navlabel">ÇALIŞMA ALANI</div><nav>
-<a class="active" href="#genel">◫ Genel Bakış</a><a href="#sayfalar">▤ Sayfa Yönetimi</a><a href="#basvurular">▣ Başvuru Yönetimi</a><a href="#medya">▧ Medya Kütüphanesi</a><a href="#menu">☷ Menü Yönetimi</a><a href="#seo">⌕ SEO Yönetimi</a>
+<a class="active" href="#genel">◫ Genel Bakış</a><div class="nav-group"><button type="button" class="nav-group-toggle" aria-expanded="true">▤ İçerik Yönetimi <span>⌄</span></button><div class="nav-submenu"><a href="#sayfalar">Sayfa Yönetimi</a><a href="#hizmetler">Hizmet Yönetimi</a></div></div><a href="#basvurular">▣ Başvuru Yönetimi</a><a href="#medya">▧ Medya Kütüphanesi</a><a href="#menu">☷ Menü Yönetimi</a><a href="#seo">⌕ SEO Yönetimi</a>
 </nav><div class="navlabel">YÖNETİM</div><nav><a href="#gecmis">↶ İşlem Geçmişi</a></nav>
 <div class="profile"><div class="avatar">Y</div><div><b>Yönetici</b><small>Ana Yönetici</small></div></div></aside>
 <main id="genel"><div id="view-genel" class="module-view"><header><div><div class="eyebrow">EDWISE / Yönetim</div><h1>Genel Bakış</h1><p>Web sitenin içerik ve başvuru durumunu tek yerden takip et.</p></div><div class="date">YÖNETİM ÖNİZLEMESİ</div></header>
@@ -84,7 +84,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 </tbody></table><div class="no-results" id="noPages">Aramana uygun sayfa bulunamadı.</div></div>
 <div class="page-note">Bu liste, çalışma dalındaki mevcut dosyalar incelenerek hazırlandı. Şu an sayfalar listelenebilir ve önizlenebilir; içerik düzenleme, yeni sayfa oluşturma, taslak kaydetme ve yayınlama işlevleri henüz bağlanmadı. Bu aşamada mevcut sayfa dosyalarına müdahale edilmedi.</div><section class="panel" id="pageEditorPanel" style="margin-top:16px">
 <div class="section-head"><div><div class="eyebrow">GÖRSEL SAYFA DÜZENLEYİCİ</div><h2>Sayfa içerik düzenleyici</h2><p class="section-intro">Metin ve görselleri Word benzeri araçlarla düzenle. Taslak bu tarayıcıda saklanır.</p></div><span class="tag">Taslak modu</span></div>
-<div class="page-tools" style="margin-bottom:10px"><input id="editorTitle" placeholder="Sayfa başlığı" style="flex:2"><input id="editorPath" type="hidden" value=""><input id="editorSlug" placeholder="sayfa-adresi" style="flex:1"><button type="button" id="editorNew" class="app-refresh">Yeni sayfa</button></div>
+<div class="page-tools" style="margin-bottom:10px"><input id="editorTitle" placeholder="Sayfa başlığı" style="flex:2"><input id="editorPath" type="hidden" value=""><input id="editorSlug" placeholder="sayfa-adresi" style="flex:1"><input id="editorDescription" placeholder="Kısa açıklama (hizmetler için)" style="display:none;flex:1"><button type="button" id="editorNew" class="app-refresh">Yeni sayfa</button></div>
 <style>
 #pageEditorPanel .editor-workspace{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:16px;align-items:start;margin-top:12px}
 #pageEditorPanel{margin-top:10px!important}
@@ -200,6 +200,14 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 </section>
 
 </div>
+<div id="view-hizmetler" class="module-view" hidden>
+<header><div><div class="eyebrow">EDWISE / İçerik Yönetimi</div><h1>Hizmet Yönetimi</h1><p>EDWISE'ın sunduğu eğitim ve danışmanlık hizmetlerini buradan yönetin.</p></div><div class="date">HİZMET MODÜLÜ</div></header>
+<section class="panel" style="margin-top:22px">
+<div class="section-head"><div><div class="eyebrow">HİZMET İÇERİKLERİ</div><h2>Hizmetler</h2><p class="section-intro">Hizmet kayıtlarını listeleyin, düzenleyin ve yayın durumlarını yönetin.</p></div><button type="button" id="serviceNew" class="menu-export">＋ Yeni Hizmet</button></div>
+<div class="page-toolbar"><div class="page-tools"><input id="serviceSearch" type="search" placeholder="Hizmet adı veya açıklamada ara..." aria-label="Hizmetlerde ara"><select id="serviceCategory" aria-label="Hizmet durumuna göre filtrele"><option value="all">Tüm durumlar</option><option value="published">Yayında</option><option value="draft">Taslak</option></select></div><span class="page-count" id="serviceCount">Hizmetler yükleniyor…</span></div>
+<div class="table-wrap"><table class="pages-table"><thead><tr><th>Hizmet adı</th><th>URL</th><th>Durum</th><th>Son güncelleme</th><th>İşlem</th></tr></thead><tbody id="serviceRows"><tr><td colspan="5">Hizmetler yükleniyor…</td></tr></tbody></table><div class="no-results" id="noServices">Henüz hizmet kaydı bulunmuyor.</div></div>
+</section>
+</div>
 <div id="view-basvurular" class="module-view" hidden>
 <header><div><div class="eyebrow">EDWISE / Başvuru Takibi</div><h1>Başvuru Yönetimi</h1><p>Web sitesi üzerinden iletilen eğitim başvurularını görüntüle ve takip et.</p></div><div class="date">BAŞVURU MODÜLÜ</div></header>
 <div class="cards application-stats">
@@ -296,7 +304,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <script>
 (()=>{const q=document.getElementById('serviceSearch'),c=document.getElementById('serviceCategory'),rows=[...document.querySelectorAll('#serviceRows tr')],count=document.getElementById('serviceCount'),empty=document.getElementById('noServices');if(!q||!c)return;const apply=()=>{const term=q.value.toLocaleLowerCase('tr-TR').trim(),cat=c.value;let shown=0;rows.forEach(row=>{const visible=row.textContent.toLocaleLowerCase('tr-TR').includes(term)&&(cat==='all'||row.dataset.category===cat);row.hidden=!visible;if(visible)shown++;});count.textContent=shown+' hizmet gösteriliyor';empty.style.display=shown?'none':'block';};q.addEventListener('input',apply);c.addEventListener('change',apply);})();
 (()=>{const q=document.getElementById('pageSearch'),c=document.getElementById('pageCategory'),rows=[...document.querySelectorAll('#pageRows tr')],count=document.getElementById('pageCount'),empty=document.getElementById('noPages');if(!q||!c)return;const apply=()=>{const term=q.value.toLocaleLowerCase('tr-TR').trim(),cat=c.value;let shown=0;rows.forEach(row=>{const matchText=row.textContent.toLocaleLowerCase('tr-TR').includes(term),matchCat=cat==='all'||row.dataset.category===cat;const visible=matchText&&matchCat;row.hidden=!visible;if(visible)shown++;});count.textContent=shown+' sayfa gösteriliyor';empty.style.display=shown?'none':'block';};q.addEventListener('input',apply);c.addEventListener('change',apply);})();
-(()=>{const views={genel:document.getElementById('view-genel'),sayfalar:document.getElementById('view-sayfalar'),basvurular:document.getElementById('view-basvurular'),medya:document.getElementById('view-medya'),menu:document.getElementById('view-menu'),seo:document.getElementById('view-seo'),gecmis:document.getElementById('view-gecmis')};const links=[...document.querySelectorAll('aside nav a')];function show(key){if(!views[key])return;Object.entries(views).forEach(([name,node])=>{node.hidden=name!==key;});links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+key));if(location.hash!=='#'+key)history.replaceState(null,'','#'+key);window.scrollTo({top:0,behavior:'auto'});}links.forEach(a=>{const key=['genel','sayfalar','basvurular','medya','menu','seo','gecmis'].find(k=>a.getAttribute('href')==='#'+k);if(key)a.addEventListener('click',e=>{e.preventDefault();show(key);});});document.querySelectorAll('.actions a[href="#sayfalar"],.actions a[href="#basvurular"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();show(a.getAttribute('href').slice(1));}));const initial=['#genel','#sayfalar','#basvurular','#medya','#menu','#seo','#gecmis'].includes(location.hash)?location.hash.slice(1):'genel';show(initial);})();
+(()=>{const views={genel:document.getElementById('view-genel'),sayfalar:document.getElementById('view-sayfalar'),hizmetler:document.getElementById('view-hizmetler'),basvurular:document.getElementById('view-basvurular'),medya:document.getElementById('view-medya'),menu:document.getElementById('view-menu'),seo:document.getElementById('view-seo'),gecmis:document.getElementById('view-gecmis')};const links=[...document.querySelectorAll('aside nav a')];const groupToggle=document.querySelector('.nav-group-toggle');groupToggle?.addEventListener('click',()=>{const menu=document.querySelector('.nav-submenu');const open=groupToggle.getAttribute('aria-expanded')!=='true';groupToggle.setAttribute('aria-expanded',String(open));if(menu)menu.hidden=!open;});function show(key){if(!views[key])return;Object.entries(views).forEach(([name,node])=>{node.hidden=name!==key;});links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+key));if(location.hash!=='#'+key)history.replaceState(null,'','#'+key);window.scrollTo({top:0,behavior:'auto'});}links.forEach(a=>{const key=['genel','sayfalar','basvurular','medya','menu','seo','gecmis'].find(k=>a.getAttribute('href')==='#'+k);if(key)a.addEventListener('click',e=>{e.preventDefault();show(key);});});document.querySelectorAll('.actions a[href="#sayfalar"],.actions a[href="#basvurular"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();show(a.getAttribute('href').slice(1));}));const initial=['#genel','#sayfalar','#basvurular','#medya','#menu','#seo','#gecmis'].includes(location.hash)?location.hash.slice(1):'genel';show(initial);})();
 
 (()=>{const root=document.getElementById('view-basvurular');if(!root)return;const $=id=>document.getElementById(id);let records=[],loading=false,selected=null;
 const labels={new:'Yeni',contacted:'İletişime geçildi',completed:'Tamamlandı'};
@@ -379,7 +387,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
 (()=> {
  const root=document.getElementById('view-sayfalar'); if(!root)return;
  const $=id=>document.getElementById(id), canvas=$('pageCanvas');
- let currentId=null, pages=[], currentPath='';
+ let currentId=null, pages=[], currentPath='',editorKind='page',currentServiceId=null,services=[];
  const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function slugify(t){return String(t||'').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ö/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
  function feedback(message,type='info'){$('editorFeedback').textContent=message;$('editorFeedback').className='page-count '+(type==='error'?'error':'');}
@@ -387,6 +395,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  $('editorSlug').addEventListener('input',()=>{slugManuallyEdited=true;});
  $('editorTitle').addEventListener('input',()=>{if(!slugManuallyEdited)$('editorSlug').value=slugify($('editorTitle').value);});
  function fresh(){
+  editorKind='page';currentServiceId=null;$('editorDescription').style.display='none';$('pageEditorPanel').querySelector('.section-head h2').textContent='Sayfa içerik düzenleyici';$('pageEditorPanel').querySelector('.section-head .eyebrow').textContent='GÖRSEL SAYFA DÜZENLEYİCİ';document.getElementById('view-sayfalar').appendChild($('pageEditorPanel'));
   currentId=null; currentPath=''; $('editorPath').value=''; $('editorTitle').value=''; $('editorSlug').value=''; slugManuallyEdited=false;
   canvas.innerHTML='<h1>Yeni sayfa</h1><p>İçeriğinizi buraya yazın.</p>';
   canvas.contentEditable='false';setEditorMode(false);selectBlock(null);showEditorSurface('canvas');
@@ -464,7 +473,36 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   if(!window.confirm('Bu sayfa çöp kutusuna taşınsın mı? Kalıcı olarak silinmeyecek.'))return;
   try{const response=await fetch('/api/pages?id='+encodeURIComponent(id),{method:'DELETE',credentials:'same-origin',headers:{Accept:'application/json'}});
    const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Sayfa silinemedi.');
-   await loadPages();feedback('Sayfa silindi. Silme kaydı İşlem Geçmişi bölümünde tutuluyor.');
+   await
+ async function loadServices(){
+  const body=$('serviceRows');if(!body)return;
+  try{
+   const response=await fetch('/api/services',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
+   const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Hizmetler alınamadı.');
+   services=Array.isArray(data.services)?data.services:[];
+   const term=($('serviceSearch')?.value||'').toLocaleLowerCase('tr-TR').trim(),filter=$('serviceCategory')?.value||'all';
+   const shown=services.filter(item=>(filter==='all'||item.status===filter)&&((item.title+' '+item.description).toLocaleLowerCase('tr-TR').includes(term)));
+   body.innerHTML=shown.map(item=>'<tr><td><strong>'+safe(item.title)+'</strong><small>'+safe(item.description||'Açıklama eklenmemiş')+'</small></td><td><small>/hizmetler/'+safe(item.slug)+'</small></td><td><span class="page-type">'+(item.status==='published'?'Yayında':'Taslak')+'</span></td><td><small>'+safe(item.updated_at||'—')+'</small></td><td><button type="button" class="app-refresh" data-edit-service="'+safe(item.id)+'">Düzenle</button> <button type="button" class="app-refresh" data-delete-service="'+safe(item.id)+'">Sil</button></td></tr>').join('');
+   $('serviceCount').textContent=shown.length+' hizmet gösteriliyor';$('noServices').style.display=shown.length?'none':'block';
+  }catch(error){body.innerHTML='<tr><td colspan="5">'+safe(error.message||'Hizmetler yüklenemedi.')+'</td></tr>';$('serviceCount').textContent='Veri alınamadı';}
+ }
+ function openServiceEditor(service){
+  editorKind='service';currentServiceId=service?service.id:null;currentId=null;currentPath='';
+  $('view-hizmetler').appendChild($('pageEditorPanel'));
+  $('pageEditorPanel').querySelector('.section-head h2').textContent='Hizmet içerik düzenleyici';
+  $('pageEditorPanel').querySelector('.section-head .eyebrow').textContent='GÖRSEL HİZMET DÜZENLEYİCİ';
+  $('editorDescription').style.display='block';$('editorTitle').value=service?.title||'';$('editorSlug').value=service?.slug||'';$('editorDescription').value=service?.description||'';
+  $('editorPath').value='';slugManuallyEdited=!!service;canvas.innerHTML=service?.content||'<h1>Yeni hizmet</h1><p>Hizmet açıklamanızı buraya yazın.</p>';
+  canvas.contentEditable='false';setEditorMode(false);selectBlock(null);showEditorSurface('canvas');
+  $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});feedback(service?'Hizmet düzenlemeye açıldı.':'Yeni hizmet taslağı hazır.');
+ }
+ $('serviceNew')?.addEventListener('click',()=>openServiceEditor(null));
+ $('serviceSearch')?.addEventListener('input',loadServices);$('serviceCategory')?.addEventListener('change',loadServices);
+ $('serviceRows')?.addEventListener('click',async e=>{
+  const edit=e.target.closest('[data-edit-service]');if(edit){const item=services.find(x=>String(x.id)===edit.dataset.editService);if(item)openServiceEditor(item);return;}
+  const del=e.target.closest('[data-delete-service]');if(del){if(!confirm('Bu hizmeti silmek istediğine emin misin?'))return;try{const response=await fetch('/api/services',{method:'DELETE',credentials:'same-origin',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({id:del.dataset.deleteService})});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Hizmet silinemedi.');await loadServices();}catch(error){alert(error.message||'Hizmet silinemedi.');}}
+ });
+ loadPages();feedback('Sayfa silindi. Silme kaydı İşlem Geçmişi bölümünde tutuluyor.');
   }catch(error){feedback(error.message||'Sayfa silinemedi.','error');}
  }
  async function restorePage(id){
@@ -495,24 +533,26 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  }
  async function submit(status){
   const title=$('editorTitle').value.trim(),slug=slugify($('editorSlug').value.trim()||title),content=getCleanEditorContent();
-  if(!title||!slug){feedback('Sayfa başlığı ve URL zorunludur.','error');return;}
-  if(!content.trim()){feedback('Sayfa içeriği boş olamaz.','error');return;}
-  const payload={title,slug,content,status,page_path:currentPath};
+  if(!title||!slug){feedback('Başlık ve URL zorunludur.','error');return;}
+  if(!content.trim()){feedback('İçerik boş olamaz.','error');return;}
   const button=status==='published'?$('editorPublish'):$('editorSave');
   button.disabled=true;const oldText=button.textContent;button.textContent=status==='published'?'Yayımlanıyor…':'Kaydediliyor…';
   try{
-   const editing=Number.isInteger(currentId)&&currentId>0;
-   const response=await fetch('/api/pages',{method:editing?'PUT':'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(editing?{...payload,id:currentId}:payload)});
-   const data=await response.json();
-   if(!response.ok||!data.success)throw new Error(data.message||'Sayfa kaydedilemedi.');
-   if(!editing&&data.id)currentId=Number(data.id);
-   $('editorSlug').value=slug;
-   await loadPages();
-   if(status==='published'){
-    if(data.menuSynced===false) feedback('Sayfa yayımlandı ancak menüye otomatik eklenemedi. Menü ayarlarını kontrol et.','error');
-    else feedback(currentPath?'Mevcut sayfa bu dağıtımın veritabanında aynı adres üzerinde güncellendi.':'Sayfa bu dağıtımın veritabanında yayımlandı ve menü kaydı oluşturuldu: '+location.origin+pageUrl(slug));
-   }else feedback('Taslak veritabanına kaydedildi.');
-  }catch(error){feedback(error.message||'Sayfa kaydedilemedi.','error');}
+   let response,data;
+   if(editorKind==='service'){
+    const payload={id:currentServiceId,title,slug,description:$('editorDescription').value.trim(),image_url:'',content,status,sort_order:0};
+    response=await fetch('/api/services',{method:currentServiceId?'PUT':'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
+    data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Hizmet kaydedilemedi.');
+    if(!currentServiceId)currentServiceId=data.id;await loadServices();feedback(status==='published'?'Hizmet yayımlandı.':'Hizmet taslağı kaydedildi.');
+   }else{
+    const payload={title,slug,content,status,page_path:currentPath},editing=Number.isInteger(currentId)&&currentId>0;
+    response=await fetch('/api/pages',{method:editing?'PUT':'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(editing?{...payload,id:currentId}:payload)});
+    data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Sayfa kaydedilemedi.');
+    if(!editing&&data.id)currentId=Number(data.id);$('editorSlug').value=slug;await loadPages();
+    if(status==='published'){if(data.menuSynced===false)feedback('Sayfa yayımlandı ancak menüye otomatik eklenemedi. Menü ayarlarını kontrol et.','error');else feedback(currentPath?'Mevcut sayfa aynı adres üzerinde güncellendi.':'Sayfa yayımlandı ve menü kaydı oluşturuldu.');}
+    else feedback('Sayfa taslağı veritabanına kaydedildi.');
+   }
+  }catch(error){feedback(error.message||'İçerik kaydedilemedi.','error');}
   finally{button.disabled=false;button.textContent=oldText;}
  }
  $('editorNew').addEventListener('click',fresh);
@@ -625,7 +665,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   const doc='<!doctype html><html lang="tr"><head><meta charset="utf-8"><title>'+safe(title)+'</title><style>@page{size:A4;margin:18mm}body{font:12pt/1.65 Arial,sans-serif;color:#25233a}img{max-width:100%;height:auto}h1,h2,h3{break-after:avoid}</style></head><body>'+canvas.innerHTML+'</body></html>';
   win.document.open();win.document.write(doc);win.document.close();win.onload=()=>{win.focus();win.print();};
  });
- loadPages();
+ loadPages();loadServices();
 })();;
 </script>
 </main></body></html>
