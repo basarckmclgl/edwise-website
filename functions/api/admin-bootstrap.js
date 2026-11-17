@@ -17,7 +17,8 @@ function validOrigin(request){try{return request.headers.get("Origin")===new URL
 
 export async function onRequestPost({request,env}){
   if(!validOrigin(request))return json({success:false,message:"İstek kaynağı geçersiz."},403);
-  const db=env["edwise-deneme"];\n  if(!db)return json({success:false,message:"Önizleme yönetici veritabanı bağlantısı bulunamadı."},503);
+  const db=env["edwise-deneme"];
+  if(!db)return json({success:false,message:"Önizleme yönetici veritabanı bağlantısı bulunamadı."},503);
   if(!env.ADMIN_BOOTSTRAP_TOKEN)return json({success:false,message:"İlk kurulum anahtarı Preview ortamında tanımlanmamış."},503);
   try{
     const data=await request.json();
