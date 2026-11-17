@@ -405,6 +405,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 }
 
 
+.mobile-editor-launch,.mobile-editor-view-switch{display:none}
 /* EDWISE MOBILE SYSTEM — desktop rules intentionally untouched */
 @media (max-width:620px){
   html{scroll-padding-top:78px}
@@ -1449,7 +1450,7 @@ const close=()=>{aside.classList.remove('mobile-menu-open');toggle.setAttribute(
 const open=()=>{aside.classList.add('mobile-menu-open');toggle.setAttribute('aria-expanded','true');toggle.innerHTML='✕ <span>Kapat</span>';};
 toggle.addEventListener('click',()=>toggle.getAttribute('aria-expanded')==='true'?close():open());
 panel.addEventListener('click',e=>{if(e.target.closest('a'))close();});
-aside.addEventListener('click',e=>{if(e.target===aside.querySelector('::before'))close();});
+aside.addEventListener('click',e=>{if(e.target===aside&&aside.classList.contains('mobile-menu-open'))close();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
 window.addEventListener('resize',()=>{if(window.innerWidth>620)close();});
 })();
