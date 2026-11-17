@@ -28,7 +28,9 @@ export async function onRequestPost(context){
     if(!origin||origin!==new URL(request.url).origin)return json({success:false,error:"İstek kaynağı geçersiz."},403);
     const auth=await requireEditor(context);
     if(auth.response)return auth.response;
-    if(!env.DB||!env.GITHUB_TOKEN||!env.GITHUB_REPO)return json({success:false,error:"Sunucu ayarları eksik."},500);
+    const db=env["edwise-deneme"];
+    const storageBranch="onizleme";
+    if(!db||!env.GITHUB_TOKEN||!env.GITHUB_REPO)return json({success:false,error:"Sunucu ayarları eksik."},500);
 
     const headers={"Authorization":"Bearer "+env.GITHUB_TOKEN,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"EDWISE-CMS"};
     const sources=[
@@ -40,7 +42,7 @@ export async function onRequestPost(context){
 
     for(const source of sources){
       const sourceName=source.path.split("/").pop();
-      const sourceResponse=await fetch("https://api.github.com/repos/"+env.GITHUB_REPO+"/contents/"+source.path+"?ref=main",{headers});
+      const sourceResponse=await fetch("https://api.github.com/repos/"+env.GITHUB_REPO+"/contents/"+source.path+"?ref="+storageBranch",{headers});
       if(!sourceResponse.ok){skipped.push({file:sourceName,reason:"Kaynak dosya okunamadı."});continue;}
       const sourceData=await sourceResponse.json();
       const bytes=base64ToBytes(sourceData.content||"");
@@ -53,18 +55,18 @@ export async function onRequestPost(context){
         filename=crypto.randomUUID()+"."+extension;
         const put=await fetch("https://api.github.com/repos/"+env.GITHUB_REPO+"/contents/media/"+filename,{
           method:"PUT",headers:{...headers,"Content-Type":"application/json"},
-          body:JSON.stringify({message:"EDWISE: site görselini medya kütüphanesine aktar",content:toBase64(bytes),branch:"main"})
+          body:JSON.stringify({message:"EDWISE: site görselini medya kütüphanesine aktar",content:toBase64(bytes),branch:storageBranch})
         });
         if(!put.ok){skipped.push({file:sourceName,reason:"Medya deposuna kopyalanamadı."});continue;}
       }
 
-      const existing=await env.DB.prepare("SELECT id FROM media WHERE file_name=?").bind(filename).first();
+      const existing=await db.prepare("SELECT id FROM media WHERE file_name=?").bind(filename).first();
       if(existing){skipped.push({file:sourceName,reason:"Zaten medya kütüphanesinde."});continue;}
 
       const url="/api/media/"+filename;
       await env.DB.prepare("INSERT INTO media (file_name,file_url,file_type,created_at) VALUES (?,?,?,datetime('now'))").bind(filename,url,type).run();
       const record=await env.DB.prepare("SELECT * FROM media WHERE file_name=?").bind(filename).first();
-      await logAudit(env.DB,request,auth.admin,{action:"media_imported",entity_type:"media",entity_id:filename,entity_title:sourceName,details:{before:null,after:record,source_path:source.path}});
+      await logAudit(db,request,auth.admin,{action:"media_imported",entity_type:"media",entity_id:filename,entity_title:sourceName,details:{before:null,after:record,source_path:source.path}});
       imported.push({file:sourceName,filename,url});
     }
 
