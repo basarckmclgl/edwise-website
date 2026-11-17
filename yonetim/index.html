@@ -388,7 +388,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
  const $=id=>document.getElementById(id), canvas=$('pageCanvas');
  let currentId=null, pages=[], currentPath='',editorKind='page',currentServiceId=null,currentServiceImage='',currentServiceSort=0,services=[];
  const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- function slugify(t){return String(t||'').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ö/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+ function slugify(t){return String(t||'').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ö/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
  function feedback(message,type='info'){$('editorFeedback').textContent=message;$('editorFeedback').className='page-count '+(type==='error'?'error':'');}
  let slugManuallyEdited=false;
  $('editorSlug').addEventListener('input',()=>{slugManuallyEdited=true;});
@@ -433,8 +433,8 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   }catch(error){const status=$('editorPreviewStatus');if(status)status.textContent='Önizleme yenilenemedi';}
  }
  function pageUrl(slug){return '/pages/sayfa.html?slug='+encodeURIComponent(slug);}
- function contentKey(value){return String(value||'').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ö/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
- function pathKey(value){try{const url=new URL(value,location.origin);return url.pathname.replace(/\\/$/,'')||'/index.html';}catch{return String(value||'').split('?')[0].replace(/\\/$/,'');}}
+ function contentKey(value){return String(value||'').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ö/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+ function pathKey(value){try{const url=new URL(value,location.origin);return url.pathname.replace(/\/$/,'')||'/index.html';}catch{return String(value||'').split('?')[0].replace(/\/$/,'');}}
  function renderPages(){
   const tbody=$('pageRows'); tbody.querySelectorAll('[data-cms-page-row]').forEach(row=>row.remove());
   const seen=new Set();
