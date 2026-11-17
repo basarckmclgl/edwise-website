@@ -1,51 +1,69 @@
 <!doctype html>
 <html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>EDWISE | Yönetici Girişi</title>
 <style>*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#f7f1ff,#fff 65%);font:15px Inter,system-ui,Arial;color:#54218f}.card{width:min(100%,420px);padding:34px;background:#fff;border:1px solid #eee5f7;border-radius:20px;box-shadow:0 18px 55px #54218f12}.brand{text-align:center;font-size:12px;letter-spacing:2px;color:#8b55c5;font-weight:800}.brand strong{display:block;font-size:23px;letter-spacing:.5px;color:#54218f;margin:7px 0 4px}.sub{text-align:center;color:#827292;font-size:13px;margin:0 0 28px}label{display:block;font-size:12px;font-weight:700;margin:16px 0 7px}input{width:100%;padding:13px;border:1px solid #e5d9f0;border-radius:10px;font:inherit;color:#342344;outline:none}input:focus{border-color:#8b55c5;box-shadow:0 0 0 3px #8b55c51a}.password-wrap{position:relative}.password-wrap input{padding-right:48px}.password-toggle{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:36px;height:36px;margin:0;padding:7px;border:0;border-radius:8px;background:transparent;color:#76558f;display:grid;place-items:center;cursor:pointer}.password-toggle:hover{background:#f5effb}.password-toggle:focus-visible{outline:2px solid #8b55c5;outline-offset:2px}.password-toggle svg{width:20px;height:20px;display:block}button{width:100%;margin-top:22px;padding:13px;border:0;border-radius:10px;background:#7138b8;color:#fff;font:inherit;font-weight:750;cursor:pointer}button:disabled{opacity:.6;cursor:wait}.message{display:none;margin-top:15px;padding:11px;border-radius:9px;background:#fff2f1;color:#a43e38;font-size:12px;line-height:1.5}.account-options{margin-top:18px;border-top:1px solid #f0e8f7;padding-top:14px}.account-options summary{list-style:none;text-align:center;color:#7138b8;font-size:12px;font-weight:700;cursor:pointer}.account-options summary::-webkit-details-marker{display:none}.account-options summary:after{content:"⌄";margin-left:7px}.account-options[open] summary:after{content:"⌃"}.forgot-form{margin-top:14px}.forgot-form p{font-size:12px;line-height:1.5;color:#827292;margin-bottom:10px}.forgot-form input{margin-bottom:4px}.forgot-form button{margin-top:10px}.forgot-message{display:none;margin-top:10px;padding:10px;border-radius:9px;background:#f5effb;color:#65428a;font-size:12px;line-height:1.5}.foot{text-align:center;color:#998ca6;font-size:11px;margin-top:22px}
-/* Premium Glass — yalnızca mobil yönetici giriş ekranı */
+/* Mobil giriş düzeni — yalnızca önizleme */
 @media (max-width:620px){
  body{
-  padding:22px;
+  min-height:100vh;
+  min-height:100svh;
+  display:grid;
+  place-items:center;
+  padding:clamp(14px,4vh,30px) 16px;
   background:
-   radial-gradient(ellipse at 12% 12%,rgba(196,157,244,.34),transparent 42%),
-   radial-gradient(ellipse at 88% 82%,rgba(222,190,255,.30),transparent 44%),
-   linear-gradient(145deg,#f4eaff 0%,#faf6ff 48%,#eee4fb 100%);
+   radial-gradient(ellipse at 12% 10%,rgba(196,157,244,.28),transparent 42%),
+   radial-gradient(ellipse at 88% 88%,rgba(222,190,255,.25),transparent 44%),
+   linear-gradient(145deg,#f4eaff 0%,#faf6ff 52%,#eee4fb 100%);
  }
  .card{
-  width:100%;
-  padding:34px 26px;
-  border:1px solid rgba(255,255,255,.88);
-  border-radius:28px;
-  background:rgba(255,255,255,.58);
-  box-shadow:0 24px 70px rgba(83,35,130,.14),inset 0 1px 0 rgba(255,255,255,.95);
-  -webkit-backdrop-filter:blur(24px) saturate(145%);
-  backdrop-filter:blur(24px) saturate(145%);
+  width:min(100%,420px);
+  padding:28px 24px 24px;
+  border:1px solid rgba(255,255,255,.9);
+  border-radius:24px;
+  background:rgba(255,255,255,.72);
+  box-shadow:0 18px 48px rgba(83,35,130,.12),inset 0 1px 0 rgba(255,255,255,.95);
+  -webkit-backdrop-filter:blur(18px) saturate(135%);
+  backdrop-filter:blur(18px) saturate(135%);
  }
- .brand{color:#8752b7}
- .brand strong{color:#54218f}
- .sub{color:#756681}
- label{color:#5c347f}
+ .brand{font-size:11px;letter-spacing:2px;color:#8752b7}
+ .brand strong{font-size:21px;line-height:1.2;margin:6px 0 3px;color:#54218f}
+ .sub{font-size:13px;line-height:1.45;margin:0 0 21px;color:#756681}
+ #loginForm>label:not(.remember-option){font-size:13px;margin:13px 0 6px;color:#5c347f}
  input:not([type=checkbox]){
-  background:rgba(255,255,255,.68);
+  min-height:48px;
+  padding:11px 13px;
+  background:rgba(255,255,255,.82);
   border:1px solid rgba(129,91,164,.22);
-  border-radius:14px;
-  box-shadow:inset 0 1px 3px rgba(83,35,130,.035);
+  border-radius:12px;
+  font-size:15px;
  }
- input:not([type=checkbox]):focus{
-  background:rgba(255,255,255,.88);
-  border-color:#9b69cc;
-  box-shadow:0 0 0 4px rgba(139,85,197,.13);
- }
- .password-toggle{border-radius:12px}
+ .password-wrap input{padding-right:48px}
+ .password-toggle{width:38px;height:38px;border-radius:10px}
+ .remember-option{margin-top:13px!important;font-size:12px!important;gap:9px!important}
  #submit,.forgot-form button{
-  border-radius:14px;
-  background:linear-gradient(115deg,#8b4bc4,#6730a8);
-  box-shadow:0 10px 22px rgba(103,48,168,.24),inset 0 1px 0 rgba(255,255,255,.22);
+  min-height:48px;
+  margin-top:18px;
+  padding:12px 16px;
+  border-radius:12px;
+  background:linear-gradient(115deg,#8245bd,#6730a8);
+  box-shadow:0 7px 16px rgba(103,48,168,.18);
  }
- .account-options{border-top-color:rgba(129,91,164,.16)}
- .foot{color:#8d7b9e}
+ .account-options{margin-top:15px;padding-top:12px;border-top-color:rgba(129,91,164,.16)}
+ .account-options summary{font-size:13px}
+ .forgot-form{margin-top:12px}
+ .foot{font-size:11px;margin-top:17px;color:#8d7b9e}
 }
 @media (max-width:390px){
- .card{padding:29px 20px;border-radius:24px}
+ body{padding:14px 12px}
+ .card{padding:25px 19px 21px;border-radius:22px}
+ .brand strong{font-size:19px}
+}
+@media (max-height:700px) and (max-width:620px){
+ body{place-items:start center;padding-top:14px;padding-bottom:14px}
+ .card{padding-top:22px;padding-bottom:20px}
+ .sub{margin-bottom:14px}
+ #loginForm>label:not(.remember-option){margin-top:10px}
+ #submit{margin-top:14px}
+ .foot{margin-top:13px}
 }
 
 </style></head>
