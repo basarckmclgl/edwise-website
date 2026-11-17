@@ -764,34 +764,37 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
  // Mevcut statik sayfaların her birine gerçek içerik düzenleyici bağlantısı ekle.
  $('pageRows').querySelectorAll('tr').forEach(row=>{
   if(row.dataset.cmsPageRow)return;
-  const action=row.querySelector('td:last-child');
-  const preview=row.querySelector('a.preview-link');
+  const action=row.querySelector('td:last-child'),preview=row.querySelector('a.preview-link');
   if(!action||!preview||action.querySelector('[data-edit-static]'))return;
-  const button=document.createElement('button');button.type='button';button.className='app-refresh';button.textContent='Düzenle';button.dataset.editStatic='true';button.dataset.path=(new URL(preview.href,location.origin).pathname==='/'?'/index.html':new URL(preview.href,location.origin).pathname);const del=document.createElement('button');del.type='button';del.className='app-refresh';del.textContent='Sil';del.dataset.deleteStatic='true';del.dataset.path=button.dataset.path;del.dataset.title=row.querySelector('strong')?.textContent||'Sayfa';action.append(' ',del);
-  action.append(' ',button);
+  const resolvedPath=new URL(preview.getAttribute('href'),location.href).pathname;
+  const pagePath=resolvedPath==='/'?'/index.html':resolvedPath;
+  const button=document.createElement('button');button.type='button';button.className='app-refresh';button.textContent='Düzenle';button.dataset.editStatic='true';button.dataset.path=pagePath;
+  const del=document.createElement('button');del.type='button';del.className='app-refresh';del.textContent='Sil';del.dataset.deleteStatic='true';del.dataset.path=pagePath;del.dataset.title=row.querySelector('strong')?.textContent||'Sayfa';
+  action.append(' ',del,' ',button);
  });
  $('pageRows').addEventListener('click',async e=>{
   const staticButton=e.target.closest('[data-edit-static]');
   if(staticButton){
-   const row=staticButton.closest('tr'),preview=row?.querySelector('a.preview-link');if(!preview)return;
+   const row=staticButton.closest('tr');
    try{
     staticButton.disabled=true;staticButton.textContent='Açılıyor…';
-    const response=await fetch(preview.href,{cache:'no-store'});if(!response.ok)throw new Error('Sayfa dosyası alınamadı.');
-    const pagePath=staticButton.dataset.path||new URL(preview.href,location.origin).pathname;
-    if(pagePath==='/pages/sayfa.html'){
-      feedback('Bu dosya dinamik sayfa şablonudur; doğrudan içerik sayfası değildir. Düzenlemek istediğin gerçek CMS sayfasını CMS sayfa satırından seçmelisin.','error');
-      return;
-    }
+    const pagePath=staticButton.dataset.path;
+    if(!pagePath||!pagePath.startsWith('/'))throw new Error('Sayfa adresi panel içinde çözümlenemedi.');
+    if(pagePath==='/pages/sayfa.html'){feedback('Bu dosya dinamik sayfa şablonudur; düzenlemek istediğin gerçek CMS sayfasını CMS sayfa satırından seçmelisin.','error');return;}
+    const pageUrl=new URL(pagePath,location.origin);
+    const response=await fetch(pageUrl.href,{credentials:'same-origin',cache:'no-store'});
+    if(!response.ok)throw new Error('Sayfa dosyası alınamadı (HTTP '+response.status+').');
     const html=await response.text(),doc=new DOMParser().parseFromString(html,'text/html');
-    const main=doc.querySelector('main, body > section.single-page-content, body > section.section, body > section');
+    const main=doc.querySelector('main.single-page-content, main, body > section.single-page-content, body > section.section, body > section');
     if(!main)throw new Error('Sayfanın içerik alanı bulunamadı; mevcut sayfa değiştirilmedi.');
     const existing=pages.find(page=>page.page_path===pagePath);
     currentId=existing?Number(existing.id):null;currentPath=pagePath;$('editorPath').value=pagePath;
     $('editorTitle').value=existing?.title||row.querySelector('strong')?.textContent?.trim()||doc.title||'Sayfa';
     $('editorSlug').value=existing?.slug||slugify($('editorTitle').value);slugManuallyEdited=true;
-    canvas.innerHTML=existing?.content||main.innerHTML;canvas.contentEditable='false';setEditorMode(true);selectBlock(null);
-    await loadFullPagePreview(preview.href,canvas.innerHTML);
-    feedback('Mevcut sayfanın tam tasarımı yüklendi. Metin kutusundaki değişiklikler canlı görünümde anlık yansır.');
+    canvas.innerHTML=existing?.content||main.innerHTML;
+    setEditorMode(true);selectBlock(null);showEditorSurface('canvas');
+    await loadFullPagePreview(pageUrl.href,canvas.innerHTML);
+    feedback('Sayfa düzenleyici açıldı. İçerik panelde yüklendi; gerçek görünüm sekmesinden kontrol edebilirsin.');
     $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
    }catch(error){feedback(error.message||'Sayfa açılamadı.','error');}
    finally{staticButton.disabled=false;staticButton.textContent='Düzenle';}
