@@ -730,6 +730,19 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
    const result=await save.json();if(!save.ok||!result.success)throw new Error(result.message||'Sayfa menüye eklenemedi.');
   }
  }
+ // Kaynak sayfanın gerçek tasarımını yönetim panelinin geri kalanına bulaştırmadan editör tuvaline taşır.
+ function applySourceDesign(sourceRoot,targetRoot){
+  if(!sourceRoot||!targetRoot)return;
+  const ignored=new Set(['position','top','right','bottom','left','z-index','transform','transition','animation','pointer-events','cursor']);
+  const copyStyle=(source,target)=>{
+   const computed=getComputedStyle(source);
+   for(let i=0;i<computed.length;i++){const prop=computed[i];if(!ignored.has(prop))target.style.setProperty(prop,computed.getPropertyValue(prop),computed.getPropertyPriority(prop));}
+  };
+  copyStyle(sourceRoot,targetRoot);
+  targetRoot.style.width='100%';targetRoot.style.maxWidth='100%';targetRoot.style.boxSizing='border-box';
+  const walk=(source,target)=>{const src=[...source.children],dst=[...target.children];for(let i=0;i<Math.min(src.length,dst.length);i++){copyStyle(src[i],dst[i]);walk(src[i],dst[i]);}};
+  walk(sourceRoot,targetRoot);targetRoot.dataset.sourceDesignApplied='true';
+ }
  function getCleanEditorContent(){
   const copy=canvas.cloneNode(true);
   copy.querySelectorAll('[data-editor-old-outline]').forEach(el=>{el.style.outline=el.dataset.editorOldOutline||'';el.removeAttribute('data-editor-old-outline');});
@@ -792,6 +805,7 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
     $('editorTitle').value=existing?.title||row.querySelector('strong')?.textContent?.trim()||doc.title||'Sayfa';
     $('editorSlug').value=existing?.slug||slugify($('editorTitle').value);slugManuallyEdited=true;
     canvas.innerHTML=existing?.content||main.innerHTML;
+     applySourceDesign(main,canvas);
     setEditorMode(true);selectBlock(null);showEditorSurface('canvas');
     await loadFullPagePreview(pageUrl.href,canvas.innerHTML);
     feedback('Sayfa düzenleyici açıldı. İçerik panelde yüklendi; gerçek görünüm sekmesinden kontrol edebilirsin.');
