@@ -706,27 +706,12 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
   const tbody=$('pageRows');
   tbody.querySelectorAll('[data-cms-page-row]').forEach(row=>row.remove());
 
-  // Statik dosya olarak zaten listelenen sayfaların CMS kopyalarını ikinci kez gösterme.
-  // Kayıtları veya veritabanı içeriklerini silmez; yalnızca mükerrer satırı gizler.
-  const staticPaths=new Set();
-  tbody.querySelectorAll('tr:not([data-cms-page-row])').forEach(row=>{
-   const link=row.querySelector('a.preview-link[href]');
-   if(!link)return;
-   try{
-    const path=new URL(link.getAttribute('href'),location.origin).pathname;
-    staticPaths.add(path==='/'?'/index.html':path);
-   }catch(_){}
-  });
-
-  const seenSlugs=new Set();
+  // Yalnızca kullanıcı tarafından belirtilen iki mükerrer CMS kaydını listeden gizle.
+  // Diğer CMS sayfaları ve tüm içerik/veritabanı kayıtları aynen korunur.
+  const duplicateSlugs=new Set(['edwise-rehber','ana-sayfa']);
   pages.forEach(page=>{
    const slug=String(page.slug||'').trim().toLocaleLowerCase('tr-TR');
-   if(!slug)return;
-   const canonicalPath=slug==='ana-sayfa'?'/index.html':'/pages/'+slug+'.html';
-
-   // Aynı statik sayfanın CMS kaydını ve aynı slug'a sahip tekrarlı CMS kayıtlarını listeleme.
-   if(staticPaths.has(canonicalPath)||seenSlugs.has(slug))return;
-   seenSlugs.add(slug);
+   if(!slug||duplicateSlugs.has(slug))return;
 
    const tr=document.createElement('tr');tr.dataset.cmsPageRow='true';tr.dataset.category='cms';
    const url=pageUrl(page.slug);
