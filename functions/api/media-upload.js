@@ -53,7 +53,8 @@ export async function onRequestPost(context) {
 
     const token = context.env.GITHUB_TOKEN;
     const repo = context.env.GITHUB_REPO;
-    const db = context.env.DB;
+    const db = context.env["edwise-deneme"];
+    const storageBranch = "onizleme";
 
     if (!token || !repo || !db) {
       return json({
@@ -102,7 +103,7 @@ export async function onRequestPost(context) {
         body: JSON.stringify({
           message: `EDWISE CMS görseli: ${filename}`,
           content: toBase64(bytes),
-          branch: "main"
+          branch: storageBranch
         })
       }
     );
