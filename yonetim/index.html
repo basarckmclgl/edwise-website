@@ -473,66 +473,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   try{const response=await fetch('/api/pages?id='+encodeURIComponent(id),{method:'DELETE',credentials:'same-origin',headers:{Accept:'application/json'}});
    const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Sayfa silinemedi.');
    await
- const staticServices=[
-  {title:'Eğitim Danışmanlığı',description:'Eğitim danışmanlığı hizmet sayfası',slug:'egitim-danismanligi',path:'/pages/egitim-danismanligi.html'},
-  {title:'Coaching ve Mentorluk',description:'Bireysel koçluk ve mentorluk',slug:'coaching-mentoring',path:'/pages/coaching-mentoring.html'},
-  {title:'IELTS Hazırlık',description:'IELTS sınav hazırlığı',slug:'ielts',path:'/pages/ielts.html'},
-  {title:'TOEFL Hazırlık',description:'TOEFL sınav hazırlığı',slug:'toefl',path:'/pages/toefl.html'},
-  {title:'YDS Hazırlık',description:'YDS sınav hazırlığı',slug:'yds',path:'/pages/yds.html'},
-  {title:'YÖKDİL Hazırlık',description:'YÖKDİL sınav hazırlığı',slug:'yokdil',path:'/pages/yokdil.html'},
-  {title:'Speaking Club',description:'Konuşma kulübü',slug:'speaking-club',path:'/pages/speaking-club.html'}
- ];
- async function loadServices(){
-  const body=$('serviceRows');if(!body)return;
-  try{
-   const response=await fetch('/api/services',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
-   const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Hizmetler alınamadı.');
-   services=Array.isArray(data.services)?data.services:[];
-   const term=($('serviceSearch')?.value||'').toLocaleLowerCase('tr-TR').trim(),filter=$('serviceCategory')?.value||'all';
-   const staticShown=staticServices.filter(item=>(term===''||(item.title+' '+item.description).toLocaleLowerCase('tr-TR').includes(term)));
-   const staticSlugs=new Set(staticServices.map(item=>item.slug));
-   const shown=services.filter(item=>!staticSlugs.has(item.slug)&&(filter==='all'||item.status===filter)&&((item.title+' '+item.description).toLocaleLowerCase('tr-TR').includes(term)));
-   const staticRows=staticShown.map(item=>'<tr><td><strong>'+safe(item.title)+'</strong><small>'+safe(item.description)+'</small></td><td><small>'+safe(item.slug)+'</small></td><td><span class="page-type">Mevcut sayfa</span></td><td><small>Dosya mevcut</small></td><td><button type="button" class="app-refresh" data-edit-static-service="true" data-path="'+safe(item.path)+'">Düzenle</button></td></tr>').join('');
-   const serviceRows=shown.map(item=>'<tr><td><strong>'+safe(item.title)+'</strong><small>'+safe(item.description||'Açıklama eklenmemiş')+'</small></td><td><small>'+safe(item.slug)+'</small></td><td><span class="page-type">'+(item.status==='published'?'Yayında':'Taslak')+'</span></td><td><small>'+safe(item.updated_at||'—')+'</small></td><td><button type="button" class="app-refresh" data-edit-service="'+safe(item.id)+'">Düzenle</button> <button type="button" class="app-refresh" data-delete-service="'+safe(item.id)+'">Sil</button></td></tr>').join('');
-   body.innerHTML=staticRows+serviceRows;
-   const total=staticShown.length+shown.length;$('serviceCount').textContent=total+' hizmet gösteriliyor';$('noServices').style.display=total?'none':'block';
-  }catch(error){const staticRows=staticServices.filter(item=>{const term=($('serviceSearch')?.value||'').toLocaleLowerCase('tr-TR').trim();return !term||(item.title+' '+item.description).toLocaleLowerCase('tr-TR').includes(term);}).map(item=>'<tr><td><strong>'+safe(item.title)+'</strong><small>'+safe(item.description)+'</small></td><td><small>'+safe(item.slug)+'</small></td><td><span class="page-type">Mevcut sayfa</span></td><td><small>Dosya mevcut</small></td><td><button type="button" class="app-refresh" data-edit-static-service="true" data-path="'+safe(item.path)+'">Düzenle</button></td></tr>').join('');body.innerHTML=staticRows||'<tr><td colspan="5">'+safe(error.message||'Hizmetler yüklenemedi.')+'</td></tr>';$('serviceCount').textContent=staticServices.length+' mevcut sayfa · kayıt API bağlantısı yok';$('noServices').style.display=staticRows?'none':'block';}
- }
- function openServiceEditor(service){
-  editorKind='service';currentServiceId=service?service.id:null;currentServiceImage=service?.image_url||'';currentServiceSort=Number(service?.sort_order||0);currentId=null;currentPath='';
-  $('view-hizmetler').appendChild($('pageEditorPanel'));
-  $('pageEditorPanel').querySelector('.section-head h2').textContent='Hizmet içerik düzenleyici';
-  $('pageEditorPanel').querySelector('.section-head .eyebrow').textContent='GÖRSEL HİZMET DÜZENLEYİCİ';
-  $('editorDescription').style.display='block';$('editorTitle').value=service?.title||'';$('editorSlug').value=service?.slug||'';$('editorDescription').value=service?.description||'';
-  $('editorPath').value='';slugManuallyEdited=!!service;canvas.innerHTML=service?.content||'<h1>Yeni hizmet</h1><p>Hizmet açıklamanızı buraya yazın.</p>';
-  canvas.contentEditable='false';setEditorMode(false);selectBlock(null);showEditorSurface('canvas');
-  $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});feedback(service?'Hizmet düzenlemeye açıldı.':'Yeni hizmet taslağı hazır.');
- }
- $('serviceNew')?.addEventListener('click',()=>openServiceEditor(null));
- $('serviceSearch')?.addEventListener('input',loadServices);$('serviceCategory')?.addEventListener('change',loadServices);
- $('serviceRows')?.addEventListener('click',async e=>{
-  const staticEdit=e.target.closest('[data-edit-static-service]');
-  if(staticEdit){
-   try{
-    const pagePath=staticEdit.dataset.path,response=await fetch(pagePath,{cache:'no-store'});if(!response.ok)throw new Error('Mevcut hizmet sayfası alınamadı.');
-    const doc=new DOMParser().parseFromString(await response.text(),'text/html'),main=doc.querySelector('main, body > section.single-page-content, body > section.section, body > section');
-    if(!main)throw new Error('Hizmet sayfasının içerik alanı bulunamadı.');
-    const existing=pages.find(page=>page.page_path===pagePath);
-    editorKind='page';currentServiceId=null;currentId=existing?Number(existing.id):null;currentPath=pagePath;
-    $('view-hizmetler').appendChild($('pageEditorPanel'));$('pageEditorPanel').querySelector('.section-head h2').textContent='Hizmet içerik düzenleyici';$('pageEditorPanel').querySelector('.section-head .eyebrow').textContent='MEVCUT HİZMET SAYFASI';
-    $('editorDescription').style.display='none';$('editorPath').value=pagePath;
-    $('editorTitle').value=existing?.title||doc.title||staticEdit.closest('tr')?.querySelector('strong')?.textContent||'Hizmet';
-    $('editorSlug').value=existing?.slug||slugify($('editorTitle').value);slugManuallyEdited=true;
-    canvas.innerHTML=existing?.content||main.innerHTML;canvas.contentEditable='false';setEditorMode(false);selectBlock(null);
-    await loadFullPagePreview(pagePath,canvas.innerHTML).catch(()=>showEditorSurface('canvas'));
-    feedback('Mevcut hizmet sayfası düzenlemeye açıldı.');$('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
-   }catch(error){feedback(error.message||'Hizmet sayfası açılamadı.','error');}
-   return;
-  }
-  const edit=e.target.closest('[data-edit-service]');if(edit){const item=services.find(x=>String(x.id)===edit.dataset.editService);if(item)openServiceEditor(item);return;}
-  const del=e.target.closest('[data-delete-service]');if(del){if(!confirm('Bu hizmeti silmek istediğine emin misin?'))return;try{const response=await fetch('/api/services',{method:'DELETE',credentials:'same-origin',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({id:del.dataset.deleteService})});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Hizmet silinemedi.');await loadServices();}catch(error){alert(error.message||'Hizmet silinemedi.');}}
- });
- loadPages();feedback('Sayfa silindi. Silme kaydı İşlem Geçmişi bölümünde tutuluyor.');
+  loadPages();feedback('Sayfa silindi. Silme kaydı İşlem Geçmişi bölümünde tutuluyor.');
   }catch(error){feedback(error.message||'Sayfa silinemedi.','error');}
  }
  async function restorePage(id){
@@ -697,6 +638,66 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   const doc='<!doctype html><html lang="tr"><head><meta charset="utf-8"><title>'+safe(title)+'</title><style>@page{size:A4;margin:18mm}body{font:12pt/1.65 Arial,sans-serif;color:#25233a}img{max-width:100%;height:auto}h1,h2,h3{break-after:avoid}</style></head><body>'+canvas.innerHTML+'</body></html>';
   win.document.open();win.document.write(doc);win.document.close();win.onload=()=>{win.focus();win.print();};
  });
+const staticServices=[
+  {title:'Eğitim Danışmanlığı',description:'Eğitim danışmanlığı hizmet sayfası',slug:'egitim-danismanligi',path:'/pages/egitim-danismanligi.html'},
+  {title:'Coaching ve Mentorluk',description:'Bireysel koçluk ve mentorluk',slug:'coaching-mentoring',path:'/pages/coaching-mentoring.html'},
+  {title:'IELTS Hazırlık',description:'IELTS sınav hazırlığı',slug:'ielts',path:'/pages/ielts.html'},
+  {title:'TOEFL Hazırlık',description:'TOEFL sınav hazırlığı',slug:'toefl',path:'/pages/toefl.html'},
+  {title:'YDS Hazırlık',description:'YDS sınav hazırlığı',slug:'yds',path:'/pages/yds.html'},
+  {title:'YÖKDİL Hazırlık',description:'YÖKDİL sınav hazırlığı',slug:'yokdil',path:'/pages/yokdil.html'},
+  {title:'Speaking Club',description:'Konuşma kulübü',slug:'speaking-club',path:'/pages/speaking-club.html'}
+ ];
+ async function loadServices(){
+  const body=$('serviceRows');if(!body)return;
+  try{
+   const response=await fetch('/api/services',{credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
+   const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Hizmetler alınamadı.');
+   services=Array.isArray(data.services)?data.services:[];
+   const term=($('serviceSearch')?.value||'').toLocaleLowerCase('tr-TR').trim(),filter=$('serviceCategory')?.value||'all';
+   const staticShown=staticServices.filter(item=>(term===''||(item.title+' '+item.description).toLocaleLowerCase('tr-TR').includes(term)));
+   const staticSlugs=new Set(staticServices.map(item=>item.slug));
+   const shown=services.filter(item=>!staticSlugs.has(item.slug)&&(filter==='all'||item.status===filter)&&((item.title+' '+item.description).toLocaleLowerCase('tr-TR').includes(term)));
+   const staticRows=staticShown.map(item=>'<tr><td><strong>'+safe(item.title)+'</strong><small>'+safe(item.description)+'</small></td><td><small>'+safe(item.slug)+'</small></td><td><span class="page-type">Mevcut sayfa</span></td><td><small>Dosya mevcut</small></td><td><button type="button" class="app-refresh" data-edit-static-service="true" data-path="'+safe(item.path)+'">Düzenle</button></td></tr>').join('');
+   const serviceRows=shown.map(item=>'<tr><td><strong>'+safe(item.title)+'</strong><small>'+safe(item.description||'Açıklama eklenmemiş')+'</small></td><td><small>'+safe(item.slug)+'</small></td><td><span class="page-type">'+(item.status==='published'?'Yayında':'Taslak')+'</span></td><td><small>'+safe(item.updated_at||'—')+'</small></td><td><button type="button" class="app-refresh" data-edit-service="'+safe(item.id)+'">Düzenle</button> <button type="button" class="app-refresh" data-delete-service="'+safe(item.id)+'">Sil</button></td></tr>').join('');
+   body.innerHTML=staticRows+serviceRows;
+   const total=staticShown.length+shown.length;$('serviceCount').textContent=total+' hizmet gösteriliyor';$('noServices').style.display=total?'none':'block';
+  }catch(error){const staticRows=staticServices.filter(item=>{const term=($('serviceSearch')?.value||'').toLocaleLowerCase('tr-TR').trim();return !term||(item.title+' '+item.description).toLocaleLowerCase('tr-TR').includes(term);}).map(item=>'<tr><td><strong>'+safe(item.title)+'</strong><small>'+safe(item.description)+'</small></td><td><small>'+safe(item.slug)+'</small></td><td><span class="page-type">Mevcut sayfa</span></td><td><small>Dosya mevcut</small></td><td><button type="button" class="app-refresh" data-edit-static-service="true" data-path="'+safe(item.path)+'">Düzenle</button></td></tr>').join('');body.innerHTML=staticRows||'<tr><td colspan="5">'+safe(error.message||'Hizmetler yüklenemedi.')+'</td></tr>';$('serviceCount').textContent=staticServices.length+' mevcut sayfa · kayıt API bağlantısı yok';$('noServices').style.display=staticRows?'none':'block';}
+ }
+ function openServiceEditor(service){
+  editorKind='service';currentServiceId=service?service.id:null;currentServiceImage=service?.image_url||'';currentServiceSort=Number(service?.sort_order||0);currentId=null;currentPath='';
+  $('view-hizmetler').appendChild($('pageEditorPanel'));
+  $('pageEditorPanel').querySelector('.section-head h2').textContent='Hizmet içerik düzenleyici';
+  $('pageEditorPanel').querySelector('.section-head .eyebrow').textContent='GÖRSEL HİZMET DÜZENLEYİCİ';
+  $('editorDescription').style.display='block';$('editorTitle').value=service?.title||'';$('editorSlug').value=service?.slug||'';$('editorDescription').value=service?.description||'';
+  $('editorPath').value='';slugManuallyEdited=!!service;canvas.innerHTML=service?.content||'<h1>Yeni hizmet</h1><p>Hizmet açıklamanızı buraya yazın.</p>';
+  canvas.contentEditable='false';setEditorMode(false);selectBlock(null);showEditorSurface('canvas');
+  $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});feedback(service?'Hizmet düzenlemeye açıldı.':'Yeni hizmet taslağı hazır.');
+ }
+ $('serviceNew')?.addEventListener('click',()=>openServiceEditor(null));
+ $('serviceSearch')?.addEventListener('input',loadServices);$('serviceCategory')?.addEventListener('change',loadServices);
+ $('serviceRows')?.addEventListener('click',async e=>{
+  const staticEdit=e.target.closest('[data-edit-static-service]');
+  if(staticEdit){
+   try{
+    const pagePath=staticEdit.dataset.path,response=await fetch(pagePath,{cache:'no-store'});if(!response.ok)throw new Error('Mevcut hizmet sayfası alınamadı.');
+    const doc=new DOMParser().parseFromString(await response.text(),'text/html'),main=doc.querySelector('main, body > section.single-page-content, body > section.section, body > section');
+    if(!main)throw new Error('Hizmet sayfasının içerik alanı bulunamadı.');
+    const existing=pages.find(page=>page.page_path===pagePath);
+    editorKind='page';currentServiceId=null;currentId=existing?Number(existing.id):null;currentPath=pagePath;
+    $('view-hizmetler').appendChild($('pageEditorPanel'));$('pageEditorPanel').querySelector('.section-head h2').textContent='Hizmet içerik düzenleyici';$('pageEditorPanel').querySelector('.section-head .eyebrow').textContent='MEVCUT HİZMET SAYFASI';
+    $('editorDescription').style.display='none';$('editorPath').value=pagePath;
+    $('editorTitle').value=existing?.title||doc.title||staticEdit.closest('tr')?.querySelector('strong')?.textContent||'Hizmet';
+    $('editorSlug').value=existing?.slug||slugify($('editorTitle').value);slugManuallyEdited=true;
+    canvas.innerHTML=existing?.content||main.innerHTML;canvas.contentEditable='false';setEditorMode(false);selectBlock(null);
+    await loadFullPagePreview(pagePath,canvas.innerHTML).catch(()=>showEditorSurface('canvas'));
+    feedback('Mevcut hizmet sayfası düzenlemeye açıldı.');$('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
+   }catch(error){feedback(error.message||'Hizmet sayfası açılamadı.','error');}
+   return;
+  }
+  const edit=e.target.closest('[data-edit-service]');if(edit){const item=services.find(x=>String(x.id)===edit.dataset.editService);if(item)openServiceEditor(item);return;}
+  const del=e.target.closest('[data-delete-service]');if(del){if(!confirm('Bu hizmeti silmek istediğine emin misin?'))return;try{const response=await fetch('/api/services',{method:'DELETE',credentials:'same-origin',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({id:del.dataset.deleteService})});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Hizmet silinemedi.');await loadServices();}catch(error){alert(error.message||'Hizmet silinemedi.');}}
+ });
+
  loadPages();loadServices();
 })();;
 </script>
