@@ -7,9 +7,9 @@ export async function onRequestGet(context){
   const cookie=context.request.headers.get("Cookie")||"",match=cookie.match(/(?:^|;\s*)edwise_session=([a-f0-9]{64})(?:;|$)/i);
   if(!match)return json({success:false,message:"Oturum doğrulanamadı."},401);
   const db=context.env["edwise-deneme"],currentHash=await hashToken(match[1]);
-  const current=await db.prepare("SELECT expires_at FROM admin_sessions WHERE admin_id=? AND token_hash=? AND expires_at>datetime('now') LIMIT 1").bind(auth.admin.id,currentHash).first();
+  const current=await db.prepare("SELECT expires_at FROM admin_sessions WHERE admin_id=? AND token_hash=? AND datetime(expires_at)>datetime('now') LIMIT 1").bind(auth.admin.id,currentHash).first();
   if(!current)return json({success:false,message:"Aktif oturum bulunamadı."},401);
-  const count=await db.prepare("SELECT COUNT(*) AS total FROM admin_sessions WHERE admin_id=? AND token_hash<>? AND expires_at>datetime('now')").bind(auth.admin.id,currentHash).first();
+  const count=await db.prepare("SELECT COUNT(*) AS total FROM admin_sessions WHERE admin_id=? AND token_hash<>? AND datetime(expires_at)>datetime('now')").bind(auth.admin.id,currentHash).first();
   return json({success:true,currentExpiresAt:current.expires_at,otherSessionCount:Number(count?.total||0)});
  }catch(error){console.error("EDWISE SESSIONS GET ERROR:",error);return json({success:false,message:"Oturum bilgileri alınamadı."},500);}
 }
