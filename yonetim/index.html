@@ -1470,36 +1470,5 @@ launch.addEventListener('click',()=>{const opening=panel.classList.contains('mob
 const applyViewport=()=>{if(mobile()){if(!panel.dataset.mobileInitialized){panel.classList.add('mobile-editor-closed');panel.classList.add('mobile-show-canvas');panel.dataset.mobileInitialized='1';}}else{panel.classList.remove('mobile-editor-closed','mobile-show-canvas','mobile-show-preview');launch.setAttribute('aria-expanded','false');launch.innerHTML='✎ <span>Düzenleme alanını aç</span>';}};applyViewport();window.addEventListener('resize',applyViewport);
 })();
 </script>
-<script>
-/* Bağımsız modül gezinmesi: ana panel betiğinden ayrıdır. */
-(()=> {
- const names=['genel','sayfalar','hizmetler','basvurular','medya','menu','seo','gecmis','profil'];
- const views=Object.fromEntries(names.map(name=>[name,document.getElementById('view-'+name)]));
- const links=[...document.querySelectorAll('aside nav a')];
- const aside=document.querySelector('body>aside');
- const menuToggle=document.getElementById('mobileMenuToggle');
- function showModule(name){
-  if(!views[name])return;
-  names.forEach(key=>{if(views[key])views[key].hidden=key!==name;});
-  links.forEach(link=>link.classList.toggle('active',link.getAttribute('href')==='#'+name));
-  if(location.hash!=='#'+name)history.replaceState(null,'','#'+name);
-  if(aside&&menuToggle&&window.matchMedia('(max-width:620px)').matches){
-   aside.classList.remove('mobile-menu-open');
-   menuToggle.setAttribute('aria-expanded','false');
-   menuToggle.innerHTML='☰ <span>Menü</span>';
-  }
-  window.scrollTo({top:0,behavior:'auto'});
- }
- links.forEach(link=>{
-  const name=link.getAttribute('href')?.slice(1);
-  if(names.includes(name))link.addEventListener('click',event=>{event.preventDefault();showModule(name);});
- });
- document.querySelectorAll('.actions a[href^="#"]').forEach(link=>{
-  const name=link.getAttribute('href').slice(1);
-  if(names.includes(name))link.addEventListener('click',event=>{event.preventDefault();showModule(name);});
- });
- const initial=location.hash.slice(1);
- showModule(names.includes(initial)?initial:'genel');
-})();
-</script>
+
 </body></html>
