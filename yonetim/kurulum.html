@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Cache-Control" content="no-store">
+<title>EDWISE | İlk Yönetici Kurulumu</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:#faf8fd;color:#54218f;font:15px Inter,system-ui,Arial}.card{width:min(100%,560px);background:#fff;border:1px solid #eadff4;border-radius:18px;padding:28px;box-shadow:0 12px 36px #51278012}h1{font-size:24px;margin:0 0 8px}.intro{color:#786b91;line-height:1.6;margin:0 0 22px}.field{display:grid;gap:7px;margin:14px 0}.field label{font-size:12px;font-weight:700;color:#65428a}.field input{width:100%;padding:12px;border:1px solid #e3d8ed;border-radius:9px;font:inherit;color:#39204f}.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}.btn{width:100%;border:0;border-radius:9px;padding:13px;background:#7138b8;color:white;font:inherit;font-weight:700;cursor:pointer;margin-top:10px}.btn:disabled{opacity:.6;cursor:wait}.msg{display:none;margin-top:16px;padding:12px;border-radius:9px;line-height:1.5;font-size:13px}.msg.show{display:block}.msg.err{background:#fff3f1;color:#a33e37}.msg.ok{background:#f1faf3;color:#28643a}.warn{font-size:12px;color:#8b78a1;line-height:1.6;margin-top:14px}@media(max-width:520px){.card{padding:20px}.pair{grid-template-columns:1fr;gap:0}}
+</style>
+</head>
+<body>
+<main class="card">
+<h1>İlk yönetici kurulumu</h1>
+<p class="intro">Bu ekran yalnızca Pınar önizleme ortamındaki boş yönetici veritabanında bir kez kullanılabilir. İki yönetici hesabını oluşturmak için kurulum anahtarını ve başlangıç parolalarını gir.</p>
+<form id="setupForm">
+<div class="field"><label for="setupToken">Preview kurulum anahtarı</label><input id="setupToken" type="password" autocomplete="off" required></div>
+<div class="pair">
+<div class="field"><label for="u1">1. Kullanıcı adı</label><input id="u1" value="basarckmclgl" readonly></div>
+<div class="field"><label for="e1">1. E-posta</label><input id="e1" type="email" value="basarcekmecelioglu6@gmail.com" readonly></div>
+</div>
+<div class="field"><label for="p1">1. Başlangıç parolası</label><input id="p1" type="password" autocomplete="new-password" required></div>
+<div class="pair">
+<div class="field"><label for="u2">2. Kullanıcı adı</label><input id="u2" value="cilematasoy" readonly></div>
+<div class="field"><label for="e2">2. E-posta</label><input id="e2" type="email" value="edwisedanismanlik@gmail.com" readonly></div>
+</div>
+<div class="field"><label for="p2">2. Başlangıç parolası</label><input id="p2" type="password" autocomplete="new-password" required></div>
+<button class="btn" id="submitBtn" type="submit">İki hesabı oluştur</button>
+</form>
+<div class="msg" id="message" role="status" aria-live="polite"></div>
+<p class="warn">Kurulum anahtarı ve parolalar bu sayfadan API'ye güvenli istekle gönderilir; sayfaya veya GitHub koduna kaydedilmez. İşlem başarılı olursa kurulum uç noktası tekrar kullanılamaz.</p>
+</main>
+<script>
+const form=document.getElementById("setupForm"),btn=document.getElementById("submitBtn"),msg=document.getElementById("message");
+form.addEventListener("submit",async event=>{
+ event.preventDefault();btn.disabled=true;btn.textContent="Hesaplar oluşturuluyor…";msg.className="msg";msg.textContent="";
+ const payload={setupToken:document.getElementById("setupToken").value,users:[
+  {username:"basarckmclgl",email:"basarcekmecelioglu6@gmail.com",password:document.getElementById("p1").value},
+  {username:"cilematasoy",email:"edwisedanismanlik@gmail.com",password:document.getElementById("p2").value}
+ ]};
+ try{
+  const response=await fetch("/api/admin-bootstrap",{method:"POST",headers:{"Content-Type":"application/json"},credentials:"same-origin",body:JSON.stringify(payload)});
+  const data=await response.json();
+  if(!response.ok||!data.success)throw new Error(data.message||"Kurulum tamamlanamadı.");
+  form.reset();msg.textContent="İki yönetici hesabı oluşturuldu. Artık yönetim panelinden giriş yapabilirsiniz.";msg.className="msg show ok";
+ }catch(error){msg.textContent=error.message||"Bağlantı hatası oluştu.";msg.className="msg show err";}
+ finally{btn.disabled=false;btn.textContent="İki hesabı oluştur";}
+});
+</script>
+</body>
+</html>
