@@ -15,19 +15,19 @@
   "/pages/yasal-bilgilendirme.html":"yasal-bilgilendirme"
  };
  const path=location.pathname;
- const isHome=path==="/"||path==="/index.html";
+ // Ana sayfanın özgün HTML tasarımını koru; CMS ana sayfayı değiştirmesin.
+ if(path==="/"||path==="/index.html")return;
  const params=new URLSearchParams(location.search);
  if(path==="/pages/sayfa.html"&&params.has("slug"))return;
  const slug=routes[path];
- if(!slug&&!isHome)return;
+ if(!slug)return;
  const root=document.querySelector("[data-cms-slug]")||
   document.querySelector(".single-page-content")||
   document.querySelector(".guide-page")||
   document.querySelector("main");
  if(!root)return;
  const setMeta=(selector,value)=>{const node=document.querySelector(selector);if(node&&value)node.setAttribute("content",value)};
- const endpoint=isHome?"/api/public-pages?path=%2Findex.html":"/api/public-pages?slug="+encodeURIComponent(slug);
- fetch(endpoint,{headers:{Accept:"application/json"},cache:"no-store"})
+ fetch("/api/public-pages?slug="+encodeURIComponent(slug),{headers:{Accept:"application/json"},cache:"no-store"})
   .then(async response=>{const data=await response.json();if(!response.ok||!data.success||!data.page)throw new Error("Page unavailable");return data.page;})
   .then(page=>{
    const liveNodes=["services-list","guide-content"].map(id=>document.getElementById(id)).filter(Boolean);
