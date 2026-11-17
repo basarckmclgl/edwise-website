@@ -1302,6 +1302,39 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
   const title=$('editorTitle').value||'Sayfa',win=window.open('','_blank');
   if(!win){feedback('PDF oluşturmak için açılır pencereye izin verin.','error');return;}
   const doc='<!doctype html><html lang="tr"><head><meta charset="utf-8"><title>'+safe(title)+'</title><style>@page{size:A4;margin:18mm}body{font:12pt/1.65 Arial,sans-serif;color:#25233a}img{max-width:100%;height:auto}h1,h2,h3{break-after:avoid}</style></head><body>'+canvas.innerHTML+'
+
+<script>
+/* Bağımsız modül gezinmesi: ana panel betiğinden ayrıdır. */
+(()=> {
+ const names=['genel','sayfalar','hizmetler','basvurular','medya','menu','seo','gecmis','profil'];
+ const views=Object.fromEntries(names.map(name=>[name,document.getElementById('view-'+name)]));
+ const links=[...document.querySelectorAll('aside nav a')];
+ const aside=document.querySelector('body>aside');
+ const menuToggle=document.getElementById('mobileMenuToggle');
+ function showModule(name){
+  if(!views[name])return;
+  names.forEach(key=>{if(views[key])views[key].hidden=key!==name;});
+  links.forEach(link=>link.classList.toggle('active',link.getAttribute('href')==='#'+name));
+  if(location.hash!=='#'+name)history.replaceState(null,'','#'+name);
+  if(aside&&menuToggle&&window.matchMedia('(max-width:620px)').matches){
+   aside.classList.remove('mobile-menu-open');
+   menuToggle.setAttribute('aria-expanded','false');
+   menuToggle.innerHTML='☰ <span>Menü</span>';
+  }
+  window.scrollTo({top:0,behavior:'auto'});
+ }
+ links.forEach(link=>{
+  const name=link.getAttribute('href')?.slice(1);
+  if(names.includes(name))link.addEventListener('click',event=>{event.preventDefault();showModule(name);});
+ });
+ document.querySelectorAll('.actions a[href^="#"]').forEach(link=>{
+  const name=link.getAttribute('href').slice(1);
+  if(names.includes(name))link.addEventListener('click',event=>{event.preventDefault();showModule(name);});
+ });
+ const initial=location.hash.slice(1);
+ showModule(names.includes(initial)?initial:'genel');
+})();
+</script>
 </body></html>';
   win.document.open();win.document.write(doc);win.document.close();win.onload=()=>{win.focus();win.print();};
  });
