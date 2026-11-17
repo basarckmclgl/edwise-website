@@ -585,7 +585,7 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
  const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function slugify(t){return String(t||'').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ö/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
  function comparableSlug(value){return slugify(value).replace(/-/g,'');}
- function staticPathSlug(path){const normalized=String(path||'').split('?')[0].replace(/\\/g,'/');if(normalized==='/'||normalized==='/index.html')return 'anasayfa';const file=normalized.split('/').pop()||'';return file.replace(/\\.html?$/i,'');}
+ function staticPathSlug(path){const normalized=String(path||'').split('?')[0].replace(/\\/g,'/');if(normalized==='/'||normalized==='/index.html')return 'anasayfa';const file=normalized.split('/').pop()||'';return file.replace(/\.html?$/i,'');}
  function cmsPageForStaticPath(path){const target=staticPathSlug(path);return pages.find(page=>String(page.page_path||'').split('?')[0]===path)||pages.find(page=>comparableSlug(page.slug)===comparableSlug(target));}
  function feedback(message,type='info'){$('editorFeedback').textContent=message;$('editorFeedback').className='page-count '+(type==='error'?'error':'');}
  let slugManuallyEdited=false;
