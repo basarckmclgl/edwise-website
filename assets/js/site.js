@@ -384,7 +384,8 @@
   })();
 
 
-// CMS: mevcut statik sayfaların yayımlanmış içerik sürümünü aynı URL üzerinde uygula.
+// CMS: yayımlanmış içerik yalnızca gerçekten doluysa statik sayfanın yerini alır.
+// Boş/bozuk CMS kaydı ana sayfanın tamamını görünmez bırakmamalıdır.
 (function applyManagedPageContent(){
   const main=document.querySelector("main");
   if(!main)return;
@@ -393,11 +394,21 @@
     .then(response=>response.ok?response.json():null)
     .then(data=>{
       if(data&&data.deleted){location.replace("/");return;}
-      if(!data||!data.success||!data.page||!data.page.content)return;
-      if(window.EDWISEContent)window.EDWISEContent.render(main,data.page.content);
-      else main.innerHTML=data.page.content;
+      const content=data&&data.success&&data.page&&typeof data.page.content==="string"?data.page.content.trim():"";
+      if(!content)return;
+      const candidate=document.createElement("div");
+      candidate.innerHTML=content;
+      const meaningfulText=(candidate.textContent||"").replace(/\\s+/g," ").trim();
+      const hasVisual=candidate.querySelector("img, picture, video, iframe, svg, canvas");
+      // Sadece boş kapsayıcı/boşluk içeren CMS içeriği mevcut çalışan sayfanın üstüne yazılmaz.
+      if(meaningfulText.length<12&&!hasVisual){
+        console.warn("CMS sayfa içeriği boş veya eksik; mevcut sayfa görünümü korundu.");
+        return;
+      }
+      if(window.EDWISEContent&&typeof window.EDWISEContent.render==="function")window.EDWISEContent.render(main,content);
+      else main.innerHTML=content;
       if(data.page.meta_title)document.title=data.page.meta_title;
       if(data.page.meta_description){const meta=document.querySelector('meta[name="description"]');if(meta)meta.content=data.page.meta_description;}
     })
-    .catch(error=>console.warn("CMS sayfa içeriği uygulanamadı:",error));
+    .catch(error=>console.warn("CMS sayfa içeriği uygulanamadı; mevcut sayfa görünümü korundu:",error));
 })();
