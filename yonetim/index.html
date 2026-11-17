@@ -39,6 +39,75 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 .logout-button{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:auto;min-width:0;margin:0;padding:5px 8px;border:1px solid #e5d7f2;border-radius:9px;background:#fff;color:#7138b8;font:inherit;font-size:9px;font-weight:700;line-height:1.2;text-align:center;white-space:nowrap;cursor:pointer}.logout-button:hover{background:#f3eafb}.logout-button:disabled{opacity:.6;cursor:wait}
 
 .profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:18px}.profile-field{padding:15px;border:1px solid var(--line);border-radius:11px;background:#fff}.profile-field span{display:block;color:var(--muted);font-size:11px;margin-bottom:7px}.profile-field strong{display:block;color:#54218f;font-size:14px;overflow-wrap:anywhere}.profile-form{display:grid;gap:12px;max-width:520px}.profile-form label{display:grid;gap:6px;color:#65546f;font-size:12px;font-weight:700}.profile-form input{width:100%;border:1px solid #e6deec;border-radius:8px;padding:11px;background:#fff;color:#332442;font:inherit}.profile-form button,.profile-session-button{width:max-content;border:0;border-radius:8px;padding:11px 15px;background:#7138b8;color:#fff;font:inherit;font-size:12px;font-weight:700;cursor:pointer}.profile-form button:disabled,.profile-session-button:disabled{opacity:.55;cursor:wait}.profile-feedback{margin-top:12px;padding:11px 13px;border-radius:9px;background:#f5effb;color:#65428a;font-size:12px;line-height:1.5}.profile-feedback.error{background:#fff4f2;color:#a33e37}.profile-feedback.success{background:#f0f8f1;color:#28643a}.profile-session-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-top:1px solid var(--line)}.profile-session-row:first-of-type{border-top:0}.profile-session-row b{display:block;color:#54218f;font-size:13px}.profile-session-row small{display:block;color:var(--muted);font-size:11px;margin-top:5px}@media(max-width:620px){.profile-grid{grid-template-columns:1fr}.profile-session-row{align-items:flex-start;flex-direction:column}}
+
+/* Mobil uyumluluk: yönetim paneli */
+@media (max-width: 620px) {
+  body { display:block; min-width:0; }
+  aside { width:100%; min-width:0; padding:12px 12px 10px; display:block; border-right:0; border-bottom:1px solid var(--line); }
+  .brand { display:flex; padding:0 6px 6px; min-height:42px; }
+  .brand img { width:132px; max-height:44px; }
+  .sub { padding:0 6px 5px; font-size:9px; }
+  .owner-name { display:inline-block; width:auto; margin:0 6px 8px; padding-bottom:3px; font-size:12px; }
+  .navlabel { display:none; }
+  aside nav { display:flex; flex-wrap:nowrap; align-items:stretch; gap:5px; width:100%; margin:5px 0; overflow-x:auto; overflow-y:hidden; padding:2px 0 7px; scrollbar-width:thin; -webkit-overflow-scrolling:touch; }
+  aside nav > a { flex:0 0 auto; white-space:nowrap; font-size:12px; padding:9px 11px; margin:0; }
+  aside nav .nav-group { flex:0 0 auto; min-width:0; margin:0; }
+  aside nav .nav-group-toggle { width:auto; min-height:36px; white-space:nowrap; padding:9px 11px; font-size:12px; }
+  aside nav .nav-submenu { display:flex; gap:4px; padding:4px 0 0; overflow-x:auto; }
+  aside nav .nav-submenu a { flex:0 0 auto; white-space:nowrap; font-size:11px; padding:7px 9px; }
+  .profile { display:flex; gap:8px; margin-top:6px; padding:10px 5px 2px; }
+  .profile .avatar { width:30px; height:30px; flex:0 0 30px; }
+  .profile b { font-size:12px; }
+  .profile small { font-size:10px; }
+  .logout-button { font-size:10px; padding:7px 9px; }
+  main { width:100%; min-width:0; padding:18px 12px 28px; }
+  main > .module-view > header { align-items:flex-start; gap:8px; flex-direction:column; margin-bottom:18px; }
+  h1 { font-size:23px; line-height:1.25; }
+  .date { display:none; }
+  .welcome { padding:15px; margin-bottom:16px; }
+  .welcome h2 { font-size:16px; }
+  .cards { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:16px 0; }
+  .card,.panel { min-width:0; padding:13px; border-radius:12px; }
+  .card .number,.number { font-size:22px; overflow-wrap:anywhere; }
+  .layout { grid-template-columns:minmax(0,1fr); gap:10px; }
+  .actions { grid-template-columns:1fr; }
+  .section-head { align-items:flex-start; }
+  .section-head h2 { font-size:18px; }
+  .page-toolbar,.page-tools { width:100%; min-width:0; }
+  .page-tools { flex-direction:column; }
+  .page-tools input,.page-tools select { width:100%; min-height:42px; }
+  .page-count { white-space:normal; }
+  .table-wrap { width:100%; max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .pages-table { min-width:680px; }
+  .application-table { min-width:850px; }
+  .media-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .menu-edit-row { grid-template-columns:30px minmax(0,1fr); padding:9px; gap:8px; }
+  .menu-fields { grid-template-columns:minmax(0,1fr); min-width:0; }
+  .menu-row-actions { grid-column:2; flex-direction:row; justify-content:space-between; align-items:center; }
+  .seo-grid,.seo-fields { grid-template-columns:minmax(0,1fr); }
+  .seo-fields label.full { grid-column:auto; }
+  .seo-stat,.history-stats,.profile-grid { grid-template-columns:minmax(0,1fr); }
+  .history-scope { grid-template-columns:minmax(0,1fr); }
+  .profile-session-row { align-items:flex-start; flex-direction:column; gap:8px; }
+  #pageEditorPanel .editor-workspace { grid-template-columns:minmax(0,1fr); }
+  #pageEditorPanel .editor-toolbar { position:static; grid-column:1; grid-row:2; }
+  #pageEditorPanel .editor-page-stage { grid-column:1; grid-row:1; }
+  #pageEditorPanel .editor-integrated-surfaces { grid-template-columns:minmax(0,1fr); }
+  #pageEditorPanel #editorLivePreview { height:520px; min-height:360px; }
+  #pageEditorPanel .editor-page-stage #pageCanvas { min-height:420px; }
+  .app-actions { align-items:stretch; }
+  .app-actions button,.app-actions select { min-height:36px; }
+  .seo-actions,.menu-editor-actions,.menu-action-right { width:100%; }
+  button,input,select,textarea { max-width:100%; }
+}
+@media (max-width: 390px) {
+  main { padding-left:10px; padding-right:10px; }
+  .cards,.media-grid { grid-template-columns:minmax(0,1fr); }
+  .card { min-height:unset; }
+  .editor-tabs button { font-size:11px; padding:8px 3px; }
+  #pageEditorPanel .editor-surface-heading { padding:9px 10px; }
+}
+
 </style>
 
 </head>
