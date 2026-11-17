@@ -78,7 +78,7 @@ function json(data, status = 200, extraHeaders = {}) {
 
 export async function onRequestPost({ request, env }) {
   try {
-    if (!env.DB) {
+    const db = env["edwise-deneme"];\n    if (!db) {
       return json({ success: false, message: "Veritabanı bağlantısı yok." }, 500);
     }
 
@@ -88,15 +88,15 @@ export async function onRequestPost({ request, env }) {
       return json({ success: false, message: "İstek kaynağı geçersiz." }, 403);
     }
 
-    await env.DB.exec(`CREATE TABLE IF NOT EXISTS admin_login_attempts (ip_address TEXT NOT NULL, username TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, first_attempt_at TEXT NOT NULL DEFAULT (datetime('now')), last_attempt_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY(ip_address,username));`);
+    await db.exec(`CREATE TABLE IF NOT EXISTS admin_login_attempts (ip_address TEXT NOT NULL, username TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, first_attempt_at TEXT NOT NULL DEFAULT (datetime('now')), last_attempt_at TEXT NOT NULL DEFAULT (datetime('now')), PRIMARY KEY(ip_address,username));`);
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";
     const data = await request.json();
     const username = String(data.username || "").trim().slice(0,50);
     const password = String(data.password || "");
-    const attempt = await env.DB.prepare("SELECT attempts,(julianday('now')-julianday(first_attempt_at))*1440 AS age_minutes FROM admin_login_attempts WHERE ip_address=? AND username=?").bind(ip,username.toLowerCase()).first();
-    const ipAttempts = await env.DB.prepare("SELECT COALESCE(SUM(attempts),0) AS attempts FROM admin_login_attempts WHERE ip_address=? AND (julianday('now')-julianday(last_attempt_at))*1440<15").bind(ip).first();
+    const attempt = await db.prepare("SELECT attempts,(julianday('now')-julianday(first_attempt_at))*1440 AS age_minutes FROM admin_login_attempts WHERE ip_address=? AND username=?").bind(ip,username.toLowerCase()).first();
+    const ipAttempts = await db.prepare("SELECT COALESCE(SUM(attempts),0) AS attempts FROM admin_login_attempts WHERE ip_address=? AND (julianday('now')-julianday(last_attempt_at))*1440<15").bind(ip).first();
     if((attempt && Number(attempt.attempts)>=8 && Number(attempt.age_minutes)<15) || Number(ipAttempts?.attempts)>=20){
-      await logAudit(env.DB,request,null,{action:"login_rate_limited",entity_type:"security",entity_title:"Giriş denemesi sınırlandı",details:{username,attempts:attempt.attempts}});
+      await logAudit(db,request,null,{action:"login_rate_limited",entity_type:"security",entity_title:"Giriş denemesi sınırlandı",details:{username,attempts:attempt.attempts}});
       return json({success:false,message:"Çok fazla başarısız giriş denemesi. 15 dakika sonra tekrar deneyin."},429);
     }
 
@@ -104,7 +104,7 @@ export async function onRequestPost({ request, env }) {
       return json({ success: false, message: "Kullanıcı adı veya parola hatalı." }, 400);
     }
 
-    const admin = await env.DB.prepare(`
+    const admin = await db.prepare(`
       SELECT id, username, email, password_hash, role
       FROM admins
       WHERE username = ? AND is_active = 1
@@ -112,8 +112,8 @@ export async function onRequestPost({ request, env }) {
     `).bind(username).first();
 
     if (!admin) {
-      await env.DB.prepare(`INSERT INTO admin_login_attempts(ip_address,username,attempts) VALUES(?,?,1) ON CONFLICT(ip_address,username) DO UPDATE SET attempts=CASE WHEN (julianday('now')-julianday(first_attempt_at))*1440>15 THEN 1 ELSE attempts+1 END,first_attempt_at=CASE WHEN (julianday('now')-julianday(first_attempt_at))*1440>15 THEN datetime('now') ELSE first_attempt_at END,last_attempt_at=datetime('now')`).bind(ip,username.toLowerCase()).run();
-      await logAudit(env.DB,request,null,{action:"login_failed",entity_type:"security",entity_title:"Başarısız yönetici girişi",details:{username,reason:"account_not_found"}});
+      await db.prepare(`INSERT INTO admin_login_attempts(ip_address,username,attempts) VALUES(?,?,1) ON CONFLICT(ip_address,username) DO UPDATE SET attempts=CASE WHEN (julianday('now')-julianday(first_attempt_at))*1440>15 THEN 1 ELSE attempts+1 END,first_attempt_at=CASE WHEN (julianday('now')-julianday(first_attempt_at))*1440>15 THEN datetime('now') ELSE first_attempt_at END,last_attempt_at=datetime('now')`).bind(ip,username.toLowerCase()).run();
+      await logAudit(db,request,null,{action:"login_failed",entity_type:"security",entity_title:"Başarısız yönetici girişi",details:{username,reason:"account_not_found"}});
       return json({ success: false, message: "Kullanıcı adı veya parola hatalı." }, 401);
     }
 
@@ -123,11 +123,11 @@ export async function onRequestPost({ request, env }) {
     );
 
     if (!validPassword) {
-      await env.DB.prepare(`INSERT INTO admin_login_attempts(ip_address,username,attempts) VALUES(?,?,1) ON CONFLICT(ip_address,username) DO UPDATE SET attempts=CASE WHEN (julianday('now')-julianday(first_attempt_at))*1440>15 THEN 1 ELSE attempts+1 END,first_attempt_at=CASE WHEN (julianday('now')-julianday(first_attempt_at))*1440>15 THEN datetime('now') ELSE first_attempt_at END,last_attempt_at=datetime('now')`).bind(ip,username.toLowerCase()).run();
-      await logAudit(env.DB,request,null,{action:"login_failed",entity_type:"security",entity_title:"Başarısız yönetici girişi",details:{username,reason:"invalid_password"}});
+      await db.prepare(`INSERT INTO admin_login_attempts(ip_address,username,attempts) VALUES(?,?,1) ON CONFLICT(ip_address,username) DO UPDATE SET attempts=CASE WHEN (julianday('now')-julianday(first_attempt_at))*1440>15 THEN 1 ELSE attempts+1 END,first_attempt_at=CASE WHEN (julianday('now')-julianday(first_attempt_at))*1440>15 THEN datetime('now') ELSE first_attempt_at END,last_attempt_at=datetime('now')`).bind(ip,username.toLowerCase()).run();
+      await logAudit(db,request,null,{action:"login_failed",entity_type:"security",entity_title:"Başarısız yönetici girişi",details:{username,reason:"invalid_password"}});
       return json({ success: false, message: "Kullanıcı adı veya parola hatalı." }, 401);
     }
-    await env.DB.prepare("DELETE FROM admin_login_attempts WHERE ip_address=? AND username=?").bind(ip,username.toLowerCase()).run();
+    await db.prepare("DELETE FROM admin_login_attempts WHERE ip_address=? AND username=?").bind(ip,username.toLowerCase()).run();
 
     const randomBytes = crypto.getRandomValues(new Uint8Array(32));
     const token = Array.from(randomBytes)
@@ -137,34 +137,34 @@ export async function onRequestPost({ request, env }) {
     const tokenHash = await hashToken(token);
 
     const expiresAt = new Date(
-      Date.now() + 7 * 24 * 60 * 60 * 1000
+      Date.now() + 12 * 60 * 60 * 1000
     ).toISOString();
 
-    await env.DB.prepare(`
+    await db.prepare(`
       DELETE FROM admin_sessions
       WHERE expires_at <= ?
     `).bind(new Date().toISOString()).run();
 
-    await env.DB.prepare(`
+    await db.prepare(`
       INSERT INTO admin_sessions
         (admin_id, token_hash, expires_at)
       VALUES (?, ?, ?)
     `).bind(admin.id, tokenHash, expiresAt).run();
 
-    await env.DB.prepare(`
+    await db.prepare(`
       UPDATE admins
       SET last_login_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(admin.id).run();
 
-    await logAudit(env.DB,request,{id:admin.id,username:admin.username,role:admin.role},{action:"login_success",entity_type:"admin",entity_id:admin.id,entity_title:admin.username,details:{}});
+    await logAudit(db,request,{id:admin.id,username:admin.username,role:admin.role},{action:"login_success",entity_type:"admin",entity_id:admin.id,entity_title:admin.username,details:{}});
     const cookie = [
       `edwise_session=${token}`,
       "HttpOnly",
       "Secure",
       "SameSite=Lax",
       "Path=/",
-      "Max-Age=604800"
+      "Max-Age=43200"
     ].join("; ");
 
     return json({
