@@ -108,6 +108,83 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
   #pageEditorPanel .editor-surface-heading { padding:9px 10px; }
 }
 
+
+/* Premium Glass mobil tema — yalnızca yönetim paneli */
+@media (max-width: 620px) {
+  :root { --bg:#f3effa; --panel:rgba(255,255,255,.82); --line:rgba(255,255,255,.78); }
+  html { background:#f3effa; }
+  body { background:radial-gradient(ellipse at 8% 0%,#e9dafa 0%,transparent 42%),linear-gradient(155deg,#f6f2fb 0%,#eee8f7 100%); color:#38234f; }
+  aside {
+    position:relative; z-index:2; padding:14px 13px 12px;
+    background:linear-gradient(135deg,rgba(255,255,255,.88),rgba(247,241,255,.78));
+    border:1px solid rgba(255,255,255,.9); border-bottom:1px solid rgba(255,255,255,.72);
+    border-radius:0 0 22px 22px; box-shadow:0 12px 32px rgba(74,42,111,.09);
+    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+  }
+  .brand { padding:0 5px 5px; }
+  .brand img { width:138px; max-height:44px; }
+  .sub { color:#89769e; letter-spacing:1.8px; font-size:9px; }
+  .owner-name { color:#63349a; border-bottom-color:#b995df; }
+  aside nav { gap:7px; padding:5px 1px 9px; }
+  aside nav > a, aside nav .nav-group-toggle {
+    border:1px solid rgba(255,255,255,.95); border-radius:12px;
+    background:rgba(255,255,255,.58); color:#65477f;
+    box-shadow:0 3px 10px rgba(72,44,102,.045);
+  }
+  aside nav > a.active { background:linear-gradient(135deg,#8d5bc2,#6e3aa5); color:#fff; box-shadow:0 6px 16px rgba(105,57,160,.22); }
+  aside nav .nav-group-toggle { background:rgba(239,229,250,.88); color:#60328f; }
+  aside nav .nav-submenu a { background:rgba(255,255,255,.55); border:1px solid rgba(255,255,255,.8); border-radius:10px; }
+  .profile { border-top:1px solid rgba(119,82,157,.13); padding:10px 4px 1px; }
+  .profile .avatar { background:linear-gradient(145deg,#cba9ed,#7543ad); box-shadow:0 4px 12px rgba(104,61,155,.2); }
+  .logout-button { background:rgba(255,255,255,.75); border-color:rgba(132,91,177,.22); color:#7041a0; border-radius:11px; }
+  main { padding:20px 12px 32px; }
+  main > .module-view > header { margin-bottom:16px; }
+  .eyebrow { color:#9365bd; }
+  h1 { color:#4c2b70; letter-spacing:-.45px; }
+  .welcome,.card,.panel,.media-card,.history-scope>div,.profile-field {
+    background:rgba(255,255,255,.76); border:1px solid rgba(255,255,255,.94);
+    box-shadow:0 9px 26px rgba(75,47,107,.075),inset 0 1px 0 rgba(255,255,255,.9);
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  }
+  .welcome { background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(238,224,252,.76)); border-radius:19px; }
+  .welcome h2,.panel h2,.section-head h2 { color:#56317a; }
+  .card { border-radius:17px; }
+  .card-icon,.welcome-mark { background:linear-gradient(145deg,#f1e6fc,#e5d3f7); color:#7543a9; }
+  .number,.card .number { color:#7542a8; }
+  .tag,.page-type { background:rgba(235,220,250,.8); color:#70409d; }
+  .action { background:rgba(255,255,255,.68); border:1px solid rgba(255,255,255,.95); border-radius:14px; box-shadow:0 4px 14px rgba(74,45,105,.05); }
+  .notice,.page-note,.app-feedback,.history-empty { background:rgba(248,243,253,.8); border-color:rgba(255,255,255,.9); border-radius:13px; }
+  .page-tools input,.page-tools select,.seo-fields input,.seo-fields textarea,.seo-fields select,
+  .history-toolbar input,.history-toolbar select,.menu-fields input,.menu-fields select,.profile-form input {
+    background:rgba(255,255,255,.86); border:1px solid rgba(132,98,169,.19);
+    border-radius:11px; box-shadow:inset 0 1px 2px rgba(70,42,100,.025);
+  }
+  button,.app-refresh,.app-save,.menu-export,.profile-form button,.profile-session-button {
+    border-radius:11px;
+  }
+  .app-refresh,.app-save,.media-copy { background:rgba(255,255,255,.78); border-color:rgba(132,98,169,.2); }
+  .menu-export,.profile-form button,.profile-session-button { background:linear-gradient(135deg,#8957bb,#67369b); box-shadow:0 5px 13px rgba(105,58,157,.18); }
+  .table-wrap { border:1px solid rgba(255,255,255,.95); border-radius:14px; background:rgba(255,255,255,.7); box-shadow:0 6px 18px rgba(75,47,107,.05); }
+  .pages-table { background:transparent; }
+  .pages-table th { background:rgba(241,233,250,.88); }
+  .pages-table td { background:rgba(255,255,255,.38); }
+  .media-card { overflow:hidden; border-radius:15px; }
+  .media-preview { background:rgba(244,237,251,.9); }
+  .menu-edit-row { background:rgba(255,255,255,.76); border:1px solid rgba(255,255,255,.95); border-radius:14px; box-shadow:0 5px 16px rgba(75,47,107,.05); }
+  .seo-preview,.seo-check { background:rgba(255,255,255,.78); border-color:rgba(255,255,255,.95); border-radius:13px; }
+  .profile-field { border-radius:13px; }
+  #pageEditorPanel .editor-page-stage { border-color:rgba(255,255,255,.95); border-radius:16px; box-shadow:0 9px 25px rgba(75,47,107,.08); }
+  #pageEditorPanel .editor-toolbar { background:rgba(255,255,255,.58); border:1px solid rgba(255,255,255,.9); border-radius:15px; padding:9px; box-shadow:0 6px 18px rgba(75,47,107,.05); }
+  #pageEditorPanel .editor-tabs { background:rgba(235,224,247,.8); border-color:rgba(255,255,255,.9); border-radius:12px; }
+  #pageEditorPanel .editor-toolgroup { background:rgba(255,255,255,.85); border-color:rgba(255,255,255,.95); border-radius:12px; }
+}
+@media (max-width: 390px) {
+  aside { padding-left:10px; padding-right:10px; }
+  main { padding-left:10px; padding-right:10px; }
+  .welcome,.panel { border-radius:15px; }
+  .card { border-radius:14px; }
+}
+
 </style>
 
 </head>
