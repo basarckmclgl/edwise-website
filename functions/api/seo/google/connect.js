@@ -13,7 +13,7 @@ export async function onRequestPost(context){
  await db.prepare("CREATE TABLE IF NOT EXISTS seo_google_oauth_state (state_hash TEXT PRIMARY KEY, created_at TEXT NOT NULL DEFAULT (datetime('now')))").run();
  await db.prepare("INSERT INTO seo_google_oauth_state(state_hash,created_at) VALUES(?,datetime('now'))").bind(stateHash).run();
  await db.prepare("DELETE FROM seo_google_oauth_state WHERE created_at < datetime('now','-1 hour')").run();
- const redirectUri="https://yonetim-paneli.edwise.pages.dev/api/seo/google/callback";
+ const redirectUri="https://onizleme.edwise.pages.dev/api/seo/google/callback";
  const params=new URLSearchParams({client_id:env.GOOGLE_OAUTH_CLIENT_ID,redirect_uri:redirectUri,response_type:"code",scope:"https://www.googleapis.com/auth/webmasters.readonly",access_type:"offline",prompt:"consent",include_granted_scopes:"true",state});
  return json({success:true,url:"https://accounts.google.com/o/oauth2/v2/auth?"+params.toString()});
 }
