@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>EDWISE | Yeni Yönetim Paneli</title>
+<style>
+:root{color-scheme:light;--ink:#211d2c;--muted:#777285;--line:#e9e5ef;--purple:#7650d8;--soft:#f6f3fb;--nav:#211b30}
+*{box-sizing:border-box}body{margin:0;background:#f7f6f9;color:var(--ink);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input{font:inherit}.layout{min-height:100vh;display:grid;grid-template-columns:248px 1fr}.side{background:var(--nav);color:#f8f6fc;padding:24px 16px;display:flex;flex-direction:column;gap:26px}.brand{padding:4px 12px 20px;border-bottom:1px solid #ffffff20}.brand b{font-size:21px;letter-spacing:3px}.brand small{display:block;color:#b9afca;margin-top:4px}.nav-label{padding:0 12px;color:#9f95b2;font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;color:#d8d2e2;text-align:left;padding:11px 12px;border-radius:9px;cursor:pointer}.nav button.active,.nav button:hover{background:#ffffff16;color:#fff}.nav button[hidden]{display:none}.side-foot{margin-top:auto;padding:12px;color:#b9afca;font-size:12px}.main{min-width:0}.top{height:76px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px}.crumb{color:var(--muted)}.user{display:flex;align-items:center;gap:12px}.avatar{width:34px;height:34px;border-radius:50%;background:#eee8fb;color:var(--purple);display:grid;place-items:center;font-weight:800}.content{max-width:1180px;margin:0 auto;padding:34px}.eyebrow{color:var(--purple);font-size:11px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase}h1{font-size:27px;letter-spacing:-.7px;margin:5px 0}.sub{color:var(--muted);margin:0 0 26px}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:24px 0}.card,.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px}.card small{color:var(--muted)}.number{font-size:28px;font-weight:750;margin-top:7px}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.panel h2{font-size:16px;margin:0}.search{max-width:260px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;outline-color:var(--purple)}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:13px 10px;border-bottom:1px solid #f0edf4}th{font-size:11px;color:var(--muted);font-weight:700}td{font-size:13px}.status{display:inline-block;padding:4px 8px;border-radius:20px;background:#f1eff5;color:#625b70;font-size:11px}.status.published{background:#eaf7ef;color:#287346}.empty{padding:28px;text-align:center;color:var(--muted)}.notice{padding:12px 14px;border-radius:10px;background:#f2eefb;color:#59458c;margin-bottom:20px}.error{background:#fff0ef;color:#a33b32}.loading{color:var(--muted);padding:20px}.mobile{display:none}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.side{padding:14px;gap:12px}.brand{padding:4px 8px 12px}.nav{display:flex;overflow:auto}.nav-label,.side-foot{display:none}.nav button{white-space:nowrap;padding:8px 10px}.top{height:60px;padding:0 18px}.content{padding:22px 16px}.cards{grid-template-columns:1fr}.panel{overflow:auto}.panel-head{align-items:flex-start;flex-direction:column}.search{max-width:none}}
+</style></head>
+<body>
+<div class="layout">
+<aside class="side">
+ <div class="brand"><b>EDWISE</b><small>Yönetim çalışma alanı</small></div>
+ <div><div class="nav-label">Çalışma alanı</div><nav class="nav">
+  <button class="active" data-view="overview">Genel Bakış</button>
+  <button data-view="pages">Sayfalar</button>
+  <button data-view="applications" disabled title="Bu bölüm henüz bağlanmadı">Başvurular · hazırlanıyor</button>
+  <button data-view="lessons" disabled title="Bu bölüm henüz bağlanmadı">Dersler · hazırlanıyor</button>
+  <button data-view="students" disabled title="Bu bölüm henüz bağlanmadı">Öğrenciler · hazırlanıyor</button>
+  <button data-view="media" disabled title="Bu bölüm henüz bağlanmadı">Medya · hazırlanıyor</button>
+ </nav></div>
+ <div><div class="nav-label">Sistem yönetimi</div><nav class="nav">
+  <button data-view="users" data-superadmin hidden>Kullanıcılar ve Roller</button>
+  <button data-view="settings" data-superadmin hidden>Sistem Ayarları</button>
+  <button data-view="audit" data-superadmin hidden>İşlem Kayıtları</button>
+  <button data-view="security" data-superadmin hidden>Güvenlik ve Oturumlar</button>
+ </nav></div>
+ <div class="side-foot">Yeni panel • Test ortamı bekleniyor<br>Önizleme şu an canlı veritabanına bağlı.</div>
+</aside>
+<main class="main">
+ <header class="top"><div class="crumb">EDWISE <span style="color:#c7c1d0">/</span> <span id="crumb">Genel Bakış</span></div><div class="user"><div class="avatar" id="avatar">E</div><div><b id="username">Oturum doğrulanıyor</b><div id="role" style="font-size:11px;color:var(--muted)">—</div></div></div></header>
+ <section class="content">
+  <div class="eyebrow">Yeni yönetim paneli</div><h1 id="heading">Genel Bakış</h1><p class="sub" id="intro">İçerik ve site yönetimi için sade çalışma alanı.</p>
+  <div id="message" class="notice">Mevcut yönetici oturumu güvenli biçimde doğrulanıyor…</div>
+  <div id="overview">
+   <div class="cards">
+    <div class="card"><small>Toplam sayfa</small><div class="number" id="pageCount">—</div></div>
+    <div class="card"><small>Yayındaki sayfalar</small><div class="number" id="publishedCount">—</div></div>
+    <div class="card"><small>Taslak sayfalar</small><div class="number" id="draftCount">—</div></div>
+   </div>
+   <div class="panel"><div class="panel-head"><h2>Son düzenlenen sayfalar</h2><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="search" id="newPage" type="button">＋ Yeni sayfa oluştur</button><button class="search" id="showPages" type="button">Tüm sayfaları görüntüle →</button></div></div><div id="recentPages" class="loading">Sayfalar yükleniyor…</div></div>
+  </div>
+  <div id="pages" hidden><div class="panel"><div class="panel-head"><div style="display:flex;gap:8px;align-items:center"><h2>Sayfa listesi</h2><button class="search" id="newPageList" type="button">＋ Yeni sayfa</button></div><input id="pageSearch" class="search" placeholder="Sayfa ara…" aria-label="Sayfa ara"></div><div id="allPages" class="loading">Sayfalar yükleniyor…</div></div></div>
+  <div id="placeholder" class="panel" hidden><h2 id="placeholderTitle">Bölüm</h2><p class="sub" style="margin:8px 0 0">Bu bölüm yeni panelin sonraki geliştirme adımında bağlanacak. Mevcut paneldeki işleyişe henüz müdahale edilmedi.</p></div>
+ </section>
+</main></div>
+<script>
+const $=s=>document.querySelector(s);let currentAdmin=null,pages=[];
+const labels={overview:"Genel Bakış",pages:"Sayfalar",applications:"Başvurular",lessons:"Dersler",students:"Öğrenciler",media:"Medya",users:"Kullanıcılar ve Roller",settings:"Sistem Ayarları",audit:"İşlem Kayıtları",security:"Güvenlik ve Oturumlar"};
+function showMessage(t,bad=false){const el=$("#message");el.textContent=t;el.className="notice"+(bad?" error":"");}
+function renderPages(target,list){if(!list.length){target.innerHTML='<div class="empty">Henüz yönetilebilir sayfa bulunamadı.</div>';return;}target.innerHTML='<table><thead><tr><th>Sayfa</th><th>URL</th><th>Durum</th><th>Son güncelleme</th></tr></thead><tbody>'+list.map(p=>'<tr data-edit-page="'+esc(p.id)+'" style="cursor:pointer"><td><b>'+esc(p.title)+'</b></td><td>/'+esc(p.slug)+'</td><td><span class="status '+(p.status==="published"?"published":"")+'">'+(p.status==="published"?"Yayında":"Taslak")+'</span></td><td>'+esc((p.updated_at||"—").replace("T"," ").slice(0,16))+'</td></tr>').join("")+'</tbody></table>';target.querySelectorAll("[data-edit-page]").forEach(row=>row.addEventListener("click",()=>location.href="/admin-v2/page-builder.html?id="+encodeURIComponent(row.dataset.editPage)));}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function navigate(view){if(!labels[view])return;if(["users","settings","audit","security"].includes(view)&&currentAdmin?.role!=="superadmin")return;document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===view));$("#crumb").textContent=labels[view];$("#heading").textContent=labels[view];$("#overview").hidden=view!=="overview";$("#pages").hidden=view!=="pages";$("#placeholder").hidden=["overview","pages"].includes(view);$("#placeholderTitle").textContent=labels[view];$("#intro").textContent=view==="overview"?"İçerik ve site yönetimi için sade çalışma alanı.":labels[view]+" bölümü";if(view==="pages")renderPages($("#allPages"),pages);}
+document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>navigate(b.dataset.view)));
+$("#showPages").addEventListener("click",()=>navigate("pages"));$("#newPage").addEventListener("click",()=>location.href="/admin-v2/page-builder.html");$("#newPageList").addEventListener("click",()=>location.href="/admin-v2/page-builder.html");
+$("#pageSearch").addEventListener("input",e=>renderPages($("#allPages"),pages.filter(p=>(p.title+" "+p.slug).toLocaleLowerCase("tr").includes(e.target.value.toLocaleLowerCase("tr")))));
+async function init(){try{const r=await fetch("/api/me",{credentials:"same-origin",cache:"no-store"});const d=await r.json();if(!r.ok||!d.authenticated||!d.admin){location.replace("/admin/");return;}currentAdmin=d.admin;$("#username").textContent=d.admin.username;$("#role").textContent=d.admin.role==="superadmin"?"Süper Admin":"Admin";$("#avatar").textContent=(d.admin.username||"E").slice(0,1).toUpperCase();document.querySelectorAll("[data-superadmin]").forEach(x=>x.hidden=d.admin.role!=="superadmin");showMessage("Arayüz ayrı tutuluyor; ancak önizleme canlı veritabanına bağlı. Kayıt işlemleri test için kapalıdır.");const pr=await fetch("/api/pages",{credentials:"same-origin",cache:"no-store"});const pd=await pr.json();if(!pr.ok||!pd.success)throw new Error(pd.message||"Sayfalar alınamadı.");pages=pd.pages||[];$("#pageCount").textContent=pages.length;$("#publishedCount").textContent=pages.filter(p=>p.status==="published").length;$("#draftCount").textContent=pages.filter(p=>p.status==="draft").length;renderPages($("#recentPages"),pages.slice(0,6));}catch(e){showMessage(e.message||"Panel verileri yüklenemedi.",true);}}
+init();
+</script></body></html>
