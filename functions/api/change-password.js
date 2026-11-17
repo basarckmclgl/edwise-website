@@ -88,12 +88,12 @@ export async function onRequestPost(context) {
     }
 
     const newHash = await hashPassword(newPassword);
-    await env.DB.prepare(
+    await db.prepare(
       "UPDATE admins SET password_hash = ?, updated_at = datetime('now') WHERE id = ?"
     ).bind(newHash, admin.id).run();
 
     const currentTokenHash = await hashToken(match[1]);
-    await env.DB.prepare(
+    await db.prepare(
       "DELETE FROM admin_sessions WHERE admin_id = ? AND token_hash <> ?"
     ).bind(admin.id, currentTokenHash).run();
 
