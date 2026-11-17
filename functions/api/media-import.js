@@ -42,7 +42,7 @@ export async function onRequestPost(context){
 
     for(const source of sources){
       const sourceName=source.path.split("/").pop();
-      const sourceResponse=await fetch("https://api.github.com/repos/"+env.GITHUB_REPO+"/contents/"+source.path+"?ref="+storageBranch",{headers});
+      const sourceResponse=await fetch("https://api.github.com/repos/"+env.GITHUB_REPO+"/contents/"+source.path+"?ref="+storageBranch,{headers});
       if(!sourceResponse.ok){skipped.push({file:sourceName,reason:"Kaynak dosya okunamadı."});continue;}
       const sourceData=await sourceResponse.json();
       const bytes=base64ToBytes(sourceData.content||"");
@@ -64,8 +64,8 @@ export async function onRequestPost(context){
       if(existing){skipped.push({file:sourceName,reason:"Zaten medya kütüphanesinde."});continue;}
 
       const url="/api/media/"+filename;
-      await env.DB.prepare("INSERT INTO media (file_name,file_url,file_type,created_at) VALUES (?,?,?,datetime('now'))").bind(filename,url,type).run();
-      const record=await env.DB.prepare("SELECT * FROM media WHERE file_name=?").bind(filename).first();
+      await db.prepare("INSERT INTO media (file_name,file_url,file_type,created_at) VALUES (?,?,?,datetime('now'))").bind(filename,url,type).run();
+      const record=await db.prepare("SELECT * FROM media WHERE file_name=?").bind(filename).first();
       await logAudit(db,request,auth.admin,{action:"media_imported",entity_type:"media",entity_id:filename,entity_title:sourceName,details:{before:null,after:record,source_path:source.path}});
       imported.push({file:sourceName,filename,url});
     }
