@@ -4,7 +4,7 @@ async function hashToken(token){const digest=await crypto.subtle.digest("SHA-256
 export async function onRequestGet(context){
  try{
   const auth=await requireAdmin(context);if(auth.response)return auth.response;
-  const cookie=context.request.headers.get("Cookie")||"",match=cookie.match(/(?:^|;\\s*)edwise_session=([a-f0-9]{64})(?:;|$)/i);
+  const cookie=context.request.headers.get("Cookie")||"",match=cookie.match(/(?:^|;\s*)edwise_session=([a-f0-9]{64})(?:;|$)/i);
   if(!match)return json({success:false,message:"Oturum doğrulanamadı."},401);
   const db=context.env["edwise-deneme"],currentHash=await hashToken(match[1]);
   const current=await db.prepare("SELECT expires_at FROM admin_sessions WHERE admin_id=? AND token_hash=? AND expires_at>datetime('now') LIMIT 1").bind(auth.admin.id,currentHash).first();
@@ -17,7 +17,7 @@ export async function onRequestPost(context){
  const {request}=context;const origin=request.headers.get("Origin");if(!origin||origin!==new URL(request.url).origin)return json({success:false,message:"İstek kaynağı geçersiz."},403);
  try{
   const auth=await requireAdmin(context);if(auth.response)return auth.response;
-  const cookie=request.headers.get("Cookie")||"",match=cookie.match(/(?:^|;\\s*)edwise_session=([a-f0-9]{64})(?:;|$)/i);
+  const cookie=request.headers.get("Cookie")||"",match=cookie.match(/(?:^|;\s*)edwise_session=([a-f0-9]{64})(?:;|$)/i);
   if(!match)return json({success:false,message:"Oturum doğrulanamadı."},401);
   const db=context.env["edwise-deneme"],currentHash=await hashToken(match[1]);
   const result=await db.prepare("DELETE FROM admin_sessions WHERE admin_id=? AND token_hash<>?").bind(auth.admin.id,currentHash).run();
