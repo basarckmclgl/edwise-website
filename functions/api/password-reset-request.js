@@ -44,7 +44,7 @@ export async function onRequestPost({request,env}){
     const token=[...crypto.getRandomValues(new Uint8Array(32))].map(x=>x.toString(16).padStart(2,"0")).join("");
     await env.DB.prepare("INSERT INTO admin_password_resets(admin_id,token_hash,expires_at) VALUES(?,?,?)").bind(admin.id,await hash(token),new Date(Date.now()+30*60*1000).toISOString()).run();
 
-    const link=new URL("/admin/?reset="+encodeURIComponent(token),request.url).toString();
+    const link=new URL("/yonetim/sifre-sifirla.html?token="+encodeURIComponent(token),request.url).toString();
     let sent;
     let responseBody={};
     try{
