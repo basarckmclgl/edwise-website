@@ -62,6 +62,14 @@ export async function onRequestPost(context) {
       }, 500);
     }
 
+    await db.prepare(`CREATE TABLE IF NOT EXISTS media (
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ file_name TEXT NOT NULL UNIQUE,
+ file_url TEXT NOT NULL,
+ file_type TEXT NOT NULL,
+ created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);`).run();
+
     const form = await context.request.formData();
     const file = form.get("file");
 
