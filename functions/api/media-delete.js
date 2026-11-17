@@ -10,7 +10,9 @@ export async function onRequestPost(context) {
   const { request, env } = context;
 
   try {
-    if (!env.DB || !env.GITHUB_TOKEN || !env.GITHUB_REPO) {
+    const db = env["edwise-deneme"];
+    const storageBranch = "onizleme";
+    if (!db || !env.GITHUB_TOKEN || !env.GITHUB_REPO) {
       return Response.json({ success: false, error: "Sunucu ayarları eksik." }, { status: 500 });
     }
 
@@ -32,9 +34,9 @@ export async function onRequestPost(context) {
       return Response.json({ success: false, error: "Geçersiz görsel adresi veya dosya adı." }, { status: 400 });
     }
 
-    const before = await env.DB.prepare("SELECT * FROM media WHERE file_name = ?").bind(fileName).first();
+    const before = await db.prepare("SELECT * FROM media WHERE file_name = ?").bind(fileName).first();
     const apiUrl = "https://api.github.com/repos/" + env.GITHUB_REPO +
-      "/contents/media/" + encodeURIComponent(fileName) + "?ref=main";
+      "/contents/media/" + encodeURIComponent(fileName) + "?ref=" + storageBranch;
     const headers = {
       "Authorization": "Bearer " + env.GITHUB_TOKEN,
       "Accept": "application/vnd.github+json",
@@ -46,7 +48,7 @@ export async function onRequestPost(context) {
     if (fileResponse.status === 404) {
       // Depoda zaten yoksa bile yetim veritabanı kaydını temizle.
       await env.DB.prepare("DELETE FROM media WHERE file_name = ?").bind(fileName).run();
-      await logAudit(env.DB,request,auth.admin,{action:"media_deleted",entity_type:"media",entity_id:fileName,entity_title:fileName,details:{before:before||{file_name:fileName},after:null,storage_state:"already_missing"}});
+      await logAudit(db,request,auth.admin,{action:"media_deleted",entity_type:"media",entity_id:fileName,entity_title:fileName,details:{before:before||{file_name:fileName},after:null,storage_state:"already_missing"}});
       return Response.json({ success: true, message: "Dosya depoda yoktu; medya kaydı temizlendi." });
     }
     if (!fileResponse.ok) {
@@ -60,7 +62,7 @@ export async function onRequestPost(context) {
       body: JSON.stringify({
         message: "EDWISE CMS: " + fileName + " silindi",
         sha: fileData.sha,
-        branch: "main"
+        branch: storageBranch
       })
     });
 
