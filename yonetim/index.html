@@ -621,13 +621,17 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
  async function loadFullPagePreview(url,content){
   if(!livePreview)return;
   try{
+   // iframe gizli durumdayken lazy-load onload beklemek kilitlenmeye yol açabilir.
+   // Önce önizleme yüzeyini görünür yap, sonra iframe'i yükle.
+   showEditorSurface('preview');
+   livePreview.loading='eager';
    await new Promise((resolve,reject)=>{
     const timer=setTimeout(()=>reject(new Error('Sayfa önizlemesi zamanında yüklenemedi.')),12000);
     livePreview.onload=()=>{clearTimeout(timer);resolve();};
     livePreview.onerror=()=>{clearTimeout(timer);reject(new Error('Sayfa önizlemesi yüklenemedi.'));};
     livePreview.src=url;
    });
-   syncLivePreview(content);showEditorSurface('preview');
+   syncLivePreview(content);
   }catch(error){
    showFallbackPreview(content);
    const status=$('editorPreviewStatus');if(status)status.textContent='Tam sayfa açılamadı; içerik önizlemesi gösteriliyor';
