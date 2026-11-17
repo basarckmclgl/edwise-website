@@ -822,9 +822,12 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
     const html=await response.text(),doc=new DOMParser().parseFromString(html,'text/html');
     const main=doc.querySelector('main.single-page-content, main, body > section.single-page-content, body > section.section, body > section');
     if(!main)throw new Error('Sayfanın içerik alanı bulunamadı; mevcut sayfa değiştirilmedi.');
-    const existing=pages.find(page=>page.page_path===pagePath);
+    const rowTitle=row.querySelector('strong')?.textContent?.trim()||doc.title||'Sayfa';
+    const pathMatch=pages.find(page=>page.page_path===pagePath);
+    const titleSlug=slugify(rowTitle);
+    const existing=pathMatch||pages.find(page=>page.slug===titleSlug);
     currentId=existing?Number(existing.id):null;currentPath=pagePath;$('editorPath').value=pagePath;
-    $('editorTitle').value=existing?.title||row.querySelector('strong')?.textContent?.trim()||doc.title||'Sayfa';
+    $('editorTitle').value=existing?.title||rowTitle;
     $('editorSlug').value=existing?.slug||slugify($('editorTitle').value);slugManuallyEdited=true;
     canvas.innerHTML=existing?.content||main.innerHTML;
     const previousDesign=document.getElementById('editorSourceDesignStyles');if(previousDesign)previousDesign.remove();
