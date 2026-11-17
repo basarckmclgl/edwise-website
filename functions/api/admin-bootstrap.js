@@ -33,7 +33,7 @@ export async function onRequestPost({request,env}){
       password:String(u.password||"")
     }));
     for(const u of normalized){
-      if(!/^[a-z0-9._-]{3,50}$/.test(u.username)||!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(u.email))return json({success:false,message:"Kullanıcı adı veya e-posta biçimi geçersiz."},400);
+      if(!/^[a-z0-9._-]{3,50}$/.test(u.username)||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(u.email))return json({success:false,message:"Kullanıcı adı veya e-posta biçimi geçersiz."},400);
       if(u.password.length<12||u.password.length>128||!/[A-Z]/.test(u.password)||!/[a-z]/.test(u.password)||!/[0-9]/.test(u.password)||!/[^A-Za-z0-9]/.test(u.password))return json({success:false,message:"Her şifre en az 12 karakter ve büyük/küçük harf, rakam, özel karakter içermeli."},400);
     }
     if(normalized[0].username===normalized[1].username||normalized[0].email===normalized[1].email)return json({success:false,message:"İki kullanıcı adı ve e-posta birbirinden farklı olmalı."},400);
