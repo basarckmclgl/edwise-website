@@ -78,7 +78,8 @@ function json(data, status = 200, extraHeaders = {}) {
 
 export async function onRequestPost({ request, env }) {
   try {
-    const db = env["edwise-deneme"];\n    if (!db) {
+    const db = env["edwise-deneme"];
+    if (!db) {
       return json({ success: false, message: "Veritabanı bağlantısı yok." }, 500);
     }
 
