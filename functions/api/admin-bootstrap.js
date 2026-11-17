@@ -17,12 +17,12 @@ function validOrigin(request){try{return request.headers.get("Origin")===new URL
 
 export async function onRequestPost({request,env}){
   if(!validOrigin(request))return json({success:false,message:"İstek kaynağı geçersiz."},403);
-  if(!env.DB)return json({success:false,message:"Veritabanı bağlantısı bulunamadı."},503);
+  const db=env["edwise-deneme"];\n  if(!db)return json({success:false,message:"Önizleme yönetici veritabanı bağlantısı bulunamadı."},503);
   if(!env.ADMIN_BOOTSTRAP_TOKEN)return json({success:false,message:"İlk kurulum anahtarı Preview ortamında tanımlanmamış."},503);
   try{
     const data=await request.json();
     if(!same(String(data.setupToken||""),String(env.ADMIN_BOOTSTRAP_TOKEN)))return json({success:false,message:"Kurulum anahtarı geçersiz."},403);
-    const count=await env.DB.prepare("SELECT COUNT(*) AS total FROM admins").first();
+    const count=await db.prepare("SELECT COUNT(*) AS total FROM admins").first();
     if(Number(count?.total)>0)return json({success:false,message:"İlk yönetici kurulumu daha önce yapılmış. Bu uç nokta tekrar kullanılamaz."},409);
     const users=Array.isArray(data.users)?data.users:[];
     if(users.length!==2)return json({success:false,message:"Tam olarak iki süper yönetici bilgisi gerekli."},400);
@@ -37,8 +37,8 @@ export async function onRequestPost({request,env}){
     }
     if(normalized[0].username===normalized[1].username||normalized[0].email===normalized[1].email)return json({success:false,message:"İki kullanıcı adı ve e-posta birbirinden farklı olmalı."},400);
     const hashes=await Promise.all(normalized.map(u=>passwordHash(u.password)));
-    await env.DB.batch(normalized.map((u,i)=>env.DB.prepare("INSERT INTO admins (username,email,password_hash,role,is_active,created_at,updated_at,permissions_json) VALUES (?,?,?,'superadmin',1,datetime('now'),datetime('now'),'{}')").bind(u.username,u.email,hashes[i])));
-    await logAudit(env.DB,request,null,{action:"initial_superadmins_created",entity_type:"security",entity_title:"İlk iki süper yönetici oluşturuldu",details:{usernames:normalized.map(u=>u.username),count:2}});
+    await db.batch(normalized.map((u,i)=>db.prepare("INSERT INTO admins (username,email,password_hash,role,is_active,created_at,updated_at,permissions_json) VALUES (?,?,?,'superadmin',1,datetime('now'),datetime('now'),'{}')").bind(u.username,u.email,hashes[i])));
+    await logAudit(db,request,null,{action:"initial_superadmins_created",entity_type:"security",entity_title:"İlk iki süper yönetici oluşturuldu",details:{usernames:normalized.map(u=>u.username),count:2}});
     return json({success:true,message:"İki süper yönetici hesabı oluşturuldu. Kurulum anahtarı artık kullanılmayacak."},201);
   }catch(error){
     console.error("ADMIN BOOTSTRAP ERROR",error);
