@@ -626,6 +626,37 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
    livePreview.style.height=Math.min(height+8,6000)+'px';
   }catch(error){}
  }
+ function applySourceDesignFromFrame(targetRoot){
+  const doc=livePreview?.contentDocument,sourceRoot=doc&&previewDocTarget(doc);
+  if(!sourceRoot||!targetRoot)return false;
+  const old=document.getElementById('editorSourceDesignStyles');
+  if(old)old.remove();
+  const allowed=/^(display|box-sizing|width|max-width|min-width|height|max-height|min-height|margin(?:-.+)?|padding(?:-.+)?|color|background(?:-.+)?|border(?:-.+)?|box-shadow|font(?:-.+)?|line-height|letter-spacing|text-align|text-transform|text-decoration(?:-.+)?|opacity|overflow(?:-.+)?|object-fit|aspect-ratio|flex(?:-.+)?|grid(?:-.+)?|gap|align-items|align-content|justify-content|justify-items|justify-self|align-self|vertical-align|list-style(?:-.+)?)$/;
+  const ignored=new Set(['position','top','right','bottom','left','z-index','transform','transition','animation','pointer-events','cursor','user-select','outline']);
+  const rules=[];
+  const walk=(source,target,selector)=>{
+   if(!source||!target||source.tagName!==target.tagName)return;
+   const computed=doc.defaultView.getComputedStyle(source),declarations=[];
+   for(let i=0;i<computed.length;i++){
+    const prop=computed[i];
+    if(!allowed.test(prop)||ignored.has(prop))continue;
+    const value=computed.getPropertyValue(prop);
+    if(value)declarations.push(prop+':'+value+' !important');
+   }
+   if(declarations.length)rules.push(selector+'{'+declarations.join(';')+'}');
+   const src=[...source.children],dst=[...target.children];
+   for(let i=0;i<Math.min(src.length,dst.length);i++){
+    if(src[i].tagName!==dst[i].tagName)continue;
+    walk(src[i],dst[i],selector+' > '+dst[i].tagName.toLowerCase()+':nth-child('+(i+1)+')');
+   }
+  };
+  walk(sourceRoot,targetRoot,'#pageCanvas');
+  const style=document.createElement('style');
+  style.id='editorSourceDesignStyles';
+  style.textContent=rules.join('\n');
+  document.head.appendChild(style);
+  return rules.length>0;
+ }
  async function loadFullPagePreview(url,content){
   if(!livePreview)return;
   try{
@@ -647,10 +678,12 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
     livePreview.onerror=()=>finish(new Error('Gerçek sayfa iframe içinde açılamadı.'));
     livePreview.src=sourceUrl.href;
    });
+   applySourceDesignFromFrame(canvas);
    syncLivePreview(content);
    resizeLivePreview();
    requestAnimationFrame(resizeLivePreview);
    setTimeout(resizeLivePreview,500);
+   showEditorSurface('canvas');
   }catch(error){
    showFallbackPreview(content);
    const status=$('editorPreviewStatus');
@@ -792,6 +825,7 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
     $('editorTitle').value=existing?.title||row.querySelector('strong')?.textContent?.trim()||doc.title||'Sayfa';
     $('editorSlug').value=existing?.slug||slugify($('editorTitle').value);slugManuallyEdited=true;
     canvas.innerHTML=existing?.content||main.innerHTML;
+    const previousDesign=document.getElementById('editorSourceDesignStyles');if(previousDesign)previousDesign.remove();
     setEditorMode(true);selectBlock(null);showEditorSurface('canvas');
     await loadFullPagePreview(pageUrl.href,canvas.innerHTML);
     feedback('Sayfa düzenleyici açıldı. İçerik panelde yüklendi; gerçek görünüm sekmesinden kontrol edebilirsin.');
