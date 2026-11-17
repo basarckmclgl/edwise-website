@@ -11,8 +11,8 @@ export async function onRequest(context) {
   // Serve the management panel at /admin without changing the browser URL.
   // Only the exact entry routes are mapped; unknown /admin/* paths remain unavailable.
   const isAdminEntry = path === "/admin" || path === "/admin/";
-  const isLoginPage = path === "/yonetim/giris.html";
-  const isPasswordResetPage = path === "/yonetim/sifre-sifirla.html";
+  const isLoginPage = path === "/yonetim/giris" || path === "/yonetim/giris.html";
+  const isPasswordResetPage = path === "/yonetim/sifre-sifirla" || path === "/yonetim/sifre-sifirla.html";
   const isPanelPage = path === "/yonetim" || (path.startsWith("/yonetim/") && !isLoginPage && !isPasswordResetPage);
 
   // The login document must always be served as a public static asset.
