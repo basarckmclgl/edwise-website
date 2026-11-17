@@ -810,7 +810,7 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
   else if(livePreview){livePreview.removeAttribute('src');livePreview.srcdoc='<main style="font:16px/1.7 Arial;padding:28px"><h1>'+safe(page.title)+'</h1>'+canvas.innerHTML+'</main>';}
   feedback('CMS sayfası düzenlemeye açıldı. Tam sayfa görünümü aşağıda; metin kutusu değişiklikleri anlık yansıtır.');
   $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
- });
+ },true);
 
  const editorTabButtons=[...document.querySelectorAll('[data-editor-tab]')];
  function activateEditorTab(name){editorTabButtons.forEach(btn=>btn.setAttribute('aria-selected',String(btn.dataset.editorTab===name)));document.querySelectorAll('[data-editor-panel]').forEach(panel=>panel.classList.toggle('is-active',panel.dataset.editorPanel===name));}
