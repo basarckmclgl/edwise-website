@@ -772,7 +772,7 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
   const del=document.createElement('button');del.type='button';del.className='app-refresh';del.textContent='Sil';del.dataset.deleteStatic='true';del.dataset.path=pagePath;del.dataset.title=row.querySelector('strong')?.textContent||'Sayfa';
   action.append(' ',del,' ',button);
  });
- $('pageRows').addEventListener('click',async e=>{
+ document.addEventListener('click',async e=>{
   const staticButton=e.target.closest('[data-edit-static]');
   if(staticButton){
    const row=staticButton.closest('tr');
