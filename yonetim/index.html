@@ -784,6 +784,16 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
   copy.querySelectorAll('[data-editor-old-outline]').forEach(el=>{el.style.outline=el.dataset.editorOldOutline||'';el.removeAttribute('data-editor-old-outline');});
   return copy.innerHTML;
  }
+ function openCmsEditor(page,pagePath=''){
+  currentId=Number(page.id);currentPath=pagePath||page.page_path||'';$('editorPath').value=currentPath;slugManuallyEdited=true;
+  $('editorTitle').value=page.title||'';$('editorSlug').value=page.slug||'';canvas.innerHTML=page.content||'';canvas.contentEditable='false';
+  const previousDesign=document.getElementById('editorSourceDesignStyles');if(previousDesign)previousDesign.remove();
+  setEditorMode(true);selectBlock(null);showEditorSurface('canvas');
+  if(page.status==='published') loadFullPagePreview(pageUrl(page.slug),canvas.innerHTML).catch(()=>{});
+  else if(livePreview){livePreview.removeAttribute('src');livePreview.srcdoc='<main style="font:16px/1.7 Arial;padding:28px"><h1>'+safe(page.title)+'</h1>'+canvas.innerHTML+'</main>';}
+  feedback('CMS sayfası düzenlemeye açıldı. Tam sayfa görünümü aşağıda; metin kutusu değişiklikleri anlık yansıtır.');
+  $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
+ }
  async function submit(status){
   const title=$('editorTitle').value.trim(),slug=slugify($('editorSlug').value.trim()||title),content=getCleanEditorContent();
   if(!title||!slug){feedback('Sayfa başlığı ve URL zorunludur.','error');return;}
@@ -824,29 +834,12 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
  document.addEventListener('click',async e=>{
   const staticButton=e.target.closest('[data-edit-static]');
   if(staticButton){
-   const row=staticButton.closest('tr');
    try{
     staticButton.disabled=true;staticButton.textContent='Açılıyor…';
     const pagePath=staticButton.dataset.path;
-    if(!pagePath||!pagePath.startsWith('/'))throw new Error('Sayfa adresi panel içinde çözümlenemedi.');
-    if(pagePath==='/pages/sayfa.html'){feedback('Bu dosya dinamik sayfa şablonudur; düzenlemek istediğin gerçek CMS sayfasını CMS sayfa satırından seçmelisin.','error');return;}
-    const pageUrl=new URL(pagePath,location.origin);
-    const response=await fetch(pageUrl.href,{credentials:'same-origin',cache:'no-store'});
-    if(!response.ok)throw new Error('Sayfa dosyası alınamadı (HTTP '+response.status+').');
-    const html=await response.text(),doc=new DOMParser().parseFromString(html,'text/html');
-    const main=doc.querySelector('main.single-page-content, main, body > section.single-page-content, body > section.section, body > section');
-    if(!main)throw new Error('Sayfanın içerik alanı bulunamadı; mevcut sayfa değiştirilmedi.');
-    const rowTitle=row.querySelector('strong')?.textContent?.trim()||doc.title||'Sayfa';
-    const existing=cmsPageForStaticPath(pagePath)||null;
-    currentId=existing?Number(existing.id):null;currentPath=pagePath;$('editorPath').value=pagePath;
-    $('editorTitle').value=existing?.title||rowTitle;
-    $('editorSlug').value=existing?.slug||slugify($('editorTitle').value);slugManuallyEdited=true;
-    canvas.innerHTML=existing?.content||main.innerHTML;
-    const previousDesign=document.getElementById('editorSourceDesignStyles');if(previousDesign)previousDesign.remove();
-    setEditorMode(true);selectBlock(null);showEditorSurface('canvas');
-    await loadFullPagePreview(pageUrl.href,canvas.innerHTML);
-    feedback('Sayfa düzenleyici açıldı. İçerik panelde yüklendi; gerçek görünüm sekmesinden kontrol edebilirsin.');
-    $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
+    const page=cmsPageForStaticPath(pagePath);
+    if(!page)throw new Error('Bu dosya için CMS kaydı bulunamadı; başka bir sayfanın kaydı açılmadı.');
+    openCmsEditor(page,pagePath);
    }catch(error){feedback(error.message||'Sayfa açılamadı.','error');}
    finally{staticButton.disabled=false;staticButton.textContent='Düzenle';}
    return;
@@ -855,12 +848,7 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
   const del=e.target.closest('[data-delete-cms]');if(del){deletePage(del.dataset.deleteCms);return;}
   const button=e.target.closest('[data-edit-cms]');if(!button)return;
   const page=pages.find(item=>String(item.id)===button.dataset.editCms);if(!page)return;
-  currentId=Number(page.id);currentPath=page.page_path||'';$('editorPath').value=currentPath;slugManuallyEdited=true;
-  $('editorTitle').value=page.title||'';$('editorSlug').value=page.slug||'';canvas.innerHTML=page.content||'';canvas.contentEditable='false';setEditorMode(true);selectBlock(null);
-  if(page.status==='published') await loadFullPagePreview(pageUrl(page.slug),canvas.innerHTML).catch(()=>{});
-  else if(livePreview){livePreview.removeAttribute('src');livePreview.srcdoc='<main style="font:16px/1.7 Arial;padding:28px"><h1>'+safe(page.title)+'</h1>'+canvas.innerHTML+'</main>';}
-  feedback('CMS sayfası düzenlemeye açıldı. Tam sayfa görünümü aşağıda; metin kutusu değişiklikleri anlık yansıtır.');
-  $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
+  openCmsEditor(page,page.page_path||'');
  },true);
 
  const editorTabButtons=[...document.querySelectorAll('[data-editor-tab]')];
