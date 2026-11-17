@@ -64,12 +64,12 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <section class="panel" style="margin-top:16px"><h2>Son işlemler</h2><div class="empty"><span class="activity-dot"></span>Henüz listelenecek bir işlem yok. İşlem geçmişi modülü tamamlandığında son değişiklikler burada görünecek.</div></section>
 
 </div><div id="view-sayfalar" class="module-view" hidden><header><div><div class="eyebrow">EDWISE / İçerik Yönetimi</div><h1>Sayfa Yönetimi</h1><p>Web sitesindeki sayfaları ayrı bir çalışma alanında görüntüle ve yönet.</p></div><div class="date">İÇERİK MODÜLÜ</div></header><section id="sayfalar" class="panel" style="margin-top:22px">
-<div class="section-head"><div><div class="eyebrow">İÇERİK YÖNETİMİ</div><h2>Sayfa Yönetimi</h2><p class="section-intro">EDWISE sitesindeki mevcut sayfa dosyalarını tek listede görüntüle.</p></div><span class="tag">14 kayıt</span></div>
-<div class="page-toolbar"><div class="page-tools"><input id="pageSearch" type="search" placeholder="Sayfa adı veya dosya yolunda ara..." aria-label="Sayfalarda ara"><select id="pageCategory" aria-label="Sayfa türüne göre filtrele"><option value="all">Tüm türler</option><option value="genel">Genel sayfalar</option><option value="iletisim">Başvuru ve iletişim</option><option value="yasal">Yasal sayfalar</option><option value="sablon">Şablon</option></select></div><span class="page-count" id="pageCount">14 sayfa gösteriliyor</span></div>
+<div class="section-head"><div><div class="eyebrow">İÇERİK YÖNETİMİ</div><h2>Sayfa Yönetimi</h2><p class="section-intro">Kurumsal, bilgilendirme, başvuru, iletişim ve yasal sayfaları buradan yönetin.</p></div><span class="tag">6 sayfa</span></div>
+<div class="page-toolbar"><div class="page-tools"><input id="pageSearch" type="search" placeholder="Sayfa adı veya dosya yolunda ara..." aria-label="Sayfalarda ara"><select id="pageCategory" aria-label="Sayfa türüne göre filtrele"><option value="all">Tüm sayfalar</option><option value="genel">Kurumsal sayfalar</option><option value="iletisim">Başvuru ve iletişim</option><option value="yasal">Yasal ve gizlilik</option><option value="sablon">Sayfa şablonu</option></select></div><span class="page-count" id="pageCount">6 sayfa gösteriliyor</span></div>
 <div class="table-wrap"><table class="pages-table"><thead><tr><th>Sayfa adı</th><th>Tür</th><th>Dosya yolu</th><th>Durum</th><th>İşlem</th></tr></thead><tbody id="pageRows">
 <tr data-category="genel"><td><strong>Ana Sayfa</strong><small>EDWISE ana giriş sayfası</small></td><td><span class="page-type">Genel</span></td><td><small>/index.html</small></td><td>Dosya mevcut</td><td><a class="preview-link" href="../" target="_blank" rel="noopener">Önizle ↗</a></td></tr>
 <tr data-category="genel"><td><strong>Hakkımızda</strong><small>EDWISE hakkında</small></td><td><span class="page-type">Genel</span></td><td><small>/pages/hakkimizda.html</small></td><td>Dosya mevcut</td><td><a class="preview-link" href="../pages/hakkimizda.html" target="_blank" rel="noopener">Önizle ↗</a></td></tr>
-<tr data-category="genel"><td><strong>Hizmetlerimiz</strong><small>Eğitim ve yabancı dil hizmetleri</small></td><td><span class="page-type">Genel</span></td><td><small>/pages/hizmetlerimiz.html</small></td><td>Dosya mevcut</td><td><a class="preview-link" href="../pages/hizmetlerimiz.html" target="_blank" rel="noopener">Önizle ↗</a></td></tr>
+
 
 
 
@@ -639,6 +639,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   win.document.open();win.document.write(doc);win.document.close();win.onload=()=>{win.focus();win.print();};
  });
 const staticServices=[
+  {title:'Hizmetlerimiz',description:'Eğitim ve yabancı dil hizmetlerinin genel tanıtım sayfası',slug:'hizmetlerimiz',path:'/pages/hizmetlerimiz.html'},
   {title:'Eğitim Danışmanlığı',description:'Eğitim danışmanlığı hizmet sayfası',slug:'egitim-danismanligi',path:'/pages/egitim-danismanligi.html'},
   {title:'Coaching ve Mentorluk',description:'Bireysel koçluk ve mentorluk',slug:'coaching-mentoring',path:'/pages/coaching-mentoring.html'},
   {title:'IELTS Hazırlık',description:'IELTS sınav hazırlığı',slug:'ielts',path:'/pages/ielts.html'},
