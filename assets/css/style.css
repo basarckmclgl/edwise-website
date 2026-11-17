@@ -400,3 +400,72 @@ header nav#site-menu a.menu-contact:hover {
     background: #eee4f7 !important;
     color: #1b0d2d !important;
 }
+
+
+/* EDWISE RESPONSIVE REFINEMENT 2026-11-17 */
+@media (max-width:900px){
+ .contact-grid,.about{grid-template-columns:minmax(0,1fr)}
+ .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .application-card{width:100%}
+}
+@media (max-width:680px){
+ html,body{width:100%;max-width:100%;overflow-x:clip}
+ img,video,iframe{max-width:100%}
+ .topbar{padding:8px 14px;gap:4px 12px;font-size:12px;justify-content:center}
+ header{width:100%;height:70px;padding:0 16px}
+ header a.brand{min-width:0}
+ header a.brand img.logo{width:min(145px,42vw);max-width:100%;height:48px}
+ .menu{flex:0 0 auto;padding:9px 12px}
+ header nav#site-menu{left:12px;right:12px;width:auto;max-width:none;max-height:min(76vh,620px);overflow-y:auto;overscroll-behavior:contain}
+ header nav#site-menu a{min-height:44px}
+ .hero{min-height:0;padding:68px 20px 54px}
+ .hero:after{width:260px;height:260px;right:-150px;top:35px}
+ .hero-content{width:100%;max-width:100%}
+ .eyebrow{font-size:10px;letter-spacing:2px;line-height:1.5;margin-bottom:14px}
+ h1{font-size:clamp(36px,10vw,48px);line-height:1.12;overflow-wrap:anywhere;margin-bottom:18px}
+ .hero p{font-size:16px;line-height:1.65;margin-bottom:24px}
+ .hero-actions{display:grid;grid-template-columns:1fr;gap:10px}
+ .hero-actions>a{width:100%;min-height:46px;text-align:center}
+ .hero-note{margin-top:28px;gap:10px;font-size:12px}
+ .section,.cta{padding:52px 20px}
+ .section-head{margin-bottom:28px}
+ h2{font-size:clamp(29px,8vw,36px);line-height:1.18;overflow-wrap:anywhere}
+ .cards,#anasayfa-hakkimizda .vision-mission-grid{grid-template-columns:minmax(0,1fr);gap:14px}
+ .card{padding:22px 20px;min-width:0}
+ .card:hover{transform:none}
+ .about,.contact-grid{grid-template-columns:minmax(0,1fr);gap:20px}
+ .about-panel{min-height:0;padding:28px 22px}
+ .about-panel .quote{font-size:22px}
+ .contact-info,.map-card{min-width:0;padding:22px 18px}
+ .map-embed,.map-consent-box iframe{height:260px}
+ .application-card{padding:18px 16px;border-radius:14px}
+ .form-grid{grid-template-columns:minmax(0,1fr);gap:14px}
+ .form-grid>*{min-width:0}
+ .form-grid input,.form-grid select,.form-grid textarea{min-height:46px;font-size:16px}
+ .full-field{grid-column:auto}
+ .application-submit{width:100%;min-height:48px}
+ .privacy-gate{padding:8px}
+ .privacy-dialog{width:100%;max-height:94dvh;border-radius:14px}
+ .privacy-dialog-head,.privacy-dialog-body,.privacy-dialog-foot{padding:15px}
+ .privacy-dialog-body{min-height:0}
+ .cookie-banner{left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));padding:15px;max-height:65dvh;overflow-y:auto}
+ .cookie-actions{display:grid;grid-template-columns:1fr}
+ .cookie-actions button{width:100%;min-height:42px}
+ footer{padding:26px 20px;flex-direction:column;align-items:center;gap:12px;text-align:center}
+ .legal-links{justify-content:center;gap:10px 14px}
+ .whatsapp-float{right:12px;bottom:max(12px,env(safe-area-inset-bottom));padding:11px 14px}
+ .legal-section{padding:42px 16px}
+ .legal-card{padding:17px;overflow-wrap:anywhere}
+ .legal-warning{padding-inline:4px}
+}
+@media(max-width:380px){
+ header{padding-inline:12px}
+ header a.brand img.logo{width:126px;height:44px}
+ .menu{padding:8px 10px;font-size:14px}
+ .hero{padding-inline:17px}
+ h1{font-size:clamp(33px,9.5vw,38px)}
+ .section,.cta{padding-inline:16px}
+ .whatsapp-float{font-size:12px}
+}
+html[dir=rtl] header nav#site-menu{transform-origin:top left}
+html[dir=rtl] .hero,html[dir=rtl] .section{text-align:right}
