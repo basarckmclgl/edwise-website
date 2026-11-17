@@ -28,7 +28,7 @@ export async function onRequestPost({ request, env }) {
       return json({ success: false, message: "İstek kaynağı geçersiz." }, 403);
     }
 
-    if (!env.DB) {
+    const db = env["edwise-deneme"];\n    if (!db) {
       return json({ success: false, message: "Veritabanı bağlantısı yok." }, 500);
     }
 
@@ -38,7 +38,7 @@ export async function onRequestPost({ request, env }) {
     if (match) {
       const tokenHash = await hashToken(match[1]);
 
-      await env.DB.prepare(`
+      await db.prepare(`
         DELETE FROM admin_sessions
         WHERE token_hash = ?
       `).bind(tokenHash).run();
