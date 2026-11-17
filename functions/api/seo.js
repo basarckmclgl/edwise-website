@@ -1,6 +1,6 @@
 import { requirePermission } from "./_auth.js";
 function json(data,status=200){return Response.json(data,{status,headers:{"Cache-Control":"no-store"}});}
-function previewOnly(request){const h=new URL(request.url).hostname;return h==="pinar-iskelet.edwise.pages.dev";}
+function previewOnly(request){const h=new URL(request.url).hostname;return h==="onizleme.edwise.pages.dev";}
 function dbFor(context){return context.env["edwise-deneme"]||null;}
 async function schema(db){await db.prepare("CREATE TABLE IF NOT EXISTS seo_settings (id INTEGER PRIMARY KEY CHECK(id=1), settings_json TEXT NOT NULL DEFAULT '{}', updated_at TEXT NOT NULL DEFAULT (datetime('now')))").run();}
 function clean(input){const keys=["seoTitle","seoDescription","seoCanonical","seoRobots","seoKeywords","seoOgTitle","seoOgDescription","seoOgImage","seoGaId","seoGsc"];const out={};for(const k of keys){const v=typeof input?.[k]==="string"?input[k].trim():"";if(v.length>600)throw new Error("SEO alanlarından biri 600 karakter sınırını aşıyor.");out[k]=v;}for(const k of ["seoCanonical","seoOgImage"]){if(out[k]){const u=new URL(out[k]);if(u.protocol!=="https:")throw new Error("Canonical ve sosyal görsel bağlantıları HTTPS olmalıdır.");}}if(out.seoRobots&&!["index,follow","noindex,nofollow"].includes(out.seoRobots))throw new Error("İndeksleme tercihi geçersiz.");if(out.seoGaId&&!/^G-[A-Z0-9]+$/.test(out.seoGaId))throw new Error("GA4 kimliği geçersiz.");if(out.seoGsc&&!/^[A-Za-z0-9_=-]{10,300}$/.test(out.seoGsc))throw new Error("Search Console doğrulama kodu geçersiz.");return out;}
