@@ -607,12 +607,12 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
  $('editorCanvasView').addEventListener('click',()=>showEditorSurface('canvas'));
  const livePreview=$('editorLivePreview');
  function previewDocTarget(doc){return doc.querySelector('main, body > section.single-page-content, body > section.section, body > section');}
- function showFallbackPreview(content){
+ function showFallbackPreview(content,activate=true){
   if(!livePreview)return;
   livePreview.removeAttribute('src');
   livePreview.srcdoc='<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;padding:28px;font:16px/1.7 Arial,sans-serif;color:#25233a;background:#fff}main{max-width:1100px;margin:0 auto}img{max-width:100%;height:auto}*{box-sizing:border-box}</style></head><body><main>'+String(content||'')+'</main></body></html>';
   const status=$('editorPreviewStatus');if(status)status.textContent='İçerik önizlemesi';
-  showEditorSurface('preview');
+  if(activate)showEditorSurface('preview');
  }
  $('editorPreviewView').addEventListener('click',()=>{
   if(!livePreview?.getAttribute('src')&&!livePreview?.getAttribute('srcdoc'))showFallbackPreview(getCleanEditorContent());
@@ -636,10 +636,10 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
  function syncLivePreview(content){
   try{
    const doc=livePreview?.contentDocument,target=doc&&previewDocTarget(doc);
-   if(!target){showFallbackPreview(content);return;}
+   if(!target){showFallbackPreview(content,false);return;}
    target.innerHTML=content;
    const status=$('editorPreviewStatus');if(status)status.textContent='Görünüm güncel';
-  }catch(error){showFallbackPreview(content);}
+  }catch(error){showFallbackPreview(content,false);}
  }
  function pageUrl(slug){return '/pages/sayfa.html?slug='+encodeURIComponent(slug);}
  function renderPages(){
