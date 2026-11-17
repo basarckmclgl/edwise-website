@@ -591,7 +591,7 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
  function fresh(){
   currentId=null; currentPath=''; $('editorPath').value=''; $('editorTitle').value=''; $('editorSlug').value=''; slugManuallyEdited=false;
   canvas.innerHTML='<h1>Yeni sayfa</h1><p>İçeriğinizi buraya yazın.</p>';
-  canvas.contentEditable='false';setEditorMode(false);selectBlock(null);showEditorSurface('canvas');
+  canvas.contentEditable='false';setEditorMode(true);selectBlock(null);showEditorSurface('canvas');
   feedback('Yeni sayfa taslağı hazır. Sayfa alanında çalışabilirsiniz.');
  }
 
@@ -764,7 +764,7 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
     currentId=existing?Number(existing.id):null;currentPath=pagePath;$('editorPath').value=pagePath;
     $('editorTitle').value=existing?.title||row.querySelector('strong')?.textContent?.trim()||doc.title||'Sayfa';
     $('editorSlug').value=existing?.slug||slugify($('editorTitle').value);slugManuallyEdited=true;
-    canvas.innerHTML=existing?.content||main.innerHTML;canvas.contentEditable='false';setEditorMode(false);selectBlock(null);
+    canvas.innerHTML=existing?.content||main.innerHTML;canvas.contentEditable='false';setEditorMode(true);selectBlock(null);
     await loadFullPagePreview(preview.href,canvas.innerHTML);
     feedback('Mevcut sayfanın tam tasarımı yüklendi. Metin kutusundaki değişiklikler canlı görünümde anlık yansır.');
     $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
@@ -777,7 +777,7 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
   const button=e.target.closest('[data-edit-cms]');if(!button)return;
   const page=pages.find(item=>String(item.id)===button.dataset.editCms);if(!page)return;
   currentId=Number(page.id);currentPath=page.page_path||'';$('editorPath').value=currentPath;slugManuallyEdited=true;
-  $('editorTitle').value=page.title||'';$('editorSlug').value=page.slug||'';canvas.innerHTML=page.content||'';canvas.contentEditable='false';setEditorMode(false);selectBlock(null);
+  $('editorTitle').value=page.title||'';$('editorSlug').value=page.slug||'';canvas.innerHTML=page.content||'';canvas.contentEditable='false';setEditorMode(true);selectBlock(null);
   if(page.status==='published') await loadFullPagePreview(pageUrl(page.slug),canvas.innerHTML).catch(()=>{});
   else if(livePreview){livePreview.removeAttribute('src');livePreview.srcdoc='<main style="font:16px/1.7 Arial;padding:28px"><h1>'+safe(page.title)+'</h1>'+canvas.innerHTML+'</main>';}
   feedback('CMS sayfası düzenlemeye açıldı. Tam sayfa görünümü aşağıda; metin kutusu değişiklikleri anlık yansıtır.');
