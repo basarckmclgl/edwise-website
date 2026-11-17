@@ -52,6 +52,8 @@ async function hashToken(token) {
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+  const db = env["edwise-deneme"];
+  if (!db) return json({ success: false, message: "Önizleme veritabanı bağlantısı bulunamadı." }, 503);
   const origin = request.headers.get("Origin");
   if (!origin || origin !== new URL(request.url).origin) {
     return json({ success: false, message: "İstek kaynağı geçersiz." }, 403);
@@ -78,7 +80,7 @@ export async function onRequestPost(context) {
       return json({ success: false, message: "Yeni şifreniz mevcut şifrenizden farklı olmalıdır." }, 400);
     }
 
-    const admin = await env.DB.prepare(
+    const admin = await db.prepare(
       "SELECT id, username, password_hash FROM admins WHERE id = ? AND is_active = 1 LIMIT 1"
     ).bind(auth.admin.id).first();
     if (!admin || !(await verifyPassword(currentPassword, admin.password_hash))) {
@@ -95,7 +97,7 @@ export async function onRequestPost(context) {
       "DELETE FROM admin_sessions WHERE admin_id = ? AND token_hash <> ?"
     ).bind(admin.id, currentTokenHash).run();
 
-    await logAudit(env.DB, request, auth.admin, {
+    await logAudit(db, request, auth.admin, {
       action: "password_changed",
       entity_type: "admin",
       entity_id: admin.id,
