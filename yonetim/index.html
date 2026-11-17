@@ -830,7 +830,9 @@ const staticServices=[
   const del=e.target.closest('[data-delete-service]');if(del){if(!confirm('Bu hizmeti silmek istediğine emin misin?'))return;try{const response=await fetch('/api/services',{method:'DELETE',credentials:'same-origin',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({id:del.dataset.deleteService})});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Hizmet silinemedi.');await loadServices();}catch(error){alert(error.message||'Hizmet silinemedi.');}}
  });
 
-\n const logoutButton=document.getElementById("logoutButton");\n if(logoutButton){logoutButton.addEventListener("click",async()=>{if(!window.confirm("Yönetim oturumunu kapatmak istiyor musun?"))return;logoutButton.disabled=true;logoutButton.textContent="Çıkış yapılıyor…";try{const response=await fetch("/api/logout",{method:"POST",credentials:"same-origin",headers:{Accept:"application/json"}});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||"Çıkış yapılamadı.");window.location.replace("/yonetim/giris.html");}catch(error){logoutButton.disabled=false;logoutButton.textContent="↪ Çıkış Yap";window.alert(error.message||"Çıkış sırasında hata oluştu.");}});}\n loadPages();loadServices();
+
+ const logoutButton=document.getElementById("logoutButton");\n if(logoutButton){logoutButton.addEventListener("click",async()=>{if(!window.confirm("Yönetim oturumunu kapatmak istiyor musun?"))return;logoutButton.disabled=true;logoutButton.textContent="Çıkış yapılıyor…";try{const response=await fetch("/api/logout",{method:"POST",credentials:"same-origin",headers:{Accept:"application/json"}});const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||"Çıkış yapılamadı.");window.location.replace("/yonetim/giris.html");}catch(error){logoutButton.disabled=false;logoutButton.textContent="↪ Çıkış Yap";window.alert(error.message||"Çıkış sırasında hata oluştu.");}});}
+ loadPages();loadServices();
 })();;
 </script>
 </main></body></html>
