@@ -1,6 +1,6 @@
 import { requirePermission } from "../../_auth.js";
 const json=(data,status=200)=>Response.json(data,{status,headers:{"Cache-Control":"no-store"}});
-const PREVIEW="pinar-iskelet.edwise.pages.dev";
+const PREVIEW="onizleme.edwise.pages.dev";
 async function sha(value){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(value));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");}
 export async function onRequestPost(context){
  const {request,env}=context;const url=new URL(request.url);
