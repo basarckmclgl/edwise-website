@@ -703,8 +703,31 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
  }
  function pageUrl(slug){return '/pages/sayfa.html?slug='+encodeURIComponent(slug);}
  function renderPages(){
-  const tbody=$('pageRows'); tbody.querySelectorAll('[data-cms-page-row]').forEach(row=>row.remove());
+  const tbody=$('pageRows');
+  tbody.querySelectorAll('[data-cms-page-row]').forEach(row=>row.remove());
+
+  // Statik dosya olarak zaten listelenen sayfaların CMS kopyalarını ikinci kez gösterme.
+  // Kayıtları veya veritabanı içeriklerini silmez; yalnızca mükerrer satırı gizler.
+  const staticPaths=new Set();
+  tbody.querySelectorAll('tr:not([data-cms-page-row])').forEach(row=>{
+   const link=row.querySelector('a.preview-link[href]');
+   if(!link)return;
+   try{
+    const path=new URL(link.getAttribute('href'),location.origin).pathname;
+    staticPaths.add(path==='/'?'/index.html':path);
+   }catch(_){}
+  });
+
+  const seenSlugs=new Set();
   pages.forEach(page=>{
+   const slug=String(page.slug||'').trim().toLocaleLowerCase('tr-TR');
+   if(!slug)return;
+   const canonicalPath=slug==='ana-sayfa'?'/index.html':'/pages/'+slug+'.html';
+
+   // Aynı statik sayfanın CMS kaydını ve aynı slug'a sahip tekrarlı CMS kayıtlarını listeleme.
+   if(staticPaths.has(canonicalPath)||seenSlugs.has(slug))return;
+   seenSlugs.add(slug);
+
    const tr=document.createElement('tr');tr.dataset.cmsPageRow='true';tr.dataset.category='cms';
    const url=pageUrl(page.slug);
    tr.innerHTML='<td><strong>'+safe(page.title)+'</strong><small>CMS sayfası · #'+safe(page.id)+'</small></td><td><span class="page-type">CMS</span></td><td><small>'+safe(url)+'</small></td><td>'+(page.status==='published'?'Yayımlandı':'Taslak')+'</td><td><a class="preview-link" href="'+url+'" target="_blank" rel="noopener">Aç ↗</a> <button type="button" class="app-refresh" data-edit-cms="'+safe(page.id)+'">Düzenle</button> <button type="button" class="app-refresh" data-delete-cms="'+safe(page.id)+'">Sil</button></td>';
