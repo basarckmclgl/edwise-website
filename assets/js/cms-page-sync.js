@@ -42,12 +42,10 @@
    document.documentElement.dataset.cmsPageLoaded="true";
    document.dispatchEvent(new CustomEvent("edwise:cms-page-loaded",{detail:{slug:slug,page:page}}));
   })
-  .catch(()=>{
-   root.replaceChildren();
-   root.classList.add("cms-page-unavailable");
-   const notice=document.createElement("div");notice.className="empty";notice.textContent="Bu sayfa şu anda yayımlanmıyor veya kaldırılmış.";
-   root.append(notice);
-   const robots=document.querySelector('meta[name="robots"]');if(robots)robots.content="noindex, nofollow";
-   document.documentElement.dataset.cmsPageLoaded="missing";
+  .catch(error=>{
+   // CMS kaydı bulunamazsa mevcut statik sayfa içeriğini koru.
+   // API hatası veya yayımlanmamış CMS kaydı, sayfanın gövdesini boşaltmamalı.
+   console.warn("CMS içeriği yüklenemedi; statik sayfa korunuyor:",error);
+   document.documentElement.dataset.cmsPageLoaded="fallback";
   });
 })();
