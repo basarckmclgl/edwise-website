@@ -7,7 +7,7 @@ export async function onRequest(context) {
   // The login page remains public; API handlers continue enforcing their own permissions.
   if ((path.startsWith("/yonetim/") && path !== "/yonetim/giris.html") || path === "/admin" || path === "/admin/") {
     const cookie = context.request.headers.get("Cookie") || "";
-    const match = cookie.match(/(?:^|;\\s*)edwise_session=([^;]*)/);
+    const match = cookie.match(/(?:^|;\s*)edwise_session=([^;]*)/);
     let authorized = false;
     const previewDb = context.env["edwise-deneme"];
     if (match && previewDb) {
