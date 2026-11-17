@@ -108,6 +108,13 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 #pageEditorPanel .editor-surface-tabs button.is-active{background:#fff;color:#54218f;box-shadow:0 1px 4px #34204a18}
 #pageEditorPanel .editor-surface-tabs span{margin-left:auto;font-size:11px;color:#81788e}
 #pageEditorPanel .editor-canvas-surface{padding:0;background:#fff}
+#pageEditorPanel .editor-integrated-surfaces{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0;background:#fff}
+#pageEditorPanel .editor-canvas-surface,#pageEditorPanel .editor-preview-surface{display:block!important;min-width:0;background:#fff;border-right:1px solid #e9e4ef}
+#pageEditorPanel .editor-preview-surface{border-right:0}
+#pageEditorPanel .editor-surface-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:#f8f6fb;border-bottom:1px solid #e9e4ef;color:#786b91;font-size:9px;font-weight:750;letter-spacing:.07em}
+#pageEditorPanel .editor-surface-heading span{font-size:10px;font-weight:500;letter-spacing:0;text-transform:none}
+#pageEditorPanel #editorLivePreview{height:760px;min-height:420px;max-height:1400px}
+@media(max-width:900px){#pageEditorPanel .editor-integrated-surfaces{grid-template-columns:1fr}#pageEditorPanel .editor-canvas-surface{border-right:0;border-bottom:1px solid #e9e4ef}#pageEditorPanel #editorLivePreview{height:620px}}
 #pageEditorPanel .editor-preview-surface{background:#fff}
 #pageEditorPanel .editor-preview-surface[hidden]{display:none}
 #pageEditorPanel #pageCanvas{resize:none;overflow:visible}
@@ -187,16 +194,15 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
  </div>
 </div>
  <div class="editor-page-stage">
- <div class="editor-surface-tabs" role="tablist" aria-label="Sayfa çalışma görünümü">
-  <button type="button" id="editorCanvasView" class="is-active" aria-selected="true">Düzenle</button>
-  <button type="button" id="editorPreviewView" aria-selected="false">Gerçek sayfa görünümü</button>
-  <span id="editorPreviewStatus">Düzenlemeler burada anlık görünür</span>
- </div>
- <div id="editorCanvasSurface" class="editor-canvas-surface">
-  <div id="pageCanvas" contenteditable="false" aria-label="Sayfa içerik alanı" title="Sayfa içeriğini burada doğrudan düzenleyin." style="display:block;width:100%;max-width:100%;min-height:680px;box-sizing:border-box;padding:30px;border:0;border-radius:0;background:#fff;color:#25233a;line-height:1.7;outline:none"><h1>Sayfa başlığınız</h1><p>İçeriğinizi buraya yazın. Metni seçerek biçimlendirebilir, resim ekleyip sürükleyerek yerini değiştirebilirsiniz.</p></div>
- </div>
- <div id="editorPreviewSurface" class="editor-preview-surface" hidden>
-  <iframe id="editorLivePreview" title="Sayfanın gerçek görünümü" style="display:block;width:100%;height:760px;min-height:420px;max-height:1400px;resize:vertical;overflow:auto;border:0;background:#fff" loading="lazy"></iframe>
+ <div class="editor-integrated-surfaces">
+  <section id="editorCanvasSurface" class="editor-canvas-surface">
+   <div class="editor-surface-heading">İÇERİK DÜZENLEME</div>
+   <div id="pageCanvas" contenteditable="false" aria-label="Sayfa içerik alanı" title="Sayfa içeriğini burada doğrudan düzenleyin." style="display:block;width:100%;max-width:100%;min-height:680px;box-sizing:border-box;padding:24px;border:0;border-radius:0;background:#fff;color:#25233a;line-height:1.7;outline:none"><h1>Sayfa başlığınız</h1><p>İçeriğinizi burada düzenleyin. Değişiklikler yan taraftaki gerçek sayfa görünümüne anlık yansır.</p></div>
+  </section>
+  <section id="editorPreviewSurface" class="editor-preview-surface">
+   <div class="editor-surface-heading">GERÇEK SAYFA GÖRÜNÜMÜ <span id="editorPreviewStatus">Önizleme bekleniyor</span></div>
+   <iframe id="editorLivePreview" title="Sayfanın gerçek görünümü" style="display:block;width:100%;height:760px;min-height:420px;max-height:1400px;overflow:auto;border:0;background:#fff" loading="lazy"></iframe>
+  </section>
  </div>
  </div>
 
@@ -528,21 +534,14 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
   editorKind='page';currentServiceId=null;$('editorDescription').style.display='none';$('pageEditorPanel').querySelector('.section-head h2').textContent='Sayfa içerik düzenleyici';$('pageEditorPanel').querySelector('.section-head .eyebrow').textContent='GÖRSEL SAYFA DÜZENLEYİCİ';document.getElementById('view-sayfalar').appendChild($('pageEditorPanel'));
   currentId=null; currentPath=''; $('editorPath').value=''; $('editorTitle').value=''; $('editorSlug').value=''; slugManuallyEdited=false;
   canvas.innerHTML='<h1>Yeni sayfa</h1><p>İçeriğinizi buraya yazın.</p>';
-  canvas.contentEditable='false';setEditorMode(false);selectBlock(null);showEditorSurface('canvas');
+  canvas.contentEditable='false';setEditorMode(false);selectBlock(null);showEditorSurface();
   feedback('Yeni sayfa taslağı hazır. Sayfa alanında çalışabilirsiniz.');
  }
 
- function showEditorSurface(which){
-  const canvasMode=which!=='preview';
-  $('editorCanvasSurface').hidden=!canvasMode;
-  $('editorPreviewSurface').hidden=canvasMode;
-  $('editorCanvasView').classList.toggle('is-active',canvasMode);
-  $('editorPreviewView').classList.toggle('is-active',!canvasMode);
-  $('editorCanvasView').setAttribute('aria-selected',String(canvasMode));
-  $('editorPreviewView').setAttribute('aria-selected',String(!canvasMode));
+ function showEditorSurface(){
+  $('editorCanvasSurface').hidden=false;
+  $('editorPreviewSurface').hidden=false;
  }
- $('editorCanvasView').addEventListener('click',()=>showEditorSurface('canvas'));
- $('editorPreviewView').addEventListener('click',()=>showEditorSurface('preview'));
  const livePreview=$('editorLivePreview');
  function previewDocTarget(doc){return doc.querySelector('main, body > section.single-page-content, body > section.section, body > section');}
  async function loadFullPagePreview(url,content){
@@ -553,7 +552,7 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
    livePreview.onerror=()=>{clearTimeout(timer);reject(new Error('Sayfa önizlemesi yüklenemedi.'));};
    livePreview.src=url;
   });
-  syncLivePreview(content);showEditorSurface('preview');
+  syncLivePreview(content);showEditorSurface();
  }
  function syncLivePreview(content){
   try{
@@ -705,7 +704,7 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
     currentId=existing?Number(existing.id):null;currentPath=pagePath;$('editorPath').value=pagePath;
     $('editorTitle').value=existing?.title||row.querySelector('strong')?.textContent?.trim()||doc.title||'Sayfa';
     $('editorSlug').value=existing?.slug||slugify($('editorTitle').value);slugManuallyEdited=true;
-    canvas.innerHTML=existing?.content||main.innerHTML;canvas.contentEditable='false';setEditorMode(false);selectBlock(null);
+    canvas.innerHTML=existing?.content||main.innerHTML;canvas.contentEditable='false';setEditorMode(false);selectBlock(null);showEditorSurface();
     await loadFullPagePreview(preview.href,canvas.innerHTML);
     feedback('Mevcut sayfanın tam tasarımı yüklendi. Metin kutusundaki değişiklikler canlı görünümde anlık yansır.');
     $('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
@@ -719,7 +718,7 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
   const page=pages.find(item=>String(item.id)===button.dataset.editCms);if(!page)return;
   editorKind='page';currentServiceId=null;$('editorDescription').style.display='none';document.getElementById('view-sayfalar').appendChild($('pageEditorPanel'));$('pageEditorPanel').querySelector('.section-head h2').textContent='Sayfa içerik düzenleyici';$('pageEditorPanel').querySelector('.section-head .eyebrow').textContent='GÖRSEL SAYFA DÜZENLEYİCİ';
   currentId=Number(page.id);currentPath=page.page_path||'';$('editorPath').value=currentPath;slugManuallyEdited=true;
-  $('editorTitle').value=page.title||'';$('editorSlug').value=page.slug||'';canvas.innerHTML=page.content||'';canvas.contentEditable='false';setEditorMode(false);selectBlock(null);
+  $('editorTitle').value=page.title||'';$('editorSlug').value=page.slug||'';canvas.innerHTML=page.content||'';canvas.contentEditable='false';setEditorMode(false);selectBlock(null);showEditorSurface();
   if(page.status==='published') await loadFullPagePreview(pageUrl(page.slug),canvas.innerHTML).catch(()=>{});
   else if(livePreview){livePreview.removeAttribute('src');livePreview.srcdoc='<main style="font:16px/1.7 Arial;padding:28px"><h1>'+safe(page.title)+'</h1>'+canvas.innerHTML+'</main>';}
   feedback('CMS sayfası düzenlemeye açıldı. Tam sayfa görünümü aşağıda; metin kutusu değişiklikleri anlık yansıtır.');
@@ -851,7 +850,7 @@ const staticServices=[
     $('editorDescription').style.display='none';$('editorPath').value=pagePath;
     $('editorTitle').value=existing?.title||doc.title||staticEdit.closest('tr')?.querySelector('strong')?.textContent||'Hizmet';
     $('editorSlug').value=existing?.slug||slugify($('editorTitle').value);slugManuallyEdited=true;
-    canvas.innerHTML=existing?.content||main.innerHTML;canvas.contentEditable='false';setEditorMode(false);selectBlock(null);
+    canvas.innerHTML=existing?.content||main.innerHTML;canvas.contentEditable='false';setEditorMode(false);selectBlock(null);showEditorSurface();
     await loadFullPagePreview(pagePath,canvas.innerHTML).catch(()=>showEditorSurface('canvas'));
     feedback('Mevcut hizmet sayfası düzenlemeye açıldı.');$('pageEditorPanel').scrollIntoView({behavior:'smooth',block:'start'});
    }catch(error){feedback(error.message||'Hizmet sayfası açılamadı.','error');}
