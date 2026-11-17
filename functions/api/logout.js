@@ -28,7 +28,8 @@ export async function onRequestPost({ request, env }) {
       return json({ success: false, message: "İstek kaynağı geçersiz." }, 403);
     }
 
-    const db = env["edwise-deneme"];\n    if (!db) {
+    const db = env["edwise-deneme"];
+    if (!db) {
       return json({ success: false, message: "Veritabanı bağlantısı yok." }, 500);
     }
 
