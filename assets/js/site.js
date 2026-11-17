@@ -329,7 +329,19 @@
 
   }
 
-  menuButton.addEventListener('click', () => setMenuOpen(!siteMenu.classList.contains('open')));
+  // Mobil dokunmatik ekranlarda menü düğmesini doğrudan ve tek noktadan yönet.
+  // onclick ataması, olası eski/çakışan click dinleyicilerinin çift tetiklemesini önler.
+  menuButton.onclick = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setMenuOpen(!siteMenu.classList.contains('open'));
+  };
+  menuButton.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      setMenuOpen(!siteMenu.classList.contains('open'));
+    }
+  });
 
   siteMenu.addEventListener('click', event => { if (event.target.closest('a')) setMenuOpen(false); });
 
