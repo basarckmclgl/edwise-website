@@ -856,34 +856,34 @@ const staticServices=[
    if(window.confirm('Yönetim oturumunu kapatmak istiyor musun?'))endAdminSession('manual');
   });
  }
- // 5 dakika hareketsizlikte güvenli otomatik çıkış.
+ // Yalnızca yönetim panelindeki gerçek işlemler zamanlayıcıyı yeniler.
  (()=>{
-  const IDLE_LIMIT=5*60*1000,ACTIVITY_KEY='edwise_admin_last_activity_v1';
-  let lastActivity=Date.now(),timer=null,lastBroadcast=0;
-  try{const saved=Number(localStorage.getItem(ACTIVITY_KEY));if(Number.isFinite(saved)&&saved>0)lastActivity=Math.max(lastActivity,saved);}catch{}
+  const IDLE_LIMIT=5*60*1000;
+  let lastAction=Date.now(),timer=null;
   function schedule(){
    clearTimeout(timer);
-   const remaining=IDLE_LIMIT-(Date.now()-lastActivity);
+   const remaining=IDLE_LIMIT-(Date.now()-lastAction);
    if(remaining<=0){endAdminSession('idle');return;}
    timer=setTimeout(schedule,remaining);
   }
-  function activity(){
+  function panelAction(event){
    if(sessionEnding)return;
-   const now=Date.now();lastActivity=now;
-   if(now-lastBroadcast>1000){
-    lastBroadcast=now;
-    try{localStorage.setItem(ACTIVITY_KEY,String(now));}catch{}
-   }
+   if(event.target.closest('#logoutButton'))return;
+   lastAction=Date.now();
    schedule();
   }
-  ['pointerdown','keydown','touchstart','scroll','mousemove'].forEach(type=>document.addEventListener(type,activity,{passive:true}));
-  window.addEventListener('storage',event=>{
-   if(event.key!==ACTIVITY_KEY)return;
-   const stamp=Number(event.newValue);
-   if(Number.isFinite(stamp)&&stamp>lastActivity){lastActivity=stamp;schedule();}
+  const panel=document.querySelector('main');
+  const navigation=document.querySelector('aside nav');
+  [panel,navigation].filter(Boolean).forEach(root=>{
+   ['click','input','change','submit'].forEach(type=>
+    root.addEventListener(type,panelAction,true)
+   );
   });
   document.addEventListener('visibilitychange',()=>{
-   if(!document.hidden){const elapsed=Date.now()-lastActivity;if(elapsed>=IDLE_LIMIT)endAdminSession('idle');else schedule();}
+   if(!document.hidden){
+    if(Date.now()-lastAction>=IDLE_LIMIT)endAdminSession('idle');
+    else schedule();
+   }
   });
   schedule();
  })();
