@@ -32,6 +32,14 @@ export async function onRequestPost(context){
     const storageBranch="onizleme";
     if(!db||!env.GITHUB_TOKEN||!env.GITHUB_REPO)return json({success:false,error:"Sunucu ayarları eksik."},500);
 
+    await db.prepare(`CREATE TABLE IF NOT EXISTS media (
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ file_name TEXT NOT NULL UNIQUE,
+ file_url TEXT NOT NULL,
+ file_type TEXT NOT NULL,
+ created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);`).run();
+
     const headers={"Authorization":"Bearer "+env.GITHUB_TOKEN,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"EDWISE-CMS"};
     const sources=[
       {path:"media/4117a118-e1e2-47b0-b56b-74833991107a.png",copy:false},
