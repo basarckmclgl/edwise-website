@@ -205,7 +205,7 @@ main{flex:1;min-width:0;padding:32px clamp(18px,4vw,54px)}header{display:flex;ju
 <section class="panel" style="margin-top:22px">
 <div class="section-head"><div><div class="eyebrow">HİZMET İÇERİKLERİ</div><h2>Hizmetler</h2><p class="section-intro">Hizmet kayıtlarını listeleyin, düzenleyin ve yayın durumlarını yönetin.</p></div><button type="button" id="serviceNew" class="menu-export">＋ Yeni Hizmet</button></div>
 <div class="page-toolbar"><div class="page-tools"><input id="serviceSearch" type="search" placeholder="Hizmet adı veya açıklamada ara..." aria-label="Hizmetlerde ara"><select id="serviceCategory" aria-label="Hizmet durumuna göre filtrele"><option value="all">Tüm durumlar</option><option value="published">Yayında</option><option value="draft">Taslak</option></select></div><span class="page-count" id="serviceCount">Hizmetler yükleniyor…</span></div>
-<div class="table-wrap"><table class="pages-table"><thead><tr><th>Hizmet adı</th><th>URL</th><th>Durum</th><th>Son güncelleme</th><th>İşlem</th></tr></thead><tbody id="serviceRows"><tr><td colspan="5">Hizmetler yükleniyor…</td></tr></tbody></table><div class="no-results" id="noServices">Henüz hizmet kaydı bulunmuyor.</div></div>
+<div class="table-wrap"><table class="pages-table"><thead><tr><th>Hizmet adı</th><th>Bağlantı adı</th><th>Durum</th><th>Son güncelleme</th><th>İşlem</th></tr></thead><tbody id="serviceRows"><tr><td colspan="5">Hizmetler yükleniyor…</td></tr></tbody></table><div class="no-results" id="noServices">Henüz hizmet kaydı bulunmuyor.</div></div>
 </section>
 </div>
 <div id="view-basvurular" class="module-view" hidden>
@@ -387,7 +387,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
 (()=> {
  const root=document.getElementById('view-sayfalar'); if(!root)return;
  const $=id=>document.getElementById(id), canvas=$('pageCanvas');
- let currentId=null, pages=[], currentPath='',editorKind='page',currentServiceId=null,services=[];
+ let currentId=null, pages=[], currentPath='',editorKind='page',currentServiceId=null,currentServiceImage='',currentServiceSort=0,services=[];
  const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function slugify(t){return String(t||'').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ö/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
  function feedback(message,type='info'){$('editorFeedback').textContent=message;$('editorFeedback').className='page-count '+(type==='error'?'error':'');}
@@ -482,12 +482,12 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
    services=Array.isArray(data.services)?data.services:[];
    const term=($('serviceSearch')?.value||'').toLocaleLowerCase('tr-TR').trim(),filter=$('serviceCategory')?.value||'all';
    const shown=services.filter(item=>(filter==='all'||item.status===filter)&&((item.title+' '+item.description).toLocaleLowerCase('tr-TR').includes(term)));
-   body.innerHTML=shown.map(item=>'<tr><td><strong>'+safe(item.title)+'</strong><small>'+safe(item.description||'Açıklama eklenmemiş')+'</small></td><td><small>/hizmetler/'+safe(item.slug)+'</small></td><td><span class="page-type">'+(item.status==='published'?'Yayında':'Taslak')+'</span></td><td><small>'+safe(item.updated_at||'—')+'</small></td><td><button type="button" class="app-refresh" data-edit-service="'+safe(item.id)+'">Düzenle</button> <button type="button" class="app-refresh" data-delete-service="'+safe(item.id)+'">Sil</button></td></tr>').join('');
+   body.innerHTML=shown.map(item=>'<tr><td><strong>'+safe(item.title)+'</strong><small>'+safe(item.description||'Açıklama eklenmemiş')+'</small></td><td><small>'+safe(item.slug)+'</small></td><td><span class="page-type">'+(item.status==='published'?'Yayında':'Taslak')+'</span></td><td><small>'+safe(item.updated_at||'—')+'</small></td><td><button type="button" class="app-refresh" data-edit-service="'+safe(item.id)+'">Düzenle</button> <button type="button" class="app-refresh" data-delete-service="'+safe(item.id)+'">Sil</button></td></tr>').join('');
    $('serviceCount').textContent=shown.length+' hizmet gösteriliyor';$('noServices').style.display=shown.length?'none':'block';
   }catch(error){body.innerHTML='<tr><td colspan="5">'+safe(error.message||'Hizmetler yüklenemedi.')+'</td></tr>';$('serviceCount').textContent='Veri alınamadı';}
  }
  function openServiceEditor(service){
-  editorKind='service';currentServiceId=service?service.id:null;currentId=null;currentPath='';
+  editorKind='service';currentServiceId=service?service.id:null;currentServiceImage=service?.image_url||'';currentServiceSort=Number(service?.sort_order||0);currentId=null;currentPath='';
   $('view-hizmetler').appendChild($('pageEditorPanel'));
   $('pageEditorPanel').querySelector('.section-head h2').textContent='Hizmet içerik düzenleyici';
   $('pageEditorPanel').querySelector('.section-head .eyebrow').textContent='GÖRSEL HİZMET DÜZENLEYİCİ';
@@ -540,7 +540,7 @@ render();if(dirty)feedback('Önceki yerel menü taslağı yüklendi. Canlı site
   try{
    let response,data;
    if(editorKind==='service'){
-    const payload={id:currentServiceId,title,slug,description:$('editorDescription').value.trim(),image_url:'',content,status,sort_order:0};
+    const payload={id:currentServiceId,title,slug,description:$('editorDescription').value.trim(),image_url:currentServiceImage,content,status,sort_order:currentServiceSort};
     response=await fetch('/api/services',{method:currentServiceId?'PUT':'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
     data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Hizmet kaydedilemedi.');
     if(!currentServiceId)currentServiceId=data.id;await loadServices();feedback(status==='published'?'Hizmet yayımlandı.':'Hizmet taslağı kaydedildi.');
