@@ -16,6 +16,14 @@ export async function onRequestPost(context) {
       return Response.json({ success: false, error: "Sunucu ayarları eksik." }, { status: 500 });
     }
 
+    await db.prepare(`CREATE TABLE IF NOT EXISTS media (
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ file_name TEXT NOT NULL UNIQUE,
+ file_url TEXT NOT NULL,
+ file_type TEXT NOT NULL,
+ created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);`).run();
+
     const body = await request.json();
     let fileName = typeof body.file_name === "string" ? body.file_name : "";
 
