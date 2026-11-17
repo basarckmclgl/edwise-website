@@ -31,7 +31,7 @@ export async function onRequestGet({ params, env }) {
 
   try {
     const upstream = await fetch(
-      "https://api.github.com/repos/" + repo + "/contents/media/" + filename + "?ref=main",
+      "https://api.github.com/repos/" + repo + "/contents/media/" + filename + "?ref=onizleme",
       {
         headers: {
           "Authorization": "Bearer " + token,
