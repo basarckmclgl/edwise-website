@@ -699,7 +699,7 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
    const doc=livePreview?.contentDocument,target=doc&&previewDocTarget(doc);
    if(!target){showFallbackPreview(content,false);return;}
    target.innerHTML=content;
-   const status=$('editorPreviewStatus');if(status)status.textContent='Gerçek sayfa görünümü güncel';
+   const status=$('editorPreviewStatus');if(status)status.textContent='Gerçek sayfa üzerinde düzenleme açık';
    resizeLivePreview();
   }catch(error){showFallbackPreview(content,false);}
  }
