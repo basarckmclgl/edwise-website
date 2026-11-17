@@ -585,6 +585,8 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
  const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function slugify(t){return String(t||'').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ö/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
  function comparableSlug(value){return slugify(value).replace(/-/g,'');}
+ function staticPathSlug(path){const normalized=String(path||'').split('?')[0].replace(/\\/g,'/');if(normalized==='/'||normalized==='/index.html')return 'anasayfa';const file=normalized.split('/').pop()||'';return file.replace(/\\.html?$/i,'');}
+ function cmsPageForStaticPath(path){const target=staticPathSlug(path);return pages.find(page=>String(page.page_path||'').split('?')[0]===path)||pages.find(page=>comparableSlug(page.slug)===comparableSlug(target));}
  function feedback(message,type='info'){$('editorFeedback').textContent=message;$('editorFeedback').className='page-count '+(type==='error'?'error':'');}
  let slugManuallyEdited=false;
  $('editorSlug').addEventListener('input',()=>{slugManuallyEdited=true;});
@@ -707,13 +709,15 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
   const tbody=$('pageRows');
   tbody.querySelectorAll('[data-cms-page-row]').forEach(row=>row.remove());
 
-  // Statik dosyası bulunan sayfaların CMS karşılıklarını ikinci satır olarak gösterme.
-  // CMS kaydı silinmez; asıl dosya satırındaki Düzenle işlemi bu kaydı açar.
-  const staticSlugs=new Set([...tbody.querySelectorAll('tr:not([data-cms-page-row])')]
-   .map(row=>comparableSlug(row.querySelector('strong')?.textContent||'')).filter(Boolean));
+  // Statik dosya satırı, aynı dosyaya bağlı CMS kaydının tek görünür temsilidir.
+  // Eşleştirme başlıktan değil, dosya yolundan/slug'dan yapılır; DB kayıtları silinmez.
+  const staticPaths=new Set([...tbody.querySelectorAll('tr:not([data-cms-page-row])')]
+   .map(row=>{const link=row.querySelector('td:nth-child(3) a.preview-link');return link?new URL(link.getAttribute('href'),location.origin).pathname:null;}).filter(Boolean));
   pages.forEach(page=>{
    const slug=String(page.slug||'').trim().toLocaleLowerCase('tr-TR');
-   if(!slug||staticSlugs.has(comparableSlug(slug)))return;
+   const linkedPath=String(page.page_path||'').split('?')[0];
+   const represented=staticPaths.has(linkedPath)||[...staticPaths].some(path=>comparableSlug(staticPathSlug(path))===comparableSlug(slug));
+   if(!slug||represented)return;
 
    const tr=document.createElement('tr');tr.dataset.cmsPageRow='true';tr.dataset.category='cms';
    const url=pageUrl(page.slug);
@@ -833,9 +837,7 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
     const main=doc.querySelector('main.single-page-content, main, body > section.single-page-content, body > section.section, body > section');
     if(!main)throw new Error('Sayfanın içerik alanı bulunamadı; mevcut sayfa değiştirilmedi.');
     const rowTitle=row.querySelector('strong')?.textContent?.trim()||doc.title||'Sayfa';
-    const pathMatch=pages.find(page=>page.page_path===pagePath);
-    const titleSlug=slugify(rowTitle);
-    const existing=pathMatch||pages.find(page=>comparableSlug(page.slug)===comparableSlug(titleSlug));
+    const existing=cmsPageForStaticPath(pagePath)||null;
     currentId=existing?Number(existing.id):null;currentPath=pagePath;$('editorPath').value=pagePath;
     $('editorTitle').value=existing?.title||rowTitle;
     $('editorSlug').value=existing?.slug||slugify($('editorTitle').value);slugManuallyEdited=true;
