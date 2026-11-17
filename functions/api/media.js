@@ -6,7 +6,7 @@ export async function onRequestGet(context) {
     const auth = await requireEditor(context);
     if (auth.response) return auth.response;
 
-    const db = context.env.DB;
+    const db = context.env["edwise-deneme"];
 
     if (!db) {
       return Response.json(
