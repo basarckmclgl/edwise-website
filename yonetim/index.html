@@ -629,8 +629,8 @@ ids.forEach(id=>$(id).addEventListener('input',preview));$('seoSave').addEventLi
    let html=await response.text();
    const base='<base href="'+sourceUrl.href.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'">';
    // srcdoc içinde göreli CSS, görsel ve script yolları kaynak sayfaya göre çözülür.
-   html=html.replace(/<base\\b[^>]*>/i,'');
-   if(/<head\\b[^>]*>/i.test(html))html=html.replace(/<head\\b[^>]*>/i,match=>match+base);
+   html=html.replace(/<base\b[^>]*>/i,'');
+   if(/<head\b[^>]*>/i.test(html))html=html.replace(/<head\b[^>]*>/i,match=>match+base);
    else html='<!doctype html><html lang="tr"><head>'+base+'</head><body>'+html+'</body></html>';
    showEditorSurface('preview');
    livePreview.loading='eager';
