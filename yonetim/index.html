@@ -833,23 +833,60 @@ const staticServices=[
 
 
  const logoutButton=document.getElementById('logoutButton');
+ let sessionEnding=false;
+ async function endAdminSession(reason){
+  if(sessionEnding)return;
+  sessionEnding=true;
+  if(logoutButton){logoutButton.disabled=true;logoutButton.textContent='Çıkış yapılıyor…';}
+  try{
+   const response=await fetch('/api/logout',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
+   const data=await response.json();
+   if(!response.ok||!data.success)throw new Error(data.message||'Oturum kapatılamadı.');
+   const target=reason==='idle'?'/yonetim/giris.html?reason=idle':'/yonetim/giris.html';
+   window.location.replace(target);
+  }catch(error){
+   sessionEnding=false;
+   if(logoutButton){logoutButton.disabled=false;logoutButton.textContent='↪ Çıkış Yap';}
+   if(reason!=='idle')window.alert(error.message||'Çıkış sırasında hata oluştu.');
+   else window.location.replace('/yonetim/giris.html?reason=idle');
+  }
+ }
  if(logoutButton){
-  logoutButton.addEventListener('click',async()=>{
-   if(!window.confirm('Yönetim oturumunu kapatmak istiyor musun?'))return;
-   logoutButton.disabled=true;
-   logoutButton.textContent='Çıkış yapılıyor…';
-   try{
-    const response=await fetch('/api/logout',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{Accept:'application/json'}});
-    const data=await response.json();
-    if(!response.ok||!data.success)throw new Error(data.message||'Oturum kapatılamadı.');
-    window.location.assign('/yonetim/giris.html');
-   }catch(error){
-    logoutButton.disabled=false;
-    logoutButton.textContent='↪ Çıkış Yap';
-    window.alert(error.message||'Çıkış sırasında hata oluştu.');
-   }
+  logoutButton.addEventListener('click',()=>{
+   if(window.confirm('Yönetim oturumunu kapatmak istiyor musun?'))endAdminSession('manual');
   });
  }
+ // 5 dakika hareketsizlikte güvenli otomatik çıkış.
+ (()=>{
+  const IDLE_LIMIT=5*60*1000,ACTIVITY_KEY='edwise_admin_last_activity_v1';
+  let lastActivity=Date.now(),timer=null,lastBroadcast=0;
+  try{const saved=Number(localStorage.getItem(ACTIVITY_KEY));if(Number.isFinite(saved)&&saved>0)lastActivity=Math.max(lastActivity,saved);}catch{}
+  function schedule(){
+   clearTimeout(timer);
+   const remaining=IDLE_LIMIT-(Date.now()-lastActivity);
+   if(remaining<=0){endAdminSession('idle');return;}
+   timer=setTimeout(schedule,remaining);
+  }
+  function activity(){
+   if(sessionEnding)return;
+   const now=Date.now();lastActivity=now;
+   if(now-lastBroadcast>1000){
+    lastBroadcast=now;
+    try{localStorage.setItem(ACTIVITY_KEY,String(now));}catch{}
+   }
+   schedule();
+  }
+  ['pointerdown','keydown','touchstart','scroll','mousemove'].forEach(type=>document.addEventListener(type,activity,{passive:true}));
+  window.addEventListener('storage',event=>{
+   if(event.key!==ACTIVITY_KEY)return;
+   const stamp=Number(event.newValue);
+   if(Number.isFinite(stamp)&&stamp>lastActivity){lastActivity=stamp;schedule();}
+  });
+  document.addEventListener('visibilitychange',()=>{
+   if(!document.hidden){const elapsed=Date.now()-lastActivity;if(elapsed>=IDLE_LIMIT)endAdminSession('idle');else schedule();}
+  });
+  schedule();
+ })();
  loadPages();loadServices();
 })();;
 </script>
