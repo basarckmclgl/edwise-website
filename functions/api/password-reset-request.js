@@ -26,7 +26,7 @@ export async function onRequestPost({request,env}){
     const ip=request.headers.get("CF-Connecting-IP")||"unknown";
     const ipHash=await hash(ip);
     const now=new Date().toISOString();
-    await env.DB.prepare("INSERT INTO password_reset_limits(ip_hash,window_start,attempts) VALUES(?,?,1) ON CONFLICT(ip_hash) DO UPDATE SET attempts=CASE WHEN (julianday('now')-julianday(window_start))*24>1 THEN 1 ELSE attempts+1 END,window_start=CASE WHEN (julianday('now')-julianday(window_start))*24>1 THEN excluded.window_start ELSE window_start END").bind(ipHash,now).run();
+    await env.DB.prepare("INSERT INTO password_reset_limits(ip_hash,window_start,attempts) VALUES(?,?,1) ON CONFLICT(ip_hash) DO UPDATE SET attempts=CASE WHEN (julianday('now')-julianday(window_start))*1440>10 THEN 1 ELSE attempts+1 END,window_start=CASE WHEN (julianday('now')-julianday(window_start))*1440>10 THEN excluded.window_start ELSE window_start END").bind(ipHash,now).run();
     const limit=await env.DB.prepare("SELECT attempts FROM password_reset_limits WHERE ip_hash=?").bind(ipHash).first();
 
     if(Number(limit?.attempts)>5){
