@@ -1,6 +1,6 @@
 import { requirePermission } from "../../_auth.js";
 const json=(data,status=200)=>Response.json(data,{status,headers:{"Cache-Control":"no-store"}});
-const PREVIEW="pinar-iskelet.edwise.pages.dev";
+const PREVIEW="onizleme.edwise.pages.dev";
 function b64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0));}
 async function cryptoKey(env){if(!env.SEO_TOKEN_ENCRYPTION_KEY)throw new Error("SEO_TOKEN_ENCRYPTION_KEY Secret bulunamadı.");const raw=b64(env.SEO_TOKEN_ENCRYPTION_KEY);if(raw.length!==32)throw new Error("Şifreleme anahtarı 32 byte değil.");return crypto.subtle.importKey("raw",raw,{name:"AES-GCM"},false,["decrypt"]);}
 async function getAccessToken(env,db){
