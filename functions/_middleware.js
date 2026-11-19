@@ -6,19 +6,6 @@ export async function onRequest(context) {
   // Require a valid preview admin session before serving any management page.
   // The login page remains public; API handlers continue enforcing their own permissions.
   const isPublicAuthPage = /^\/yonetim\/(?:giris|sifre-sifirla)(?:\.html)?\/?$/.test(path);
-  // Support extensionless login/reset URLs used by shared mobile links.
-  const authPageAlias = path.match(/^\/yonetim\/(giris|sifre-sifirla)\/?$/);
-  if (authPageAlias) {
-    const target = new URL(`/yonetim/${authPageAlias[1]}.html${url.search}`, url.origin);
-    return new Response(null, {
-      status: 302,
-      headers: {
-        "Location": target.toString(),
-        "Cache-Control": "no-store, max-age=0",
-        "Pragma": "no-cache"
-      }
-    });
-  }
   if ((path.startsWith("/yonetim/") && !isPublicAuthPage) || path === "/yonetim" || path === "/admin" || path === "/admin/") {
     const cookie = context.request.headers.get("Cookie") || "";
     const match = cookie.match(/(?:^|;\s*)edwise_session=([^;]*)/);
