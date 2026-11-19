@@ -5,8 +5,8 @@ export async function onRequest(context) {
   const path = url.pathname;
   // Require a valid preview admin session before serving any management page.
   // The login page remains public; API handlers continue enforcing their own permissions.
-  const isLoginPage = /^\/yonetim\/giris(?:\.html)?\/?$/.test(path);
-  if ((path.startsWith("/yonetim/") && !isLoginPage) || path === "/yonetim" || path === "/admin" || path === "/admin/") {
+  const isPublicAuthPage = /^\/yonetim\/(?:giris|sifre-sifirla)(?:\.html)?\/?$/.test(path);
+  if ((path.startsWith("/yonetim/") && !isPublicAuthPage) || path === "/yonetim" || path === "/admin" || path === "/admin/") {
     const cookie = context.request.headers.get("Cookie") || "";
     const match = cookie.match(/(?:^|;\s*)edwise_session=([^;]*)/);
     let authorized = false;
