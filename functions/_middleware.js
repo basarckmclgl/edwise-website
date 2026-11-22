@@ -3,52 +3,12 @@ const MAINTENANCE_HTML = "<!doctype html><html lang=\"tr\"><meta charset=\"utf-8
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const path = url.pathname;
-  // Require a valid preview admin session before serving any management page.
-  // The login page remains public; API handlers continue enforcing their own permissions.
-  const isPublicAuthPage = /^\/yonetim\/(?:giris|sifre-sifirla)(?:\.html)?\/?$/.test(path);
-  if ((path.startsWith("/yonetim/") && !isPublicAuthPage) || path === "/yonetim" || path === "/admin" || path === "/admin/") {
-    const cookie = context.request.headers.get("Cookie") || "";
-    const match = cookie.match(/(?:^|;\s*)edwise_session=([^;]*)/);
-    let authorized = false;
-    const previewDb = context.env["edwise-deneme"];
-    if (match && previewDb) {
-      try {
-        const token = decodeURIComponent(match[1]);
-        if (/^[a-f0-9]{64}$/i.test(token)) {
-          const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
-          const tokenHash = Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2, "0")).join("");
-          const session = await previewDb.prepare(`
-            SELECT s.id
-            FROM admin_sessions s
-            INNER JOIN admins a ON a.id = s.admin_id
-            WHERE s.token_hash = ?
-              AND datetime(s.expires_at) > datetime('now')
-              AND a.is_active = 1
-            LIMIT 1
-          `).bind(tokenHash).first();
-          authorized = Boolean(session);
-        }
-      } catch (error) {
-        console.error("EDWISE preview page authentication failed:", error);
-      }
-    }
-    if (!authorized) {
-      const login = new URL("/yonetim/giris.html", url.origin);
-      login.searchParams.set("next", path + url.search);
-      return new Response(null, {
-        status: 302,
-        headers: {
-          "Location": login.toString(),
-          "Cache-Control": "no-store, max-age=0",
-          "Pragma": "no-cache"
-        }
-      });
-    }
+  // EDWISE preview administration has been retired. Block all panel routes.
+  if (path === "/yonetim" || path.startsWith("/yonetim/") || path === "/admin" || path.startsWith("/admin/")) {
+    return new Response("Not Found", {status:404,headers:{"Content-Type":"text/plain; charset=utf-8","Cache-Control":"no-store, max-age=0","X-Content-Type-Options":"nosniff"}});
   }
-  // Serve the management panel at /admin without changing the browser URL.
-  // Only the exact entry routes are mapped; unknown /admin/* paths remain unavailable.
-  const isAdminEntry = path === "/admin" || path === "/admin/";
-  if (path.startsWith("/admin/") && !isAdminEntry) {
+  const retiredAdminApi = new Set(["/api/login", "/api/logout", "/api/me", "/api/change-password", "/api/password-reset-request", "/api/password-reset", "/api/session-work"]);
+  if (retiredAdminApi.has(path) || path.startsWith("/api/admin-")) {
     return new Response("Not Found", {status:404,headers:{"Content-Type":"text/plain; charset=utf-8","Cache-Control":"no-store, max-age=0","X-Content-Type-Options":"nosniff"}});
   }
   if (!path.startsWith("/api/") && context.env.DB) {
