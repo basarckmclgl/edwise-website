@@ -4,7 +4,11 @@ export async function onRequest(context) {
   const url = new URL(context.request.url);
   const path = url.pathname;
   // The administration interface has been retired. Do not serve cached or residual admin routes.
-  if (path === "/admin" || path.startsWith("/admin/")) {
+  if (path === "/admin" || path.startsWith("/admin/") || path === "/yonetim" || path.startsWith("/yonetim/")) {
+    return new Response("Not Found", {status:404,headers:{"Content-Type":"text/plain; charset=utf-8","Cache-Control":"no-store, max-age=0","X-Content-Type-Options":"nosniff"}});
+  }
+  const retiredAdminApi = new Set(["/api/login", "/api/logout", "/api/me", "/api/change-password", "/api/password-reset-request", "/api/password-reset", "/api/session-work"]);
+  if (retiredAdminApi.has(path) || path.startsWith("/api/admin-")) {
     return new Response("Not Found", {status:404,headers:{"Content-Type":"text/plain; charset=utf-8","Cache-Control":"no-store, max-age=0","X-Content-Type-Options":"nosniff"}});
   }
   if (!path.startsWith("/api/") && context.env.DB) {
